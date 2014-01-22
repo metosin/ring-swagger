@@ -128,11 +128,11 @@
        :info (select-keys parameters info-keys)}
       (select-keys parameters top-level-keys))))
 
-(defn api-declaration [details basepath]
+(defn api-declaration [details request]
   (response
     {:apiVersion "1.0.0"
      :swaggerVersion "1.2"
-     :basePath basepath
+     :basePath (extract-basepath request)
      :resourcePath "" ;; TODO: should be supported?
      :produces ["application/json"]
      :models (apply transform-models (:models details))
