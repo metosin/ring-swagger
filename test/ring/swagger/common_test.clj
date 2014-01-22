@@ -31,19 +31,22 @@
 (fact "remove-empty-keys"
   (remove-empty-keys {:a nil :b false :c 0}) => {:b false :c 0})
 
-(def Abba "abba")
+(def Abba "jabba")
 
 (fact "name-of"
-  (name-of (resolve 'Abba)) => "Abba"
+  (name-of Abba)   => "jabba"
   (name-of 'Abba)  => "Abba"
+  (name-of #'Abba) => "Abba"
   (name-of "Abba") => "Abba"
   (name-of :Abba)  => "Abba"
+  (name-of {})     => nil
   (name-of nil)    => nil)
 
 (fact "value-of"
-  (value-of Abba) => "abba"
-  (value-of 'Abba) => "abba"
-  (value-of #'Abba) => "abba")
+  (value-of Abba)   => "jabba"
+  (value-of 'Abba)  => "jabba"
+  (value-of #'Abba) => "jabba"
+  (value-of :abba   => :abba))
 
 (fact "extractors"
 
