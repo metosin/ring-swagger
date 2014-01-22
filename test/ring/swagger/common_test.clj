@@ -28,21 +28,6 @@
   (->map *tuples) => *map
   (->map *record) => *map)
 
-(fact "record?"
-  (record? *map) => false
-  (record? *tuples) => false
-  (record? *record) => true)
-
-(fact "map-def"
-  (let [f (map-def (fn->> vals (apply +)))]
-    (f {:x 1 :y 2 :z 3}) => 6
-    (f "x") => "x"))
-
-(fact "map-defn"
-  (let [f (map-defn [{:keys [x y z]}] (+ x y z))]
-    (f {:x 1 :y 2 :z 3}) => 6
-    (f "x") => "x"))
-
 (fact "remove-empty-keys"
   (remove-empty-keys {:a nil :b false :c 0}) => {:b false :c 0})
 
@@ -63,8 +48,8 @@
 (fact "extractors"
 
   (fact "extract-map"
-    (extract-map-parameters [{:a 1 :b 2}]) => [{} [{:a 1 :b 2}]]
-    (extract-map-parameters [{:a 1 :b 2} ..any..]) => [{:a 1 :b 2} [..any..]])
+    (extract-parameters [{:a 1 :b 2}]) => [{} [{:a 1 :b 2}]]
+    (extract-parameters [{:a 1 :b 2} ..any..]) => [{:a 1 :b 2} [..any..]])
 
   (fact "extract-parameters"
     (extract-parameters [:kikka 1 :kakka 2 ..any..]) => [{:kikka 1 :kakka 2} [..any..]]
