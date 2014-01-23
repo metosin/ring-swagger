@@ -140,20 +140,19 @@
                (fn [{:keys [method uri metadata] :as route}]
                  (let [{:keys [return summary notes nickname parameters]} metadata]
                    {:path (swagger-path uri)
-                    :operations
-                    [{:method (-> method name .toUpperCase)
-                      :summary (or summary "")
-                      :notes (or notes "")
-                      :type (or (schema/schema-name return) "")
-                      :nickname (or nickname (generate-nick route))
-                      :parameters (into
-                                    parameters
-                                    (map
-                                      (fn [path-parameter]
-                                        {:name (name path-parameter)
-                                         :description ""
-                                         :required true
-                                         :type "string"
-                                         :paramType "path"})
-                                      (extract-path-parameters uri)))}]}))
-                 (:routes details))})))
+                    :operations [{:method (-> method name .toUpperCase)
+                                  :summary (or summary "")
+                                  :notes (or notes "")
+                                  :type (or (schema/schema-name return) "")
+                                  :nickname (or nickname (generate-nick route))
+                                  :parameters (into
+                                                parameters
+                                                (map
+                                                  (fn [path-parameter]
+                                                    {:name (name path-parameter)
+                                                     :description ""
+                                                     :required true
+                                                     :type "string"
+                                                     :paramType "path"})
+                                                  (extract-path-parameters uri)))}]}))
+               (:routes details))})))

@@ -13,9 +13,13 @@
         old-meta (meta pred)]
     (with-meta pred (merge old-meta metadata))))
 
+(defn coerce [model value]
+  ((sc/coercer (value-of model) sc/json-coercion-matcher) value))
+
 (defmacro defmodel [model form]
-  `(def ~model ~(str model) (with-meta ~form {:model (var ~model)})))
+  `(do
+     (def ~model ~(str model) (with-meta ~form {:model (var ~model)}))
+     (defn ~(symbol (str "coerce-" model "*"))
+       [x#] ((sc/coercer ~form sc/json-coercion-matcher) x#))))
 
 (defn schema-name [x] (-> x value-of meta :model name-of))
-
-(defn coerce [model] (sc/coercer (value-of model) sc/json-coercion-matcher))
