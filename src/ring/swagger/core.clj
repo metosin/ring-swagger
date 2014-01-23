@@ -127,12 +127,12 @@
                swagger)
        :info (select-keys parameters api-declaration-keys)})))
 
-(defn api-declaration [parameters details request]
+(defn api-declaration [parameters basepath details]
   (response
     (merge
       swagger-defaults
       (select-keys parameters [:apiVersion])
-      {:basePath (extract-basepath request)
+      {:basePath basepath
        :resourcePath ""
        :produces ["application/json"]
        :models (apply transform-models (:models details))

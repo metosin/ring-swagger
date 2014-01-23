@@ -122,3 +122,17 @@
                                                                             :description ""}
                                                                            {:path "/api2"
                                                                             :description ..desc..}]))))
+
+(fact "api-declaration"
+  (fact "empty api"
+    (api-declaration
+      {:apiVersion ..version..}
+      ..basepath..
+      {}) => (has-body {:swaggerVersion "1.2"
+                        :apiVersion ..version..
+                        :basePath ..basepath..
+                        :resourcePath ""
+                        :produces ["application/json"]
+                        :models {}
+                        :apis []})))
+
