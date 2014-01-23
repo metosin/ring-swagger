@@ -123,7 +123,7 @@
       {:apis (map
                (fn [[api details]]
                  {:path (str "/" (name api))
-                  :description (:description details)})
+                  :description (or (:description details) "")})
                swagger)
        :info (select-keys parameters api-declaration-keys)})))
 

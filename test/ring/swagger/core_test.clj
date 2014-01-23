@@ -86,10 +86,10 @@
 ;; Final json
 ;;
 
-(defn has-body [expected] (fn [x] (= (-> x :body) expected)))
-(defn has-apis [expected] (fn [x] (= (-> x :body :apis) expected)))
+(defn has-body [expected] (chatty-checker [x] (= (-> x :body) expected)))
+(defn has-apis [expected] (chatty-checker [x] (= (-> x :body :apis) expected)))
 
-(facts "swagger-json"
+(facts "api-listing"
   (fact "without parameters"
     (api-listing {} {}) => (has-body
                              {:swaggerVersion "1.2"
@@ -113,7 +113,12 @@
                                                                :license ..licence..
                                                                :licenseUrl ..licenceUrl..}
                                                         :apis []}))
-
-  (fact "with api"
-    (fact "no apis"
-      (api-listing ..map.. {}) => (has-apis []))))
+  (fact "apis"
+    (fact "none"
+      (api-listing ..map.. {}) => (has-apis []))
+    (fact "some"
+      (api-listing ..map.. {"api1" {}
+                            "api2" {:description ..desc..}}) => (has-apis [{:path "/api1"
+                                                                            :description ""}
+                                                                           {:path "/api2"
+                                                                            :description ..desc..}]))))
