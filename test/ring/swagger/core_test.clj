@@ -140,7 +140,12 @@
       {:apiVersion ..version..}
       ..basepath..
       {:models [#'Pet]
-       :routes [(->Route :get "/" {:return 'Pet})]})
+       :routes [(->Route
+                  :get
+                  "/pets/:id"
+                  {:return 'Pet
+                   :summary ..summary..
+                   :notes ..notes..})]})
 
     => (has-body
          {:swaggerVersion "1.2"
@@ -152,9 +157,13 @@
                    :Tag Tag'
                    :Category Category'}
           :apis [{:operations [{:method "GET"
-                                :nickname "get"
-                                :notes ""
-                                :parameters nil
-                                :summary ""
+                                :nickname "getPetsById"
+                                :notes ..notes..
+                                :parameters [{:description ""
+                                              :name "id"
+                                              :paramType "path"
+                                              :required true
+                                              :type "string"}]
+                                :summary ..summary..
                                 :type "Pet"}]
-                  :path "/"}]})))
+                  :path "/pets/{id}"}]})))
