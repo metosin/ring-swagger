@@ -86,25 +86,34 @@
 ;; Final json
 ;;
 
+(defn has-body [expected] (fn [x] (= (-> x :body) expected)))
+(defn has-apis [expected] (fn [x] (= (-> x :body :apis) expected)))
+
 (facts "swagger-json"
   (fact "without parameters"
-    (:body (api-listing {} {})) => {:swaggerVersion "1.2"
-                                    :apiVersion "0.0.1"
-                                    :apis []
-                                    :info {}})
+    (api-listing {} {}) => (has-body
+                             {:swaggerVersion "1.2"
+                              :apiVersion "0.0.1"
+                              :apis []
+                              :info {}}))
   (fact "with parameters"
-    (:body (api-listing {:apiVersion ...version...
-                         :title ..title..
-                         :description ..description..
-                         :termsOfServiceUrl ..terms..
-                         :contact ..contact..
-                         :license ..licence..
-                         :licenseUrl ..licenceUrl..} {})) => {:swaggerVersion "1.2"
-                                                              :apiVersion ...version...
-                                                              :info {:title ..title..
-                                                                     :description ..description..
-                                                                     :termsOfServiceUrl ..terms..
-                                                                     :contact ..contact..
-                                                                     :license ..licence..
-                                                                     :licenseUrl ..licenceUrl..}
-                                                              :apis []}))
+    (api-listing {:apiVersion ...version...
+                  :title ..title..
+                  :description ..description..
+                  :termsOfServiceUrl ..terms..
+                  :contact ..contact..
+                  :license ..licence..
+                  :licenseUrl ..licenceUrl..} {}) => (has-body
+                                                       {:swaggerVersion "1.2"
+                                                        :apiVersion ...version...
+                                                        :info {:title ..title..
+                                                               :description ..description..
+                                                               :termsOfServiceUrl ..terms..
+                                                               :contact ..contact..
+                                                               :license ..licence..
+                                                               :licenseUrl ..licenceUrl..}
+                                                        :apis []}))
+
+  (fact "with api"
+    (fact "no apis"
+      (api-listing ..map.. {}) => (has-apis []))))
