@@ -139,10 +139,22 @@
     (api-declaration
       {:apiVersion ..version..}
       ..basepath..
-      {:description ..desc..}) => (has-body {:swaggerVersion "1.2"
-                                             :apiVersion ..version..
-                                             :basePath ..basepath..
-                                             :resourcePath ""
-                                             :produces ["application/json"]
-                                             :models {}
-                                             :apis []})))
+      {:models [#'Pet]
+       :routes [(->Route :get "/" {:return 'Pet})]})
+
+    => (has-body
+         {:swaggerVersion "1.2"
+          :apiVersion ..version..
+          :basePath ..basepath..
+          :resourcePath ""
+          :produces ["application/json"]
+          :models {:Pet Pet'
+                   :Tag Tag'
+                   :Category Category'}
+          :apis [{:operations [{:method "GET"
+                                :nickname "get"
+                                :notes ""
+                                :parameters nil
+                                :summary ""
+                                :type "Pet"}]
+                  :path "/"}]})))
