@@ -12,7 +12,7 @@
 ;; Models
 ;;
 
-(defrecord Route [method uri])
+(defrecord Route [method uri metadata])
 
 ;;
 ;; Schema Transformations
@@ -92,10 +92,6 @@
 ;; Route generation
 ;;
 
-(defn extract-basepath
-  [{:keys [scheme server-name server-port]}]
-  (str (name scheme) "://" server-name ":" server-port))
-
 (defn extract-path-parameters [path]
   (-> path clout/route-compile :keys))
 
@@ -110,6 +106,10 @@
 
 (def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
 (def api-declaration-keys  [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
+
+(defn extract-basepath
+  [{:keys [scheme server-name server-port]}]
+  (str (name scheme) "://" server-name ":" server-port))
 
 ;;
 ;; Public api
@@ -137,22 +137,23 @@
        :produces ["application/json"]
        :models (apply transform-models (:models details))
        :apis (map
-               (fn [[{:keys [method uri] :as route} {:keys [return summary notes nickname parameters]}]]
-                 {:path (swagger-path uri)
-                  :operations
-                  [{:method (-> method name .toUpperCase)
-                    :summary (or summary "")
-                    :notes (or notes "")
-                    :type (or (schema/schema-name return) "")
-                    :nickname (or nickname (generate-nick route))
-                    :parameters (into
-                                parameters
-                                (map
-                                  (fn [path-parameter]
-                                    {:name (name path-parameter)
-                                     :description ""
-                                     :required true
-                                     :type "string"
-                                     :paramType "path"})
-                                  (extract-path-parameters uri)))}]})
-             (:routes details))})))
+               (fn [{:keys [method uri metadata] :as route}]
+                 (let [{:keys [return summary notes nickname parameters]} metadata]
+                   {:path (swagger-path uri)
+                    :operations
+                    [{:method (-> method name .toUpperCase)
+                      :summary (or summary "")
+                      :notes (or notes "")
+                      :type (or (schema/schema-name return) "")
+                      :nickname (or nickname (generate-nick route))
+                      :parameters (into
+                                    parameters
+                                    (map
+                                      (fn [path-parameter]
+                                        {:name (name path-parameter)
+                                         :description ""
+                                         :required true
+                                         :type "string"
+                                         :paramType "path"})
+                                      (extract-path-parameters uri)))}]}))
+                 (:routes details))})))

@@ -79,8 +79,8 @@
   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
 
 (fact "generate-nick"
-  (generate-nick (->Route :get "/api/pizzas/:id")) => "getApiPizzasById"
-  (generate-nick (->Route :delete "/api/:version/pizzas/:id")) => "deleteApiByVersionPizzasById")
+  (generate-nick (->Route :get "/api/pizzas/:id" ..meta..)) => "getApiPizzasById"
+  (generate-nick (->Route :delete "/api/:version/pizzas/:id" ..meta..)) => "deleteApiByVersionPizzasById")
 
 ;;
 ;; Final json
@@ -139,11 +139,10 @@
     (api-declaration
       {:apiVersion ..version..}
       ..basepath..
-      {}) => (has-body {:swaggerVersion "1.2"
-                        :apiVersion ..version..
-                        :basePath ..basepath..
-                        :resourcePath ""
-                        :produces ["application/json"]
-                        :models {}
-                        :apis []})))
-
+      {:description ..desc..}) => (has-body {:swaggerVersion "1.2"
+                                             :apiVersion ..version..
+                                             :basePath ..basepath..
+                                             :resourcePath ""
+                                             :produces ["application/json"]
+                                             :models {}
+                                             :apis []})))
