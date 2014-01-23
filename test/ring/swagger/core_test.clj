@@ -126,6 +126,17 @@
 (fact "api-declaration"
   (fact "empty api"
     (api-declaration
+      {}
+      ..basepath..
+      {}) => (has-body {:swaggerVersion "1.2"
+                        :apiVersion "0.0.1"
+                        :basePath ..basepath..
+                        :resourcePath ""
+                        :produces ["application/json"]
+                        :models {}
+                        :apis []}))
+  (fact "full api"
+    (api-declaration
       {:apiVersion ..version..}
       ..basepath..
       {}) => (has-body {:swaggerVersion "1.2"

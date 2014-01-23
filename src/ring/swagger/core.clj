@@ -83,7 +83,7 @@
 (defn transform-models [& schemas*]
   (->> schemas*
     (mapcat collect-models)
-    set
+    distinct
     (map transform)
     (map (juxt (comp keyword :id) identity))
     (into {})))
