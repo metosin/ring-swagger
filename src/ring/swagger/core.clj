@@ -22,9 +22,8 @@
   (fn [x jsonGenerator] (.writeString jsonGenerator (name-of x))))
 
 (defmulti json-type  identity)
-(defmethod json-type s/Int    [_] {:type "integer" :format "int64"})
-(defmethod json-type s/String [_] {:type "string"})
-(defmethod json-type schema/sString  [_] {:type "string"})
+(defmethod json-type s/Int [_] {:type "integer" :format "int64"})
+(defmethod json-type s/Str [_] {:type "string"})
 (defmethod json-type :default [e]
   (cond
     (= (class e)

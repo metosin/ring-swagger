@@ -3,14 +3,8 @@
             [schema.macros :as sm]
             [ring.swagger.common :refer :all]))
 
-(def sString
-  "Clojure String Predicate enabling setting metadata to it."
-  (s/pred string? 'string?))
-
 (defn field [pred metadata]
-  (let [pred (if (= s/String pred) sString pred)
-        old-meta (meta pred)]
-    (with-meta pred (merge old-meta metadata))))
+  (with-meta pred (merge (meta pred) metadata)))
 
 (defn required [k] (s/required-key k))
 (defn optional [k] (s/optional-key k))
