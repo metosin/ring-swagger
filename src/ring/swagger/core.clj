@@ -107,8 +107,9 @@
     (str/replace #":" " by ")
     ->camelCase))
 
-(def top-level-keys [:apiVersion])
-(def info-keys      [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
+(def swagger-defaults      {:swaggerVersion "1.2"
+                            :apiVersion "0.0.1"})
+(def api-declaration-keys  [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
 
 ;;
 ;; Public api
@@ -117,34 +118,34 @@
 (defn api-listing [parameters swagger]
   (response
     (merge
-      {:apiVersion "1.0.0"
-       :swaggerVersion "1.2"
-       :apis (map
+      swagger-defaults
+      (select-keys parameters [:apiVersion])
+      {:apis (map
                (fn [[api details]]
                  {:path (str "/" (name api))
                   :description (:description details)})
                swagger)
-       :info (select-keys parameters info-keys)}
-      (select-keys parameters top-level-keys))))
+       :info (select-keys parameters api-declaration-keys)})))
 
-(defn api-declaration [details request]
+(defn api-declaration [parameters details request]
   (response
-    {:apiVersion "1.0.0"
-     :swaggerVersion "1.2"
-     :basePath (extract-basepath request)
-     :resourcePath "" ;; TODO: should be supported?
-     :produces ["application/json"]
-     :models (apply transform-models (:models details))
-     :apis (map
-             (fn [[{:keys [method uri] :as route} {:keys [return summary notes nickname parameters]}]]
-               {:path (swagger-path uri)
-                :operations
-                [{:method (-> method name .toUpperCase)
-                  :summary (or summary "")
-                  :notes (or notes "")
-                  :type (or (schema/schema-name return) "json")
-                  :nickname (or nickname (generate-nick route))
-                  :parameters (into
+    (merge
+      swagger-defaults
+      (select-keys parameters [:apiVersion])
+      {:basePath (extract-basepath request)
+       :resourcePath ""
+       :produces ["application/json"]
+       :models (apply transform-models (:models details))
+       :apis (map
+               (fn [[{:keys [method uri] :as route} {:keys [return summary notes nickname parameters]}]]
+                 {:path (swagger-path uri)
+                  :operations
+                  [{:method (-> method name .toUpperCase)
+                    :summary (or summary "")
+                    :notes (or notes "")
+                    :type (or (schema/schema-name return) "")
+                    :nickname (or nickname (generate-nick route))
+                    :parameters (into
                                 parameters
                                 (map
                                   (fn [path-parameter]
@@ -154,4 +155,4 @@
                                      :type "string"
                                      :paramType "path"})
                                   (extract-path-parameters uri)))}]})
-             (:routes details))}))
+             (:routes details))})))
