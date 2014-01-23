@@ -81,3 +81,30 @@
 (fact "generate-nick"
   (generate-nick (->Route :get "/api/pizzas/:id")) => "getApiPizzasById"
   (generate-nick (->Route :delete "/api/:version/pizzas/:id")) => "deleteApiByVersionPizzasById")
+
+;;
+;; Final json
+;;
+
+(facts "swagger-json"
+  (fact "without parameters"
+    (:body (api-listing {} {})) => {:swaggerVersion "1.2"
+                                    :apiVersion "0.0.1"
+                                    :apis []
+                                    :info {}})
+  (fact "with parameters"
+    (:body (api-listing {:apiVersion ...version...
+                         :title ..title..
+                         :description ..description..
+                         :termsOfServiceUrl ..terms..
+                         :contact ..contact..
+                         :license ..licence..
+                         :licenseUrl ..licenceUrl..} {})) => {:swaggerVersion "1.2"
+                                                              :apiVersion ...version...
+                                                              :info {:title ..title..
+                                                                     :description ..description..
+                                                                     :termsOfServiceUrl ..terms..
+                                                                     :contact ..contact..
+                                                                     :license ..licence..
+                                                                     :licenseUrl ..licenceUrl..}
+                                                              :apis []}))
