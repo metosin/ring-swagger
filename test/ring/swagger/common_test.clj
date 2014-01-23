@@ -48,6 +48,18 @@
   (value-of #'Abba) => "jabba"
   (value-of :abba   => :abba))
 
+(require '[potemkin :refer [import-vars]])
+
+(fact "re-resolve"
+  (fact "potemkin'd var is imported locally"
+    (import-vars [clojure.walk walk])
+    #'walk => #'ring.swagger.common-test/walk)
+  (fact "re-resolve to the rescue!"
+    (re-resolve walk) => #'clojure.walk/walk
+    (re-resolve 'walk) => #'clojure.walk/walk
+    (re-resolve #'walk) => #'clojure.walk/walk))
+
+
 (fact "extractors"
 
   (fact "extract-map"

@@ -51,6 +51,16 @@
     (symbol? x) (eval x)
     :else x))
 
+(defmacro re-resolve
+  "Extracts original var from a (potemkined) var or a symbol or returns nil"
+  [x]
+  (let [s (if (symbol? x) x (eval x))
+        x (if (var? s) s (resolve s))
+        m (meta x)]
+    (and m
+      (let [s (symbol (str (:ns m) "/" (:name m)))]
+        `(var ~s)))))
+
 (defn extract-parameters
   "Extract parameters from head of the list. Parameters can be:
      1) a map (if followed by any form) [{:a 1 :b 2} :body] => {:a 1 :b 2}
