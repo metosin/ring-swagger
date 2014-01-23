@@ -24,6 +24,7 @@
 (defmulti json-type  identity)
 (defmethod json-type s/Int [_] {:type "integer" :format "int64"})
 (defmethod json-type s/Str [_] {:type "string"})
+(defmethod json-type schema/Str*  [_] {:type "string"})
 (defmethod json-type :default [e]
   (cond
     (= (class e)
@@ -107,8 +108,7 @@
     (str/replace #":" " by ")
     ->camelCase))
 
-(def swagger-defaults      {:swaggerVersion "1.2"
-                            :apiVersion "0.0.1"})
+(def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
 (def api-declaration-keys  [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
 
 ;;
