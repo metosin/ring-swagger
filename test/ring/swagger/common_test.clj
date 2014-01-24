@@ -49,15 +49,34 @@
   (value-of :abba   => :abba))
 
 (require '[potemkin :refer [import-vars]])
+(import-vars [clojure.walk walk])
 
 (fact "re-resolve"
+
   (fact "potemkin'd var is imported locally"
-    (import-vars [clojure.walk walk])
     #'walk => #'ring.swagger.common-test/walk)
+
+  (fact "non-symbol/var resolves to nil"
+    (re-resolve 1) => nil)
+
   (fact "re-resolve to the rescue!"
     (re-resolve walk) => #'clojure.walk/walk
     (re-resolve 'walk) => #'clojure.walk/walk
     (re-resolve #'walk) => #'clojure.walk/walk))
+
+(defmacro re-resolve-in-compile-time [sym]
+  (let [resolved (re-resolve sym)]
+    `~resolved))
+
+(defmacro eval-re-resolve-in-compile-time [sym]
+  (let [resolved (eval-re-resolve sym)]
+    `~resolved))
+
+(fact "re-resolve in compile-time"
+  (fact "re-resolve does not work with macros"
+    (re-resolve-in-compile-time 'walk) => nil)
+  (fact "eval-re-resolve works with macros"
+    (eval-re-resolve-in-compile-time 'walk) => #'clojure.walk/walk))
 
 
 (fact "extractors"

@@ -54,12 +54,17 @@
 (defmacro re-resolve
   "Extracts original var from a (potemkined) var or a symbol or returns nil"
   [x]
-  (let [s (if (symbol? x) x (eval x))
-        x (if (var? s) s (resolve s))
-        m (meta x)]
-    (and m
-      (let [s (symbol (str (:ns m) "/" (:name m)))]
+  (let [evaluated (if (symbol? x) x (eval x))
+        resolved  (cond
+                    (var? evaluated)    evaluated
+                    (symbol? evaluated) (resolve evaluated)
+                    :else       nil)
+        metadata  (meta resolved)]
+    (if metadata
+      (let [s (symbol (str (:ns metadata) "/" (:name metadata)))]
         `(var ~s)))))
+
+(defn eval-re-resolve [x] (eval `(re-resolve ~x)))
 
 (defn extract-parameters
   "Extract parameters from head of the list. Parameters can be:
