@@ -17,9 +17,6 @@
   ((sc/coercer (value-of model) sc/json-coercion-matcher) value))
 
 (defmacro defmodel [model form]
-  `(do
-     (def ~model ~(str model) (with-meta ~form {:model (var ~model)}))
-     (defn ~(symbol (str "coerce-" model "*"))
-       [x#] ((sc/coercer ~form sc/json-coercion-matcher) x#))))
+  `(def ~model ~(str model) (with-meta ~form {:model (var ~model)})))
 
 (defn schema-name [x] (-> x value-of meta :model name-of))
