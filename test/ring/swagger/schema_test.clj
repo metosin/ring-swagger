@@ -18,3 +18,7 @@
     (schema-name Inty) => "Inty"
     (schema-name 'Inty) => "Inty"
     (schema-name #'Inty) => "Inty"))
+
+(fact "enum?"
+  (enum? s/Int) => false
+  (enum? (s/enum [:a :b])) => true)

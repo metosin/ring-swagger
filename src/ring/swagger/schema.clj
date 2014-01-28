@@ -27,3 +27,5 @@
       (:model (meta value)))))
 
 (defn schema-name [x] (some-> x model-of name-of))
+
+(defn enum? [x] (= (class x) schema.core.EnumSchema))
