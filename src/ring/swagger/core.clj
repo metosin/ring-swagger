@@ -31,14 +31,14 @@
 (defmulti json-type  identity)
 (defmethod json-type s/Int [_] {:type "integer" :format "int64"})
 (defmethod json-type s/Str [_] {:type "string"})
-(defmethod json-type schema/Str*  [_] {:type "string"})
+(defmethod json-type schema/Str* [_] {:type "string"})
 (defmethod json-type :default [e]
   (cond
-    (= (class e)
-      schema.core.EnumSchema) {:type "string"
-                               :enum (seq (:vs e))}
+    (schema/enum? e)  {:type "string" :enum (seq (:vs e))}
     (schema/model? e) {:$ref (schema/schema-name e)}
-    :else (throw (IllegalArgumentException. (str e)))))
+    ;; High level types are presented as Types (should be in a separate return-type-of?
+    (schema/model? (value-of (resolve-model-var e))) {:type (schema/schema-name e)}
+    :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
 
 (defn type-of [v]
   (if (sequential? v)
@@ -145,19 +145,20 @@
                (fn [{:keys [method uri metadata] :as route}]
                  (let [{:keys [return summary notes nickname parameters]} metadata]
                    {:path (swagger-path uri)
-                    :operations [{:method (-> method name .toUpperCase)
-                                  :summary (or summary "")
-                                  :notes (or notes "")
-                                  :type (or (schema/schema-name return) "void")
-                                  :nickname (or nickname (generate-nick route))
-                                  :parameters (into
-                                                parameters
-                                                (map
-                                                  (fn [path-parameter]
-                                                    {:name (name path-parameter)
-                                                     :description ""
-                                                     :required true
-                                                     :type "string"
-                                                     :paramType "path"})
-                                                  (extract-path-parameters uri)))}]}))
+                    :operations [(merge
+                                   (if return (type-of return) {:type "void"})
+                                   {:method (-> method name .toUpperCase)
+                                    :summary (or summary "")
+                                    :notes (or notes "")
+                                    :nickname (or nickname (generate-nick route))
+                                    :parameters (into
+                                                  parameters
+                                                  (map
+                                                    (fn [path-parameter]
+                                                      {:name (name path-parameter)
+                                                       :description ""
+                                                       :required true
+                                                       :type "string"
+                                                       :paramType "path"})
+                                                    (extract-path-parameters uri)))})]}))
                (:routes details))})))
