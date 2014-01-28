@@ -72,15 +72,31 @@
 ;; Route generation
 ;;
 
-(fact "extract-path-parameters"
-  (extract-path-parameters "/api/:kikka/:kakka/:kukka") => [:kikka :kakka :kukka])
+(fact "swagger-path-parameters"
+  (swagger-path-parameters ["/api/" :kikka "/" :kakka "/" :kukka])
+
+  => [{:description ""
+       :name "kikka"
+       :paramType "path"
+       :required true
+       :type "string"}
+      {:description ""
+       :name "kakka"
+       :paramType "path"
+       :required true
+       :type "string"}
+      {:description ""
+       :name "kukka"
+       :paramType "path"
+       :required true
+       :type "string"}])
 
 (fact "swagger-path"
-  (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
+  (swagger-path ["/api/" :kikka "/" :kakka "/" :kukka]) => "/api/{kikka}/{kakka}/{kukka}")
 
 (fact "generate-nick"
-  (generate-nick (->Route :get "/api/pizzas/:id" ..meta..)) => "getApiPizzasById"
-  (generate-nick (->Route :delete "/api/:version/pizzas/:id" ..meta..)) => "deleteApiByVersionPizzasById")
+  (generate-nick (->Route :get ["/api/pizzas/" :id] ..meta..)) => "getApiPizzasById"
+  (generate-nick (->Route :delete ["/api/" :version "/pizzas/" :id] ..meta..)) => "deleteApiByVersionPizzasById")
 
 ;;
 ;; Helpers
@@ -153,13 +169,13 @@
       {:models [#'Pet]
        :routes [(->Route
                   :get
-                  "/pets/:id"
+                  ["/pets/" :id]
                   {:return 'Pet
                    :summary ..summary..
                    :notes ..notes..})
                 (->Route
                   :get
-                  "/pets"
+                  ["/pets"]
                   {:return ['Pet]
                    :summary ..summary2..
                    :notes ..notes2..})]})

@@ -2,7 +2,6 @@
   (:require [clojure.string :as str]
             [ring.util.response :refer :all]
             [schema.core :as s]
-            [clout.core :as clout]
             [ring.swagger.schema :as schema]
             [ring.swagger.common :refer :all]
             [cheshire.generate :refer [add-encoder]]
@@ -102,14 +101,19 @@
 ;; Route generation
 ;;
 
-(defn extract-path-parameters [path]
-  (-> path clout/route-compile :keys))
+(defn swagger-path-parameters [uri]
+  (for [p (filter keyword? uri)]
+    {:name (name p)
+     :description ""
+     :required true
+     :type "string"
+     :paramType "path"}))
 
-(defn swagger-path [path]
-  (str/replace path #":([^/]+)" "{$1}"))
+(defn swagger-path [uri]
+  (str/replace (str/join uri) #":([^/]+)" "{$1}"))
 
 (defn generate-nick [{:keys [method uri]}]
-  (-> (str (name method) " " uri)
+  (-> (str (name method) " " (str/join uri))
     (str/replace #"/" " ")
     (str/replace #":" " by ")
     ->camelCase))
@@ -158,12 +162,5 @@
                                     :nickname (or nickname (generate-nick route))
                                     :parameters (concat
                                                   parameters
-                                                  (map
-                                                    (fn [path-parameter]
-                                                      {:name (name path-parameter)
-                                                       :description ""
-                                                       :required true
-                                                       :type "string"
-                                                       :paramType "path"})
-                                                    (extract-path-parameters uri)))})]}))
+                                                  (swagger-path-parameters uri))})]}))
                (:routes details))})))
