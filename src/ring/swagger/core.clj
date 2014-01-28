@@ -134,11 +134,9 @@
     (merge
       swagger-defaults
       (select-keys parameters [:apiVersion])
-      {:apis (map
-               (fn [[api details]]
-                 {:path (str "/" (name api))
-                  :description (or (:description details) "")})
-               swagger)
+      {:apis (for [[api details] swagger]
+               {:path (str "/" (name api))
+                :description (or (:description details) "")})
        :info (select-keys parameters api-declaration-keys)})))
 
 (defn api-declaration [parameters basepath details]
@@ -150,17 +148,16 @@
        :resourcePath ""
        :produces ["application/json"]
        :models (apply transform-models (:models details))
-       :apis (map
-               (fn [{:keys [method uri metadata] :as route}]
-                 (let [{:keys [return summary notes nickname parameters]} metadata]
-                   {:path (swagger-path uri)
-                    :operations [(merge
-                                   (if return (return-type-of return) {:type "void"})
-                                   {:method (-> method name .toUpperCase)
-                                    :summary (or summary "")
-                                    :notes (or notes "")
-                                    :nickname (or nickname (generate-nick route))
-                                    :parameters (concat
-                                                  parameters
-                                                  (swagger-path-parameters uri))})]}))
-               (:routes details))})))
+       :apis (for [{:keys [method uri metadata] :as route} (:routes details)
+                   :let [{:keys [return summary notes nickname parameters]} metadata]]
+               {:path (swagger-path uri)
+                :operations [(merge
+                               (if return (return-type-of return) {:type "void"})
+                               {:method (-> method name .toUpperCase)
+                                :summary (or summary "")
+                                :notes (or notes "")
+                                :nickname (or nickname (generate-nick route))
+                                :parameters (concat
+                                              parameters
+                                              (swagger-path-parameters uri))})]})})))
+
