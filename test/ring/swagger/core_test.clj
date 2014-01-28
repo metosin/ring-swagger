@@ -83,6 +83,17 @@
   (generate-nick (->Route :delete "/api/:version/pizzas/:id" ..meta..)) => "deleteApiByVersionPizzasById")
 
 ;;
+;; Helpers
+;;
+
+(facts "generating return types from models and list of models"
+  (doseq [x [Tag 'Tag #'Tag]]
+    (fact {:midje/description (str "returning " x)}
+      (return-type-of x) => {:type "Tag"})
+    (fact {:midje/description (str "returning [" x "]")}
+      (return-type-of [x]) => {:items {:$ref "Tag"}, :type "array"})))
+
+;;
 ;; Final json
 ;;
 
@@ -145,7 +156,13 @@
                   "/pets/:id"
                   {:return 'Pet
                    :summary ..summary..
-                   :notes ..notes..})]})
+                   :notes ..notes..})
+                (->Route
+                  :get
+                  "/pets"
+                  {:return ['Pet]
+                   :summary ..summary2..
+                   :notes ..notes2..})]})
 
     => (has-body
          {:swaggerVersion "1.2"
@@ -166,13 +183,19 @@
                                               :type "string"}]
                                 :summary ..summary..
                                 :type "Pet"}]
-                  :path "/pets/{id}"}]})))
+                  :path "/pets/{id}"}
+                 {:operations [{:method "GET"
+                                :nickname "getPets"
+                                :notes ..notes2..
+                                :parameters []
+                                :summary ..summary2..
+                                :type "array"
+                                :items {:$ref "Pet"}}]
+                  :path "/pets"}]})))
 
 (fact "resolve-model-vars"
   (resolve-model-vars Tag) => #'Tag
   (resolve-model-vars 'Tag) => #'Tag
   (resolve-model-vars #'Tag) => #'Tag
   (resolve-model-vars [Tag, 'Tag, #'Tag]) => [#'Tag, #'Tag, #'Tag]
-  (resolve-model-vars {:a Tag, :b 'Tag, :c #'Tag}) => {:a #'Tag, :b #'Tag, :c #'Tag}
-
-  )
+  (resolve-model-vars {:a Tag, :b 'Tag, :c #'Tag}) => {:a #'Tag, :b #'Tag, :c #'Tag})

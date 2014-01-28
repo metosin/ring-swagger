@@ -36,8 +36,7 @@
   (cond
     (schema/enum? e)  {:type "string" :enum (seq (:vs e))}
     (schema/model? e) {:$ref (schema/schema-name e)}
-    ;; High level types are presented as Types (should be in a separate return-type-of?
-    (schema/model? (value-of (resolve-model-var e))) {:type (schema/schema-name e)}
+    (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/schema-name e)}
     :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
 
 (defn type-of [v]
@@ -45,6 +44,12 @@
     {:type "array"
      :items (json-type (first v))}
     (json-type v)))
+
+(defn return-type-of [v]
+  (if (sequential? v)
+    {:type "array"
+     :items (json-type (first v))}
+    {:type (schema/schema-name v)}))
 
 (defn properties [schema]
   (into {}
@@ -146,12 +151,12 @@
                  (let [{:keys [return summary notes nickname parameters]} metadata]
                    {:path (swagger-path uri)
                     :operations [(merge
-                                   (if return (type-of return) {:type "void"})
+                                   (if return (return-type-of return) {:type "void"})
                                    {:method (-> method name .toUpperCase)
                                     :summary (or summary "")
                                     :notes (or notes "")
                                     :nickname (or nickname (generate-nick route))
-                                    :parameters (into
+                                    :parameters (concat
                                                   parameters
                                                   (map
                                                     (fn [path-parameter]
