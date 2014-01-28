@@ -19,4 +19,11 @@
 (defmacro defmodel [model form]
   `(def ~model ~(str model) (with-meta ~form {:model (var ~model)})))
 
-(defn schema-name [x] (-> x value-of meta :model name-of))
+(defn model? [x] (and (map? x) (var? (:model (meta x)))))
+
+(defn model-of [x]
+  (let [value (value-of x)]
+    (if (model? value)
+      (:model (meta value)))))
+
+(defn schema-name [x] (some-> x model-of name-of))

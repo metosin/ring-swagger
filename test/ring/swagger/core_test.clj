@@ -167,3 +167,12 @@
                                 :summary ..summary..
                                 :type "Pet"}]
                   :path "/pets/{id}"}]})))
+
+(fact "resolve-model-vars"
+  (resolve-model-vars Tag) => #'Tag
+  (resolve-model-vars 'Tag) => #'Tag
+  (resolve-model-vars #'Tag) => #'Tag
+  (resolve-model-vars [Tag, 'Tag, #'Tag]) => [#'Tag, #'Tag, #'Tag]
+  (resolve-model-vars {:a Tag, :b 'Tag, :c #'Tag}) => {:a #'Tag, :b #'Tag, :c #'Tag}
+
+  )

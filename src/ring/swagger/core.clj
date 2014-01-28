@@ -21,6 +21,13 @@
 (add-encoder clojure.lang.Var
   (fn [x jsonGenerator] (.writeString jsonGenerator (name-of x))))
 
+(defn resolve-model-var [x]
+  (cond
+    (map? x)    (or (-> x meta :model) x)
+    (symbol? x) (-> x eval recur)
+    :else       (let [x' (eval x)]
+                  (if (= (class x) (class x')) x (recur x')))))
+
 (defmulti json-type  identity)
 (defmethod json-type s/Int [_] {:type "integer" :format "int64"})
 (defmethod json-type s/Str [_] {:type "string"})
@@ -30,7 +37,7 @@
     (= (class e)
       schema.core.EnumSchema) {:type "string"
                                :enum (seq (:vs e))}
-    (map? e) {:$ref (-> e meta :model name-of)}
+    (schema/model? e) {:$ref (schema/schema-name e)}
     :else (throw (IllegalArgumentException. (str e)))))
 
 (defn type-of [v]
@@ -48,15 +55,13 @@
 (defn required-keys [schema]
   (filter s/required-key? (keys schema)))
 
-(defn purge-model-var [x]
+;; walk it.
+(defn resolve-model-vars [x]
   (cond
-    (map? x)    (or (-> x meta :model) x)
-    (symbol? x) (-> x eval recur)
-    :else       (let [x' (eval x)]
-                  (if (= (class x) (class x')) x (recur x')))))
-
-(defn purge-model-vars [m]
-  (into {} (for [[k v] m] [k (purge-model-var v)])))
+    (schema/model? x) (schema/model-of x)
+    (map? x) (into {} (for [[k v] x] [k (resolve-model-var v)]))
+    (sequential? x) (map resolve-model-var x)
+    :else (resolve-model-var x)))
 
 ;;
 ;; public Api
@@ -143,7 +148,7 @@
                     :operations [{:method (-> method name .toUpperCase)
                                   :summary (or summary "")
                                   :notes (or notes "")
-                                  :type (or (schema/schema-name return) "")
+                                  :type (or (schema/schema-name return) "void")
                                   :nickname (or nickname (generate-nick route))
                                   :parameters (into
                                                 parameters

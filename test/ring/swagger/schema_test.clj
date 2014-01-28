@@ -5,5 +5,16 @@
 
 (defmodel Inty {:int s/Int})
 
-(fact "defmodel"
-  (:model (meta Inty)) => (var Inty))
+(fact "models"
+  (fact "model?"
+    (model? Inty) => true
+    (model? Inty) => true
+    (model? {:int s/Int}) => false)
+  (fact "model-of"
+    (model-of Inty) => #'Inty
+    (model-of 'Inty) => #'Inty
+    (model-of #'Inty) => #'Inty)
+  (fact "schema-name"
+    (schema-name Inty) => "Inty"
+    (schema-name 'Inty) => "Inty"
+    (schema-name #'Inty) => "Inty"))
