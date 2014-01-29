@@ -134,10 +134,10 @@
     (merge
       swagger-defaults
       (select-keys parameters [:apiVersion])
-      {:apis (for [[api details] swagger]
+      {:info (select-keys parameters api-declaration-keys)
+       :apis (for [[api details] swagger]
                {:path (str "/" (name api))
-                :description (or (:description details) "")})
-       :info (select-keys parameters api-declaration-keys)})))
+                :description (or (:description details) "")})})))
 
 (defn api-declaration [parameters basepath details]
   (response
