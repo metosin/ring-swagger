@@ -158,29 +158,31 @@
   (fact "empty api"
     (api-declaration
       {}
-      ..basepath..
-      {}) => (has-body {:swaggerVersion "1.2"
-                        :apiVersion "0.0.1"
-                        :basePath ..basepath..
-                        :resourcePath ""
-                        :produces ["application/json"]
-                        :models {}
-                        :apis []}))
+      {..api.. {}}
+      ..api..
+      ..basepath..) => (has-body {:swaggerVersion "1.2"
+                                  :apiVersion "0.0.1"
+                                  :basePath ..basepath..
+                                  :resourcePath ""
+                                  :produces ["application/json"]
+                                  :models {}
+                                  :apis []}))
   (fact "full api"
     (api-declaration
       {:apiVersion ..version..}
-      ..basepath..
-      {:models [#'Pet]
-       :routes [{:method :get
-                 :uri ["/pets/" :id]
-                 :metadata {:return 'Pet
-                            :summary ..summary..
-                            :notes ..notes..}}
-                {:method :get
-                 :uri ["/pets"]
-                 :metadata {:return ['Pet]
-                            :summary ..summary2..
-                            :notes ..notes2..}}]})
+      {..api.. {:models [#'Pet]
+                :routes [{:method :get
+                          :uri ["/pets/" :id]
+                          :metadata {:return 'Pet
+                                     :summary ..summary..
+                                     :notes ..notes..}}
+                         {:method :get
+                          :uri ["/pets"]
+                          :metadata {:return ['Pet]
+                                     :summary ..summary2..
+                                     :notes ..notes2..}}]}}
+      ..api..
+      ..basepath..)
 
     => (has-body
          {:swaggerVersion "1.2"

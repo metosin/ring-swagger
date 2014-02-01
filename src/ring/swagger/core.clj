@@ -141,25 +141,26 @@
                {:path (str "/" (name api))
                 :description (or (:description details) "")})})))
 
-(defn api-declaration [parameters basepath details]
-  (response
-    (merge
-      swagger-defaults
-      (select-keys parameters [:apiVersion])
-      {:basePath basepath
-       :resourcePath ""
-       :produces ["application/json"]
-       :models (apply transform-models (:models details))
-       :apis (for [{:keys [method uri metadata] :as route} (:routes details)
-                   :let [{:keys [return summary notes nickname parameters]} metadata]]
-               {:path (swagger-path uri)
-                :operations [(merge
-                               (if return (return-type-of return) {:type "void"})
-                               {:method (-> method name .toUpperCase)
-                                :summary (or summary "")
-                                :notes (or notes "")
-                                :nickname (or nickname (generate-nick route))
-                                :parameters (concat
-                                              parameters
-                                              (swagger-path-parameters uri))})]})})))
+(defn api-declaration [parameters swagger api basepath]
+  (if-let [details (and swagger (swagger api))]
+    (response
+      (merge
+        swagger-defaults
+        (select-keys parameters [:apiVersion])
+        {:basePath basepath
+         :resourcePath ""
+         :produces ["application/json"]
+         :models (apply transform-models (:models details))
+         :apis (for [{:keys [method uri metadata] :as route} (:routes details)
+                     :let [{:keys [return summary notes nickname parameters]} metadata]]
+                 {:path (swagger-path uri)
+                  :operations [(merge
+                                 (if return (return-type-of return) {:type "void"})
+                                 {:method (-> method name .toUpperCase)
+                                  :summary (or summary "")
+                                  :notes (or notes "")
+                                  :nickname (or nickname (generate-nick route))
+                                  :parameters (concat
+                                                parameters
+                                                (swagger-path-parameters uri))})]})}))))
 
