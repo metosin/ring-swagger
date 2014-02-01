@@ -11,7 +11,9 @@
 ;; Models
 ;;
 
-(defrecord Route [method uri metadata])
+(s/defschema Route {:method   s/Keyword
+                    :uri      [s/Any]
+                    :metadata {s/Keyword s/Any}})
 
 ;;
 ;; Schema Transformations

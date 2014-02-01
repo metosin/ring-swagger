@@ -95,8 +95,12 @@
   (swagger-path ["/api/" :kikka "/" :kakka "/" :kukka]) => "/api/{kikka}/{kakka}/{kukka}")
 
 (fact "generate-nick"
-  (generate-nick (->Route :get ["/api/pizzas/" :id] ..meta..)) => "getApiPizzasById"
-  (generate-nick (->Route :delete ["/api/" :version "/pizzas/" :id] ..meta..)) => "deleteApiByVersionPizzasById")
+  (generate-nick {:method :get
+                  :uri ["/api/pizzas/" :id]
+                  :metadata ..meta..}) => "getApiPizzasById"
+  (generate-nick {:method :delete
+                  :uri ["/api/" :version "/pizzas/" :id]
+                  :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
 ;;
 ;; Helpers
@@ -167,18 +171,16 @@
       {:apiVersion ..version..}
       ..basepath..
       {:models [#'Pet]
-       :routes [(->Route
-                  :get
-                  ["/pets/" :id]
-                  {:return 'Pet
-                   :summary ..summary..
-                   :notes ..notes..})
-                (->Route
-                  :get
-                  ["/pets"]
-                  {:return ['Pet]
-                   :summary ..summary2..
-                   :notes ..notes2..})]})
+       :routes [{:method :get
+                 :uri ["/pets/" :id]
+                 :metadata {:return 'Pet
+                            :summary ..summary..
+                            :notes ..notes..}}
+                {:method :get
+                 :uri ["/pets"]
+                 :metadata {:return ['Pet]
+                            :summary ..summary2..
+                            :notes ..notes2..}}]})
 
     => (has-body
          {:swaggerVersion "1.2"
