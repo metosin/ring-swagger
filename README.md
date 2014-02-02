@@ -1,146 +1,22 @@
-# Compojure-api
+# Ring-Swagger
 
-Collection on helpers on top of [Compojure](https://github.com/weavejester/compojure) for helping to create sweet web apis.
+[Swagger](...) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data modelling.
 
-Contains a [Swagger](...) implementation for Compojure & [Schema](https://github.com/Prismatic/schema), on top of [ring-swagger](https://github.com/metosin/ring-swagger).
+- Provides handlers for both [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing) and [Api declaration](https://github.com/wordnik/swagger-core/wiki/API-Declaration).
+- Does not cover how the routes, models and endpoints are gathered from your web app (and by so should be compatible and a base implementation for all Ring-based web frameworks)
+- Provides a clean Map-based interface to create Swagger Spec out of the route definitions
 
-(There are other Swagger-implementations for Clojure, at least [Swag](https://developers.helloreverb.com/swagger/) and [Octohipster](https://github.com/myfreeweb/octohipster))
+For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ring-app, check out the [Ring-swagger-ui](https://github.com/metosin/ring-swagger-ui).
 
-Currently work-in-progress. See [Examples](/tree/master/src/compojure/api/example) for m
+## Existing Adapters
+- [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 
-## Installation
-
-Add the following dependency to your `project.clj` file:
-
-    [metosin/compojure-swagger "0.0.1"]
-
-## Quickstart
-
-1) Start with vanilla Compojure app (with [json-middleware](https://github.com/ring-clojure/ring-json)):
-
-```
-(ns examples.example1
-  (:require [compojure.core :refer :all]
-            [ring.util.response :refer :all]))
-
-(defroutes app
-  (context "/api" []
-    (GET "/thing" [] (response {:get "thing"}))
-    (POST "/thing" [] (response {:post "thing"}))
-    (DELETE "/thing" [] (response {:delete "thing"}))))
-```
-
-2) Start server and browse to ```/api/thing``` to see the JSON response
-
-3) Import the ```compojure.swagger.core```:
-
-```
-(ns examples.example1
-  (:require [compojure.core :refer :all]
-            [ring.util.response :refer :all]
-            [compojure.swagger.core :refer :all]))
-```
-
-4) Create a Swagger-app by wrapping you routes with ```swaggered```-macro:
-
-```
-  (swaggered "things"
-    :description "Things Api"
-    (context "/api" []
-      (GET "/thing" [] (response {:get "thing"}))
-      (POST "/thing" [] (response {:post "thing"}))
-      (DELETE "/thing" [] (response {:delete "thing"}))))
-```
-
-5) Add ```swagger-docs```-route to generate swagger jsons descriptions
-
-```
-  (swagger-docs "/api/docs"
-    :title "Example Api"
-    :description "Described it is.")
-```
-
-6) Browse to ```/api/docs``` & ```/api/docs/things``` to see the swagger details.
-
-## Swagger-ui
-
-You have three options to get the Swagger-UI for browsing and consuming your Apis.
-
-### External
-
-Requires [CORS-support](https://github.com/r0man/ring-cors) for your APIs. Example of external.
-
-### Embedded
-
-Package the Swagger-UI yourself to go with the app (recommened option for production)
-
-### Ring-Swagger-UI
-
-Embed the prepackaged swagger-UI directly to your app.
-
-1) Add the following dependency to your `project.clj` file:
-
-    [metosin/ring-swagger-ui "0.0.1"]
-
-2) Add ```swagger-ui```-route to start serving the ui
-
-```
-  (swagger-ui)
-```
-
-3) Browse to ```/``` to see the Swagger-UI
-
-## Final code
-
-In project.clj:
-
-    [metosin/compojure-swagger "0.0.1"]
-    [metosin/ring-swagger-ui "0.0.1"]
-
-```
-(ns examples.example1
-  (:require [compojure.core :refer :all]
-            [ring.util.response :refer :all]
-            [compojure.swagger.core :refer :all]))
-
-(defroutes app
-  (swagger-ui)
-  (swagger-docs "/api/docs"
-    :title "Example Api"
-    :description "Described it is.")
-  (swaggered "things"
-    :description "Things Api"
-    (context "/api" []
-      (GET "/thing" [] (response {:get "thing"}))
-      (POST "/thing" [] (response {:post "thing"}))
-      (DELETE "/thing" [] (response {:delete "thing"}))))
-```
-
-## Running the sample(s)
-
-```lein ring server``` (samples will be pushed later external directory/respository)
-
-## Adding meta-data to your Routes
-
-TODO
-
-## Features and quirks
-
-- Ring-Swagger & Compojure-Swagger are not feature-complete, see TODO
-- All Routes swaggered at compile-time, there should be no runtime penalty for api descriptions
-- Routes are stored in an Atom => One should disable AOT when Uberjarring
-- ```swaggered``` can only see routes in the same lexical scope (as it uses macro-peeling)
-- As Compojure currently does not allow easy declaration of meta-data to routes..., to use rich swagger meta-data, one has to either a) pimp... compojure or b) wrap all Compojure-route macros (on the roadmap)
+Want to integrate your favourite web framework to use this lib? Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj#L116-L214).
 
 ## TODO
 - [ ] error messages
 - [ ] consumes
-- [ ] full samples
-- [ ] smart destructuring of query parameters
-- [ ] swagger-ui witn partially generated html
 - [ ] travis
-- [ ] cors-support
-- [ ] license
 
 ## License
 
