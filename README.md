@@ -21,7 +21,6 @@ Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/r
 - [ ] don't have to list Models, traverse api declarations to get 'em
 - [ ] support for consumes
 - [ ] non-json produces & consumes
-- [ ] travis
 
 ## License
 
