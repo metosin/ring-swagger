@@ -20,7 +20,7 @@
 (defn coerce! [model value]
   (let [result (coerce model value)]
     (if (su/error? result)
-      (throw (ex-info "validation error" (:error result)))
+      (throw (ex-info (str (:error result)) result))
       result)))
 
 (defmacro defmodel [model form]
