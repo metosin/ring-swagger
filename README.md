@@ -10,6 +10,10 @@
 
 For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ring-app, check out the [ring-swagger-ui](https://github.com/metosin/ring-swagger-ui).
 
+## Installation
+
+    [metosin/ring-swagger "0.1.0"]
+
 ## Existing Adapters
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 
