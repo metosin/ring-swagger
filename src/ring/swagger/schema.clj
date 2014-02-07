@@ -2,6 +2,7 @@
   (:require [schema.core :as s]
             [schema.coerce :as sc]
             [schema.macros :as sm]
+            [schema.utils :as su]
             [ring.swagger.common :refer :all]))
 
 (def Str*
@@ -15,6 +16,12 @@
 
 (defn coerce [model value]
   ((sc/coercer (value-of model) sc/json-coercion-matcher) value))
+
+(defn coerce! [model value]
+  (let [result (coerce model value)]
+    (if (su/error? result)
+      (throw (ex-info "validation error" (:error result)))
+      result)))
 
 (defmacro defmodel [model form]
   `(def ~model ~(str model) (with-meta ~form {:model (var ~model)})))
