@@ -105,7 +105,7 @@
 (fact "extract-models returns distict models from both return values & parameters types"
   (extract-models {:routes [{:metadata {:return ['Tag]
                                         :parameters [{:type 'Tag}
-                                                     {:type 'Category}]}}
+                                                     {:type ['Category]}]}}
                             {:metadata {:return 'Tag}}]}) => ['Category 'Tag])
 ;;
 ;; Helpers

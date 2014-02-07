@@ -113,6 +113,7 @@
         parameter-models (->> route-meta (mapcat :parameters) (keep :type))]
     (-> return-models
       (into parameter-models)
+      flatten
       distinct
       vec)))
 
