@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [ring.util.response :refer :all]
             [schema.core :as s]
+            [schema.utils :as su]
             [ring.swagger.schema :as schema]
             [ring.swagger.common :refer :all]
             [cheshire.generate :refer [add-encoder]]
@@ -20,7 +21,14 @@
 ;;
 
 (add-encoder clojure.lang.Var
-  (fn [x jsonGenerator] (.writeString jsonGenerator (name-of x))))
+  (fn [x jsonGenerator]
+    (.writeString jsonGenerator (name-of x))))
+
+(add-encoder schema.utils.ValidationError
+  (fn [x jsonGenerator]
+    (.writeString jsonGenerator
+      (str (su/validation-error-explain x)))))
+
 
 (defn resolve-model-var [x]
   (cond
@@ -160,6 +168,7 @@
                                   :summary (or summary "")
                                   :notes (or notes "")
                                   :nickname (or nickname (generate-nick route))
+                                  :responseMessages [] ;; TODO
                                   :parameters (concat
                                                 parameters
                                                 (swagger-path-parameters uri))})]})}))))
