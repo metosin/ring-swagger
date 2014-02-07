@@ -30,8 +30,8 @@
                              :name {:type "string"
                                     :description "Name of the category"}}})
 
-(defmodel Pet  {:id                   (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
-                :name                 (field s/Str {:description "Friendly name of the pet"})
+(defmodel Pet  {:id                         (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
+                :name                       (field s/Str {:description "Friendly name of the pet"})
                 (s/optional-key :category)  (field Category {:description "Category the pet is in"})
                 (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
                 (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
@@ -196,6 +196,7 @@
           :apis [{:operations [{:method "GET"
                                 :nickname "getPetsById"
                                 :notes ..notes..
+                                :responseMessages []
                                 :parameters [{:description ""
                                               :name "id"
                                               :paramType "path"
@@ -207,6 +208,7 @@
                  {:operations [{:method "GET"
                                 :nickname "getPets"
                                 :notes ..notes2..
+                                :responseMessages []
                                 :parameters []
                                 :summary ..summary2..
                                 :type "array"
