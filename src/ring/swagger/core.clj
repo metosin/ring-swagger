@@ -107,6 +107,15 @@
     (map (juxt (comp keyword :id) identity))
     (into {})))
 
+(defn extract-models [details]
+  (let [route-meta (->> details :routes (map :metadata))
+        return-models (->> route-meta (keep :return) flatten)
+        parameter-models (->> route-meta (mapcat :parameters) (keep :type))]
+    (-> return-models
+      (into parameter-models)
+      distinct
+      vec)))
+
 ;;
 ;; Route generation
 ;;
@@ -158,7 +167,7 @@
         {:basePath basepath
          :resourcePath ""
          :produces ["application/json"]
-         :models (apply transform-models (:models details))
+         :models (apply transform-models (extract-models details))
          :apis (for [{:keys [method uri metadata] :as route} (:routes details)
                      :let [{:keys [return summary notes nickname parameters]} metadata]]
                  {:path (swagger-path uri)

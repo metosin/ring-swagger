@@ -102,6 +102,11 @@
                   :uri ["/api/" :version "/pizzas/" :id]
                   :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
+(fact "extract-models returns distict models from both return values & parameters types"
+  (extract-models {:routes [{:metadata {:return ['Tag]
+                                        :parameters [{:type 'Tag}
+                                                     {:type 'Category}]}}
+                            {:metadata {:return 'Tag}}]}) => ['Category 'Tag])
 ;;
 ;; Helpers
 ;;
@@ -170,8 +175,7 @@
   (fact "full api"
     (api-declaration
       {:apiVersion ..version..}
-      {..api.. {:models [#'Pet]
-                :routes [{:method :get
+      {..api.. {:routes [{:method :get
                           :uri ["/pets/" :id]
                           :metadata {:return 'Pet
                                      :summary ..summary..
