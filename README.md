@@ -12,7 +12,7 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 
 ## Installation
 
-    [metosin/ring-swagger "0.1.0"]
+    [metosin/ring-swagger "0.2.0"]
 
 ## Existing Adapters
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
@@ -21,10 +21,9 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj#L116-L214).
 
 ## TODO
-- [ ] support for error messages
-- [ ] don't have to list Models, traverse api declarations to get 'em
-- [ ] support for consumes
-- [ ] non-json produces & consumes
+
+- support for consumes
+- non-json produces & consumes
 
 ## License
 
