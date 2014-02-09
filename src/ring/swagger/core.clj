@@ -64,7 +64,13 @@
   (into {}
     (for [[k v] schema
           :let [k (s/explicit-schema-key k)]]
-      [k (merge (dissoc (meta v) :model) (type-of v))])))
+      [k (merge
+           (dissoc (meta v) :model)
+           (try (type-of v)
+             (catch Exception e
+               (throw
+                 (IllegalArgumentException.
+                   (str "error converting to json schema [" k " " (s/explain v) "]") e)))))])))
 
 (defn required-keys [schema]
   (filter s/required-key? (keys schema)))
@@ -182,4 +188,3 @@
                                   :parameters (concat
                                                 parameters
                                                 (swagger-path-parameters uri))})]})}))))
-
