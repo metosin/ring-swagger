@@ -20,10 +20,19 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 ## Writing new Adapter
 Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj#L116-L214).
 
+## Supported Schema elements
+
+- schema/Int
+- schema/String
+- schema/Enum
+- Sequences
+- References
+
 ## TODO
 
 - support for consumes
 - non-json produces & consumes
+- better json-schema support (external / multimethods?)
 
 ## License
 
