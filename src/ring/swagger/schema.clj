@@ -11,9 +11,9 @@
 ;; Primitives
 ;;
 
-(def Int*      s/Int)
+(def Int*      (s/pred (partial instance? Integer) 'integer?))
 (def Long*     (s/pred (partial instance? Long) 'long?))
-(def Float*    (s/pred float? 'float?))
+(def Float*    (s/pred (partial instance? Float) 'float?))
 (def Double*   (s/pred (partial instance? Double) 'double?))
 (def Str*      (s/pred string? 'string?))
 (def Byte*     (s/pred (partial instance? Byte) 'byte?))

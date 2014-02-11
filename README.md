@@ -22,17 +22,27 @@ Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/r
 
 ## Supported Schema elements
 
-- schema/Int
-- schema/String
-- schema/Enum
-- Sequences
-- References
+| Element | JSON-schema  |
+| --------|:------------:|
+| `Integer` | integer, int32
+| `Long`, `schema/Int` | integer, int64
+| `Float` | number, float
+| `Double` | number, double
+| `String`, `schema/str` | string
+| `Byte` | string, byte
+| `Boolean` | boolean
+| `java.util.Date` | string, date
+| `org.joda.time.DateTime` | string, date-time
+
+- Arrays (not yet sets)
+- Complex Types (no nesting), including references
 
 ## TODO
 
 - support for consumes
+- support for sets
+- remove non-idiomatic types (Integer, Byte, Float)?
 - non-json produces & consumes
-- better [json-schema](https://github.com/wordnik/swagger-core/wiki/Datatypes) support (external?)
 
 ## License
 

@@ -38,26 +38,42 @@
                   (if (= (class x) (class x')) x (recur x')))))
 
 (defmulti json-type  identity)
-(defmethod json-type s/Int [_] {:type "integer" :format "int64"})
-(defmethod json-type s/Str [_] {:type "string"})
-(defmethod json-type schema/Str* [_] {:type "string"})
-(defmethod json-type :default [e]
+
+;; java types
+(defmethod json-type schema/Int*      [_] {:type "integer" :format "int32"})
+(defmethod json-type schema/Long*     [_] {:type "integer" :format "int64"})
+(defmethod json-type schema/Float*    [_] {:type "number" :format "float"})
+(defmethod json-type schema/Double*   [_] {:type "number" :format "double"})
+(defmethod json-type schema/Str*      [_] {:type "string"})
+(defmethod json-type schema/Byte*     [_] {:type "string" :format "byte"})
+(defmethod json-type schema/Boolean*  [_] {:type "boolean"})
+(defmethod json-type schema/Date*     [_] {:type "string" :format "date"})
+(defmethod json-type schema/DateTime* [_] {:type "boolean" :format "date-time"})
+
+;; schema types
+(defmethod json-type s/Int            [_] {:type "integer" :format "int64"})
+(defmethod json-type s/Str            [_] {:type "string"})
+
+(defmethod json-type :default         [e]
   (cond
     (schema/enum? e)  {:type "string" :enum (seq (:vs e))}
     (schema/model? e) {:$ref (schema/schema-name e)}
     (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/schema-name e)}
     :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
 
+(defn ->json [type]
+  (json-type (or (schema/type-map type) type)))
+
 (defn type-of [v]
   (if (sequential? v)
     {:type "array"
-     :items (json-type (first v))}
-    (json-type v)))
+     :items (->json (first v))}
+    (->json v)))
 
 (defn return-type-of [v]
   (if (sequential? v)
     {:type "array"
-     :items (json-type (first v))}
+     :items (->json (first v))}
     {:type (schema/schema-name v)}))
 
 (defn properties [schema]
