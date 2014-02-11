@@ -9,32 +9,15 @@
 ;; Primitives
 ;;
 
-(def Int*
-  s/Int)
-
-(def Long*
-  (s/pred (partial instance? Long) 'long?))
-
-(def Float*
-  (s/pred (partial instance? Float) 'float?))
-
-(def Double*
-  (s/pred (partial instance? Double) 'double?))
-
-(def Str*
-  (s/pred string? 'string?))
-
-(def Byte*
-  (s/pred (partial instance? Byte) 'byte?))
-
-(def Boolean*
-  (s/pred (partial instance? Boolean) 'boolean?))
-
-(def Date*
-  (s/pred (partial instance? java.util.Date) 'date?))
-
-(def DateTime*
-  (s/pred (partial instance? org.joda.time.DateTime) 'date-time?))
+(def Int*      s/Int)
+(def Long*     (s/pred (partial instance? Long) 'long?))
+(def Float*    (s/pred float? 'float?))
+(def Double*   (s/pred (partial instance? Double) 'double?))
+(def Str*      (s/pred string? 'string?))
+(def Byte*     (s/pred (partial instance? Byte) 'byte?))
+(def Boolean*  (s/pred (partial instance? Boolean) 'boolean?))
+(def Date*     (s/pred (partial instance? java.util.Date) 'date?))
+(def DateTime* (s/pred (partial instance? org.joda.time.DateTime) 'date-time?))
 
 ;;
 ;;
