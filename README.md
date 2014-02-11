@@ -32,7 +32,7 @@ Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/r
 
 - support for consumes
 - non-json produces & consumes
-- better json-schema support (external / multimethods?)
+- better [json-schema](https://github.com/wordnik/swagger-core/wiki/Datatypes) support (external?)
 
 ## License
 

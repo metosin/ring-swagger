@@ -5,9 +5,40 @@
             [schema.utils :as su]
             [ring.swagger.common :refer :all]))
 
+;;
+;; Primitives
+;;
+
+(def Int*
+  s/Int)
+
+(def Long*
+  (s/pred (partial instance? Long) 'long?))
+
+(def Float*
+  (s/pred (partial instance? Float) 'float?))
+
+(def Double*
+  (s/pred (partial instance? Double) 'double?))
+
 (def Str*
-  "Clojure String Predicate enabling setting metadata to it."
   (s/pred string? 'string?))
+
+(def Byte*
+  (s/pred (partial instance? Byte) 'byte?))
+
+(def Boolean*
+  (s/pred (partial instance? Boolean) 'boolean?))
+
+(def Date*
+  (s/pred (partial instance? java.util.Date) 'date?))
+
+(def DateTime*
+  (s/pred (partial instance? org.joda.time.DateTime) 'date-time?))
+
+;;
+;;
+;;
 
 (defn field [pred metadata]
   (let [pred (if (= s/Str pred) Str* pred)
