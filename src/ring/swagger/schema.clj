@@ -3,7 +3,9 @@
             [schema.coerce :as sc]
             [schema.macros :as sm]
             [schema.utils :as su]
-            [ring.swagger.common :refer :all]))
+            [ring.swagger.common :refer :all])
+  (:import (java.util Date)
+           (org.joda.time DateTime)))
 
 ;;
 ;; Primitives
@@ -19,12 +21,23 @@
 (def Date*     (s/pred (partial instance? java.util.Date) 'date?))
 (def DateTime* (s/pred (partial instance? org.joda.time.DateTime) 'date-time?))
 
+(def type-map
+  {Integer  Int*
+   Long     Long*
+   Float    Float*
+   Double   Double*
+   String   Str*
+   Byte     Byte*
+   Boolean  Boolean*
+   Date     Date*
+   DateTime DateTime*})
+
 ;;
 ;;
 ;;
 
 (defn field [pred metadata]
-  (let [pred (if (= s/Str pred) Str* pred)
+  (let [pred (or (type-map pred) pred)
         old-meta (meta pred)]
     (with-meta pred (merge old-meta metadata))))
 

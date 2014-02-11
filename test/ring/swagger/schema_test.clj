@@ -27,9 +27,16 @@
   (enum? s/Int) => false
   (enum? (s/enum [:a :b])) => true)
 
-(def types [Int* Long* Float* Double* Str* Byte* Boolean* Date* DateTime*])
+(facts "types"
 
-(facts "datatypes can act as fields"
-  (doseq [type types]
-    (fact {:midje/description (s/explain type)}
-      (meta (field type {:a 1})) => {:a 1})))
+  (fact "basic types can act as fields"
+    (doseq [type (vals type-map)]
+      (fact {:midje/description (s/explain type)}
+        (meta (field type {:a 1})) => {:a 1})))
+
+  (fact "derived types can act as fields"
+    (doseq [type (keys type-map)]
+      (fact {:midje/description (s/explain type)}
+        (meta (field type {:a 1})) => {:a 1})))
+
+  )
