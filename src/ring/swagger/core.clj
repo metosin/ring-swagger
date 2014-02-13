@@ -43,7 +43,7 @@
 ;; java types
 (defmethod json-type data/Long*     [_] {:type "integer" :format "int64"})
 (defmethod json-type data/Double*   [_] {:type "number" :format "double"})
-(defmethod json-type data/Str*      [_] {:type "string"})
+(defmethod json-type data/String*   [_] {:type "string"})
 (defmethod json-type data/Boolean*  [_] {:type "boolean"})
 (defmethod json-type data/Keyword*  [_] {:type "string"})
 

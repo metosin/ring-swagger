@@ -12,7 +12,7 @@
 (def type-map
   {Long     Long*
    Double   Double*
-   String   Str*
+   String   String*
    Boolean  Boolean*
    Keyword  Keyword*})
 

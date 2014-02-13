@@ -3,7 +3,7 @@
 
 (def Long*     s/Int)
 (def Double*   (s/pred (partial instance? Double) 'double?))
-(def Str*      (s/pred string? 'string?))
+(def String*   (s/pred string? 'string?))
 (def Boolean*  (s/pred (partial instance? Boolean) 'boolean?))
 (def Keyword*  s/Keyword)
 

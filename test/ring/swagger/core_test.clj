@@ -14,7 +14,7 @@
   (facts "datatypes"
     (->json Long*) => {:type "integer" :format "int64"}
     (->json Double*) => {:type "number" :format "double"}
-    (->json Str*) => {:type "string"}
+    (->json String*) => {:type "string"}
     (->json Boolean*) => {:type "boolean"})
   (fact "schema types"
     (->json s/Int) => {:type "integer" :format "int64"}
