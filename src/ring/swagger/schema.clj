@@ -3,37 +3,36 @@
             [schema.coerce :as sc]
             [schema.macros :as sm]
             [schema.utils :as su]
-            [ring.swagger.common :refer :all])
-  (:import (java.util Date)
-           (org.joda.time DateTime)))
+            [ring.swagger.common :refer :all]
+            [slingshot.slingshot :refer [throw+]]
+            [ring.swagger.data :refer :all]))
 
-;;
-;; Primitives
-;;
-
-(def Int*      (s/pred (partial instance? Integer) 'integer?))
-(def Long*     (s/pred (partial instance? Long) 'long?))
-(def Float*    (s/pred (partial instance? Float) 'float?))
-(def Double*   (s/pred (partial instance? Double) 'double?))
-(def Str*      (s/pred string? 'string?))
-(def Byte*     (s/pred (partial instance? Byte) 'byte?))
-(def Boolean*  (s/pred (partial instance? Boolean) 'boolean?))
-(def Date*     (s/pred (partial instance? java.util.Date) 'date?))
-(def DateTime* (s/pred (partial instance? org.joda.time.DateTime) 'date-time?))
+(def Keyword  s/Keyword)
 
 (def type-map
-  {Integer  Int*
-   Long     Long*
-   Float    Float*
+  {Long     Long*
    Double   Double*
    String   Str*
-   Byte     Byte*
    Boolean  Boolean*
-   Date     Date*
-   DateTime DateTime*})
+   Keyword  Keyword*})
+
+(let [set-matcher (fn [schema]
+                    (when (instance? clojure.lang.PersistentHashSet schema) #(set %)))
+      coercions {s/Keyword sc/string->keyword
+                 clojure.lang.Keyword sc/string->keyword
+                 s/Int sc/safe-long-cast
+                 Long sc/safe-long-cast
+                 Double double}]
+  (defn json-coercion-matcher
+    "A matcher that coerces keywords and keyword enums from strings, and longs and doubles
+     from numbers on the JVM (without losing precision)"
+    [schema]
+    (or (coercions schema)
+        (sc/keyword-enum-matcher schema)
+        (set-matcher schema))))
 
 ;;
-;;
+;; Public Api
 ;;
 
 (defn field [pred metadata]
@@ -42,7 +41,7 @@
     (with-meta pred (merge old-meta metadata))))
 
 (defn coerce [model value]
-  ((sc/coercer (value-of model) sc/json-coercion-matcher) value))
+  ((sc/coercer (value-of model) json-coercion-matcher) value))
 
 (defn coerce! [model value]
   (let [result (coerce model value)]
@@ -61,5 +60,3 @@
       (:model (meta value)))))
 
 (defn schema-name [x] (some-> x model-of name-of))
-
-(defn enum? [x] (= (class x) schema.core.EnumSchema))
