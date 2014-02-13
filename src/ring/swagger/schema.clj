@@ -4,7 +4,6 @@
             [schema.macros :as sm]
             [schema.utils :as su]
             [ring.swagger.common :refer :all]
-            [slingshot.slingshot :refer [throw+]]
             [ring.swagger.data :refer :all]))
 
 (def Keyword  s/Keyword)
