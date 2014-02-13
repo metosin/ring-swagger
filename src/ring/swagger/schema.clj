@@ -3,6 +3,7 @@
             [schema.coerce :as sc]
             [schema.macros :as sm]
             [schema.utils :as su]
+            [slingshot.slingshot :refer [throw+]]
             [ring.swagger.common :refer :all]
             [ring.swagger.data :refer :all]))
 
@@ -15,8 +16,7 @@
    Boolean  Boolean*
    Keyword  Keyword*})
 
-(let [set-matcher (fn [schema]
-                    (when (instance? clojure.lang.PersistentHashSet schema) #(set %)))
+(let [set-matcher (fn [schema] (when (instance? clojure.lang.PersistentHashSet schema) #(set %)))
       coercions {s/Keyword sc/string->keyword
                  clojure.lang.Keyword sc/string->keyword
                  s/Int sc/safe-long-cast
@@ -45,7 +45,7 @@
 (defn coerce! [model value]
   (let [result (coerce model value)]
     (if (su/error? result)
-      (throw (ex-info (str (:error result)) result))
+      (throw+ {:type ::validation :error (:error result)})
       result)))
 
 (defmacro defmodel [model form]
