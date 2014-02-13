@@ -2,17 +2,17 @@
 
 [![Build Status](https://travis-ci.org/metosin/ring-swagger.png?branch=master)](https://travis-ci.org/metosin/ring-swagger)
 
-[Swagger](...) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data modelling.
+[Swagger](...) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data modelling and input data coercion.
 
 - Provides handlers for both [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing) and [Api declaration](https://github.com/wordnik/swagger-core/wiki/API-Declaration).
-- Does not solve how the routes, models and endpoints are collected from your web app (and by so should be compatible with all Ring-based libraries)
-- Provides a clean Map-based interface to create Swagger Spec out of the route definitions
+- Does not cover how the routes and models are collected from web apps (and by so should be compatible with all Ring-based libraries)
+   - Provides a Map-based interface for routing libs to create Swagger Spec out of the route definitions
 
 For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ring-app, check out the [ring-swagger-ui](https://github.com/metosin/ring-swagger-ui).
 
 ## Installation
 
-    [metosin/ring-swagger "0.2.0"]
+    [metosin/ring-swagger "0.3.0"]
 
 ## Existing Adapters
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
@@ -22,26 +22,27 @@ Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/r
 
 ## Supported Schema elements
 
-| Element | JSON-schema  |
+| Element | JSON  |
 | --------|:------------:|
-| `Integer` | integer, int32
 | `Long`, `schema/Int` | integer, int64
-| `Float` | number, float
 | `Double` | number, double
 | `String`, `schema/str` | string
-| `Byte` | string, byte
+| Keyword, `schema/Keyword` | string
 | `Boolean` | boolean
-| `java.util.Date` | string, date
-| `org.joda.time.DateTime` | string, date-time
 
-- Arrays (not yet sets)
-- Complex Types (no nesting), including references
+- Supports also `schema/enum`s, Vectors, Sets, Maps (Complex Types) and References. References are resolved automatically.
+- Has a tuned *Schema coercion* for transforming the input data into vanilla Clojure, supporting the following coercions:
+  - numbers -> `Long` or `Double`
+  - string -> keyword
+  - vectors -> sets
+- `Integer`, `Byte` and `Float` are not supported as they can be handled as `Long`s and `Double`s.
+
+see [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/schema_test.clj).
 
 ## TODO
 
+- support for `Date` & `DateTime`
 - support for consumes
-- support for sets
-- remove non-idiomatic types (Integer, Byte, Float)?
 - non-json produces & consumes
 
 ## License
