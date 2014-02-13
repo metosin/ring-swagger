@@ -2,29 +2,20 @@
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
             [ring.swagger.schema :refer :all]
+            [ring.swagger.data :refer :all]
             [ring.swagger.core :refer :all]))
 
 (facts "type transformations"
   (facts "java types"
-    (->json Integer) => {:type "integer" :format "int32"}
     (->json Long) => {:type "integer" :format "int64"}
-    (->json Float) => {:type "number" :format "float"}
     (->json Double) => {:type "number" :format "double"}
     (->json String) => {:type "string"}
-    (->json Byte) => {:type "string" :format "byte"}
-    (->json Boolean) => {:type "boolean"}
-    (->json java.util.Date) => {:type "string" :format "date"}
-    (->json org.joda.time.DateTime) => {:type "boolean" :format "date-time"})
+    (->json Boolean) => {:type "boolean"})
   (facts "datatypes"
-    (->json Int*) => {:type "integer" :format "int32"}
     (->json Long*) => {:type "integer" :format "int64"}
-    (->json Float*) => {:type "number" :format "float"}
     (->json Double*) => {:type "number" :format "double"}
     (->json Str*) => {:type "string"}
-    (->json Byte*) => {:type "string" :format "byte"}
-    (->json Boolean*) => {:type "boolean"}
-    (->json Date*) => {:type "string" :format "date"}
-    (->json DateTime*) => {:type "boolean" :format "date-time"})
+    (->json Boolean*) => {:type "boolean"})
   (fact "schema types"
     (->json s/Int) => {:type "integer" :format "int64"}
     (->json s/Str) => {:type "string"}))

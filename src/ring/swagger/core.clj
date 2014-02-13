@@ -3,6 +3,7 @@
             [ring.util.response :refer :all]
             [schema.core :as s]
             [schema.utils :as su]
+            [ring.swagger.data :as data]
             [ring.swagger.schema :as schema]
             [ring.swagger.common :refer :all]
             [cheshire.generate :refer [add-encoder]]
@@ -40,15 +41,11 @@
 (defmulti json-type  identity)
 
 ;; java types
-(defmethod json-type schema/Int*      [_] {:type "integer" :format "int32"})
-(defmethod json-type schema/Long*     [_] {:type "integer" :format "int64"})
-(defmethod json-type schema/Float*    [_] {:type "number" :format "float"})
-(defmethod json-type schema/Double*   [_] {:type "number" :format "double"})
-(defmethod json-type schema/Str*      [_] {:type "string"})
-(defmethod json-type schema/Byte*     [_] {:type "string" :format "byte"})
-(defmethod json-type schema/Boolean*  [_] {:type "boolean"})
-(defmethod json-type schema/Date*     [_] {:type "string" :format "date"})
-(defmethod json-type schema/DateTime* [_] {:type "boolean" :format "date-time"})
+(defmethod json-type data/Long*     [_] {:type "integer" :format "int64"})
+(defmethod json-type data/Double*   [_] {:type "number" :format "double"})
+(defmethod json-type data/Str*      [_] {:type "string"})
+(defmethod json-type data/Boolean*  [_] {:type "boolean"})
+(defmethod json-type data/Keyword*  [_] {:type "string"})
 
 ;; schema types
 (defmethod json-type s/Int            [_] {:type "integer" :format "int64"})
@@ -56,7 +53,7 @@
 
 (defmethod json-type :default         [e]
   (cond
-    (schema/enum? e)  {:type "string" :enum (seq (:vs e))}
+    (data/enum? e)  {:type "string" :enum (seq (:vs e))}
     (schema/model? e) {:$ref (schema/schema-name e)}
     (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/schema-name e)}
     :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
@@ -65,10 +62,13 @@
   (json-type (or (schema/type-map type) type)))
 
 (defn type-of [v]
-  (if (sequential? v)
-    {:type "array"
-     :items (->json (first v))}
-    (->json v)))
+  (cond
+    (sequential? v) {:type "array"
+                     :items (->json (first v))}
+    (set? v)        {:type "array"
+                     :uniqueItems true
+                     :items (->json (first v))}
+    :else           (->json v)))
 
 (defn return-type-of [v]
   (if (sequential? v)
