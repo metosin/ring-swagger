@@ -12,7 +12,7 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 
 ## Installation
 
-    [metosin/ring-swagger "0.4.0"]
+    [metosin/ring-swagger "0.4.1"]
 
 ## Existing Adapters
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure

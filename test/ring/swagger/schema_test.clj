@@ -9,7 +9,7 @@
                     :c Long
                     :d String
                     :e {:f [Keyword]
-                        :g #{Keyword}
+                        :g #{String}
                         :h (s/enum :kikka :kakka :kukka)}})
 
 (def model {:a true
@@ -17,7 +17,7 @@
             :c 16
             :d "kikka"
             :e {:f [:kikka :kikka :kukka]
-                :g #{:kikka :kakka}
+                :g #{"kikka" "kakka"}
                 :h :kikka}})
 
 (fact "All types can be read from json"

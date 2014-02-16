@@ -16,7 +16,7 @@
    Boolean  Boolean*
    Keyword  Keyword*})
 
-(let [set-matcher (fn [schema] (when (instance? clojure.lang.PersistentHashSet schema) #(set %)))
+(let [set-matcher (fn [schema] (when (instance? clojure.lang.PersistentHashSet schema) (fn [x] (if (string? x) (set [x]) (set x)))))
       coercions {s/Keyword sc/string->keyword
                  clojure.lang.Keyword sc/string->keyword
                  s/Int sc/safe-long-cast
