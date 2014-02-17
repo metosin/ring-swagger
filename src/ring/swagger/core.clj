@@ -46,6 +46,7 @@
 (defmethod json-type data/String*   [_] {:type "string"})
 (defmethod json-type data/Boolean*  [_] {:type "boolean"})
 (defmethod json-type data/Keyword*  [_] {:type "string"})
+(defmethod json-type data/DateTime* [_] {:type "string" :format "date-time"})
 
 ;; schema types
 (defmethod json-type s/Int            [_] {:type "integer" :format "int64"})

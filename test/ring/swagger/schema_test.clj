@@ -10,7 +10,8 @@
                     :d String
                     :e {:f [Keyword]
                         :g #{String}
-                        :h (s/enum :kikka :kakka :kukka)}})
+                        :h (s/enum :kikka :kakka :kukka)
+                        :i java.util.Date}})
 
 (def model {:a true
             :b 2.2
@@ -18,7 +19,8 @@
             :d "kikka"
             :e {:f [:kikka :kikka :kukka]
                 :g #{"kikka" "kakka"}
-                :h :kikka}})
+                :h :kikka
+                :i (java.util.Date.)}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)

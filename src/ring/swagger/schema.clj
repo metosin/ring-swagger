@@ -1,34 +1,24 @@
 (ns ring.swagger.schema
   (:require [schema.core :as s]
             [schema.coerce :as sc]
-            [schema.macros :as sm]
             [schema.utils :as su]
             [slingshot.slingshot :refer [throw+]]
             [ring.swagger.common :refer :all]
-            [ring.swagger.data :refer :all]))
+            [ring.swagger.data :refer :all]
+            [ring.swagger.coerce :as coerce])
+  (:import [java.util Date]))
 
 (def Keyword  s/Keyword)
 
 (def type-map
-  {Long     Long*
-   Double   Double*
-   String   String*
-   Boolean  Boolean*
-   Keyword  Keyword*})
-
-(let [set-matcher (fn [schema] (when (instance? clojure.lang.PersistentHashSet schema) (fn [x] (if (string? x) (set [x]) (set x)))))
-      coercions {s/Keyword sc/string->keyword
-                 clojure.lang.Keyword sc/string->keyword
-                 s/Int sc/safe-long-cast
-                 Long sc/safe-long-cast
-                 Double double}]
-  (defn json-coercion-matcher
-    "A matcher that coerces keywords and keyword enums from strings, and longs and doubles
-     from numbers on the JVM (without losing precision)"
-    [schema]
-    (or (coercions schema)
-        (sc/keyword-enum-matcher schema)
-        (set-matcher schema))))
+  {Long      Long*
+   Double    Double*
+   String    String*
+   Boolean   Boolean*
+   Date      DateTime*
+;;   DateTime  DateTime*
+;;   LocalDate Date*
+   })
 
 ;;
 ;; Public Api
@@ -40,7 +30,7 @@
     (with-meta pred (merge old-meta metadata))))
 
 (defn coerce [model value]
-  ((sc/coercer (value-of model) json-coercion-matcher) value))
+  ((sc/coercer (value-of model) coerce/json-schema-coercion-matcher) value))
 
 (defn coerce! [model value]
   (let [result (coerce model value)]
