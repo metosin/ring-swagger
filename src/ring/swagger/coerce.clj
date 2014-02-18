@@ -1,19 +1,30 @@
 (ns ring.swagger.coerce
   (:require [schema.core :as s]
             [schema.coerce :as sc]
-            [schema.macros :as sm]
-            [schema.utils :as su]
-            [clj-time.core :as t]
             [clj-time.format :as tf]
             [clj-time.coerce :as tc]
-            [slingshot.slingshot :refer [throw+]]
             [ring.swagger.common :refer :all]
             [ring.swagger.data :refer :all])
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date]))
 
+
 (def date-formatter (tf/formatters :date))
-(def date-time-formatter (tf/formatters :date-time-no-ms))
+(def date-time-formatter (tf/formatters :date-time))
+
+(defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
+
+(defn unparse [fmt date] (tf/unparse fmt (->DateTime date)))
+(defn parse [fmt date] (tf/parse fmt (->DateTime date)))
+
+(defn date-time-matcher
+  [schema]
+  (if (date-time? schema)
+    (fn [x]
+      (if (string? x)
+        (let [parsed (parse date-time-formatter x)]
+          (if (= schema Date) (.toDate parsed) parsed))
+        x))))
 
 (defn set-matcher
   [schema]
@@ -22,15 +33,6 @@
       (if (string? x)
         (set [x])
         (set x)))))
-
-(defn date-time-matcher
-  [schema]
-  (if (date-time? schema)
-    (fn [x]
-      (if (string? x)
-        (let [parsed (tf/parse date-time-formatter x)]
-          (if (= schema Date) (.toDate parsed) parsed))
-        x))))
 
 (def coercions {s/Keyword sc/string->keyword
                 clojure.lang.Keyword sc/string->keyword

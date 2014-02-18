@@ -12,7 +12,7 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 
 ## Installation
 
-    [metosin/ring-swagger "0.4.1"]
+    [metosin/ring-swagger "0.5.0"]
 
 ## Existing Adapters
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
@@ -29,6 +29,7 @@ Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/r
 | `String`, `schema/str` | string
 | Keyword, `schema/Keyword` | string
 | `Boolean` | boolean
+| `java.util.Date`, `org.joda.time.DateTime` | string, date-time
 
 - Supports also `schema/enum`s, Vectors, Sets, Maps (Complex Types) and References. References are resolved automatically.
 - Has a tuned *Schema coercion* for transforming the input data into vanilla Clojure, supporting the following coercions:
@@ -41,7 +42,7 @@ see [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagge
 
 ## TODO
 
-- support for `Date` & `DateTime`
+- support for `LocalDate`
 - support for consumes
 - non-json produces & consumes
 

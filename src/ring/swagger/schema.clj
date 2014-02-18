@@ -6,7 +6,8 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.data :refer :all]
             [ring.swagger.coerce :as coerce])
-  (:import [java.util Date]))
+  (:import  [java.util Date]
+            [org.joda.time DateTime]))
 
 (def Keyword  s/Keyword)
 
@@ -16,9 +17,7 @@
    String    String*
    Boolean   Boolean*
    Date      DateTime*
-;;   DateTime  DateTime*
-;;   LocalDate Date*
-   })
+   DateTime  DateTime*})
 
 ;;
 ;; Public Api

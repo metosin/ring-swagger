@@ -5,6 +5,7 @@
             [schema.utils :as su]
             [ring.swagger.data :as data]
             [ring.swagger.schema :as schema]
+            [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [cheshire.generate :refer [add-encoder]]
             [camel-snake-kebab :refer [->camelCase]]))
@@ -18,7 +19,7 @@
                     :metadata {s/Keyword s/Any}})
 
 ;;
-;; Schema Transformations
+;; JSON Encoding
 ;;
 
 (add-encoder clojure.lang.Var
@@ -30,6 +31,15 @@
     (.writeString jsonGenerator
       (str (su/validation-error-explain x)))))
 
+(defn date-encoder [x jsonGenerator]
+  (.writeString jsonGenerator (coerce/unparse coerce/date-time-formatter x)))
+
+(add-encoder java.util.Date date-encoder)
+(add-encoder org.joda.time.DateTime date-encoder)
+
+;;
+;; Schema Transformations
+;;
 
 (defn resolve-model-var [x]
   (cond

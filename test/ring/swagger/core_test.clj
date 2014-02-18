@@ -3,19 +3,27 @@
             [schema.core :as s]
             [ring.swagger.schema :refer :all]
             [ring.swagger.data :refer :all]
-            [ring.swagger.core :refer :all]))
+            [ring.swagger.core :refer :all])
+  (:import  [java.util Date]
+            [org.joda.time DateTime]))
 
 (facts "type transformations"
+
   (facts "java types"
     (->json Long) => {:type "integer" :format "int64"}
     (->json Double) => {:type "number" :format "double"}
     (->json String) => {:type "string"}
-    (->json Boolean) => {:type "boolean"})
+    (->json Boolean) => {:type "boolean"}
+    (->json Date) => {:type "string" :format "date-time"}
+    (->json DateTime) => {:type "string" :format "date-time"})
+
   (facts "datatypes"
     (->json Long*) => {:type "integer" :format "int64"}
     (->json Double*) => {:type "number" :format "double"}
     (->json String*) => {:type "string"}
-    (->json Boolean*) => {:type "boolean"})
+    (->json Boolean*) => {:type "boolean"}
+    (->json DateTime*) => {:type "string" :format "date-time"})
+
   (fact "schema types"
     (->json s/Int) => {:type "integer" :format "int64"}
     (->json s/Str) => {:type "string"}))

@@ -2,7 +2,10 @@
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
             [cheshire.core :as cheshire]
-            [ring.swagger.schema :refer :all]))
+            [clj-time.core :as t]
+            [ring.swagger.schema :refer :all])
+  (:import  [java.util Date]
+            [org.joda.time DateTime]))
 
 (defmodel AllTypes {:a Boolean
                     :b Double
@@ -11,7 +14,8 @@
                     :e {:f [Keyword]
                         :g #{String}
                         :h (s/enum :kikka :kakka :kukka)
-                        :i java.util.Date}})
+                        :i Date
+                        :j DateTime}})
 
 (def model {:a true
             :b 2.2
@@ -20,7 +24,8 @@
             :e {:f [:kikka :kikka :kukka]
                 :g #{"kikka" "kakka"}
                 :h :kikka
-                :i (java.util.Date.)}})
+                :i (Date.)
+                :j (t/now)}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
