@@ -1,4 +1,4 @@
-# 0.5.0
+# 0.5.0 (18.2.2014)
 
 - Model and coarcing support for `java.util.Date` and `org.joda.time.DateTime`
 
