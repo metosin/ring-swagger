@@ -14,16 +14,27 @@
 
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
 
-(defn unparse [fmt date] (tf/unparse fmt (->DateTime date)))
-(defn parse [fmt date] (tf/parse fmt (->DateTime date)))
+(defn parse-date-time [date] (tf/parse date-time-formatter (->DateTime date)))
+(defn parse-date [date] (tf/parse-local-date date-formatter (->DateTime date)))
+
+(defn unparse-date-time [date] (tf/unparse date-time-formatter (->DateTime date)))
+(defn unparse-date [date] (tf/unparse-local-date date-formatter (->DateTime date)))
 
 (defn date-time-matcher
   [schema]
   (if (date-time? schema)
     (fn [x]
       (if (string? x)
-        (let [parsed (parse date-time-formatter x)]
+        (let [parsed (parse-date-time x)]
           (if (= schema Date) (.toDate parsed) parsed))
+        x))))
+
+(defn date-matcher
+  [schema]
+  (if (= LocalDate schema)
+    (fn [x]
+      (if (string? x)
+        (parse-date x)
         x))))
 
 (defn set-matcher
@@ -49,4 +60,5 @@
   (or (coercions schema)
     (sc/keyword-enum-matcher schema)
     (set-matcher schema)
-    (date-time-matcher schema)))
+    (date-time-matcher schema)
+    (date-matcher schema)))

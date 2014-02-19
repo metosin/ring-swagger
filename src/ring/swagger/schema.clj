@@ -7,17 +7,19 @@
             [ring.swagger.data :refer :all]
             [ring.swagger.coerce :as coerce])
   (:import  [java.util Date]
-            [org.joda.time DateTime]))
+            [org.joda.time DateTime LocalDate]))
 
 (def Keyword  s/Keyword)
 
-(def type-map
-  {Long      Long*
-   Double    Double*
-   String    String*
-   Boolean   Boolean*
-   Date      DateTime*
-   DateTime  DateTime*})
+(def type-map {Long      Long*
+               Double    Double*
+               String    String*
+               Boolean   Boolean*
+               Date      DateTime*
+               DateTime  DateTime*
+               LocalDate Date*
+               ;; schema types
+               s/Int     Long*})
 
 ;;
 ;; Public Api

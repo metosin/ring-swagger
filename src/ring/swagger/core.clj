@@ -31,11 +31,15 @@
     (.writeString jsonGenerator
       (str (su/validation-error-explain x)))))
 
-(defn date-encoder [x jsonGenerator]
-  (.writeString jsonGenerator (coerce/unparse coerce/date-time-formatter x)))
+(defn date-time-encoder [x jsonGenerator]
+  (.writeString jsonGenerator (coerce/unparse-date-time x)))
 
-(add-encoder java.util.Date date-encoder)
-(add-encoder org.joda.time.DateTime date-encoder)
+(add-encoder java.util.Date date-time-encoder)
+(add-encoder org.joda.time.DateTime date-time-encoder)
+
+(add-encoder org.joda.time.LocalDate
+  (fn [x jsonGenerator]
+    (.writeString jsonGenerator (coerce/unparse-date x))))
 
 ;;
 ;; Schema Transformations
@@ -57,10 +61,7 @@
 (defmethod json-type data/Boolean*  [_] {:type "boolean"})
 (defmethod json-type data/Keyword*  [_] {:type "string"})
 (defmethod json-type data/DateTime* [_] {:type "string" :format "date-time"})
-
-;; schema types
-(defmethod json-type s/Int            [_] {:type "integer" :format "int64"})
-(defmethod json-type s/Str            [_] {:type "string"})
+(defmethod json-type data/Date*     [_] {:type "string" :format "date"})
 
 (defmethod json-type :default         [e]
   (cond

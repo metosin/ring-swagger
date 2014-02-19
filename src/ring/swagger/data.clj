@@ -1,7 +1,7 @@
 (ns ring.swagger.data
   (:require [schema.core :as s])
   (:import [java.util Date]
-           [org.joda.time DateTime]))
+           [org.joda.time DateTime LocalDate]))
 
 (defn date-time? [x]
   (#{Date DateTime} x))
@@ -12,5 +12,7 @@
 (def Boolean*  (s/pred (partial instance? Boolean) 'boolean?))
 (def Keyword*  s/Keyword)
 (def DateTime* (s/pred (fn [x] (#{Date DateTime} (class x))) 'date-time?))
+(def Date*     (s/pred (fn [x] (#{LocalDate} (class x))) 'date?))
 
 (defn enum? [x] (= (class x) schema.core.EnumSchema))
+(defn maybe? [x] (= (class x) schema.core.Maybe))

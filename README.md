@@ -12,39 +12,69 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 
 ## Installation
 
-    [metosin/ring-swagger "0.5.0"]
+    [metosin/ring-swagger "0.6.0"]
 
-## Existing Adapters
+## Existing adapters
+
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 
-## Writing new Adapter
+## Writing a new Adapter (for you favourite routing lib)
+
 Check out the [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj#L116-L214).
 
 ## Supported Schema elements
 
-| Element | JSON  |
-| --------|:------------:|
-| `Long`, `schema/Int` | integer, int64
-| `Double` | number, double
-| `String`, `schema/str` | string
-| Keyword, `schema/Keyword` | string
-| `Boolean` | boolean
-| `java.util.Date`, `org.joda.time.DateTime` | string, date-time
+| Clojure | JSON Schema | Sample  |
+| --------|-------|:------------:|
+| `Long`, `schema/Int`        | integer, int64 | `1`|
+| `Double`                    | number, double | `1.2`
+| `String`, `schema/str`, Keyword, `schema/Keyword`      | string | `"kikka"`
+| `Boolean`                   | boolean | `true` 
+| `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`
+| `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
 
-- Supports also `schema/enum`s, Vectors, Sets, Maps (Complex Types) and References. References are resolved automatically.
-- Has a tuned *Schema coercion* for transforming the input data into vanilla Clojure, supporting the following coercions:
+- Vectors, Sets and Maps can be used as containers
+- Maps are modelled either as (Complex Types) or References. References are resolved automatically.
+- Nested maps are not supported (by the Spec)
+- Utilizes *Schema coercions* for transforming the input data into vanilla Clojure, supporting the following coercions:
   - numbers -> `Long` or `Double`
-  - string -> keyword
-  - vectors -> sets
-- `Integer`, `Byte` and `Float` are not supported as they can be handled as `Long`s and `Double`s.
+  - string -> Keyword
+  - string -> `java.util.Date`, `org.joda.time.DateTime` or `org.joda.time.LocalDate`
+  - vectors -> Sets
+- `Integer`, `Byte` and `Float` are not supported as they can be handled more idiomatically as `Long`s and `Double`s.
 
 see [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/schema_test.clj).
 
+## Models
+
+The building blocks for creating Web Schemas are found in package `ring.swagger.schema`. All schemas must be declared by `defmodel`, which set up the needed meta-data. Otherwise, it's just a normal [Schema](https://github.com/Prismatic/schema).
+
+Currently, the following `schema.core` predicates are supported: `Int`, `String`, `enum`, `required-key` and `optional-key`.
+
+### A Sample Schema
+
+```clojure
+(require '[ring.swagger.schema :refer :all])
+(require '[schema.core :refer :all])
+
+(defmodel AllTypes {:a Boolean
+                    :b Double
+                    :c Long
+                    :d String
+                    :e {:f [Keyword] ;; list of keywords
+                        :g #{String} ;; set of strings
+                        :h #{(s/enum :kikka :kakka :kukka)} ;; set of enums
+                        :i Date
+                        :j DateTime
+                        :k LocalDate}})
+```
+
+
 ## TODO
 
-- support for `LocalDate`
 - support for consumes
 - non-json produces & consumes
+- better support for `Schema`-predicates (`maybe`, `either`, `both`, ...)
 
 ## License
 

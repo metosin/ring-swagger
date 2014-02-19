@@ -5,7 +5,7 @@
             [clj-time.core :as t]
             [ring.swagger.schema :refer :all])
   (:import  [java.util Date]
-            [org.joda.time DateTime]))
+            [org.joda.time DateTime LocalDate]))
 
 (defmodel AllTypes {:a Boolean
                     :b Double
@@ -13,9 +13,10 @@
                     :d String
                     :e {:f [Keyword]
                         :g #{String}
-                        :h (s/enum :kikka :kakka :kukka)
+                        :h #{(s/enum :kikka :kakka :kukka)}
                         :i Date
-                        :j DateTime}})
+                        :j DateTime
+                        :k LocalDate}})
 
 (def model {:a true
             :b 2.2
@@ -23,9 +24,10 @@
             :d "kikka"
             :e {:f [:kikka :kikka :kukka]
                 :g #{"kikka" "kakka"}
-                :h :kikka
+                :h #{:kikka}
                 :i (Date.)
-                :j (t/now)}})
+                :j (t/now)
+                :k (t/today)}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
