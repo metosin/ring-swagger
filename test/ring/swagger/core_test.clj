@@ -28,7 +28,11 @@
 
   (fact "schema types"
     (->json s/Int) => {:type "integer" :format "int64"}
-    (->json s/Str) => {:type "string"}))
+    (->json s/Str) => {:type "string"})
+
+  (fact "containers"
+    (type-of [Long]) => {:type "array" :items {:format "int64" :type "integer"}}
+    (type-of #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true}))
 
 ;;
 ;; Schema Transformations

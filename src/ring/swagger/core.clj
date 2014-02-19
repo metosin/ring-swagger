@@ -144,7 +144,7 @@
 (defn extract-models [details]
   (let [route-meta (->> details :routes (map :metadata))
         return-models (->> route-meta (keep :return) flatten)
-        parameter-models (->> route-meta (mapcat :parameters) (keep :type))]
+        parameter-models (->> route-meta (mapcat :parameters) (keep :type) flatten)]
     (-> return-models
       (into parameter-models)
       flatten
@@ -178,6 +178,11 @@
 (defn extract-basepath
   [{:keys [scheme server-name server-port]}]
   (str (name scheme) "://" server-name ":" server-port))
+
+(defn convert-parameter [parameter]
+  (merge
+    parameter
+    (return-type-of (:type parameter))))
 
 ;;
 ;; Public api
@@ -214,5 +219,5 @@
                                   :nickname (or nickname (generate-nick route))
                                   :responseMessages [] ;; TODO
                                   :parameters (concat
-                                                parameters
+                                                (map convert-parameter parameters)
                                                 (swagger-path-parameters uri))})]})}))))
