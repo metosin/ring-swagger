@@ -182,7 +182,7 @@
 (defn convert-parameter [parameter]
   (merge
     parameter
-    (return-type-of (:type parameter))))
+    (type-of (:type parameter))))
 
 ;;
 ;; Public api
