@@ -1,6 +1,7 @@
 ## 0.6.0 (19.2.2014)
 
 - Model, serialization and coercion support for `org.joda.time.LocalDate`
+- Supports now model sequences in (body) parameters
 
 ## 0.5.0 (18.2.2014)
 
