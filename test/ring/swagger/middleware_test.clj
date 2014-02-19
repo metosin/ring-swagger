@@ -5,24 +5,23 @@
             [ring.swagger.middleware :refer :all]
             [ring.util.http-response :refer :all]))
 
-(defmodel P {:a {:b {:c (s/enum :kikka :kakka)
-                     :d Long}}})
+(defmodel P {:a Long
+             :b {:c (s/enum :kikka :kakka)}})
 
-(defmacro always [& body] `(fn [_#] ~@body))
-
-(def bad (always (coerce! P {:a {:b {:c nil}}})))
-(def good (always (coerce! P {:a {:b {:c :kikka
-                                      :d 1}}})))
+(defn bad  [_] (coerce! P {:b {:c nil}}))
+(defn good [_] (coerce! P {:a 1
+                           :b {:c :kikka}}))
+(defn fail [_] (throw (RuntimeException.)))
 
 (fact "catch-response"
 
   (facts "without middleware exception is thrown for validation error"
     (good ..request..) =not=> (throws Exception)
-    (bad ..request..) => (throws Exception))
+    (bad  ..request..)   =>   (throws Exception))
 
   (facts "with middleware exceptions are converted into bad-request"
-    ((catch-validation-errors bad) ..request..) => (bad-request {:errors {:a {:b {:c "(not (#{:kikka :kakka} nil))"
-                                                                                  :d "missing-required-key"}}}}))
+    ((catch-validation-errors bad) ..request..) => (bad-request {:errors {:a "missing-required-key"
+                                                                          :b {:c "(not (#{:kikka :kakka} nil))"}}}))
 
   (fact "only response-exceptions are caught"
-    ((catch-validation-errors (always (throw (RuntimeException.)))) ..request..) => (throws Exception)))
+    ((catch-validation-errors (fail ..request..))) => (throws Exception)))
