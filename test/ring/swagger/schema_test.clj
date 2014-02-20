@@ -87,8 +87,7 @@
     (eval `(defmodel MapModel [String])) => (throws AssertionError))
 
   (fact "has meta-data"
-    MapModel => (has-meta {:name 'MapModel
-                           :model #'MapModel}))
+    MapModel => (has-meta {:model #'MapModel}))
   (fact "model?"
     (model? MapModel) => true
     (model? {:a String}) => false))

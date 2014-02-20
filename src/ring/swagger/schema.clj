@@ -27,14 +27,12 @@
 
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
-   and the name of the model to it's metadata - used in handling
-   Model references."
+   to it's metadata - used in handling Model references."
   ([name form]
     `(defmodel ~name ~(str name " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([name docstring form]
     {:pre  [(map? form)]}
-    `(def ~name ~docstring (with-meta ~form {:model (var ~name)
-                                             :name  '~name}))))
+    `(def ~name ~docstring (with-meta ~form {:model (var ~name)}))))
 
 (defn model?
   "Checks weather input is a model."
