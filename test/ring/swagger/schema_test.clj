@@ -3,7 +3,8 @@
             [schema.core :as s]
             [cheshire.core :as cheshire]
             [clj-time.core :as t]
-            [ring.swagger.schema :refer :all])
+            [ring.swagger.schema :refer :all]
+            ring.swagger.core) ;; transformers
   (:import  [java.util Date]
             [org.joda.time DateTime LocalDate]))
 
