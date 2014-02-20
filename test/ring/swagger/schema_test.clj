@@ -73,3 +73,25 @@
     (doseq [type (keys type-map)]
       (fact {:midje/description (s/explain type)}
         (meta (field type {:a 1})) => {:a 1}))))
+
+(defn has-meta [expected] (chatty-checker [x] (= (meta x) expected)))
+
+(fact "defmodel"
+  (defmodel MapModel {:a String})
+
+  (fact "has meta-data"
+    MapModel => (has-meta {:name 'MapModel
+                           :model #'MapModel}))
+  (fact "model?"
+    (model? MapModel) => true
+    (model? {:a String}) => false))
+
+(fact "field"
+  (doseq [c (keys type-map)]
+    (fact {:midje/description (str "can't set meta-data to " c)}
+      (with-meta c {:a 1}) => (throws Exception)))
+  (doseq [c (vals type-map)]
+    (fact {:midje/description (str "can set meta-data to " (s/explain c))}
+      (with-meta c {:a 1}) =not=> (throws Exception)))
+  (fact "field set meta-data to it"
+    (field String {:kikka :kakka}) => (has-meta {:kikka :kakka})))

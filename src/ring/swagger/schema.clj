@@ -17,15 +17,33 @@
                Boolean   Boolean*
                Date      DateTime*
                DateTime  DateTime*
-               LocalDate Date*
-               ;; schema types
-               s/Int     Long*})
+               LocalDate Date*})
 
 ;;
 ;; Public Api
 ;;
 
-(defn field [pred metadata]
+(defmacro defmodel
+  "Defines a new Schema model (a Map) and attaches the model var
+   and the name of the model to it's metadata - used in handling
+   Model references."
+  ([name form]
+    `(defmodel ~name ~(str name) ~form))
+  ([name docstring form]
+    {:pre  [(map? form)]}
+    `(def ~name ~docstring (with-meta ~form {:model (var ~name)
+                                             :name  '~name}))))
+
+(defn model?
+  "Checks weather input is a model."
+  [x] (and (map? x) (var? (:model (meta x)))))
+
+(defn field
+  "Defines a Schema predicate and attaches meta-data into it.
+   Supports also basic immutable Java objects via type-mapping.
+   These include: Long, Double, String, Boolean, Date, DateTime
+   and LocalDate."
+  [pred metadata]
   (let [pred (or (type-map pred) pred)
         old-meta (meta pred)]
     (with-meta pred (merge old-meta metadata))))
@@ -38,11 +56,6 @@
     (if (su/error? result)
       (throw+ {:type ::validation :error (:error result)})
       result)))
-
-(defmacro defmodel [model form]
-  `(def ~model ~(str model) (with-meta ~form {:model (var ~model)})))
-
-(defn model? [x] (and (map? x) (var? (:model (meta x)))))
 
 (defn model-of [x]
   (let [value (value-of x)]
