@@ -2,11 +2,13 @@
   (:require [schema.core :as s]
             [schema.coerce :as sc]
             [schema.utils :as su]
+            [clojure.pprint :as pprint]
             [slingshot.slingshot :refer [throw+]]
             [ring.swagger.common :refer :all]
             [ring.swagger.data :refer :all]
             [ring.swagger.coerce :as coerce])
-  (:import  [java.util Date]
+  (:import  [java.io StringWriter]
+            [java.util Date]
             [org.joda.time DateTime LocalDate]))
 
 (def Keyword  s/Keyword)
@@ -28,7 +30,7 @@
    and the name of the model to it's metadata - used in handling
    Model references."
   ([name form]
-    `(defmodel ~name ~(str name) ~form))
+    `(defmodel ~name ~(str name " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([name docstring form]
     {:pre  [(map? form)]}
     `(def ~name ~docstring (with-meta ~form {:model (var ~name)
