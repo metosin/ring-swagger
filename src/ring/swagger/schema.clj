@@ -48,18 +48,32 @@
         old-meta (meta pred)]
     (with-meta pred (merge old-meta metadata))))
 
-(defn coerce [model value]
+(defn error?
+  "Checks weather input is an Schema error."
+  [x] (su/error? x))
+
+(defn coerce
+  "Coerces a value against a schema using enhanced json-coercion.
+   If no errors, returns the value, otherwise returns ValidationError."
+  [model value]
   ((sc/coercer (value-of model) coerce/json-schema-coercion-matcher) value))
 
 (defn coerce! [model value]
+  "Coerces a value against a schema using enhanced json-coercion.
+   If no errors, returns the value, otherwise slingshots a
+   validation exception."
   (let [result (coerce model value)]
-    (if (su/error? result)
+    (if (error? result)
       (throw+ {:type ::validation :error (:error result)})
       result)))
 
-(defn model-of [x]
+(defn model-var
+  "Returns models var."
+  [x]
   (let [value (value-of x)]
     (if (model? value)
       (:model (meta value)))))
 
-(defn schema-name [x] (some-> x model-of name-of))
+(defn model-name
+  "Returns model name or nil"
+  [x] (some-> x model-var name-of))

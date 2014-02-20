@@ -66,8 +66,8 @@
 (defmethod json-type :default         [e]
   (cond
     (data/enum? e)  {:type "string" :enum (seq (:vs e))}
-    (schema/model? e) {:$ref (schema/schema-name e)}
-    (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/schema-name e)}
+    (schema/model? e) {:$ref (schema/model-name e)}
+    (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
     :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
 
 (defn ->json [type]
@@ -86,7 +86,7 @@
   (if (sequential? v)
     {:type "array"
      :items (->json (first v))}
-    {:type (schema/schema-name v)}))
+    {:type (schema/model-name v)}))
 
 (defn properties [schema]
   (into {}
@@ -106,7 +106,7 @@
 ;; walk it.
 (defn resolve-model-vars [x]
   (cond
-    (schema/model? x) (schema/model-of x)
+    (schema/model? x) (schema/model-var x)
     (map? x) (into {} (for [[k v] x] [k (resolve-model-var v)]))
     (sequential? x) (map resolve-model-var x)
     :else (resolve-model-var x)))

@@ -50,17 +50,19 @@
     (model? AllTypes) => true
     (model? 'AllTypes) => false
     (model? #'AllTypes) => false
-    (model? {:int s/Int}) => false)
+    (model? {:a String}) => false)
 
-  (fact "model-of"
-    (model-of AllTypes) => #'AllTypes
-    (model-of 'AllTypes) => #'AllTypes
-    (model-of #'AllTypes) => #'AllTypes)
+  (fact "model-var"
+    (model-var AllTypes) => #'AllTypes
+    (model-var 'AllTypes) => #'AllTypes
+    (model-var #'AllTypes) => #'AllTypes
+    (model-var {:a String}) => nil)
 
-  (fact "schema-name"
-    (schema-name AllTypes) => "AllTypes"
-    (schema-name 'AllTypes) => "AllTypes"
-    (schema-name #'AllTypes) => "AllTypes"))
+  (fact "model-name"
+    (model-name AllTypes) => "AllTypes"
+    (model-name 'AllTypes) => "AllTypes"
+    (model-name #'AllTypes) => "AllTypes"
+    (model-name {:a String}) => nil))
 
 (facts "types"
 
@@ -77,7 +79,12 @@
 (defn has-meta [expected] (chatty-checker [x] (= (meta x) expected)))
 
 (fact "defmodel"
-  (defmodel MapModel {:a String})
+
+  (fact "Map is allowed as a model"
+    (defmodel MapModel {:a String}))
+
+  (fact "Non-map is not allowed as a model"
+    (eval `(defmodel MapModel [String])) => (throws AssertionError))
 
   (fact "has meta-data"
     MapModel => (has-meta {:name 'MapModel
@@ -87,11 +94,35 @@
     (model? {:a String}) => false))
 
 (fact "field"
+
+  (fact "field set meta-data to it"
+    (field String {:kikka :kakka}) => (has-meta {:kikka :kakka}))
+
   (doseq [c (keys type-map)]
     (fact {:midje/description (str "can't set meta-data to " c)}
       (with-meta c {:a 1}) => (throws Exception)))
+
   (doseq [c (vals type-map)]
     (fact {:midje/description (str "can set meta-data to " (s/explain c))}
       (with-meta c {:a 1}) =not=> (throws Exception)))
+
   (fact "field set meta-data to it"
     (field String {:kikka :kakka}) => (has-meta {:kikka :kakka})))
+
+(fact "coercion"
+  (let [valid {:a "kikka"}
+        invalid {}]
+
+    (fact "coerce works for both models and schemas"
+      (coerce MapModel valid) => valid
+      (coerce {:a String} valid) => valid
+
+      (coerce MapModel invalid) => error?
+      (coerce {:a String} invalid) => error?)
+
+    (fact "coerce! works for both models and schemas"
+      (coerce! MapModel valid) => valid
+      (coerce! {:a String} valid) => valid
+
+      (coerce! MapModel invalid) => (throws clojure.lang.ExceptionInfo)
+      (coerce! {:a String} invalid) => (throws clojure.lang.ExceptionInfo))))
