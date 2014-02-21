@@ -8,6 +8,7 @@
   (:import  [java.util Date]
             [org.joda.time DateTime LocalDate]))
 
+(defmodel SubType  {:alive Boolean})
 (defmodel AllTypes {:a Boolean
                     :b Double
                     :c Long
@@ -19,7 +20,8 @@
                         :j DateTime
                         :k LocalDate
                         :l (s/maybe String)
-                        :m (s/both Long (s/pred odd? 'odd?))}})
+                        :m (s/both Long (s/pred odd? 'odd?))
+                        :n SubType}})
 
 (def model {:a true
             :b 2.2
@@ -32,7 +34,8 @@
                 :j (t/now)
                 :k (t/today)
                 :l nil
-                :m 1}})
+                :m 1
+                :n {:alive true}}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)

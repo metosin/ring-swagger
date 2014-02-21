@@ -54,14 +54,13 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
   - vectors -> Sets
 - `Integer`, `Byte` and `Float` are not supported as they can be handled more idiomatically as `Long`s and `Double`s.
 
-see [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/schema_test.clj).
-
 ### A Sample Schema
 
 ```clojure
 (require '[ring.swagger.schema :refer :all])
 (require '[schema.core :refer :all])
 
+(defmodel SubType  {:alive Boolean})
 (defmodel AllTypes {:a Boolean
                     :b Double
                     :c Long
@@ -73,8 +72,11 @@ see [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagge
                         :j DateTime
                         :k LocalDate
                         :l (s/maybe String)
-                        :m (s/both Long (s/pred odd? 'odd?))}})
+                        :m (s/both Long (s/pred odd? 'odd?))
+                        :n SubType}})
 ```
+
+see models and coercion in action in [tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/schema_test.clj).
 
 ## TODO
 
