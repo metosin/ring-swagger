@@ -32,7 +32,15 @@
 
   (fact "containers"
     (type-of [Long]) => {:type "array" :items {:format "int64" :type "integer"}}
-    (type-of #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true}))
+    (type-of #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
+
+  (fact "special predicates"
+    (type-of (s/enum :kikka)) => {:type "string" :enum [:kikka]}
+    (type-of (s/maybe Long)) => {:type "integer" :format "int64"}
+
+    )
+
+  )
 
 ;;
 ;; Schema Transformations

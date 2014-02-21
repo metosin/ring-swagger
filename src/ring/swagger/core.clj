@@ -54,22 +54,6 @@
 
 (defmulti json-type  identity)
 
-;; java types
-(defmethod json-type data/Long*     [_] {:type "integer" :format "int64"})
-(defmethod json-type data/Double*   [_] {:type "number" :format "double"})
-(defmethod json-type data/String*   [_] {:type "string"})
-(defmethod json-type data/Boolean*  [_] {:type "boolean"})
-(defmethod json-type data/Keyword*  [_] {:type "string"})
-(defmethod json-type data/DateTime* [_] {:type "string" :format "date-time"})
-(defmethod json-type data/Date*     [_] {:type "string" :format "date"})
-
-(defmethod json-type :default         [e]
-  (cond
-    (data/enum? e)  {:type "string" :enum (seq (:vs e))}
-    (schema/model? e) {:$ref (schema/model-name e)}
-    (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
-    :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
-
 (defn ->json [type]
   (json-type (or (schema/type-map type) type)))
 
@@ -87,6 +71,23 @@
     {:type "array"
      :items (->json (first v))}
     {:type (schema/model-name v)}))
+
+;; java types
+(defmethod json-type data/Long*     [_] {:type "integer" :format "int64"})
+(defmethod json-type data/Double*   [_] {:type "number" :format "double"})
+(defmethod json-type data/String*   [_] {:type "string"})
+(defmethod json-type data/Boolean*  [_] {:type "boolean"})
+(defmethod json-type data/Keyword*  [_] {:type "string"})
+(defmethod json-type data/DateTime* [_] {:type "string" :format "date-time"})
+(defmethod json-type data/Date*     [_] {:type "string" :format "date"})
+
+(defmethod json-type :default         [e]
+  (cond
+    (data/enum? e)  {:type "string" :enum (seq (:vs e))}
+    (data/maybe? e)  (type-of (:schema e))
+    (schema/model? e) {:$ref (schema/model-name e)}
+    (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
+    :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
 
 (defn properties [schema]
   (into {}
