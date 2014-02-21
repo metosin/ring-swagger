@@ -17,7 +17,9 @@
                         :h #{(s/enum :kikka :kakka :kukka)}
                         :i Date
                         :j DateTime
-                        :k LocalDate}})
+                        :k LocalDate
+                        :l (s/maybe String)
+                        :m (s/both Long (s/pred odd? 'odd?))}})
 
 (def model {:a true
             :b 2.2
@@ -28,7 +30,9 @@
                 :h #{:kikka}
                 :i (Date.)
                 :j (t/now)
-                :k (t/today)}})
+                :k (t/today)
+                :l nil
+                :m 1}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
@@ -124,4 +128,9 @@
       (coerce! {:a String} valid) => valid
 
       (coerce! MapModel invalid) => (throws clojure.lang.ExceptionInfo)
-      (coerce! {:a String} invalid) => (throws clojure.lang.ExceptionInfo))))
+      (coerce! {:a String} invalid) => (throws clojure.lang.ExceptionInfo))
+
+    (fact "both runs all predicates"
+      (let [OddModel (s/both Long (s/pred odd? 'odd?))]
+        (coerce OddModel 1) => 1
+        (coerce OddModel 2) => error?))))
