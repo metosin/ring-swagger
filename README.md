@@ -68,14 +68,15 @@ Currently, the following `schema.core` predicates are supported: `Int`, `String`
                     :b Double
                     :c Long
                     :d String
-                    :e {:f [Keyword] ;; list of keywords
-                        :g #{String} ;; set of strings
-                        :h #{(s/enum :kikka :kakka :kukka)} ;; set of enums
+                    :e {:f [Keyword]
+                        :g #{String}
+                        :h #{(s/enum :kikka :kakka :kukka)}
                         :i Date
                         :j DateTime
-                        :k LocalDate}})
+                        :k LocalDate
+                        :l (s/maybe String)
+                        :m (s/both Long (s/pred odd? 'odd?))}})
 ```
-
 
 ## TODO
 
