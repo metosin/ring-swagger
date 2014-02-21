@@ -58,7 +58,7 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 
 ```clojure
 (require '[ring.swagger.schema :refer :all])
-(require '[schema.core :refer :all])
+(require '[schema.core :as s])
 
 (defmodel SubType  {:alive Boolean})
 (defmodel AllTypes {:a Boolean
