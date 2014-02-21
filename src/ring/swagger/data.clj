@@ -16,3 +16,4 @@
 
 (defn enum? [x] (= (class x) schema.core.EnumSchema))
 (defn maybe? [x] (= (class x) schema.core.Maybe))
+(defn both? [x] (= (class x) schema.core.Both))

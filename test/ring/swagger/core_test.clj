@@ -35,12 +35,15 @@
     (type-of #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
 
   (fact "special predicates"
-    (type-of (s/enum :kikka)) => {:type "string" :enum [:kikka]}
-    (type-of (s/maybe Long)) => {:type "integer" :format "int64"}
 
-    )
+    (fact "enum -> enum"
+      (type-of (s/enum :kikka)) => {:type "string" :enum [:kikka]})
 
-  )
+    (fact "maybe -> type of internal schema"
+      (type-of (s/maybe Long)) => {:type "integer" :format "int64"})
+
+    (fact "both -> type of the first element"
+      (type-of (s/both Long String)) => {:type "integer" :format "int64"})))
 
 ;;
 ;; Schema Transformations
