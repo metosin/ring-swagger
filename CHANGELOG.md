@@ -1,3 +1,9 @@
+## 0.7.0
+
+- support for `schema/maybe` and `schema/both`
+- updated docs
+- more tests
+
 ## 0.6.0 (19.2.2014)
 
 - Model, serialization and coercion support for `org.joda.time.LocalDate`

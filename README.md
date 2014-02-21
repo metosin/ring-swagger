@@ -18,7 +18,7 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 
-If your favourite web lib is not listed here, you should write an client/adapter yourself. Here's howto:
+If your favourite web lib doesn't have an client adapter, you should write an it yourself. Here's howto:
 
 1. Create routes for `api-docs` and `api-docs/:api`
 2. Create route-collector to [collect the routes](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj).
@@ -37,7 +37,7 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 | `Long`, `schema/Int`        | integer, int64 | `1`|
 | `Double`                    | number, double | `1.2`
 | `String`, `schema/Str`, Keyword, `schema/Keyword`      | string | `"kikka"`
-| `Boolean`                   | boolean | `true` 
+| `Boolean`                   | boolean | `true`
 | `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`
 | `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
 | `(schema/enum X Y Z)`       | string enum(X,Y,Z)
@@ -45,14 +45,14 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 | `(schema/both X Y Z)`       | *type of X*
 
 - Vectors, Sets and Maps can be used as containers
-  - Maps are modelled either as (Complex Types) or References. References are resolved automatically.
-  - Nested maps are not supported (by the Spec)
-- Utilizes *Schema coercions* for transforming the input data into vanilla Clojure, supporting the following coercions:
+  - Maps are presented as Complex Types and References. Model references are resolved automatically.
+  - Nested maps are not supported (by the Spec), use references instead.
+- Utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back, supporting the following:
   - numbers -> `Long` or `Double`
   - string -> Keyword
   - string -> `java.util.Date`, `org.joda.time.DateTime` or `org.joda.time.LocalDate`
   - vectors -> Sets
-- `Integer`, `Byte` and `Float` are not supported as they can be handled more idiomatically as `Long`s and `Double`s.
+- `Integer`, `Byte` and `Float` are not supported as they can be handled more idiomatic as `Long`s and `Double`s.
 
 ### A Sample Schema
 
