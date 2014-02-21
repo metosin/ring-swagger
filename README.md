@@ -83,7 +83,6 @@ see models and coercion in action in [tests](https://github.com/metosin/ring-swa
 - enum -> allowed values
 - support for consumes
 - non-json produces & consumes
-- better support for `Schema`-predicates (`maybe`, `either`, `both`, ...)
 
 ## License
 
