@@ -26,7 +26,11 @@ If your favourite web lib is not listed here, you should write an client/adapter
 4. Ship it.
 5. Profit.
 
-## Supported Schema elements
+## Models
+
+The building blocks for creating Web Schemas are found in package `ring.swagger.schema`. All schemas must be declared by `defmodel`, which set up the needed meta-data. Otherwise, it's just a normal [Schema](https://github.com/Prismatic/schema).
+
+### Supported Schema elements
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
@@ -51,12 +55,6 @@ If your favourite web lib is not listed here, you should write an client/adapter
 - `Integer`, `Byte` and `Float` are not supported as they can be handled more idiomatically as `Long`s and `Double`s.
 
 see [Tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/schema_test.clj).
-
-## Models
-
-The building blocks for creating Web Schemas are found in package `ring.swagger.schema`. All schemas must be declared by `defmodel`, which set up the needed meta-data. Otherwise, it's just a normal [Schema](https://github.com/Prismatic/schema).
-
-Currently, the following `schema.core` predicates are supported: `Int`, `String`, `enum`, `required-key` and `optional-key`.
 
 ### A Sample Schema
 
