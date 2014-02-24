@@ -36,8 +36,9 @@
 
   (fact "special predicates"
 
-    (fact "enum -> enum"
-      (type-of (s/enum :kikka)) => {:type "string" :enum [:kikka]})
+    (fact "enums"
+      (type-of (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
+      (type-of (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum [1 2 3]})
 
     (fact "maybe -> type of internal schema"
       (type-of (s/maybe Long)) => {:type "integer" :format "int64"})

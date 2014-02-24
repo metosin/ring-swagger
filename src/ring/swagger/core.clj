@@ -83,7 +83,7 @@
 
 (defmethod json-type :default         [e]
   (cond
-    (data/enum? e)  {:type "string" :enum (seq (:vs e))}
+    (data/enum? e)  (merge (type-of (class (first (:vs e)))) {:enum (seq (:vs e))})
     (data/maybe? e)  (type-of (:schema e))
     (data/both? e)  (type-of (first (:schemas e)))
     (schema/model? e) {:$ref (schema/model-name e)}

@@ -19,7 +19,8 @@
                Boolean   Boolean*
                Date      DateTime*
                DateTime  DateTime*
-               LocalDate Date*})
+               LocalDate Date*
+               clojure.lang.Keyword Keyword*})
 
 ;;
 ;; Public Api
