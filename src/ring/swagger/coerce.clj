@@ -8,17 +8,13 @@
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date]))
 
-
-(def date-formatter (tf/formatters :date))
-(def date-time-formatter (tf/formatters :date-time))
-
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
 
-(defn parse-date-time [date] (tf/parse date-time-formatter (->DateTime date)))
-(defn parse-date [date] (tf/parse-local-date date-formatter (->DateTime date)))
+(defn parse-date-time [date] (tf/parse (tf/formatters :date-time-parser) (->DateTime date)))
+(defn parse-date [date] (tf/parse-local-date (tf/formatters :date) (->DateTime date)))
 
-(defn unparse-date-time [date] (tf/unparse date-time-formatter (->DateTime date)))
-(defn unparse-date [date] (tf/unparse-local-date date-formatter (->DateTime date)))
+(defn unparse-date-time [date] (tf/unparse (tf/formatters :date-time) (->DateTime date)))
+(defn unparse-date [date] (tf/unparse-local-date (tf/formatters :date) (->DateTime date)))
 
 (defn date-time-matcher
   [schema]

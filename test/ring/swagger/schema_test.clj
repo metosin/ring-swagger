@@ -51,6 +51,13 @@
     (fact "coerce! makes models match"
       (coerce! AllTypes jmodel) => model)))
 
+(fact "date-time coercion"
+  (fact "with millis"
+    (coerce! {:d Date} {:d "2014-02-24T21:37:40.477Z"}) =not=> (throws Exception))
+  (fact "without millis"
+    (coerce! {:d Date} {:d "2014-02-24T21:37:40Z"}) =not=> (throws Exception)))
+
+
 (fact "models"
 
   (fact "model?"

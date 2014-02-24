@@ -1,6 +1,7 @@
 ## 0.7.0
 
 - support for `schema/maybe` and `schema/both`
+- consume `Date` & `DateTime` both with and without millis: `"2014-02-18T18:25:37.456Z"` & `"2014-02-18T18:25:37Z"`
 - updated docs
 - more tests
 
