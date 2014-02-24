@@ -40,11 +40,7 @@
 (defn set-matcher
   [schema]
   (if (instance? clojure.lang.APersistentSet schema)
-    (fn [x]
-      (cond
-        (set? x) x
-        (sequential? x) (set x)
-        :else nil))))
+    (fn [x] (if (sequential? x) (set x) x))))
 
 (def coercions {s/Keyword sc/string->keyword
                 clojure.lang.Keyword sc/string->keyword
