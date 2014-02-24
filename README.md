@@ -18,12 +18,12 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 
-If your favourite web lib doesn't have an client adapter, you should write an it yourself. Here's howto:
+If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
 
 1. Create routes for `api-docs` and `api-docs/:api`
 2. Create route-collector to [collect the routes](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj).
-3. Test it.
-4. Ship it.
+3. Publish it.
+4. List it here.
 5. Profit.
 
 ## Models
@@ -80,7 +80,6 @@ see models and coercion in action in [tests](https://github.com/metosin/ring-swa
 
 ## TODO
 
-- enum -> allowed values
 - support for consumes
 - non-json produces & consumes
 
