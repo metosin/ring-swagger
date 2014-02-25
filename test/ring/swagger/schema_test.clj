@@ -95,10 +95,14 @@
 (fact "defmodel"
 
   (fact "Map is allowed as a model"
-    (defmodel MapModel {:a String}))
+    (defmodel MapModel {:a String})
+    (let [model {:a String}]
+      (defmodel MapModel model)))
 
   (fact "Non-map is not allowed as a model"
-    (eval `(defmodel MapModel [String])) => (throws AssertionError))
+    (defmodel MapModel [String]) => (throws AssertionError)
+    (let [model [String]]
+      (defmodel MapModel model) => (throws AssertionError)))
 
   (fact "has meta-data"
     MapModel => (has-meta {:model #'MapModel}))
@@ -125,6 +129,8 @@
 (fact "coercion"
   (let [valid {:a "kikka"}
         invalid {}]
+
+    (defmodel MapModel {:a String})
 
     (fact "coerce works for both models and schemas"
       (coerce MapModel valid) => valid

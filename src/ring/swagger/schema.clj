@@ -32,8 +32,11 @@
   ([name form]
     `(defmodel ~name ~(str name " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([name docstring form]
-    {:pre  [(map? form)]}
-    `(def ~name ~docstring (with-meta ~form {:model (var ~name)}))))
+    `(do (assert (map? ~form))
+         (def ~name ~docstring
+           (with-meta
+             ~form
+             {:model (var ~name)})))))
 
 (defn model?
   "Checks weather input is a model."
