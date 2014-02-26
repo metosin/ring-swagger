@@ -80,6 +80,7 @@ see models and coercion in action in [tests](https://github.com/metosin/ring-swa
 
 ## TODO
 
+- support for nested maps (generate SubTypes on the fly)
 - support for consumes
 - support for auth
 - non-json produces & consumes
