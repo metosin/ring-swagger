@@ -1,3 +1,19 @@
+## 0.7.1
+- `defmodel` supports nested maps.
+
+```
+(defmodel Customer {:id String
+                    :address {:street String
+                              :zip Long
+                              :country {:code Long
+                                        :name String}}})
+
+;; Customer => {:id java.lang.String, :address {:street java.lang.String, :zip java.lang.Long, :country {:name java.lang.String, :code java.lang.Long}}}
+;; Customer_Address => {:street java.lang.String, :zip java.lang.Long, :country {:name java.lang.String, :code java.lang.Long}}
+;; Customer_Address_Country => {:name java.lang.String, :code java.lang.Long}
+```
+
+
 ## 0.7.0
 
 - support for `schema/maybe` and `schema/both`

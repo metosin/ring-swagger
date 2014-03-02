@@ -46,7 +46,7 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
-  - Nested maps are not supported (by the Spec), use references instead.
+  - Nested maps are transformed automatically into flat maps with generated child references.
 - Utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back, supporting the following:
   - numbers -> `Long` or `Double`
   - string -> Keyword
