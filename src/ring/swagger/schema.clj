@@ -27,6 +27,10 @@
 ;; Public Api
 ;;
 
+(defn model?
+  "Checks weather input is a model."
+  [x] (and (map? x) (var? (:model (meta x)))))
+
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
    to it's metadata - used in handling Model references. Generates
@@ -37,20 +41,18 @@
   ([model docstring form]
     (let [form (into {}
                  (for [[k v] (eval form)
-                       :let [v (if (map? v)
-                                 (let [sub-model (symbol (str model "_" (->CamelCase (name k))))]
+                       :let [v (if (and (instance? clojure.lang.APersistentMap v) ;; need to filter out Schema records
+                                        (not (model? v))) ;; and predefined models
+                                 (let [sub-model (symbol (str model "_" (->CamelCase (name (s/explicit-schema-key k)))))]
                                    (eval `(defmodel ~sub-model ~v))
-                                   sub-model) v)]]
+                                   sub-model)
+                                 v)]]
                          [k v]))]
       `(do (assert (map? ~form))
          (def ~model ~docstring
            (with-meta
              ~form
              {:model (var ~model)}))))))
-
-(defn model?
-  "Checks weather input is a model."
-  [x] (and (map? x) (var? (:model (meta x)))))
 
 (defn field
   "Defines a Schema predicate and attaches meta-data into it.
