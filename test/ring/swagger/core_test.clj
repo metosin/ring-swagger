@@ -105,7 +105,10 @@
   (transform 'Category) => Category'
   (transform 'Pet) => Pet')
 
-(fact "Swagger Petstore example"
+(fact "collect-models"
+  (collect-models 'Pet) => #{#'Pet #'Tag #'Category})
+
+(fact "transform-models"
   (transform-models 'Pet) => {:Pet Pet'
                               :Tag Tag'
                               :Category Category'})

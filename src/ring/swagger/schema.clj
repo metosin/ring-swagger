@@ -6,6 +6,7 @@
             [slingshot.slingshot :refer [throw+]]
             [ring.swagger.common :refer :all]
             [ring.swagger.data :refer :all]
+            [camel-snake-kebab :refer [->CamelCase]]
             [ring.swagger.coerce :as coerce])
   (:import  [java.io StringWriter]
             [java.util Date]
@@ -28,15 +29,24 @@
 
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
-   to it's metadata - used in handling Model references."
-  ([name form]
-    `(defmodel ~name ~(str name " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
-  ([name docstring form]
-    `(do (assert (map? ~form))
-         (def ~name ~docstring
+   to it's metadata - used in handling Model references. Generates
+   submodels from nested Maps and links them by reference. Submodels
+   are named after their father and the child key."
+  ([model form]
+    `(defmodel ~model ~(str model " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
+  ([model docstring form]
+    (let [form (into {}
+                 (for [[k v] (eval form)
+                       :let [v (if (map? v)
+                                 (let [sub-model (symbol (str model "_" (->CamelCase (name k))))]
+                                   (eval `(defmodel ~sub-model ~v))
+                                   sub-model) v)]]
+                         [k v]))]
+      `(do (assert (map? ~form))
+         (def ~model ~docstring
            (with-meta
              ~form
-             {:model (var ~name)})))))
+             {:model (var ~model)}))))))
 
 (defn model?
   "Checks weather input is a model."

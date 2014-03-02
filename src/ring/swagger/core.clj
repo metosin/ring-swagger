@@ -127,18 +127,18 @@
        :required required})))
 
 (defn collect-models [x]
-  (let [x      (value-of x)
-        model  (-> x meta :model)
-        values (if (map? x) (vals x) (seq x))
-        cols   (filter coll? values)
-        models (->> cols (map meta) (keep :model))
-        models (if model (conj models model) model)]
-    (reduce concat models (map collect-models cols))))
+  (set
+    (let [x      (value-of x)
+          model  (-> x meta :model)
+          values (if (map? x) (vals x) (seq x))
+          cols   (filter coll? values)
+          models (->> cols (map meta) (keep :model))
+          models (if model (conj models model) model)]
+      (reduce concat models (map collect-models cols)))))
 
 (defn transform-models [& schemas*]
   (->> schemas*
     (mapcat collect-models)
-    distinct
     (map transform)
     (map (juxt (comp keyword :id) identity))
     (into {})))
