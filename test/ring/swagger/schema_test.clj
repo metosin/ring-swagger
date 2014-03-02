@@ -95,14 +95,10 @@
 (fact "defmodel"
 
   (fact "Map is allowed as a model"
-    (defmodel MapModel {:a String})
-    (let [model {:a String}]
-      (defmodel MapModel model)))
+    (defmodel MapModel {:a String}))
 
   (fact "Non-map is not allowed as a model"
-    (defmodel MapModel [String]) => (throws AssertionError)
-    (let [model [String]]
-      (defmodel MapModel model) => (throws AssertionError)))
+    (eval '(defmodel MapModel [String])) => (throws AssertionError))
 
   (fact "has meta-data"
     MapModel => (has-meta {:model #'MapModel}))
