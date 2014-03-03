@@ -1,4 +1,4 @@
-## 0.7.1
+## 0.7.1 (3.3.2014)
 - `defmodel` now supports nested maps (by generating sub-types)
 
 ```clojure
@@ -13,8 +13,7 @@
 ;; Customer_Address_Country => {:name java.lang.String, :code java.lang.Long}
 ```
 
-
-## 0.7.0
+## 0.7.0 (26.2.2014)
 
 - support for `schema/maybe` and `schema/both`
 - consume `Date` & `DateTime` both with and without millis: `"2014-02-18T18:25:37.456Z"` & `"2014-02-18T18:25:37Z"`
