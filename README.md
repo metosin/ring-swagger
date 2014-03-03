@@ -87,6 +87,10 @@ see models and coercion in action in [tests](https://github.com/metosin/ring-swa
 - non-json produces & consumes
 - full spec
 
+## Contributing
+
+Pull Requests welcome. Please run the tests (`lein midje`) and make sure they pass before you submit one.
+
 ## License
 
 Copyright © 2014 Metosin Oy
