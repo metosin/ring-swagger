@@ -4,6 +4,7 @@
             [cheshire.core :as cheshire]
             [clj-time.core :as t]
             [ring.swagger.schema :refer :all]
+            [ring.swagger.common :refer :all]
             ring.swagger.core) ;; transformers
   (:import  [java.util Date]
             [org.joda.time DateTime LocalDate]))
@@ -95,7 +96,11 @@
 (fact "defmodel"
 
   (fact "Map is allowed as a model"
-    (defmodel MapModel {:a String}))
+    (defmodel MapModel {:x String
+                        :y String}))
+
+  (fact "Something that evaluates as a map is allowed as a model"
+    (defmodel PimpedMapModel (dissoc MapModel :y)))
 
   (fact "Non-map is not allowed as a model"
     (eval '(defmodel MapModel [String])) => (throws AssertionError))
@@ -146,3 +151,20 @@
       (let [OddModel (s/both Long (s/pred odd? 'odd?))]
         (coerce OddModel 1) => 1
         (coerce OddModel 2) => error?))))
+
+(defmodel Customer {:id Long
+                    :address {:street String
+                              (s/optional-key :country) {:code #{(s/enum :fi :sv)}
+                                                         :name String}}})
+
+(facts "nested models"
+  (fact ".. have generated sub-models and are referenced from parent"
+    (model-var (get-in Customer [:address])) => #'Customer_Address
+    Customer_Address => {:street String
+                         (s/optional-key :country) {:code #{(s/enum :fi :sv)}
+                                                    :name String}})
+
+  (fact ".. for deeper level also"
+    (model-var (get-in Customer [:address (s/optional-key :country)])) => #'Customer_Address_Country
+    Customer_Address_Country => {:code #{(s/enum :fi :sv)}
+                                 :name String}))

@@ -76,6 +76,8 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
                         :n SubType}})
 ```
 
+- `AllTypes_E` gets automatically generated (and referenced).
+
 see models and coercion in action in [tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/schema_test.clj).
 
 ## TODO

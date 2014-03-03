@@ -1,7 +1,7 @@
 ## 0.7.1
-- `defmodel` supports nested maps.
+- `defmodel` now supports nested maps (by generating sub-types)
 
-```
+```clojure
 (defmodel Customer {:id String
                     :address {:street String
                               :zip Long

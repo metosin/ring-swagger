@@ -39,7 +39,6 @@
   ([model form]
     `(defmodel ~model ~(str model " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([model docstring form]
-    (assert (map? (eval form)))
     (letfn [(sub-models! [model form]
               (into {}
                 (for [[k v] form
@@ -47,13 +46,15 @@
                                     (not (model? v))) ;; and predefined models
                                 (let [sub-model (symbol (str model "_" (->CamelCase (name (s/explicit-schema-key k)))))]
                                   (eval `(defmodel ~sub-model ~v))
-                                  sub-model)
+                                  (value-of sub-model))
                                 v)]]
                   [k v])))]
-      `(def ~model ~docstring
+      `(do
+         (assert (map? ~form))
+         (def ~model ~docstring
          (with-meta
-           ~(sub-models! model form)
-           {:model (var ~model)})))))
+           (~sub-models! '~model ~form)
+           {:model (var ~model)}))))))
 
 (defn field
   "Defines a Schema predicate and attaches meta-data into it.
