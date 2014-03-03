@@ -12,7 +12,9 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 
 ## Latest version
 
-[![Latest version](https://clojars.org/metosin/ring-swagger/latest-version.svg)](https://clojars.org/metosin/ring-swagger)
+```clojure
+[metosin/ring-swagger "0.7.1"]
+```
 
 ## Client libraries
 
