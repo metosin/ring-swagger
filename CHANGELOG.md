@@ -1,3 +1,7 @@
+## 0.7.2 (4.3.2014)
+
+- sub-models don't have `_` to split up classes. `Customer_Address` -> `CustomerAddress`. Looks good.
+
 ## 0.7.1 (3.3.2014)
 - `defmodel` now supports nested maps (by generating sub-types)
 

@@ -159,12 +159,12 @@
 
 (facts "nested models"
   (fact ".. have generated sub-models and are referenced from parent"
-    (model-var (get-in Customer [:address])) => #'Customer_Address
-    Customer_Address => {:street String
-                         (s/optional-key :country) {:code #{(s/enum :fi :sv)}
-                                                    :name String}})
+    (model-var (get-in Customer [:address])) => #'CustomerAddress
+    CustomerAddress => {:street String
+                        (s/optional-key :country) {:code #{(s/enum :fi :sv)}
+                                                   :name String}})
 
   (fact ".. for deeper level also"
-    (model-var (get-in Customer [:address (s/optional-key :country)])) => #'Customer_Address_Country
-    Customer_Address_Country => {:code #{(s/enum :fi :sv)}
-                                 :name String}))
+    (model-var (get-in Customer [:address (s/optional-key :country)])) => #'CustomerAddressCountry
+    CustomerAddressCountry => {:code #{(s/enum :fi :sv)}
+                               :name String}))

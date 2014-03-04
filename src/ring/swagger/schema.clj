@@ -44,7 +44,7 @@
                 (for [[k v] form
                       :let [v (if (and (instance? clojure.lang.APersistentMap v) ;; need to filter out Schema records
                                     (not (model? v))) ;; and predefined models
-                                (let [sub-model (symbol (str model "_" (->CamelCase (name (s/explicit-schema-key k)))))]
+                                (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
                                   (eval `(defmodel ~sub-model ~v))
                                   (value-of sub-model))
                                 v)]]
