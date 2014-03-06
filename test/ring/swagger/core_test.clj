@@ -111,7 +111,8 @@
   (transform 'Pet) => Pet')
 
 (fact "collect-models"
-  (collect-models 'Pet) => #{#'Pet #'Tag #'Category})
+  (collect-models 'Pet) => #{#'Pet #'Tag #'Category}
+  (collect-models String) => #{})
 
 (fact "transform-models"
   (transform-models 'Pet) => {:Pet Pet'

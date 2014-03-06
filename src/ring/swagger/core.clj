@@ -129,9 +129,12 @@
 
 (defn collect-models [x]
   (set
-    (let [x      (value-of x)
-          model  (-> x meta :model)
-          values (if (map? x) (vals x) (seq x))
+    (let [value (value-of x)
+          model  (schema/model-var value)
+          values (cond
+                   (map? value) (vals value)
+                   (sequential? value) value
+                   :else [])
           cols   (filter coll? values)
           models (->> cols (map meta) (keep :model))
           models (if model (conj models model) model)]
@@ -186,6 +189,17 @@
   (merge
     parameter
     (type-of (:type parameter))))
+
+(defn query-model-parameters [model]
+  (doall
+    (for [[k v ] model
+          :let [rk (s/explicit-schema-key k)]]
+      (merge
+        {:name (name rk)
+         :description ""
+         :type v
+         :required (s/required-key? k)
+         :paramType "query"}))))
 
 ;;
 ;; Public api
