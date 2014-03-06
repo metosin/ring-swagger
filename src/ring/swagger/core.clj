@@ -185,21 +185,12 @@
   [{:keys [scheme server-name server-port]}]
   (str (name scheme) "://" server-name ":" server-port))
 
-(defn convert-parameter [parameter]
-  (merge
-    parameter
-    (type-of (:type parameter))))
-
-(defn query-model-parameters [model]
-  (doall
-    (for [[k v ] model
-          :let [rk (s/explicit-schema-key k)]]
+(defn convert-parameter [{:keys [type] :as parameter}]
+  (if (string? type) ;; already typed to JSON Schema
+      parameter
       (merge
-        {:name (name rk)
-         :description ""
-         :type v
-         :required (s/required-key? k)
-         :paramType "query"}))))
+        parameter
+        (type-of type))))
 
 ;;
 ;; Public api
