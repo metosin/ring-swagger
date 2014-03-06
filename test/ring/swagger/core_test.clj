@@ -43,13 +43,13 @@
       (type-of (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum [1 2 3]})
 
     (fact "maybe -> type of internal schema"
-      (type-of (s/maybe Long)) => {:type "integer" :format "int64"})
+      (type-of (s/maybe Long)) => (type-of Long))
 
     (fact "both -> type of the first element"
-      (type-of (s/both Long String)) => {:type "integer" :format "int64"})
+      (type-of (s/both Long String)) => (type-of Long))
 
     (fact "recursive -> type of internal schema"
-      (type-of (s/recursive #'Model)) => {:$ref "Model"})))
+      (type-of (s/recursive #'Model)) => (type-of #'Model))))
 
 ;;
 ;; Schema Transformations

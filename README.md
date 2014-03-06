@@ -45,6 +45,7 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 | `(schema/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
 | `(schema/maybe X)`          | *type of X*
 | `(schema/both X Y Z)`       | *type of X*
+| `(schema/recursive Var)`    | *Ref to (model) Var*
 
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
