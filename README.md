@@ -50,12 +50,25 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references.
-- Utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back, supporting the following:
-  - numbers -> `Long` or `Double`
-  - string -> Keyword
-  - string -> `java.util.Date`, `org.joda.time.DateTime` or `org.joda.time.LocalDate`
-  - vectors -> Sets
-- `Integer`, `Byte` and `Float` are not supported as they can be handled more idiomatic as `Long`s and `Double`s.
+
+### Schema coersion
+
+Ring-swagger utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back. There are two modes for coersions: json and query.
+
+#### Json-coercion
+
+- numbers -> `Long` or `Double`
+- string -> Keyword
+- string -> `java.util.Date`, `org.joda.time.DateTime` or `org.joda.time.LocalDate`
+- vectors -> Sets
+
+#### Query-coersion:
+
+extends the json-coersion with the following transformations:
+
+- string -> Long
+- string -> Double
+- string -> Boolean
 
 ### A Sample Schema
 
