@@ -73,17 +73,20 @@
 (defn coerce
   "Coerces a value against a schema using enhanced json-coercion.
    If no errors, returns the value, otherwise returns ValidationError."
-  [model value]
-  ((sc/coercer (value-of model) coerce/json-schema-coercion-matcher) value))
+  ([model value] (coerce model value :json))
+  ([model value type]
+    ((sc/coercer (value-of model) (coerce/coercer type)) value)))
 
-(defn coerce! [model value]
+(defn coerce!
   "Coerces a value against a schema using enhanced json-coercion.
    If no errors, returns the value, otherwise slingshots a
    validation exception."
-  (let [result (coerce model value)]
-    (if (error? result)
-      (throw+ {:type ::validation :error (:error result)})
-      result)))
+  ([model value] (coerce! model value :json))
+  ([model value type]
+    (let [result (coerce model value type)]
+      (if (error? result)
+        (throw+ {:type ::validation :error (:error result)})
+        result))))
 
 (defn model-var
   "Returns models var."
