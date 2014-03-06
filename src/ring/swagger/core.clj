@@ -86,6 +86,7 @@
     (data/enum? e)  (merge (type-of (class (first (:vs e)))) {:enum (seq (:vs e))})
     (data/maybe? e)  (type-of (:schema e))
     (data/both? e)  (type-of (first (:schemas e)))
+    (data/recursive? e) (type-of (:schema-var e))
     (schema/model? e) {:$ref (schema/model-name e)}
     (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
     :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))

@@ -7,6 +7,8 @@
   (:import  [java.util Date]
             [org.joda.time DateTime LocalDate]))
 
+(defmodel Model {})
+
 (facts "type transformations"
 
   (facts "java types"
@@ -44,7 +46,10 @@
       (type-of (s/maybe Long)) => {:type "integer" :format "int64"})
 
     (fact "both -> type of the first element"
-      (type-of (s/both Long String)) => {:type "integer" :format "int64"})))
+      (type-of (s/both Long String)) => {:type "integer" :format "int64"})
+
+    (fact "recursive -> type of internal schema"
+      (type-of (s/recursive #'Model)) => {:$ref "Model"})))
 
 ;;
 ;; Schema Transformations
