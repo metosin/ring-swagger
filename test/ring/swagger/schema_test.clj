@@ -58,7 +58,6 @@
   (fact "without millis"
     (coerce! {:d Date} {:d "2014-02-24T21:37:40Z"}) =not=> (throws Exception)))
 
-
 (fact "models"
 
   (fact "model?"
@@ -168,3 +167,15 @@
     (model-var (get-in Customer [:address (s/optional-key :country)])) => #'CustomerAddressCountry
     CustomerAddressCountry => {:code #{(s/enum :fi :sv)}
                                :name String}))
+
+(facts "query-parameter coercion"
+
+  (let [Model {:a Long :b Double :c Boolean :d Keyword}
+        query {:a "1"  :b "2.2"  :c "true"  :d "kikka"}
+        value {:a 1    :b 2.2    :c true    :d :kikka}]
+
+    (fact "query-coercion can convert string to Longs,Doubles and Booleans"
+      (coerce! Model query :query) => value)
+
+    (fact "json-coercion cant convert string to Longs,Doubles and Booleans"
+      (coerce! Model query :json) => (throws Exception))))

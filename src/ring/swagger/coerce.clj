@@ -38,20 +38,47 @@
   (if (instance? clojure.lang.APersistentSet schema)
     (fn [x] (if (sequential? x) (set x) x))))
 
-(def coercions {s/Keyword sc/string->keyword
-                clojure.lang.Keyword sc/string->keyword
-                s/Int sc/safe-long-cast
-                Long sc/safe-long-cast
-                Double double})
+(defn string->boolean [x]
+  (condp = x
+    "true" true
+    "false" false
+    x))
+
+(defn string->long [x]
+  (try (java.lang.Long/valueOf x) (catch Exception e x)))
+
+(defn string->double [x]
+  (try (java.lang.Double/valueOf x) (catch Exception e x)))
+
+(def json-coersions {s/Keyword sc/string->keyword
+                     clojure.lang.Keyword sc/string->keyword
+                     s/Int sc/safe-long-cast
+                     Long sc/safe-long-cast
+                     Double double})
+
+(def query-coercions {s/Int string->long
+                      Long string->long
+                      Double string->double
+                      Boolean string->boolean})
+
+(defn json-schema-coercion-matcher
+  [schema]
+  (or (json-coersions schema)
+      (sc/keyword-enum-matcher schema)
+      (set-matcher schema)
+      (date-time-matcher schema)
+      (date-matcher schema)))
+
+(defn query-schema-coercion-matcher
+  [schema]
+  (or (query-coercions schema)
+      (json-schema-coercion-matcher schema)))
 
 ;;
 ;; Public Api
 ;;
 
-(defn json-schema-coercion-matcher
-  [schema]
-  (or (coercions schema)
-    (sc/keyword-enum-matcher schema)
-    (set-matcher schema)
-    (date-time-matcher schema)
-    (date-matcher schema)))
+(defn coercer [name]
+  (condp = name
+    :json json-schema-coercion-matcher
+    :query query-schema-coercion-matcher))
