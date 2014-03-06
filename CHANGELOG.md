@@ -1,3 +1,8 @@
+## 0.7.3 (6.3.2014)
+
+- support for Recursive Models (`s/recursive`), thanks to [Arttu Kaipiainen](https://github.com/arttuka)!
+- coersion has now two modes: `:json` and `:query`, latter converts strings to Longs, Doubles and Booleans
+
 ## 0.7.2 (4.3.2014)
 
 - sub-models don't have `_` to split up classes. `Customer_Address` -> `CustomerAddress`. Looks good.
