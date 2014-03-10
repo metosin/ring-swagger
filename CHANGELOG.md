@@ -1,3 +1,7 @@
+## 0.7.4 (10.3.2014)
+
+- `resolve-model-vars` uses Walking to preserve the original collection form (Sets)
+
 ## 0.7.3 (6.3.2014)
 
 - support for Recursive Models (`s/recursive`), thanks to [Arttu Kaipiainen](https://github.com/arttuka)!

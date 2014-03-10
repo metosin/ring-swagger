@@ -1,5 +1,6 @@
 (ns ring.swagger.core
   (:require [clojure.string :as str]
+            [clojure.walk :as walk]
             [ring.util.response :refer :all]
             [schema.core :as s]
             [schema.utils :as su]
@@ -106,13 +107,8 @@
 (defn required-keys [schema]
   (filter s/required-key? (keys schema)))
 
-;; walk it.
-(defn resolve-model-vars [x]
-  (cond
-    (schema/model? x) (schema/model-var x)
-    (map? x) (into {} (for [[k v] x] [k (resolve-model-var v)]))
-    (sequential? x) (map resolve-model-var x)
-    :else (resolve-model-var x)))
+(defn resolve-model-vars [form]
+  (walk/prewalk (fn [x] (or (schema/model-var x) x)) form))
 
 ;;
 ;; public Api
