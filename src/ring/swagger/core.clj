@@ -67,11 +67,15 @@
                      :items (->json (first v))}
     :else           (->json v)))
 
+;; duplicate code to type-of. shiit.
 (defn return-type-of [v]
-  (if (sequential? v)
-    {:type "array"
-     :items (->json (first v))}
-    {:type (schema/model-name v)}))
+  (cond
+    (sequential? v) {:type "array"
+                     :items (->json (first v))}
+    (set? v)        {:type "array"
+                     :uniqueItems true
+                     :items (->json (first v))}
+    :else           {:type (schema/model-name v)}))
 
 ;; java types
 (defmethod json-type data/Long*     [_] {:type "integer" :format "int64"})

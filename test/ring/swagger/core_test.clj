@@ -162,12 +162,14 @@
 ;; Helpers
 ;;
 
-(facts "generating return types from models and list of models"
+(facts "generating return types from models, list & set of models"
   (doseq [x [Tag 'Tag #'Tag]]
     (fact {:midje/description (str "returning " x)}
       (return-type-of x) => {:type "Tag"})
     (fact {:midje/description (str "returning [" x "]")}
-      (return-type-of [x]) => {:items {:$ref "Tag"}, :type "array"})))
+      (return-type-of [x]) => {:items {:$ref "Tag"}, :type "array"})
+    (fact {:midje/description (str "returning #{" x "}")}
+      (return-type-of #{x}) => {:items {:$ref "Tag"}, :type "array" :uniqueItems true})))
 
 ;;
 ;; Final json

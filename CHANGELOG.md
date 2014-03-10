@@ -1,6 +1,7 @@
 ## 0.7.4 (10.3.2014)
 
 - `resolve-model-vars` uses Walking to preserve the original collection form (Sets)
+- `return-type-of` preserves Sets.
 
 ## 0.7.3 (6.3.2014)
 
