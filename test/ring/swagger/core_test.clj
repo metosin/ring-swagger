@@ -36,6 +36,9 @@
     (->json [Long]) => {:type "array" :items {:format "int64" :type "integer"}}
     (->json #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
 
+  (facts "nil"
+    (->json nil) => {:type "void"})
+
   (fact "special predicates"
 
     (fact "s/enum"

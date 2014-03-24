@@ -63,6 +63,7 @@
   [x & {:keys [top] :or {top false}}]
   (letfn [(type-of [x] (json-type (or (schema/type-map x) x)))]
     (cond
+      (nil? x)        {:type "void"}
       (sequential? x) {:type "array"
                        :items (type-of (first x))}
       (set? x)        {:type "array"
@@ -237,7 +238,7 @@
                      :let [{:keys [return summary notes nickname parameters]} metadata]]
                  {:path (swagger-path uri)
                   :operations [(merge
-                                 (if return (->json return :top true) {:type "void"}) ; void -> schema
+                                 (->json return :top true)
                                  {:method (-> method name .toUpperCase)
                                   :summary (or summary "")
                                   :notes (or notes "")

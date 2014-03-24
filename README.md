@@ -40,6 +40,7 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 | `Double`                    | number, double | `1.2`
 | `String`, `schema/Str`, Keyword, `schema/Keyword`      | string | `"kikka"`
 | `Boolean`                   | boolean | `true`
+| `nil`                       | void |
 | `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`, consumes also without millis: `"2014-02-18T18:25:37Z"`
 | `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
 | `(schema/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
