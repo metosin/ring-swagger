@@ -130,7 +130,7 @@
 ;;
 
 (fact "swagger-path-parameters"
-  (swagger-path-parameters ["/api/" :kikka "/" :kakka "/" :kukka])
+  (swagger-path-parameters "/api/:kikka/:kakka/:kukka")
 
   => [{:description ""
        :name "kikka"
@@ -149,14 +149,14 @@
        :type "string"}])
 
 (fact "swagger-path"
-  (swagger-path ["/api/" :kikka "/" :kakka "/" :kukka]) => "/api/{kikka}/{kakka}/{kukka}")
+  (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
 
 (fact "generate-nick"
   (generate-nick {:method :get
-                  :uri ["/api/pizzas/" :id]
+                  :uri "/api/pizzas/:id"
                   :metadata ..meta..}) => "getApiPizzasById"
   (generate-nick {:method :delete
-                  :uri ["/api/" :version "/pizzas/" :id]
+                  :uri "/api/:version/pizzas/:id"
                   :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
 (fact "extract-models returns distict models from both return values & parameters types"
@@ -235,12 +235,12 @@
     (api-declaration
       {:apiVersion ..version..}
       {..api.. {:routes [{:method :get
-                          :uri ["/pets/" :id]
+                          :uri "/pets/:id"
                           :metadata {:return 'Pet
                                      :summary ..summary..
                                      :notes ..notes..}}
                          {:method :get
-                          :uri ["/pets"]
+                          :uri "/pets"
                           :metadata {:return ['Pet]
                                      :summary ..summary2..
                                      :notes ..notes2..}}]}}

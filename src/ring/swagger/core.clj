@@ -179,8 +179,15 @@
 ;; Route generation
 ;;
 
+(defn path-params [s]
+  (-> s
+    (str/replace #":(.[^:|/]*)" " :$1 ")
+    (str/split #" ")
+    (->> (keep #(if (.startsWith % ":") (keyword (.substring % 1)))))))
+
+; move this to client, use Schame types
 (defn swagger-path-parameters [uri]
-  (for [p (filter keyword? uri)]
+  (for [p (path-params uri)]
     {:name (name p)
      :description ""
      :required true
@@ -188,11 +195,12 @@
      :paramType "path"}))
 
 (defn swagger-path [uri]
-  (str/replace (str/join uri) #":([^/]+)" "{$1}"))
+  (str/replace uri #":([^/]+)" "{$1}"))
 
 (defn generate-nick [{:keys [method uri]}]
-  (-> (str (name method) " " (str/join uri))
+  (-> (str (name method) " " uri)
     (str/replace #"/" " ")
+    (str/replace #"-" "_")
     (str/replace #":" " by ")
     ->camelCase))
 
