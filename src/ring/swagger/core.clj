@@ -92,6 +92,7 @@
     (data/maybe? e)  (type-of (:schema e))
     (data/both? e)  (type-of (first (:schemas e)))
     (data/recursive? e) (type-of (:schema-var e))
+    (data/eq? e) (type-of (class (:v e)))
     (schema/model? e) {:$ref (schema/model-name e)}
     (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
     :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
@@ -101,7 +102,7 @@
     (for [[k v] schema
           :let [k (s/explicit-schema-key k)]]
       [k (merge
-           (dissoc (meta v) :model)
+           (dissoc (meta v) :model :name)
            (try (type-of v)
              (catch Exception e
                (throw

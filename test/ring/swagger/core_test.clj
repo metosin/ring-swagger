@@ -38,18 +38,21 @@
 
   (fact "special predicates"
 
-    (fact "enums"
+    (fact "s/enum"
       (type-of (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
       (type-of (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum [1 2 3]})
 
-    (fact "maybe -> type of internal schema"
+    (fact "s/maybe -> type of internal schema"
       (type-of (s/maybe Long)) => (type-of Long))
 
-    (fact "both -> type of the first element"
+    (fact "s/both -> type of the first element"
       (type-of (s/both Long String)) => (type-of Long))
 
-    (fact "recursive -> type of internal schema"
-      (type-of (s/recursive #'Model)) => (type-of #'Model))))
+    (fact "s/recursive -> type of internal schema"
+      (type-of (s/recursive #'Model)) => (type-of #'Model))
+
+    (fact "s/eq -> type of class of value"
+      (type-of (s/eq "kikka")) => (type-of String))))
 
 ;;
 ;; Schema Transformations
