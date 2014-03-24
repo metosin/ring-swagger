@@ -28,10 +28,8 @@
 ;;
 
 (defn model?
-  "Checks weather input is a model or a schema."
-  [x] (or
-        (and (map? x) (var? (:model (meta x))))
-        (and (map? x) (boolean (:name (meta x))))))
+  "Checks weather input is a model."
+  [x] (and (map? x) (var? (:model (meta x)))))
 
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
@@ -100,6 +98,4 @@
 
 (defn model-name
   "Returns model name or nil"
-  [x] (or
-        (some-> x model-var name-of)
-        (some-> x meta :name str)))
+  [x] (some-> x model-var name-of))
