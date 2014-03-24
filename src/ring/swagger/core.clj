@@ -53,7 +53,11 @@
     :else       (let [x' (eval x)]
                   (if (= (class x) (class x')) x (recur x')))))
 
-(defmulti json-type  identity)
+;;
+;; Json Schema transformations
+;;
+
+(declare json-type)
 
 (defn ->json [type]
   (json-type (or (schema/type-map type) type)))
@@ -67,7 +71,6 @@
                      :items (->json (first v))}
     :else           (->json v)))
 
-;; duplicate code to type-of. shiit.
 (defn return-type-of [v]
   (cond
     (sequential? v) {:type "array"
@@ -77,7 +80,17 @@
                      :items (->json (first v))}
     :else           {:type (schema/model-name v)}))
 
-;; java types
+;;
+;; dispatch
+;;
+
+(defmulti json-type identity)
+(defmulti json-type-class (fn [e] (class e)))
+
+;;
+;; identity-based dispatch
+;;
+
 (defmethod json-type data/Long*     [_] {:type "integer" :format "int64"})
 (defmethod json-type data/Double*   [_] {:type "number" :format "double"})
 (defmethod json-type data/String*   [_] {:type "string"})
@@ -86,16 +99,28 @@
 (defmethod json-type data/DateTime* [_] {:type "string" :format "date-time"})
 (defmethod json-type data/Date*     [_] {:type "string" :format "date"})
 
-(defmethod json-type :default         [e]
-  (cond
-    (data/enum? e)  (merge (type-of (class (first (:vs e)))) {:enum (seq (:vs e))})
-    (data/maybe? e)  (type-of (:schema e))
-    (data/both? e)  (type-of (first (:schemas e)))
-    (data/recursive? e) (type-of (:schema-var e))
-    (data/eq? e) (type-of (class (:v e)))
-    (schema/model? e) {:$ref (schema/model-name e)}
-    (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
-    :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
+(defmethod json-type :default [e]
+  (or
+    (json-type-class e)
+    (cond
+      (schema/model? e) {:$ref (schema/model-name e)}
+      (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
+      :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+
+;;
+;; class-based dispatch
+;;
+
+(defmethod json-type-class schema.core.EnumSchema [e] (merge (type-of (class (first (:vs e)))) {:enum (seq (:vs e))}))
+(defmethod json-type-class schema.core.Maybe [e] (type-of (:schema e)))
+(defmethod json-type-class schema.core.Both  [e] (type-of (first (:schemas e))))
+(defmethod json-type-class schema.core.Recursive [e] (type-of (:schema-var e)))
+(defmethod json-type-class schema.core.EqSchema [e] (type-of (class (:v e))))
+(defmethod json-type-class :default [e])
+
+;;
+;; Common
+;;
 
 (defn properties [schema]
   (into {}
