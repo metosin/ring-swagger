@@ -33,26 +33,26 @@
     (->json s/Str) => {:type "string"})
 
   (fact "containers"
-    (type-of [Long]) => {:type "array" :items {:format "int64" :type "integer"}}
-    (type-of #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
+    (->json [Long]) => {:type "array" :items {:format "int64" :type "integer"}}
+    (->json #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
 
   (fact "special predicates"
 
     (fact "s/enum"
-      (type-of (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
-      (type-of (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum [1 2 3]})
+      (->json (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
+      (->json (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum [1 2 3]})
 
     (fact "s/maybe -> type of internal schema"
-      (type-of (s/maybe Long)) => (type-of Long))
+      (->json (s/maybe Long)) => (->json Long))
 
     (fact "s/both -> type of the first element"
-      (type-of (s/both Long String)) => (type-of Long))
+      (->json (s/both Long String)) => (->json Long))
 
     (fact "s/recursive -> type of internal schema"
-      (type-of (s/recursive #'Model)) => (type-of #'Model))
+      (->json (s/recursive #'Model)) => (->json #'Model))
 
     (fact "s/eq -> type of class of value"
-      (type-of (s/eq "kikka")) => (type-of String))))
+      (->json (s/eq "kikka")) => (->json String))))
 
 ;;
 ;; Schema Transformations
@@ -168,11 +168,11 @@
 (facts "generating return types from models, list & set of models"
   (doseq [x [Tag 'Tag #'Tag]]
     (fact {:midje/description (str "returning " x)}
-      (return-type-of x) => {:type "Tag"})
+      (->json x :top true) => {:type "Tag"})
     (fact {:midje/description (str "returning [" x "]")}
-      (return-type-of [x]) => {:items {:$ref "Tag"}, :type "array"})
+      (->json [x] :top true) => {:items {:$ref "Tag"}, :type "array"})
     (fact {:midje/description (str "returning #{" x "}")}
-      (return-type-of #{x}) => {:items {:$ref "Tag"}, :type "array" :uniqueItems true})))
+      (->json #{x} :top true) => {:items {:$ref "Tag"}, :type "array" :uniqueItems true})))
 
 ;;
 ;; Final json

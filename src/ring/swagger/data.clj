@@ -3,8 +3,7 @@
   (:import [java.util Date]
            [org.joda.time DateTime LocalDate]))
 
-(defn date-time? [x]
-  (#{Date DateTime} x))
+(defn date-time? [x] (#{Date DateTime} x))
 
 (def Long*     s/Int)
 (def Double*   (s/pred (partial instance? Double) 'double?))

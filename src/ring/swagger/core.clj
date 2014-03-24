@@ -59,27 +59,18 @@
 
 (declare json-type)
 
-(defn ->json [type]
-  (json-type (or (schema/type-map type) type)))
-
-(defn type-of [v]
-  (cond
-    (sequential? v) {:type "array"
-                     :items (->json (first v))}
-    (set? v)        {:type "array"
-                     :uniqueItems true
-                     :items (->json (first v))}
-    :else           (->json v)))
-
-(defn return-type-of [v]
-  (cond
-    (sequential? v) {:type "array"
-                     :items (->json (first v))}
-    (set? v)        {:type "array"
-                     :uniqueItems true
-                     :items (->json (first v))}
-    :else           {:type (schema/model-name v)}))
-
+(defn ->json
+  [x & {:keys [top] :or {top false}}]
+  (letfn [(type-of [x] (json-type (or (schema/type-map x) x)))]
+    (cond
+      (sequential? x) {:type "array"
+                       :items (type-of (first x))}
+      (set? x)        {:type "array"
+                       :uniqueItems true
+                       :items (type-of (first x))}
+      :else           (if top
+                        {:type (schema/model-name x)}
+                        (type-of x)))))
 ;;
 ;; dispatch
 ;;
@@ -111,11 +102,11 @@
 ;; class-based dispatch
 ;;
 
-(defmethod json-type-class schema.core.EnumSchema [e] (merge (type-of (class (first (:vs e)))) {:enum (seq (:vs e))}))
-(defmethod json-type-class schema.core.Maybe      [e] (type-of (:schema e)))
-(defmethod json-type-class schema.core.Both       [e] (type-of (first (:schemas e))))
-(defmethod json-type-class schema.core.Recursive  [e] (type-of (:schema-var e)))
-(defmethod json-type-class schema.core.EqSchema   [e] (type-of (class (:v e))))
+(defmethod json-type-class schema.core.EnumSchema [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+(defmethod json-type-class schema.core.Maybe      [e] (->json (:schema e)))
+(defmethod json-type-class schema.core.Both       [e] (->json (first (:schemas e))))
+(defmethod json-type-class schema.core.Recursive  [e] (->json (:schema-var e)))
+(defmethod json-type-class schema.core.EqSchema   [e] (->json (class (:v e))))
 (defmethod json-type-class :default [e])
 
 ;;
@@ -128,7 +119,7 @@
           :let [k (s/explicit-schema-key k)]]
       [k (merge
            (dissoc (meta v) :model :name)
-           (try (type-of v)
+           (try (->json v)
              (catch Exception e
                (throw
                  (IllegalArgumentException.
@@ -216,7 +207,7 @@
       parameter
       (merge
         parameter
-        (type-of type))))
+        (->json type))))
 
 ;;
 ;; Public api
@@ -246,7 +237,7 @@
                      :let [{:keys [return summary notes nickname parameters]} metadata]]
                  {:path (swagger-path uri)
                   :operations [(merge
-                                 (if return (return-type-of return) {:type "void"})
+                                 (if return (->json return :top true) {:type "void"}) ; void -> schema
                                  {:method (-> method name .toUpperCase)
                                   :summary (or summary "")
                                   :notes (or notes "")
