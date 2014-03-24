@@ -1,3 +1,8 @@
+## x.x.x
+
+- json schema transformations are now all multimethod-based.
+- support for `s/eq`
+
 ## 0.7.4 (10.3.2014)
 
 - `resolve-model-vars` uses Walking to preserve the original collection form (Sets)

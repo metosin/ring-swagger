@@ -112,10 +112,10 @@
 ;;
 
 (defmethod json-type-class schema.core.EnumSchema [e] (merge (type-of (class (first (:vs e)))) {:enum (seq (:vs e))}))
-(defmethod json-type-class schema.core.Maybe [e] (type-of (:schema e)))
-(defmethod json-type-class schema.core.Both  [e] (type-of (first (:schemas e))))
-(defmethod json-type-class schema.core.Recursive [e] (type-of (:schema-var e)))
-(defmethod json-type-class schema.core.EqSchema [e] (type-of (class (:v e))))
+(defmethod json-type-class schema.core.Maybe      [e] (type-of (:schema e)))
+(defmethod json-type-class schema.core.Both       [e] (type-of (first (:schemas e))))
+(defmethod json-type-class schema.core.Recursive  [e] (type-of (:schema-var e)))
+(defmethod json-type-class schema.core.EqSchema   [e] (type-of (class (:v e))))
 (defmethod json-type-class :default [e])
 
 ;;
