@@ -134,19 +134,57 @@
 
   => [{:description ""
        :name "kikka"
-       :paramType "path"
+       :paramType :path
        :required true
        :type "string"}
       {:description ""
        :name "kakka"
-       :paramType "path"
+       :paramType :path
        :required true
        :type "string"}
       {:description ""
        :name "kukka"
-       :paramType "path"
+       :paramType :path
        :required true
        :type "string"}])
+
+(defmodel Query {:id Long (s/optional-key :q) String})
+(defmodel Body {:name String :age Long})
+(defmodel Path {:p Long})
+
+(fact "convert-parameters"
+  (convert-parameters
+    [{:model Query
+      :type :query}
+     {:model Body
+      :type :body}
+     {:model Path
+      :type :path}]) => [{:name "id"
+                          :description ""
+                          :format "int64"
+                          :paramType :query
+                          :required true
+                          :type "integer"}
+                         {:name "q"
+                          :description ""
+                          :paramType :query
+                          :required false
+                          :type "string"}
+                         {:name "body"
+                          :description ""
+                          :paramType :body
+                          :required true
+                          :type #'Body}
+                         {:name "p"
+                          :description ""
+                          :format "int64"
+                          :paramType :path
+                          :required true
+                          :type "integer"}])
+
+;;
+;; Helpers
+;;
 
 (fact "swagger-path"
   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
@@ -159,14 +197,18 @@
                   :uri "/api/:version/pizzas/:id"
                   :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
-(fact "extract-models returns distict models from both return values & parameters types"
-  (extract-models {:routes [{:metadata {:return ['Tag]
-                                        :parameters [{:type 'Tag}
-                                                     {:type ['Category]}]}}
-                            {:metadata {:return 'Tag}}]}) => ['Category 'Tag])
-;;
-;; Helpers
-;;
+(fact "extract-models"
+  (fact "returns both return and body-parameters but now query or path parameter types"
+    (extract-models {:routes [{:metadata {:return ['Tag]
+                                          :parameters [{:model 'Tag
+                                                        :type :body}
+                                                       {:model ['Category]
+                                                        :type :body}
+                                                       {:model 'Pet
+                                                        :type :path}
+                                                       {:model 'Pet
+                                                        :type :query}]}}
+                              {:metadata {:return 'Tag}}]}) => ['Category 'Tag]))
 
 (facts "generating return types from models, list & set of models"
   (doseq [x [Tag 'Tag #'Tag]]
@@ -232,6 +274,7 @@
                                   :models {}
                                   :apis []}))
   (fact "full api"
+    (defmodel Q {:q String})
     (api-declaration
       {:apiVersion ..version..}
       {..api.. {:routes [{:method :get
@@ -243,7 +286,9 @@
                           :uri "/pets"
                           :metadata {:return ['Pet]
                                      :summary ..summary2..
-                                     :notes ..notes2..}}]}}
+                                     :notes ..notes2..
+                                     :parameters [{:model Q
+                                                   :type :query}]}}]}}
       ..api..
       ..basepath..)
 
@@ -262,7 +307,7 @@
                                 :responseMessages []
                                 :parameters [{:description ""
                                               :name "id"
-                                              :paramType "path"
+                                              :paramType :path
                                               :required true
                                               :type "string"}]
                                 :summary ..summary..
@@ -272,7 +317,11 @@
                                 :nickname "getPets"
                                 :notes ..notes2..
                                 :responseMessages []
-                                :parameters []
+                                :parameters [{:description ""
+                                              :name "q"
+                                              :paramType :query
+                                              :required true
+                                              :type "string"}]
                                 :summary ..summary2..
                                 :type "array"
                                 :items {:$ref "Pet"}}]

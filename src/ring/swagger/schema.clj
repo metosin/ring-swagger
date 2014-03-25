@@ -99,3 +99,9 @@
 (defn model-name
   "Returns model name or nil"
   [x] (some-> x model-var name-of))
+
+(defn find-model-name
+  "Returns model name or nil"
+  [x]
+  (some-> (if (or (set? x) (sequential? x)) (first x) x) model-var name-of))
+

@@ -168,7 +168,7 @@
 (defn extract-models [details]
   (let [route-meta (->> details :routes (map :metadata))
         return-models (->> route-meta (keep :return) flatten)
-        parameter-models (->> route-meta (mapcat :parameters) (keep :type) flatten)]
+        parameter-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)]
     (-> return-models
       (into parameter-models)
       flatten
@@ -192,7 +192,7 @@
      :description ""
      :required true
      :type "string"
-     :paramType "path"}))
+     :paramType :path}))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
@@ -211,12 +211,40 @@
   [{:keys [scheme server-name server-port]}]
   (str (name scheme) "://" server-name ":" server-port))
 
-(defn convert-parameter [{:keys [type] :as parameter}]
-  (if (string? type) ;; already typed to JSON Schema
-      parameter
+;;
+;; Convert parameters
+;;
+
+(defn- convert-query-or-path-parameter [{:keys [model type]}]
+  {:pre [(#{:query :path} type)]}
+  (for [[k v] (value-of model)
+        :let [rk (s/explicit-schema-key k)]]
+    (merge
+      (->json v)
+      {:name (name rk)
+       :description ""
+       :required (s/required-key? k)
+       :paramType type})))
+
+(defn- convert-body-parameter [{:keys [model type meta] :or {meta {}}}]
+  (if model
+    (vector
       (merge
-        parameter
-        (->json type))))
+        {:name (some-> model schema/find-model-name .toLowerCase)
+         :description ""
+         :required true}
+        meta
+        {:paramType type
+         :type (resolve-model-vars model)}))))
+
+(defn convert-parameters [parameters]
+  (apply concat
+    (for [{type :type :as parameter} parameters
+          :let [parameter (resolve-model-vars parameter)]]
+      (do
+        (if (= type :body)
+            (convert-body-parameter parameter)
+            (convert-query-or-path-parameter parameter))))))
 
 ;;
 ;; Public api
@@ -253,5 +281,5 @@
                                   :nickname (or nickname (generate-nick route))
                                   :responseMessages [] ;; TODO
                                   :parameters (concat
-                                                (map convert-parameter parameters)
+                                                (convert-parameters parameters)
                                                 (swagger-path-parameters uri))})]})}))))

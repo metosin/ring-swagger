@@ -1,10 +1,11 @@
-## 0.8.0 (24.3.2014)
+## 0.8.0 (25.3.2014)
 
 - json schema transformations are now all multimethod-based.
 - support for `s/eq`
 - support for `nil`
 - BREAKING CHANGE: `type-of` and `return-type-of` are removed in favour of `->json`.
 - BREAKING CHANGE: Route uri is passed as a String (`/api/users/:id`) instead of a Vector (`["/api/users/" :id]`)
+- BREAKING CHANGE: Parameters are passed in Schema-format, not as Json Schema
 
 ## 0.7.4 (10.3.2014)
 
