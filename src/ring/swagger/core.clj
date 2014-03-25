@@ -185,14 +185,9 @@
     (str/split #" ")
     (->> (keep #(if (.startsWith % ":") (keyword (.substring % 1)))))))
 
-; move this to client, use Schame types
-(defn swagger-path-parameters [uri]
-  (for [p (path-params uri)]
-    {:name (name p)
-     :description ""
-     :required true
-     :type "string"
-     :paramType :path}))
+(defn string-path-parameters [uri]
+  {:type :path
+   :model (zipmap (path-params uri) (repeatedly (partial identity String)))})
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
@@ -286,6 +281,4 @@
                                   :notes (or notes "")
                                   :nickname (or nickname (generate-nick route))
                                   :responseMessages [] ;; TODO
-                                  :parameters (concat
-                                                (convert-parameters parameters)
-                                                (swagger-path-parameters uri))})]})}))))
+                                  :parameters (convert-parameters parameters)})]})}))))

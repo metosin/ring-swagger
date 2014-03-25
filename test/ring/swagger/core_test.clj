@@ -129,24 +129,13 @@
 ;; Route generation
 ;;
 
-(fact "swagger-path-parameters"
-  (swagger-path-parameters "/api/:kikka/:kakka/:kukka")
+(fact "string-path-parameters"
+  (string-path-parameters "/api/:kikka/:kakka/:kukka")
 
-  => [{:description ""
-       :name "kikka"
-       :paramType :path
-       :required true
-       :type "string"}
-      {:description ""
-       :name "kakka"
-       :paramType :path
-       :required true
-       :type "string"}
-      {:description ""
-       :name "kukka"
-       :paramType :path
-       :required true
-       :type "string"}])
+  => {:type :path
+      :model {:kukka java.lang.String
+              :kakka java.lang.String
+              :kikka java.lang.String}})
 
 (fact "scrict-schema strips open keys"
   (strict-schema {s/Keyword s/Any s/Str s/Any :s String}) => {:s String})
@@ -303,22 +292,24 @@
                                   :apis []}))
   (fact "full api"
     (defmodel Q {:q String})
-    (api-declaration
-      {:apiVersion ..version..}
-      {..api.. {:routes [{:method :get
-                          :uri "/pets/:id"
-                          :metadata {:return 'Pet
-                                     :summary ..summary..
-                                     :notes ..notes..}}
-                         {:method :get
-                          :uri "/pets"
-                          :metadata {:return ['Pet]
-                                     :summary ..summary2..
-                                     :notes ..notes2..
-                                     :parameters [{:model Q
-                                                   :type :query}]}}]}}
-      ..api..
-      ..basepath..)
+    (let [uri "/pets/:id"]
+      (api-declaration
+        {:apiVersion ..version..}
+        {..api.. {:routes [{:method :get
+                            :uri uri
+                            :metadata {:return 'Pet
+                                       :summary ..summary..
+                                       :notes ..notes..
+                                       :parameters [(string-path-parameters uri)]}}
+                           {:method :get
+                            :uri "/pets"
+                            :metadata {:return ['Pet]
+                                       :summary ..summary2..
+                                       :notes ..notes2..
+                                       :parameters [{:model Q
+                                                     :type :query}]}}]}}
+        ..api..
+        ..basepath..)
 
     => (has-body
          {:swaggerVersion "1.2"
@@ -353,7 +344,7 @@
                                 :summary ..summary2..
                                 :type "array"
                                 :items {:$ref "Pet"}}]
-                  :path "/pets"}]})))
+                  :path "/pets"}]}))))
 
 (fact "resolve-model-vars"
   (resolve-model-vars Tag) => #'Tag
