@@ -1,3 +1,7 @@
+## 0.8.3 (25.3.2014)
+
+- fix bug in `string-path-parameters`
+
 ## 0.8.2 (25.3.2014)
 
 - path parameters are not set implicitly, clients can use `(string-path-parameters url)` to create those automatically

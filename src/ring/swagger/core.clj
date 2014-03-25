@@ -186,8 +186,10 @@
     (->> (keep #(if (.startsWith % ":") (keyword (.substring % 1)))))))
 
 (defn string-path-parameters [uri]
-  {:type :path
-   :model (zipmap (path-params uri) (repeatedly (partial identity String)))})
+  (let [params (path-params uri)]
+    (if (seq params)
+      {:type :path
+       :model (zipmap params (repeatedly (partial identity String)))})))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))

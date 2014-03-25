@@ -130,12 +130,11 @@
 ;;
 
 (fact "string-path-parameters"
-  (string-path-parameters "/api/:kikka/:kakka/:kukka")
-
-  => {:type :path
-      :model {:kukka java.lang.String
-              :kakka java.lang.String
-              :kikka java.lang.String}})
+  (string-path-parameters "/api/:kikka/:kakka/:kukka") => {:type :path
+                                                           :model {:kukka java.lang.String
+                                                                   :kakka java.lang.String
+                                                                   :kikka java.lang.String}}
+  (string-path-parameters "/api/ping") => nil)
 
 (fact "scrict-schema strips open keys"
   (strict-schema {s/Keyword s/Any s/Str s/Any :s String}) => {:s String})
