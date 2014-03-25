@@ -148,39 +148,67 @@
        :required true
        :type "string"}])
 
+(fact "scrict-schema strips open keys"
+  (strict-schema {s/Keyword s/Any s/Str s/Any :s String}) => {:s String})
+
 (defmodel Query {:id Long (s/optional-key :q) String})
 (defmodel Body {:name String :age Long})
 (defmodel Path {:p Long})
 
 (fact "convert-parameters"
-  (convert-parameters
-    [{:model Query
-      :type :query}
-     {:model Body
-      :type :body}
-     {:model Path
-      :type :path}]) => [{:name "id"
-                          :description ""
-                          :format "int64"
-                          :paramType :query
-                          :required true
-                          :type "integer"}
-                         {:name "q"
-                          :description ""
-                          :paramType :query
-                          :required false
-                          :type "string"}
-                         {:name "body"
-                          :description ""
-                          :paramType :body
-                          :required true
-                          :type #'Body}
-                         {:name "p"
-                          :description ""
-                          :format "int64"
-                          :paramType :path
-                          :required true
-                          :type "integer"}])
+
+  (fact "all parameter types can be converted"
+    (convert-parameters
+      [{:model Query
+        :type :query}
+       {:model Body
+        :type :body}
+       {:model Path
+        :type :path}]) => [{:name "id"
+                            :description ""
+                            :format "int64"
+                            :paramType :query
+                            :required true
+                            :type "integer"}
+                           {:name "q"
+                            :description ""
+                            :paramType :query
+                            :required false
+                            :type "string"}
+                           {:name "body"
+                            :description ""
+                            :paramType :body
+                            :required true
+                            :type #'Body}
+                           {:name "p"
+                            :description ""
+                            :format "int64"
+                            :paramType :path
+                            :required true
+                            :type "integer"}])
+
+  (fact "anonymous schemas can be used with ..."
+
+    (doseq [type [:query :path]]
+      (fact {:midje/description (str "... " type "-parameters")}
+
+        (convert-parameters
+          [{:type type
+            :model {s/Keyword s/Any
+                    s/Str s/Any
+                    :q String (s/optional-key :l) Long}}])
+
+        => [{:name "q"
+             :description ""
+             :paramType type
+             :required true
+             :type "string"}
+            {:name "l"
+             :description ""
+             :format "int64"
+             :paramType type
+             :required false
+             :type "integer"}]))))
 
 ;;
 ;; Helpers

@@ -215,16 +215,23 @@
 ;; Convert parameters
 ;;
 
+(defn strict-schema
+  "removes open keys from schema"
+  [schema]
+  {:pre [(map? schema)]}
+  (dissoc schema s/Keyword s/Str))
+
 (defn- convert-query-or-path-parameter [{:keys [model type]}]
   {:pre [(#{:query :path} type)]}
-  (for [[k v] (value-of model)
-        :let [rk (s/explicit-schema-key k)]]
-    (merge
-      (->json v)
-      {:name (name rk)
-       :description ""
-       :required (s/required-key? k)
-       :paramType type})))
+  (if model
+    (for [[k v] (-> model value-of strict-schema)
+          :let [rk (s/explicit-schema-key k)]]
+      (merge
+        (->json v)
+        {:name (name rk)
+         :description ""
+         :required (s/required-key? k)
+         :paramType type}))))
 
 (defn- convert-body-parameter [{:keys [model type meta] :or {meta {}}}]
   (if model
@@ -239,11 +246,10 @@
 
 (defn convert-parameters [parameters]
   (apply concat
-    (for [{type :type :as parameter} parameters
-          :let [parameter (resolve-model-vars parameter)]]
+    (for [{type :type :as parameter} parameters]
       (do
         (if (= type :body)
-            (convert-body-parameter parameter)
+            (convert-body-parameter (resolve-model-vars parameter))
             (convert-query-or-path-parameter parameter))))))
 
 ;;
