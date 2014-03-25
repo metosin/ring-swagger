@@ -1,4 +1,4 @@
-## 0.8.0 (25.3.2014)
+## 0.8.1 (25.3.2014)
 
 - json schema transformations are now all multimethod-based.
 - support for `s/eq`
