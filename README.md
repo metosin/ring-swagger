@@ -100,6 +100,7 @@ see models and coercion in action in [tests](https://github.com/metosin/ring-swa
 
 ## TODO
 
+- produce path parameters on the client side (to support typed parameters)
 - support for consumes
 - support for auth
 - non-json produces & consumes
