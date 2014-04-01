@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/metosin/ring-swagger.png?branch=master)](https://travis-ci.org/metosin/ring-swagger)
 
-[Swagger](...) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data modelling and input data coercion.
+[Swagger](https://helloreverb.com/developers/swagger) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data models and coercion.
 
-- Provides handlers for both [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing) and [Api declaration](https://github.com/wordnik/swagger-core/wiki/API-Declaration).
+- Provides functions to create both Swagger [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing) and [Api declarations](https://github.com/wordnik/swagger-core/wiki/API-Declaration).
 - Does not cover how the routes and models are collected from web apps (and by so should be compatible with all Ring-based libraries)
-   - Provides a Map-based interface for routing libs to create Swagger Spec out of the route definitions
-
-For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ring-app, check out the [ring-swagger-ui](https://github.com/metosin/ring-swagger-ui).
+   - Provides a Map-based interface for higher level web libs to create Swagger Spec out of their route definitions
 
 ## Latest version
 
@@ -16,17 +14,20 @@ For embedding a [Swagger-UI](https://github.com/wordnik/swagger-ui) into your Ri
 [metosin/ring-swagger "0.8.3"]
 ```
 
-## Client libraries
+## Web libs using Ring-Swagger
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
+- [fnhouse](https://github.com/ikitommi/fnhouse/tree/master/examples/guesthouse)
 
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
 
-1. Create routes for `api-docs` and `api-docs/:api`
-2. Create route-collector to [collect the routes](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj).
-3. Publish it.
-4. List it here.
-5. Profit.
+1. Define routes to serve the `ring.swagger.core/api-listing` and `ring.swagger.core/api-declaration`
+2. Create a route-collector to [collect the route metadata](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj#L245-L346).
+3. Optionally define a route for the swagger-ui
+4. Publish it.
+5. List your adapter here
+
+# Usage
 
 ## Models
 
@@ -72,35 +73,49 @@ extends the json-coersion with the following transformations:
 - string -> Double
 - string -> Boolean
 
-### A Sample Schema
+### A Sample Model usage
 
 ```clojure
 (require '[ring.swagger.schema :refer :all])
 (require '[schema.core :as s])
 
-(defmodel SubType  {:alive Boolean})
-(defmodel AllTypes {:a Boolean
-                    :b Double
-                    :c Long
-                    :d String
-                    :e {:f [Keyword]
-                        :g #{String}
-                        :h #{(s/enum :kikka :kakka :kukka)}
-                        :i Date
-                        :j DateTime
-                        :k LocalDate
-                        :l (s/maybe String)
-                        :m (s/both Long (s/pred odd? 'odd?))
-                        :n SubType}})
+(defmodel Country {:code (s/enum :fi :sv)
+                   :name String})
+; #'user/Country
+
+(defmodel Customer {:id Long
+                    :name String
+                    (s/optional-key :address) {:street String
+                                               :country Country}})
+; #'user/Customer
+
+Country
+; {:code (enum :fi :sv), :name java.lang.String}
+
+Customer
+; {:id java.lang.Long, :name java.lang.String, #schema.core.OptionalKey{:k :address} {:street java.lang.String, :country {:code (enum :fi :sv), :name java.lang.String}}}
+
+CustomerAddress
+; {:street java.lang.String, :country {:code (enum :fi :sv), :name java.lang.String}}
+
+(def matti {:id 1 :name "Matti Mallikas"})
+(def finland {:code :fi :name "Finland"})
+
+(coerce Customer matti)
+; {:name "Matti Mallikas", :id 1}
+
+(coerce Customer (assoc matti :address {:street "Leipätie 1" :country finland}))
+; {:address {:country {:name "Finland", :code :fi}, :street "Leipätie 1"}, :name "Matti Mallikas", :id 1}
+
+(coerce Customer {:id 007})
+; #schema.utils.ErrorContainer{:error {:name missing-required-key}}
+
+(coerce! Customer {:id 007})
+; ExceptionInfo throw+: {:type :ring.swagger.schema/validation, :error {:name missing-required-key}}  ring.swagger.schema/coerce! (schema.clj:89)
 ```
-
-- `AllTypesE` gets automatically generated (and referenced).
-
-see models and coercion in action in [tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/schema_test.clj).
 
 ## TODO
 
-- produce path parameters on the client side (to support typed parameters)
 - support for consumes
 - support for auth
 - non-json produces & consumes
