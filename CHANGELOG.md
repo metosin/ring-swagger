@@ -1,3 +1,8 @@
+## ???
+
+- updated docs
+- `strict-schema` and `loose-schema`
+
 ## 0.8.3 (25.3.2014)
 
 - fix bug in `string-path-parameters`
