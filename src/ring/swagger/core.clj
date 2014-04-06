@@ -168,9 +168,9 @@
 (defn extract-models [details]
   (let [route-meta (->> details :routes (map :metadata))
         return-models (->> route-meta (keep :return) flatten)
-        parameter-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)]
+        body-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)]
     (-> return-models
-      (into parameter-models)
+      (into body-models)
       flatten
       distinct
       vec)))
@@ -189,7 +189,7 @@
   (let [params (path-params uri)]
     (if (seq params)
       {:type :path
-       :model (zipmap params (repeatedly (partial identity String)))})))
+       :model (zipmap params (repeat String))})))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
@@ -216,10 +216,16 @@
   "removes open keys from schema"
   [schema]
   {:pre [(map? schema)]}
-  (dissoc schema s/Keyword s/Str))
+  (dissoc schema s/Keyword))
 
-(defn- convert-query-or-path-parameter [{:keys [model type]}]
-  {:pre [(#{:query :path} type)]}
+(defn loose-schema
+  "add open keys for top level schema"
+  [schema]
+  {:pre [(map? schema)]}
+  (assoc schema s/Keyword s/Any))
+
+(defn- convert-query-or-path-parameter [{:keys [model type] :as it}]
+  (assert (#{:query :path} type) (str "wrong type: " type "<-- " it))
   (if model
     (for [[k v] (-> model value-of strict-schema)
           :let [rk (s/explicit-schema-key k)]]
@@ -250,7 +256,7 @@
             (convert-query-or-path-parameter parameter))))))
 
 ;;
-;; Public api
+;; Routing
 ;;
 
 (defn api-listing [parameters swagger]
