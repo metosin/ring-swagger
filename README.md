@@ -17,7 +17,7 @@
 ## Web libs using Ring-Swagger
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
-- [fnhouse](https://github.com/metosin/fnhouse)
+- [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
 
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
 
