@@ -59,9 +59,8 @@
 
 (defn field
   "Defines a Schema predicate and attaches meta-data into it.
-   Supports also basic immutable Java objects via type-mapping.
-   These include: Long, Double, String, Boolean, Date, DateTime
-   and LocalDate."
+   Supports also Java classes via type-mapping. These include:
+   Long, Double, String, Boolean, Date, DateTime and LocalDate."
   [pred metadata]
   (let [pred (or (type-map pred) pred)
         old-meta (meta pred)]
