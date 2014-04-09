@@ -17,4 +17,5 @@
   :ring {:handler compojure.api.example.handler/app}
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-midje "3.1.3"]]
-                   :dependencies [[midje "1.6.3"]]}})
+                   :dependencies [[midje "1.6.3"]
+                                  [javax.servlet/servlet-api "2.5"]]}})

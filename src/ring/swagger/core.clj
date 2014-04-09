@@ -204,9 +204,23 @@
 (def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
 (def api-declaration-keys  [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
 
-(defn extract-basepath
-  [{:keys [scheme server-name server-port]}]
-  (str (name scheme) "://" server-name ":" server-port))
+(defn context
+  "Context of a request. Defaults to \"\", but has the
+   servlet-context in the legacy app-server environments."
+  [{:keys [servlet-context]}]
+  (if servlet-context (.getContextPath servlet-context) ""))
+
+(defn basepath
+  "extract a base-path from ring request. Doesn't return default ports
+   and reads the header \"x-forwarded-proto\" only if it's set to value
+   \"https\". (e.g. your ring-app is behind a nginx reverse https-proxy).
+   Adds possible servlet-context when running in legacy app-server."
+  [{:keys [scheme server-name server-port headers] :as request}]
+  (let [x-forwarded-proto (headers "x-forwarded-proto")
+        context (context request)
+        scheme (if (= x-forwarded-proto "https") "https" (name scheme))
+        port (if (#{80 443} server-port) "" (str ":" server-port))]
+    (str scheme "://" server-name port context)))
 
 ;;
 ;; Convert parameters

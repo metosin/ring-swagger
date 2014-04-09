@@ -354,3 +354,26 @@
   (resolve-model-vars [Tag, 'Tag, #'Tag]) => [#'Tag, #'Tag, #'Tag]
   (resolve-model-vars #{Tag, 'Tag, #'Tag}) => #{#'Tag}
   (resolve-model-vars {:a Tag, :b 'Tag, :c #'Tag}) => {:a #'Tag, :b #'Tag, :c #'Tag})
+
+(defn fake-servlet-context [context]
+ (proxy [javax.servlet.ServletContext] []
+   (getContextPath [] context)))
+
+(fact "(servlet-)context"
+  (context {}) => ""
+  (context {:servlet-context (fake-servlet-context "/kikka")}) => "/kikka")
+
+(fact "basepath"
+  (fact "http"
+    (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 80 :headers {}}) => "http://www.metosin.fi"
+    (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 8080 :headers {}}) => "http://www.metosin.fi:8080")
+  (fact "https"
+    (basepath {:scheme "https" :server-name "www.metosin.fi" :server-port 443 :headers {}}) => "https://www.metosin.fi"
+    (basepath {:scheme "https" :server-name "www.metosin.fi" :server-port 8443 :headers {}}) => "https://www.metosin.fi:8443")
+  (fact "with servlet-context"
+    (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 80 :headers {} :servlet-context (fake-servlet-context "/kikka")}) => "http://www.metosin.fi/kikka")
+  (fact "x-forwarded-proto"
+    (fact "we trust the given 'x-forwarded-proto'"
+      (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 443 :headers {"x-forwarded-proto" "https"}}) => "https://www.metosin.fi")
+    (fact "can't fake the protocol from https to http"
+      (basepath {:scheme "https" :server-name "www.metosin.fi" :server-port 443 :headers {"x-forwarded-proto" "http"}}) => "https://www.metosin.fi")))
