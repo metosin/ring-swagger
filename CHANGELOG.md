@@ -1,7 +1,8 @@
-## ???
+## 0.8.4 (9.4.2014)
 
 - updated docs
 - `strict-schema` and `loose-schema`
+- `extract-basepath` renamed to `basepath`, understands the `:servlet-context` and header `x-forwarded-proto`
 
 ## 0.8.3 (25.3.2014)
 
