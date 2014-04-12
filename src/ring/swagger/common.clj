@@ -45,7 +45,7 @@
                          (partition 2)
                          (take-while (comp keyword? first))
                          (mapcat identity)
-                         (apply hash-map))
+                         (apply array-map))
             form       (drop (* 2 (count parameters)) c)]
         [parameters form])
       [{} c])))
