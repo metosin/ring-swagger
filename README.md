@@ -5,7 +5,7 @@
 [Swagger](https://helloreverb.com/developers/swagger) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data models and coercion.
 
 - Provides functions to create both Swagger [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing) and [Api declarations](https://github.com/wordnik/swagger-core/wiki/API-Declaration).
-- Schema extensions for modelling, coersion and [JSON Schema](http://json-schema.org/) generation 
+- Schema extensions for modelling, coersion and [JSON Schema](http://json-schema.org/) generation
 - Does not cover how the routes and models are collected from web apps (and by so should be compatible with all Ring-based libraries)
    - Provides a Map-based interface for higher level web libs to create Swagger Spec out of their route definitions
 
@@ -113,6 +113,24 @@ CustomerAddress
 
 (coerce! Customer {:id 007})
 ; ExceptionInfo throw+: {:type :ring.swagger.schema/validation, :error {:name missing-required-key}}  ring.swagger.schema/coerce! (schema.clj:89)
+```
+## Creating your own schema-types
+
+JSON Schema generation is implemented using multimethods. You can register your own schema types by installing new methods to the multimethods.
+
+### Class-based dispatch
+
+```clojure
+(require '[ring.swagger.core :as swagger])
+(defmethod swagger/json-type-class schema.core.Maybe [e] (swagger/->json (:schema e)))
+```
+
+### Identity-based dispatch
+
+```clojure
+(require '[ring.swagger.core :as swagger])
+(require '[schema.core :as s])
+(defmethod swagger/json-type s/Any [_] {:type "string"})
 ```
 
 ## TODO
