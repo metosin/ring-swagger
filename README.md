@@ -136,8 +136,10 @@ JSON Schema generation is implemented using multimethods. You can register your 
 
 ## TODO
 
-- support for consumes
-- support for auth
+- support for vanilla schemas (removes the Var-resolving)
+- consumes
+- authorization
+- files
 - non-json produces & consumes
 - full spec
 
