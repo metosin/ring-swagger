@@ -122,7 +122,8 @@ JSON Schema generation is implemented using multimethods. You can register your 
 
 ```clojure
 (require '[ring.swagger.core :as swagger])
-(defmethod swagger/json-type-class schema.core.Maybe [e] (swagger/->json (:schema e)))
+(require '[schema.core :as s])
+(defmethod swagger/json-type-class s/Maybe [e] (swagger/->json (:schema e)))
 ```
 
 ### Identity-based dispatch
