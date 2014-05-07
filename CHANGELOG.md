@@ -1,3 +1,7 @@
+## 0.8.5 (7.4.2014)
+
+- both `consumes` and `produces` can be set by the client side for the api declaration.
+
 ## 0.8.4 (9.4.2014)
 
 - updated docs
