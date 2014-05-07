@@ -289,13 +289,18 @@
                                   :basePath ..basepath..
                                   :resourcePath ""
                                   :produces ["application/json"]
+                                  :consumes ["application/json"]
                                   :models {}
                                   :apis []}))
   (fact "full api"
     (defmodel Q {:q String})
     (let [uri "/pets/:id"]
       (api-declaration
-        {:apiVersion ..version..}
+        {:apiVersion ..version..
+         :produces ["application/json"
+                    "application/xml"]
+         :consumes ["application/json"
+                    "application/xml"]}
         {..api.. {:routes [{:method :get
                             :uri uri
                             :metadata {:return 'Pet
@@ -317,7 +322,10 @@
           :apiVersion ..version..
           :basePath ..basepath..
           :resourcePath ""
-          :produces ["application/json"]
+          :produces ["application/json"
+                     "application/xml"]
+          :consumes ["application/json"
+                     "application/xml"]
           :models {:Pet Pet'
                    :Tag Tag'
                    :Category Category'}

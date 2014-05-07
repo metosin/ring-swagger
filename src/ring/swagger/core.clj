@@ -202,6 +202,8 @@
     ->camelCase))
 
 (def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
+(def resource-defaults     {:produces ["application/json"]
+                            :consumes ["application/json"]})
 (def api-declaration-keys  [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
 
 (defn context
@@ -288,10 +290,10 @@
     (response
       (merge
         swagger-defaults
-        (select-keys parameters [:apiVersion])
+        resource-defaults
+        (select-keys parameters [:apiVersion :produces :consumes])
         {:basePath basepath
          :resourcePath ""
-         :produces ["application/json"]
          :models (apply transform-models (extract-models details))
          :apis (for [{:keys [method uri metadata] :as route} (:routes details)
                      :let [{:keys [return summary notes nickname parameters]} metadata]]
