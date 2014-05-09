@@ -1,3 +1,8 @@
+## 0.8.6 (9.4.2014)
+
+- new `ring.swagger.ui`-ns provided `swagger-ui` function which can be used to create ring handler to serve Swagger-ui.
+- updated clojure dependency
+
 ## 0.8.5 (7.4.2014)
 
 - both `consumes` and `produces` can be set by the client side for the api declaration.
