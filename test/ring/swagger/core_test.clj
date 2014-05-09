@@ -43,7 +43,7 @@
 
     (fact "s/enum"
       (->json (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
-      (->json (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum [1 2 3]})
+      (->json (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum (seq #{1 2 3})})
 
     (fact "s/maybe -> type of internal schema"
       (->json (s/maybe Long)) => (->json Long))
