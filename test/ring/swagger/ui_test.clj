@@ -30,21 +30,23 @@
 (defn GET [app uri & kwargs]
   (app (mock/request :get uri)))
 
-(defn status? [expected]
-  (fn [{:keys [status]} ]
-    (= status expected)))
+(defn status? [{:keys [status]} expected]
+  (= status expected))
 
 (defn redirect? [uri]
-  (fn [{{location "Location"} :headers :as res} ]
-    (and ((status? 302) res) (= location uri))))
+  (fn [{{location "Location"} :headers :as res}]
+    (and (status? res 302) (= location uri))))
+
+(defn html? [{{content-type "Content-Type"} :headers :as res}]
+  (and (status? res 200) (= content-type "text/html")))
 
 (facts "swagger-ui integration"
   (facts "simple use at doc root"
     (let [handler (swagger-ui)
           GET (partial GET handler)]
-      ;; Request to root of domain, uri will always contain "/"
+      ;; Uri will always start with "/"
       (GET "/") => (redirect? "/index.html")
-      (GET "/index.html") => (status? 200)
+      (GET "/index.html") => html?
       ))
   (facts "simple use at context"
     (let [handler (swagger-ui "/ui-docs")
@@ -54,7 +56,7 @@
       ;; Request to directory, uri doesn't necessarily end with "/"
       (GET "/ui-docs/") => (redirect? "/ui-docs/index.html")
       (GET "/ui-docs") => (redirect? "/ui-docs/index.html")
-      (GET "/ui-docs/index.html") => (status? 200)
+      (GET "/ui-docs/index.html") => html?
       ))
   (facts "servlet context"
     (let [handler (swagger-ui "/ui-docs")
