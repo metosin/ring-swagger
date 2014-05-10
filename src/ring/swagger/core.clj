@@ -204,6 +204,12 @@
                             :consumes ["application/json"]})
 (def api-declaration-keys  [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
 
+(defn join-paths
+  "Join several paths together with \"/\". If path ends with a slash,
+   another slash is not added."
+  [& paths]
+  (str/replace (str/replace (str/join "/" (remove nil? paths)) #"([/]+)" "/") #"/$" ""))
+
 (defn context
   "Context of a request. Defaults to \"\", but has the
    servlet-context in the legacy app-server environments."
