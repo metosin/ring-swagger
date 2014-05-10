@@ -14,3 +14,12 @@
   "/ui-docs"      "/index.html"             nil
   "/ui-docs"      "/ui-docs/index.html"     "index.html"
   )
+
+(tabular
+  (fact index-path
+    (index-path ?path) => ?redirect)
+  ?path           ?redirect
+  ""              "/index.html"
+  "/"             "/index.html"
+  "/ui-docs"      "/ui-docs/index.html"
+  "/ui-docs/"     "/ui-docs/index.html")

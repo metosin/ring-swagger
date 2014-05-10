@@ -10,6 +10,9 @@
 (defn conf-js [{:keys [swagger-docs] :or {swagger-docs "/api/api-docs"}}]
   (str "window.API_CONF = {url: \"" swagger-docs "\"};"))
 
+(defn index-path [^String path]
+  (str path (if (.endsWith path "/") "" "/") "index.html"))
+
 (defn swagger-ui [& params]
   "Route creates a ring handler which will serve swagger-ui.
    If the first parameter is a String, it used as context for swagger-ui,
@@ -26,7 +29,7 @@
           (when-let [req-path (get-path path uri)]
             (let [root (:root options "swagger-ui")]
               (condp = req-path
-                "" (response/redirect (str path (if (.endsWith path "/") "" "/") "index.html"))
+                "" (response/redirect (index-path path))
                 "conf.js" (response/response (conf-js options))
                 (response/resource-response (str root "/" req-path))))))
         (wrap-file-info (:mime-types options))
