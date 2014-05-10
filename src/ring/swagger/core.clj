@@ -182,10 +182,7 @@
 ;;
 
 (defn path-params [s]
-  (-> s
-    (str/replace #":(.[^:|/]*)" " :$1 ")
-    (str/split #" ")
-    (->> (keep #(if (.startsWith % ":") (keyword (.substring % 1)))))))
+  (map (comp keyword second) (re-seq #":(.[^:|(/]*)[/]?" s)))
 
 (defn string-path-parameters [uri]
   (let [params (path-params uri)]
