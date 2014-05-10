@@ -1,5 +1,4 @@
-(ns ring.swagger.common
-  (:use [clojure.walk :as walk]))
+(ns ring.swagger.common)
 
 (defmacro fn->
   "Creates a function that threads on input with some->"
