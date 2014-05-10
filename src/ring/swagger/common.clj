@@ -15,7 +15,7 @@
 
 (defn name-of
   "Returns name of a Var, String, Named object or nil"
-  [x]
+  ^String [x]
   (cond
     (var? x) (-> x meta :name name)
     (string? x) x
