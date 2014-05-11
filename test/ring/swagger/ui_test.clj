@@ -17,16 +17,7 @@
   "/ui-docs"      "/ui-docs/index.html"     "index.html"
   )
 
-(tabular
-  (fact index-path
-    (index-path nil ?path) => ?redirect)
-  ?path           ?redirect
-  ""              "/index.html"
-  "/"             "/index.html"
-  "/ui-docs"      "/ui-docs/index.html"
-  "/ui-docs/"     "/ui-docs/index.html")
-
-;; Utils for testing swagger-ui works with real requests
+;; Utils for testing swagger-ui with real requests
 
 (defn GET [app uri & kwargs]
   (app (merge (mock/request :get uri) (apply hash-map kwargs))))
@@ -41,15 +32,15 @@
 (defn html? [{{content-type "Content-Type"} :headers :as res}]
   (and (status? res 200) (= content-type "text/html")))
 
-(facts "swagger-ui integration"
-  (facts "simple use at doc root"
+(facts "Swagger-UI"
+  (facts "(swagger-ui)"
     (let [handler (swagger-ui)
           GET (partial GET handler)]
       ;; Uri will always start with "/"
       (GET "/") => (redirect? "/index.html")
       (GET "/index.html") => html?
       ))
-  (facts "simple use at context"
+  (facts "(swagger-ui \"/ui-docs\")"
     (let [handler (swagger-ui "/ui-docs")
           GET (partial GET handler)]
       (GET "/") => nil
@@ -59,8 +50,27 @@
       (GET "/ui-docs") => (redirect? "/ui-docs/index.html")
       (GET "/ui-docs/index.html") => html?
       ))
-  (facts "servlet context"
-    ;; In servlet context uri won't include servlet-context path
-    (GET (swagger-ui "/") "/" :servlet-context (fake-servlet-context "/foobar")) => (redirect? "/foobar/index.html")
-    (GET (swagger-ui "/test") "/test" :servlet-context (fake-servlet-context "/foobar")) => (redirect? "/foobar/test/index.html")
-    ))
+  ;; Some possible envinronments
+  (facts "Compojure"
+    (fact "(context \"/compojure\" [] (swagger-ui))"
+      (GET (swagger-ui) "/compojure" :context "/compojure") => (redirect? "/compojure/index.html"))
+    (fact "(context \"/compojure\" [] (swagger-ui \"/docs\"))"
+      (GET (swagger-ui "/docs") "/compojure/docs" :context "/compojure") => (redirect? "/compojure/docs/index.html"))
+    )
+  (facts "Servlet context"
+    ;; Servlet context:
+    ;; - uri will contain full path
+    ;; - servlet context countains ServletContext object
+    ;; - context contains context path (under compojure this will also contain compojure context)
+    (let [fake-context  (fake-servlet-context "/servlet")]
+      (fact "(swagger-ui)"
+        (GET (swagger-ui) "/servlet" :context "/servlet" :servlet-context fake-context) => (redirect? "/servlet/index.html"))
+      (fact "(swagger-ui \"/docs\")"
+        (GET (swagger-ui "/docs") "/servlet/docs" :context "/servlet" :servlet-context fake-context) => (redirect? "/servlet/docs/index.html"))
+
+      (facts "Compojure"
+        (fact "(context \"/compojure\" [] (swagger-ui))"
+          (GET (swagger-ui) "/servlet/compojure" :context "/servlet/compojure" :servlet-context fake-context) => (redirect? "/servlet/compojure/index.html"))
+        (fact "(context \"/compojure\" [] (swagger-ui \"/docs\"))"
+          (GET (swagger-ui "/docs") "/servlet/compojure/docs" :context "/servlet/compojure" :servlet-context fake-context) => (redirect? "/servlet/compojure/docs/index.html"))
+        ))))

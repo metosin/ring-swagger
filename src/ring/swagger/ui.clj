@@ -6,13 +6,11 @@
             [ring.swagger.core :as swagger]))
 
 (defn get-path [root uri]
-  (nth (re-find (re-pattern (str "^" root "[/]?(.*)")) uri) 1))
+  (second (re-find (re-pattern (str "^" root "[/]?(.*)")) uri)))
 
-(defn conf-js [{:keys [swagger-docs] :or {swagger-docs "/api/api-docs"}}]
-  (str "window.API_CONF = {url: \"" swagger-docs "\"};"))
-
-(defn index-path [req ^String ui-path]
-  (swagger/join-paths (swagger/context req) ui-path "index.html"))
+(defn conf-js [req {:keys [swagger-docs] :or {swagger-docs "/api/api-docs"}}]
+  (let [swagger-docs (swagger/join-paths (swagger/context req) swagger-docs)]
+    (str "window.API_CONF = {url: \"" swagger-docs "\"};")))
 
 (defn swagger-ui
   "This function creates a ring handler which can be used to serve swagger-ui.
@@ -26,13 +24,16 @@
   (let [[path kvs] (if (string? (first params))
                      [(first params) (rest params)]
                      ["/" params])
-        options (apply hash-map kvs)]
+        options (apply hash-map kvs)
+        root (:root options "swagger-ui")]
     (-> (fn [{:keys [http-method uri] :as req}]
-          (let [root (:root options "swagger-ui")]
+          (let [;; Prefix path with servlet-context and compojure context
+                path (swagger/join-paths (:context req) path)]
+            ;; Check if requested uri is under swagger-ui path and what file is requested
             (when-let [req-path (get-path path uri)]
               (condp = req-path
-                "" (response/redirect (index-path req path))
-                "conf.js" (response/response (conf-js options))
+                "" (response/redirect (swagger/join-paths uri "index.html"))
+                "conf.js" (response/response (conf-js req options))
                 (response/resource-response (str root "/" req-path))))))
         (wrap-content-type options)
         (wrap-not-modified)
