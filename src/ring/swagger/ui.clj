@@ -15,7 +15,7 @@
   (swagger/join-paths (swagger/context req) ui-path "index.html"))
 
 (defn swagger-ui
-  "Route creates a ring handler which will serve swagger-ui.
+  "This function creates a ring handler which can be used to serve swagger-ui.
    If the first parameter is a String, it used as context for swagger-ui,
    default is to serve swagger-ui at \"/\".
 
