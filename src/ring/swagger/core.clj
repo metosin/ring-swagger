@@ -10,8 +10,7 @@
             [ring.swagger.common :refer :all]
             [cheshire.generate :refer [add-encoder]]
             [camel-snake-kebab :refer [->camelCase]])
-  (:import [com.fasterxml.jackson.core JsonGenerator]
-           [javax.servlet ServletContext]))
+  (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 ;;
 ;; Models
@@ -208,7 +207,7 @@
 (defn context
   "Context of a request. Defaults to \"\", but has the
    servlet-context in the legacy app-server environments."
-  [{:keys [^ServletContext servlet-context]}]
+  [{:keys [servlet-context]}]
   (if servlet-context (.getContextPath servlet-context) ""))
 
 (defn basepath
