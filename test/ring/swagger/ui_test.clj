@@ -59,17 +59,8 @@
       (GET "/ui-docs") => (redirect? "/ui-docs/index.html")
       (GET "/ui-docs/index.html") => html?
       ))
-  (facts "compojure context"
-    ;; When using compojure context, requests contains :context -key with (combined) context path.
-    ;; Uri will include context path
-    ;; example: (context "/foo" (swagger-ui "/"))
-    (GET (swagger-ui "/") "/foo" :context "/foo") => (redirect? "/foo/index.html")
-    (GET (swagger-ui "/test") "/foo/test" :context "/foo") => (redirect? "/foo/test/index.html")
-    )
   (facts "servlet context"
     ;; In servlet context uri won't include servlet-context path
     (GET (swagger-ui "/") "/" :servlet-context (fake-servlet-context "/foobar")) => (redirect? "/foobar/index.html")
     (GET (swagger-ui "/test") "/test" :servlet-context (fake-servlet-context "/foobar")) => (redirect? "/foobar/test/index.html")
-    )
-  (facts "nginx proxy")
-  )
+    ))

@@ -27,10 +27,8 @@
                      [(first params) (rest params)]
                      ["/" params])
         options (apply hash-map kvs)]
-    (-> (fn [{:keys [http-method uri context] :as req}]
-          (let [root (:root options "swagger-ui")
-                ;; If we are inside compojure context, the path swagger-ui is context + path
-                path (swagger/join-paths context path)]
+    (-> (fn [{:keys [http-method uri] :as req}]
+          (let [root (:root options "swagger-ui")]
             (when-let [req-path (get-path path uri)]
               (condp = req-path
                 "" (response/redirect (index-path req path))
