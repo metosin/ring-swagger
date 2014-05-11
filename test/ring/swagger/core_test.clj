@@ -129,6 +129,15 @@
 ;; Route generation
 ;;
 
+(tabular
+  (fact path-params
+    (path-params ?input) => ?output)
+  ?input                        ?output
+  "/api/:kikka/:kakka/:kukka"   [:kikka :kakka :kukka]
+  "/api/:kikka/kakka/:kukka"    [:kikka :kukka]
+  "/:foo-bar/:foo_bar"          [:foo-bar :foo_bar]
+  "/api/ping"                   empty?)
+
 (fact "string-path-parameters"
   (string-path-parameters "/api/:kikka/:kakka/:kukka") => {:type :path
                                                            :model {:kukka java.lang.String

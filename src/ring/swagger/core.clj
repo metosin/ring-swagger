@@ -9,7 +9,8 @@
             [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [cheshire.generate :refer [add-encoder]]
-            [camel-snake-kebab :refer [->camelCase]]))
+            [camel-snake-kebab :refer [->camelCase]])
+  (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 ;;
 ;; Models
@@ -24,23 +25,23 @@
 ;;
 
 (add-encoder clojure.lang.Var
-  (fn [x jsonGenerator]
-    (.writeString jsonGenerator (name-of x))))
+  (fn [x ^JsonGenerator jg]
+    (.writeString jg (name-of x))))
 
 (add-encoder schema.utils.ValidationError
-  (fn [x jsonGenerator]
-    (.writeString jsonGenerator
+  (fn [x ^JsonGenerator jg]
+    (.writeString jg
       (str (su/validation-error-explain x)))))
 
-(defn date-time-encoder [x jsonGenerator]
-  (.writeString jsonGenerator (coerce/unparse-date-time x)))
+(defn date-time-encoder [x ^JsonGenerator jg]
+  (.writeString jg (coerce/unparse-date-time x)))
 
 (add-encoder java.util.Date date-time-encoder)
 (add-encoder org.joda.time.DateTime date-time-encoder)
 
 (add-encoder org.joda.time.LocalDate
-  (fn [x jsonGenerator]
-    (.writeString jsonGenerator (coerce/unparse-date x))))
+  (fn [x ^JsonGenerator jg]
+    (.writeString jg (coerce/unparse-date x))))
 
 ;;
 ;; Schema Transformations
@@ -180,10 +181,7 @@
 ;;
 
 (defn path-params [s]
-  (-> s
-    (str/replace #":(.[^:|/]*)" " :$1 ")
-    (str/split #" ")
-    (->> (keep #(if (.startsWith % ":") (keyword (.substring % 1)))))))
+  (map (comp keyword second) (re-seq #":(.[^:|(/]*)[/]?" s)))
 
 (defn string-path-parameters [uri]
   (let [params (path-params uri)]
@@ -256,7 +254,7 @@
   (if model
     (vector
       (merge
-        {:name (some-> model schema/find-model-name .toLowerCase)
+        {:name (some-> model schema/find-model-name str/lower-case)
          :description ""
          :required true}
         meta

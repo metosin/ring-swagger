@@ -10,11 +10,11 @@
 
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
 
-(defn parse-date-time [date] (tf/parse (tf/formatters :date-time-parser) (->DateTime date)))
-(defn parse-date [date] (tf/parse-local-date (tf/formatters :date) (->DateTime date)))
+(defn parse-date-time ^DateTime [date] (tf/parse (tf/formatters :date-time-parser) (->DateTime date)))
+(defn parse-date ^DateTime [date] (tf/parse-local-date (tf/formatters :date) (->DateTime date)))
 
-(defn unparse-date-time [date] (tf/unparse (tf/formatters :date-time) (->DateTime date)))
-(defn unparse-date [date] (tf/unparse-local-date (tf/formatters :date) (->DateTime date)))
+(defn unparse-date-time ^String [date] (tf/unparse (tf/formatters :date-time) (->DateTime date)))
+(defn unparse-date ^String [date] (tf/unparse-local-date (tf/formatters :date) (->DateTime date)))
 
 (defn date-time-matcher
   [schema]
@@ -44,10 +44,10 @@
     "false" false
     x))
 
-(defn string->long [x]
+(defn string->long [^String x]
   (try (java.lang.Long/valueOf x) (catch Exception e x)))
 
-(defn string->double [x]
+(defn string->double [^String x]
   (try (java.lang.Double/valueOf x) (catch Exception e x)))
 
 (def json-coersions {s/Keyword sc/string->keyword
