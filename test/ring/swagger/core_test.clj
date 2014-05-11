@@ -1,6 +1,7 @@
 (ns ring.swagger.core-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
+            [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
             [ring.swagger.data :refer :all]
             [ring.swagger.core :refer :all])
@@ -372,9 +373,11 @@
   (resolve-model-vars #{Tag, 'Tag, #'Tag}) => #{#'Tag}
   (resolve-model-vars {:a Tag, :b 'Tag, :c #'Tag}) => {:a #'Tag, :b #'Tag, :c #'Tag})
 
-(defn fake-servlet-context [context]
- (proxy [javax.servlet.ServletContext] []
-   (getContextPath [] context)))
+(fact join-paths
+  (join-paths "/foo" nil "index.html") => "/foo/index.html"
+  (join-paths nil "/foo/" "index.html") => "/foo/index.html"
+  (join-paths nil "" "/foo" "" "" "index.html") => "/foo/index.html"
+  (join-paths "/foo" "") => "/foo")
 
 (fact "(servlet-)context"
   (context {}) => ""
