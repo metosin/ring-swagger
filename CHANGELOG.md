@@ -1,9 +1,15 @@
-## 0.8.6 (9.4.2014)
+## 0.8.7 (12.5.2014)
+
+- Added type hints where `lein check` suggested
+- Added swagger-ui tests for multiple envinronments
+  - Fixed swagger-ui for servlet envinronment
+
+## 0.8.6 (9.5.2014)
 
 - new `ring.swagger.ui`-ns provided `swagger-ui` function which can be used to create ring handler to serve Swagger-ui.
 - updated clojure dependency
 
-## 0.8.5 (7.4.2014)
+## 0.8.5 (7.5.2014)
 
 - both `consumes` and `produces` can be set by the client side for the api declaration.
 
