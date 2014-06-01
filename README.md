@@ -12,7 +12,7 @@
 ## Latest version
 
 ```clojure
-[metosin/ring-swagger "0.8.7"]
+[metosin/ring-swagger "0.8.8"]
 ```
 
 ## Web libs using Ring-Swagger
@@ -53,7 +53,8 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
-  - Nested maps are transformed automatically into flat maps with generated child references.
+  - Nested maps are transformed automatically into flat maps with generated child references
+    - Nested maps can be within valid containers (as only element - heregenous schema sequences not supported)
 
 ### Schema coercion
 

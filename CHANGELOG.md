@@ -1,3 +1,27 @@
+## 0.8.8 (1.6.2014)
+
+- `defmodel` now supports anonymous maps within valid containers (`set`,`list`,`vector`)
+
+```clojure
+(require '[ring.swagger.schema :refer :all])
+(require '[ring.swagger.core :refer [transform]])
+
+(defmodel Items {:data [{:id Long
+                         :name String}]})
+
+Items
+;; {:data [{:name java.lang.String, :id java.lang.Long}]}
+
+ItemsData
+;; {:name java.lang.String, :id java.lang.Long}
+
+(transform Items)
+;; {:properties {:data {:items {:$ref "ItemsData"}, :type "array"}}, :required [:data]}
+
+(transform ItemsData)
+;; {:properties {:name {:type "string"}, :id {:type "integer", :format "int64"}}, :required [:name :id]}
+```
+
 ## 0.8.7 (12.5.2014)
 
 - Added type hints where `lein check` suggested
