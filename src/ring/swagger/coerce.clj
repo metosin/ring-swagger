@@ -74,11 +74,18 @@
   (or (query-coercions schema)
       (json-schema-coercion-matcher schema)))
 
+(defn all-matchers
+  "A matcher that applies all matchers"
+  [matchers]
+  (fn [schema] (reduce (fn [schema matcher]
+                         (or (matcher schema) schema)) schema matchers)))
+
 ;;
 ;; Public Api
 ;;
 
 (defn coercer [name]
   (condp = name
-    :json json-schema-coercion-matcher
+    :json  json-schema-coercion-matcher
+    ;;:both  (all-matchers [query-schema-coercion-matcher json-schema-coercion-matcher])
     :query query-schema-coercion-matcher))

@@ -128,7 +128,7 @@
                    (str "error converting to json schema [" k " " (s/explain v) "]") e)))))])))
 
 (defn required-keys [schema]
-  (filter s/required-key? (keys schema)))
+  (filterv s/required-key? (keys schema)))
 
 (defn resolve-model-vars [form]
   (walk/prewalk (fn [x] (or (schema/model-var x) x)) form))

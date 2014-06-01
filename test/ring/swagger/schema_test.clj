@@ -22,7 +22,8 @@
                         :k LocalDate
                         :l (s/maybe String)
                         :m (s/both Long (s/pred odd? 'odd?))
-                        :n SubType}})
+                        :n SubType
+                        :o [{:p #{{:q String}}}]}})
 
 (def model {:a true
             :b 2.2
@@ -36,7 +37,8 @@
                 :k (t/today)
                 :l nil
                 :m 1
-                :n {:alive true}}})
+                :n {:alive true}
+                :o [{:p #{{:q "abba"}}}]}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
@@ -168,14 +170,17 @@
     CustomerAddressCountry => {:code #{(s/enum :fi :sv)}
                                :name String}))
 
-(facts "query-parameter coercion"
+(facts "parameter coercion"
 
   (let [Model {:a Long :b Double :c Boolean :d Keyword}
         query {:a "1"  :b "2.2"  :c "true"  :d "kikka"}
         value {:a 1    :b 2.2    :c true    :d :kikka}]
 
-    (fact "query-coercion can convert string to Longs,Doubles and Booleans"
+    (fact "query-coercion can convert string to Longs, Doubles and Booleans"
       (coerce! Model query :query) => value)
 
     (fact "json-coercion cant convert string to Longs,Doubles and Booleans"
-      (coerce! Model query :json) => (throws Exception))))
+      (coerce! Model query :json) => (throws Exception))
+
+    #_(fact "both-coercion can also convert string to Longs, Doubles and Booleans"
+       (coerce! Model query :both) => value)))

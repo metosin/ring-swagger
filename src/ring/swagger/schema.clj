@@ -24,6 +24,26 @@
                clojure.lang.Keyword Keyword*})
 
 ;;
+;; Internals
+;;
+
+(declare model?)
+
+(defn- collection-with-one-element [x y]
+  (assert (= (count x) 1) "nested sequences and set can only one element.")
+  (cond
+    (set? x) #{y}
+    (sequential? x) [y]))
+
+(defn- plain-map? [x]
+  (and (instance? clojure.lang.APersistentMap x) ;; need to filter out Schema records
+       (not (model? x)))) ;; and predefined models
+
+(defn- valid-container? [x]
+  (or (sequential? x)
+      (set? x)))
+
+;;
 ;; Public Api
 ;;
 
@@ -34,28 +54,39 @@
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
    to it's metadata - used in handling Model references. Generates
-   submodels from nested Maps and links them by reference. Submodels
-   are named after their father and the child key."
+   submodels from direct nested Maps and Maps as only element in
+   valid containers (List, Vector, Set) and links them by reference.
+   Submodels are named after their father appended with the key name."
   ([model form]
     `(defmodel ~model ~(str model " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([model docstring form]
     (letfn [(sub-models! [model form]
-              (into {}
-                (for [[k v] form
-                      :let [v (if (and (instance? clojure.lang.APersistentMap v) ;; need to filter out Schema records
-                                    (not (model? v))) ;; and predefined models
-                                (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
-                                  (eval `(defmodel ~sub-model ~v))
-                                  (value-of sub-model))
-                                v)]]
-                  [k v])))]
+                         (into {}
+                               (for [[k v] form
+                                     :let [v (cond
+
+                                               ;; direct anonymous map
+                                               (plain-map? v)
+                                               (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
+                                                 (eval `(defmodel ~sub-model ~v))
+                                                 (value-of sub-model))
+
+                                               ;; anonymous map within a valid container
+                                               (and (valid-container? v) (plain-map? (first v)))
+                                               (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
+                                                 (eval `(defmodel ~sub-model ~(first v)))
+                                                 (collection-with-one-element v (value-of sub-model)))
+
+                                               ;; pass-through
+                                               :else v)]]
+                                 [k v])))]
       `(do
          (assert (map? ~form))
          (def ~model ~docstring
-         (with-meta
-           (~sub-models! '~model ~form)
-           {:model (var ~model)
-            :name '~model}))))))
+           (with-meta
+             (~sub-models! '~model ~form)
+             {:model (var ~model)
+              :name '~model}))))))
 
 (defn field
   "Defines a Schema predicate and attaches meta-data into it.
