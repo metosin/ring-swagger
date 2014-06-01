@@ -9,7 +9,7 @@
                  [cheshire "5.3.1"]
                  [slingshot "0.10.3"]
                  [metosin/ring-http-response "0.4.0"]
-                 [prismatic/schema "0.2.2"]
+                 [prismatic/schema "0.2.3"]
                  [clj-time "0.7.0"]
                  [camel-snake-kebab "0.1.5"]
                  [ring/ring-core "1.2.2"]]
