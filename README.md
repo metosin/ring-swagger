@@ -6,7 +6,7 @@
 
 - Provides functions to create Swagger [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing), [Api declarations](https://github.com/wordnik/swagger-core/wiki/API-Declaration) and the [Swagger-UI](https://github.com/metosin/ring-swagger-ui).
 - Schema extensions for modelling, coercion and Swagger [JSON Schema](http://json-schema.org/) generation
-- Does **not** cover how the routes and models are collected from your web app (and by so is compatible with all Ring-based libraries)
+- Does **not** cover how the routes and models are actually collected from your web app
    - Provides a Map-based API for web libs to create Swagger Spec out of their route definitions
 
 ## Latest version
