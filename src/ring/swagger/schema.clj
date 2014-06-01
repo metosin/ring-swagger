@@ -23,14 +23,25 @@
                LocalDate Date*
                clojure.lang.Keyword Keyword*})
 
-(defn collection-with-one-element [x y]
+;;
+;; Internals
+;;
+
+(declare model?)
+
+(defn- collection-with-one-element [x y]
+  (assert (= (count x) 1) "nested sequences and set can only one element.")
   (cond
     (set? x) #{y}
     (sequential? x) [y]))
 
-(defn plain-map? [x]
+(defn- plain-map? [x]
   (and (instance? clojure.lang.APersistentMap x) ;; need to filter out Schema records
        (not (model? x)))) ;; and predefined models
+
+(defn- valid-container? [x]
+  (or (sequential? x)
+      (set? x)))
 
 ;;
 ;; Public Api
@@ -48,22 +59,25 @@
   ([model form]
     `(defmodel ~model ~(str model " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([model docstring form]
-    (letfn [(sub-model?! [value ])
-            (sub-models! [model form]
+    (letfn [(sub-models! [model form]
                          (into {}
                                (for [[k v] form
                                      :let [v (cond
-                                               (plain-map? v)               (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
-                                                                              (eval `(defmodel ~sub-model ~v))
-                                                                              (value-of sub-model))
-                                               (and (or (sequential? v)
-                                                        (set? v))
-                                                    (plain-map? (first v))) (do
-                                                                              (assert (= (count v) 1) "nested sequences and set can only one element.")
-                                                                              (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
-                                                                                (eval `(defmodel ~sub-model ~(first v)))
-                                                                                (collection-with-one-element v (value-of sub-model))))
-                                               :else                        v)]]
+
+                                               ;; direct anonymous map
+                                               (plain-map? v)
+                                               (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
+                                                 (eval `(defmodel ~sub-model ~v))
+                                                 (value-of sub-model))
+
+                                               ;; anonymous map within a valid container
+                                               (and (valid-container? v) (plain-map? (first v)))
+                                               (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
+                                                 (eval `(defmodel ~sub-model ~(first v)))
+                                                 (collection-with-one-element v (value-of sub-model)))
+
+                                               ;; pass-through
+                                               :else v)]]
                                  [k v])))]
       `(do
          (assert (map? ~form))
