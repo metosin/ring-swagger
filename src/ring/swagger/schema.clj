@@ -54,8 +54,9 @@
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
    to it's metadata - used in handling Model references. Generates
-   submodels from nested Maps and links them by reference. Submodels
-   are named after their father and the child key."
+   submodels from direct nested Maps and Maps as only element in
+   valid containers (List, Vector, Set) and links them by reference.
+   Submodels are named after their father appended with the key name."
   ([model form]
     `(defmodel ~model ~(str model " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([model docstring form]
