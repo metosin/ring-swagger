@@ -4,8 +4,8 @@
 
 [Swagger](https://helloreverb.com/developers/swagger) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data models and coercion.
 
-- Provides functions to create both Swagger [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing) and [Api declarations](https://github.com/wordnik/swagger-core/wiki/API-Declaration).
-- Schema extensions for modelling, coercion and [JSON Schema](http://json-schema.org/) generation
+- Provides functions to create Swagger [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing), [Api declarations](https://github.com/wordnik/swagger-core/wiki/API-Declaration) and [Swagger-UI](https://github.com/metosin/ring-swagger-ui).
+- Schema extensions for modelling, coercion and Swagger [JSON Schema](http://json-schema.org/) generation
 - Does not cover how the routes and models are collected from web apps (and by so should be compatible with all Ring-based libraries)
    - Provides a Map-based interface for higher level web libs to create Swagger Spec out of their route definitions
 
@@ -22,11 +22,10 @@
 
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
 
-1. Define routes to serve the `ring.swagger.core/api-listing` and `ring.swagger.core/api-declaration`
-2. Create a route-collector to [collect the route metadata](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/core_test.clj#L247-L348).
-3. Optionally define a route for the swagger-ui
-4. Publish it.
-5. List your adapter here
+1. Define routes to serve the `ring.swagger.core/api-listing` and `ring.swagger.core/api-declaration` (and optionally the `ring.swagger.ui/swagger-ui`)
+2. Create code to collect routes from your web lib and to pass them to Ring-Swagger fns. Sample adapter [Here](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger.clj)
+3. Publish it.
+4. Pull Request to list your adapter here
 
 # Usage
 
