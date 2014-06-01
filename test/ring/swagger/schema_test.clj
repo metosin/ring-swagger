@@ -22,7 +22,8 @@
                         :k LocalDate
                         :l (s/maybe String)
                         :m (s/both Long (s/pred odd? 'odd?))
-                        :n SubType}})
+                        :n SubType
+                        :o [{:p #{{:q String}}}]}})
 
 (def model {:a true
             :b 2.2
@@ -36,7 +37,8 @@
                 :k (t/today)
                 :l nil
                 :m 1
-                :n {:alive true}}})
+                :n {:alive true}
+                :o [{:p #{{:q "abba"}}}]}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
@@ -174,7 +176,7 @@
         query {:a "1"  :b "2.2"  :c "true"  :d "kikka"}
         value {:a 1    :b 2.2    :c true    :d :kikka}]
 
-    (fact "query-coercion can convert string to Longs,Doubles and Booleans"
+    (fact "query-coercion can convert string to Longs, Doubles and Booleans"
       (coerce! Model query :query) => value)
 
     (fact "json-coercion cant convert string to Longs,Doubles and Booleans"
