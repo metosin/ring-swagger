@@ -5,6 +5,11 @@
 
 (defn date-time? [x] (#{Date DateTime} x))
 
+;;
+;; These are just internal mappings from Classes to predicates
+;; don't use in clint code.
+;;
+
 (def Long*     s/Int)
 (def Double*   (s/pred (partial instance? Double) 'double?))
 (def String*   (s/pred string? 'string?))
