@@ -43,6 +43,9 @@
   (or (sequential? x)
       (set? x)))
 
+(defn- sub-model-symbol [model k]
+  (symbol (str model (->CamelCase (name (s/explicit-schema-key k))))))
+
 ;;
 ;; Public Api
 ;;
@@ -67,13 +70,13 @@
 
                                                ;; direct anonymous map
                                                (plain-map? v)
-                                               (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
+                                               (let [sub-model (sub-model-symbol model k)]
                                                  (eval `(defmodel ~sub-model ~v))
                                                  (value-of sub-model))
 
                                                ;; anonymous map within a valid container
                                                (and (valid-container? v) (plain-map? (first v)))
-                                               (let [sub-model (symbol (str model (->CamelCase (name (s/explicit-schema-key k)))))]
+                                               (let [sub-model (sub-model-symbol model k)]
                                                  (eval `(defmodel ~sub-model ~(first v)))
                                                  (collection-with-one-element v (value-of sub-model)))
 
@@ -132,6 +135,5 @@
 
 (defn find-model-name
   "Returns model name or nil"
-  [x]
-  (some-> (if (or (set? x) (sequential? x)) (first x) x) model-var name-of))
+  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) model-var name-of))
 

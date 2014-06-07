@@ -244,7 +244,7 @@
   {:pre [(map? schema)]}
   (assoc schema s/Keyword s/Any))
 
-(defn- convert-query-or-path-parameter [{:keys [model type] :as it}]
+(defn- convert-extracted-parameter [{:keys [model type] :as it}]
   (assert (#{:query :path} type) (str "wrong type: " type "<-- " it))
   (if model
     (for [[k v] (-> model value-of strict-schema)
@@ -273,7 +273,7 @@
       (do
         (if (= type :body)
             (convert-body-parameter (resolve-model-vars parameter))
-            (convert-query-or-path-parameter parameter))))))
+            (convert-extracted-parameter parameter))))))
 
 ;;
 ;; Routing
