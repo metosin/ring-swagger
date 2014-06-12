@@ -48,6 +48,27 @@
   "Returns model name or nil"
   [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) s/schema-name))
 
+(defn- create-sub-models! [model form]
+  (into {}
+    (for [[k v] form
+          :let [v (cond
+
+                    ;; direct anonymous map
+                    (plain-map? v)
+                    (let [sub-model (sub-model-symbol model k)]
+                      (eval `(defmodel ~sub-model ~v))
+                      (value-of sub-model))
+
+                    ;; anonymous map within a valid container
+                    (and (valid-container? v) (plain-map? (first v)))
+                    (let [sub-model (sub-model-symbol model k)]
+                      (eval `(defmodel ~sub-model ~(first v)))
+                      (collection-with-one-element v (value-of sub-model)))
+
+                    ;; pass-through
+                    :else v)]]
+      [k v])))
+
 ;;
 ;; Public Api
 ;;
@@ -61,32 +82,12 @@
   ([model form]
     `(defmodel ~model ~(str model " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([model docstring form]
-    (letfn [(sub-models! [model form]
-                         (into {}
-                               (for [[k v] form
-                                     :let [v (cond
-
-                                               ;; direct anonymous map
-                                               (plain-map? v)
-                                               (let [sub-model (sub-model-symbol model k)]
-                                                 (eval `(defmodel ~sub-model ~v))
-                                                 (value-of sub-model))
-
-                                               ;; anonymous map within a valid container
-                                               (and (valid-container? v) (plain-map? (first v)))
-                                               (let [sub-model (sub-model-symbol model k)]
-                                                 (eval `(defmodel ~sub-model ~(first v)))
-                                                 (collection-with-one-element v (value-of sub-model)))
-
-                                               ;; pass-through
-                                               :else v)]]
-                                 [k v])))]
-      `(do
-         (assert (map? ~form))
-         (def ~model ~docstring
-           (with-meta
-             (~sub-models! '~model ~form)
-             {:name '~model}))))))
+   `(do
+      (assert (map? ~form))
+      (def ~model ~docstring
+        (with-meta
+          (~create-sub-models! '~model ~form)
+          {:name '~model})))))
 
 (defn field
   "Defines a Schema predicate and attaches meta-data into it.
