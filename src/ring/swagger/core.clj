@@ -248,7 +248,8 @@
   (assert (#{:query :path} type) (str "wrong type: " type "<-- " it))
   (if model
     (for [[k v] (-> model value-of strict-schema)
-          :let [rk (s/explicit-schema-key k)]]
+          :when (s/specific-key? k)
+          :let [rk (s/explicit-schema-key (eval k))]]
       (merge
         (->json v)
         {:name (name rk)
