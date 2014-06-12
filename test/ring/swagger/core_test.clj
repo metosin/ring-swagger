@@ -315,7 +315,6 @@
                                   :apis []}))
   (fact "full api"
     (defmodel Q {:q String})
-    (let [uri "/pets/:id"]
       (api-declaration
         {:apiVersion ..version..
          :produces ["application/json"
@@ -323,11 +322,11 @@
          :consumes ["application/json"
                     "application/xml"]}
         {..api.. {:routes [{:method :get
-                            :uri uri
+                          :uri "/pets/:id"
                             :metadata {:return Pet
                                        :summary ..summary..
                                        :notes ..notes..
-                                       :parameters [(string-path-parameters uri)]}}
+                                     :parameters [(string-path-parameters "/pets/:id")]}}
                            {:method :get
                             :uri "/pets"
                             :metadata {:return [Pet]
