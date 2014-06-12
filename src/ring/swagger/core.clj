@@ -249,8 +249,8 @@
          :description ""
          :required true}
         meta
-        {:paramType type
-         :type model}))))
+        (->json model :top true)
+        {:paramType type}))))
 
 (defn convert-parameters [parameters]
   (apply concat

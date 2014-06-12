@@ -190,7 +190,7 @@
                             :description ""
                             :paramType :body
                             :required true
-                            :type Body}
+                            :type 'Body}
                            {:name "p"
                             :description ""
                             :format "int64"
@@ -218,7 +218,19 @@
              :format "int64"
              :paramType type
              :required false
-             :type "integer"}]))))
+             :type "integer"}])))
+
+  (fact "Array body parameters"
+    (convert-parameters
+      [{:type :body
+        :model [Body]}])
+
+    => [{:name "body"
+         :description ""
+         :paramType :body
+         :required true
+         :items {:$ref 'Body}
+         :type "array"}]))
 
 ;;
 ;; Helpers
@@ -312,7 +324,7 @@
                                   :consumes ["application/json"]
                                   :models {}
                                   :apis []}))
-  (fact "full api"
+  (fact "more full api"
     (defmodel Q {:q String})
     (api-declaration
       {:apiVersion ..version..
