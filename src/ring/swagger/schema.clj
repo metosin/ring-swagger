@@ -44,6 +44,10 @@
 (defn- sub-model-symbol [model k]
   (symbol (str model (->CamelCase (name (s/explicit-schema-key k))))))
 
+(defn extract-schema-name
+  "Returns model name or nil"
+  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) s/schema-name))
+
 ;;
 ;; Public Api
 ;;
@@ -114,8 +118,4 @@
       (if (error? result)
         (throw+ {:type ::validation :error (:error result)})
         result))))
-
-(defn find-model-name
-  "Returns model name or nil"
-  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) s/schema-name))
 

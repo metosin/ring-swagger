@@ -233,7 +233,7 @@
   (if model
     (vector
       (merge
-        {:name (some-> model schema/find-model-name str/lower-case)
+        {:name (some-> model schema/extract-schema-name str/lower-case)
          :description ""
          :required true}
         meta
