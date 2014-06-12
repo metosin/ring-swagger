@@ -137,34 +137,28 @@
 ;; public Api
 ;;
 
-(defn transform [schema*]
-  (let [schema (value-of schema*)
-        required (required-keys schema)
+(defn transform [schema]
+  (let [required (required-keys schema)
         required (if-not (empty? required) required)]
     (remove-empty-keys
-      {:id (name-of schema*)
+      {:id (s/schema-name schema)
        :properties (properties schema)
        :required required})))
 
 (defn collect-models [x]
-  (set
-    (let [value (value-of x)
-          model  (schema/model-var value)
-          values (cond
-                   (map? value) (vals value)
-                   (sequential? value) value
-                   :else [])
-          cols   (filter coll? values)
-          models (->> cols (map meta) (keep :model))
-          models (if model (conj models model) model)]
-      (reduce concat models (map collect-models cols)))))
+  (let [schemas (atom {})]
+    (walk/prewalk
+      (fn [x]
+        (when-let [schema (s/schema-name x)]
+          (swap! schemas assoc schema x))
+        x)
+      x)
+    @schemas))
 
-(defn transform-models [& schemas*]
-  (->> schemas*
-    (mapcat collect-models)
-    (map transform)
-    (map (juxt (comp keyword :id) identity))
-    (into {})))
+(defn transform-models [& schemas]
+  (into {}
+        (for [[k v] (apply merge (map collect-models schemas))]
+          [k (transform v)])))
 
 (defn extract-models [details]
   (let [route-meta (->> details :routes (map :metadata))
