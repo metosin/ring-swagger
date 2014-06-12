@@ -126,9 +126,6 @@
 (defn required-keys [schema]
   (filterv s/required-key? (keys schema)))
 
-(defn resolve-model-vars [form]
-  (walk/prewalk (fn [x] (or (schema/model-var x) x)) form))
-
 ;;
 ;; public Api
 ;;
@@ -253,14 +250,14 @@
          :required true}
         meta
         {:paramType type
-         :type (resolve-model-vars model)}))))
+         :type model}))))
 
 (defn convert-parameters [parameters]
   (apply concat
     (for [{type :type :as parameter} parameters]
       (do
         (if (= type :body)
-            (convert-body-parameter (resolve-model-vars parameter))
+            (convert-body-parameter parameter)
             (convert-extracted-parameter parameter))))))
 
 ;;

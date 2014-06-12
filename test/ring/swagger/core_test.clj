@@ -8,7 +8,7 @@
   (:import  [java.util Date]
             [org.joda.time DateTime LocalDate]))
 
-(defmodel Model {})
+(defmodel Model {:value String})
 
 (facts "type transformations"
 
@@ -102,7 +102,7 @@
                              :description "Unique identifier for the Pet"
                              :minimum "0.0"
                              :maximum "100.0"}
-                        :category {:$ref "Category"
+                        :category {:$ref 'Category
                                    :description "Category the pet is in"}
                         :name {:type "string"
                                :description "Friendly name of the pet"}
@@ -111,7 +111,7 @@
                                     :items {:type "string"}}
                         :tags {:type "array"
                                :description "Tags assigned to this pet"
-                               :items {:$ref "Tag"}}
+                               :items {:$ref 'Tag}}
                         :status {:type "string"
                                  :description "pet status in the store"
                                  :enum [:pending :sold :available]}}})
@@ -190,7 +190,7 @@
                             :description ""
                             :paramType :body
                             :required true
-                            :type #'Body}
+                            :type Body}
                            {:name "p"
                             :description ""
                             :format "int64"
@@ -250,13 +250,12 @@
                                                                'Tag Tag}))
 
 (facts "generating return types from models, list & set of models"
-  (doseq [x [Tag 'Tag #'Tag]]
-    (fact {:midje/description (str "returning " x)}
-      (->json x :top true) => {:type "Tag"})
-    (fact {:midje/description (str "returning [" x "]")}
-      (->json [x] :top true) => {:items {:$ref "Tag"}, :type "array"})
-    (fact {:midje/description (str "returning #{" x "}")}
-      (->json #{x} :top true) => {:items {:$ref "Tag"}, :type "array" :uniqueItems true})))
+  (fact "returning Tag"
+    (->json Tag :top true) => {:type 'Tag})
+  (fact "returning [Tag]"
+    (->json [Tag] :top true) => {:items {:$ref 'Tag}, :type "array"})
+  (fact "returning #{Tag}"
+    (->json #{Tag} :top true) => {:items {:$ref 'Tag}, :type "array" :uniqueItems true}))
 
 ;;
 ;; Final json
@@ -315,25 +314,25 @@
                                   :apis []}))
   (fact "full api"
     (defmodel Q {:q String})
-      (api-declaration
-        {:apiVersion ..version..
-         :produces ["application/json"
-                    "application/xml"]
-         :consumes ["application/json"
-                    "application/xml"]}
-        {..api.. {:routes [{:method :get
+    (api-declaration
+      {:apiVersion ..version..
+       :produces ["application/json"
+                  "application/xml"]
+       :consumes ["application/json"
+                  "application/xml"]}
+      {..api.. {:routes [{:method :get
                           :uri "/pets/:id"
-                            :metadata {:return Pet
-                                       :summary ..summary..
-                                       :notes ..notes..
+                          :metadata {:return Pet
+                                     :summary ..summary..
+                                     :notes ..notes..
                                      :parameters [(string-path-parameters "/pets/:id")]}}
-                           {:method :get
-                            :uri "/pets"
-                            :metadata {:return [Pet]
-                                       :summary ..summary2..
-                                       :notes ..notes2..
-                                       :parameters [{:model Q
-                                                     :type :query}]}}]}}
+                         {:method :get
+                          :uri "/pets"
+                          :metadata {:return [Pet]
+                                     :summary ..summary2..
+                                     :notes ..notes2..
+                                     :parameters [{:model Q
+                                                   :type :query}]}}]}}
         ..api..
         ..basepath..)
 
@@ -359,7 +358,7 @@
                                               :required true
                                               :type "string"}]
                                 :summary ..summary..
-                                :type "Pet"}]
+                                :type 'Pet}]
                   :path "/pets/{id}"}
                  {:operations [{:method "GET"
                                 :nickname "getPets"
@@ -372,16 +371,8 @@
                                               :type "string"}]
                                 :summary ..summary2..
                                 :type "array"
-                                :items {:$ref "Pet"}}]
-                  :path "/pets"}]}))))
-
-(fact "resolve-model-vars"
-  (resolve-model-vars Tag) => #'Tag
-  (resolve-model-vars 'Tag) => #'Tag
-  (resolve-model-vars #'Tag) => #'Tag
-  (resolve-model-vars [Tag, 'Tag, #'Tag]) => [#'Tag, #'Tag, #'Tag]
-  (resolve-model-vars #{Tag, 'Tag, #'Tag}) => #{#'Tag}
-  (resolve-model-vars {:a Tag, :b 'Tag, :c #'Tag}) => {:a #'Tag, :b #'Tag, :c #'Tag})
+                                :items {:$ref 'Pet}}]
+                  :path "/pets"}]})))
 
 (fact join-paths
   (join-paths "/foo" nil "index.html") => "/foo/index.html"

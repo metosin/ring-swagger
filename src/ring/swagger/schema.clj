@@ -52,7 +52,7 @@
 
 (defn model?
   "Checks weather input is a model."
-  [x] (and (map? x) (var? (:model (meta x)))))
+  [x] (boolean (s/schema-name x)))
 
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
@@ -88,8 +88,7 @@
          (def ~model ~docstring
            (with-meta
              (~sub-models! '~model ~form)
-             {:model (var ~model)
-              :name '~model}))))))
+             {:name '~model}))))))
 
 (defn field
   "Defines a Schema predicate and attaches meta-data into it.
@@ -122,18 +121,11 @@
         (throw+ {:type ::validation :error (:error result)})
         result))))
 
-(defn model-var
-  "Returns models var."
-  [x]
-  (let [value (value-of x)]
-    (if (model? value)
-      (:model (meta value)))))
-
 (defn model-name
   "Returns model name or nil"
-  [x] (some-> x model-var name-of))
+  [x] (s/schema-name x))
 
 (defn find-model-name
   "Returns model name or nil"
-  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) model-var name-of))
+  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) s/schema-name))
 
