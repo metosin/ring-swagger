@@ -60,14 +60,6 @@
   (fact "without millis"
     (coerce! {:d Date} {:d "2014-02-24T21:37:40Z"}) =not=> (throws Exception)))
 
-(fact "models"
-
-  (fact "model?"
-    (model? AllTypes) => true
-    (model? #'AllTypes) => true
-    (model? 'AllTypes) => false
-    (model? {:a String}) => false))
-
 (facts "types"
 
   (fact "basic types can act as fields"
@@ -97,8 +89,8 @@
   (fact "has meta-data"
     MapModel => (has-meta {:name 'MapModel}))
   (fact "model?"
-    (model? MapModel) => true
-    (model? {:a String}) => false))
+    (s/schema-name MapModel) => 'MapModel
+    (s/schema-name {:a String}) => falsey))
 
 (fact "field"
 

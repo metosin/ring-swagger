@@ -27,8 +27,6 @@
 ;; Internals
 ;;
 
-(declare model?)
-
 (defn- collection-with-one-element [x y]
   (assert (= (count x) 1) "nested sequences and set can only one element.")
   (cond
@@ -37,7 +35,7 @@
 
 (defn- plain-map? [x]
   (and (instance? clojure.lang.APersistentMap x) ;; need to filter out Schema records
-       (not (model? x)))) ;; and predefined models
+       (not (s/schema-name x)))) ;; and predefined models
 
 (defn- valid-container? [x]
   (or (sequential? x)
@@ -49,10 +47,6 @@
 ;;
 ;; Public Api
 ;;
-
-(defn model?
-  "Checks weather input is a model."
-  [x] (boolean (s/schema-name x)))
 
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
