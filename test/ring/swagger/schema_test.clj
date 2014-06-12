@@ -66,13 +66,7 @@
     (model? AllTypes) => true
     (model? #'AllTypes) => true
     (model? 'AllTypes) => false
-    (model? {:a String}) => false)
-
-  (fact "model-name"
-    (model-name AllTypes) => 'AllTypes
-    (model-name #'AllTypes) => 'AllTypes
-    (model-name 'AllTypes) => nil
-    (model-name {:a String}) => nil))
+    (model? {:a String}) => false))
 
 (facts "types"
 

@@ -121,10 +121,6 @@
         (throw+ {:type ::validation :error (:error result)})
         result))))
 
-(defn model-name
-  "Returns model name or nil"
-  [x] (s/schema-name x))
-
 (defn find-model-name
   "Returns model name or nil"
   [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) s/schema-name))

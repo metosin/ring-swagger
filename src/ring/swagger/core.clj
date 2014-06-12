@@ -67,7 +67,7 @@
                        :uniqueItems true
                        :items (type-of (first x))}
       :else           (if top
-                        {:type (schema/model-name x)}
+                        {:type (s/schema-name x)}
                         (type-of x)))))
 ;;
 ;; dispatch
@@ -92,8 +92,8 @@
   (or
     (json-type-class e)
     (cond
-      (schema/model? e) {:$ref (schema/model-name e)}
-      (schema/model? (value-of (resolve-model-var e))) {:$ref (schema/model-name e)}
+      (schema/model? e) {:$ref (s/schema-name e)}
+      (schema/model? (value-of (resolve-model-var e))) {:$ref (s/schema-name e)}
       :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
 
 ;;
