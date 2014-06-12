@@ -24,10 +24,6 @@
 ;; JSON Encoding
 ;;
 
-(add-encoder clojure.lang.Var
-  (fn [x ^JsonGenerator jg]
-    (.writeString jg (name-of x))))
-
 (add-encoder schema.utils.ValidationError
   (fn [x ^JsonGenerator jg]
     (.writeString jg
