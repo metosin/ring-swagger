@@ -236,17 +236,18 @@
                   :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
 (fact "extract-models"
-  (fact "returns both return and body-parameters but now query or path parameter types"
-    (extract-models {:routes [{:metadata {:return ['Tag]
-                                          :parameters [{:model 'Tag
+  (fact "returns both return and body-parameters but not query or path parameter types"
+    (extract-models {:routes [{:metadata {:return [Tag]
+                                          :parameters [{:model Tag
                                                         :type :body}
-                                                       {:model ['Category]
+                                                       {:model [Category]
                                                         :type :body}
-                                                       {:model 'Pet
+                                                       {:model Pet
                                                         :type :path}
-                                                       {:model 'Pet
+                                                       {:model Pet
                                                         :type :query}]}}
-                              {:metadata {:return 'Tag}}]}) => ['Category 'Tag]))
+                              {:metadata {:return Tag}}]}) => {'Category Category
+                                                               'Tag Tag}))
 
 (facts "generating return types from models, list & set of models"
   (doseq [x [Tag 'Tag #'Tag]]

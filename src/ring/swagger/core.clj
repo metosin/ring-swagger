@@ -163,12 +163,9 @@
 (defn extract-models [details]
   (let [route-meta (->> details :routes (map :metadata))
         return-models (->> route-meta (keep :return) flatten)
-        body-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)]
-    (-> return-models
-      (into body-models)
-      flatten
-      distinct
-      vec)))
+        body-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)
+        all-models (flatten (into return-models body-models))]
+    (into {}  (mapv (juxt s/schema-name identity) all-models))))
 
 ;;
 ;; Route generation
