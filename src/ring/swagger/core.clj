@@ -165,7 +165,7 @@
         return-models (->> route-meta (keep :return) flatten)
         body-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)
         all-models (flatten (into return-models body-models))]
-    (into {}  (mapv (juxt s/schema-name identity) all-models))))
+    (into {} (map (juxt s/schema-name identity) all-models))))
 
 ;;
 ;; Route generation
