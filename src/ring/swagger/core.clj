@@ -40,17 +40,6 @@
     (.writeString jg (coerce/unparse-date x))))
 
 ;;
-;; Schema Transformations
-;;
-
-(defn resolve-model-var [x]
-  (cond
-    (map? x)    (or (-> x meta :model) x)
-    (symbol? x) (-> x eval recur)
-    :else       (let [x' (eval x)]
-                  (if (= (class x) (class x')) x (recur x')))))
-
-;;
 ;; Json Schema transformations
 ;;
 
@@ -91,10 +80,9 @@
 (defmethod json-type :default [e]
   (or
     (json-type-class e)
-    (cond
-      (schema/model? e) {:$ref (s/schema-name e)}
-      (schema/model? (value-of (resolve-model-var e))) {:$ref (s/schema-name e)}
-      :else (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+    (if (s/schema-name e)
+      {:$ref (s/schema-name e)}
+      (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
 
 ;;
 ;; class-based dispatch
