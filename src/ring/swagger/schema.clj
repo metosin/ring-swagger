@@ -102,6 +102,10 @@
   "Checks weather input is an Schema error."
   [x] (su/error? x))
 
+(defn named-schema?
+  "Checks weather input is a named schema."
+  [x] (boolean (s/schema-name x)))
+
 (defn coerce
   "Coerces a value against a schema using enhanced json-coercion.
    If no errors, returns the value, otherwise returns ValidationError."

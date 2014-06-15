@@ -108,6 +108,20 @@
   (fact "field set meta-data to it"
     (field String {:kikka :kakka}) => (has-meta {:kikka :kakka})))
 
+(fact "named-schema"
+
+  (fact "schema is named"
+    (s/defschema AbbaSchema {:s String})
+    AbbaSchema => named-schema?)
+
+  (fact "model is named"
+    (defmodel AbbaModel {:s String})
+    AbbaModel => named-schema?)
+
+  (fact "def is not named"
+    (def AbbaDef {:s String})
+    AbbaDef =not=> named-schema?))
+
 (fact "coercion"
   (let [valid {:a "kikka"}
         invalid {}]
