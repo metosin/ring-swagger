@@ -55,6 +55,7 @@
 ;; Spiking
 ;;
 
+(comment
 (s/defschema OrderType {:name String})
 
 (s/defschema Order {:id String
@@ -73,4 +74,4 @@
 (-> Order2 :mass first (s/schema-name))
 (-> Order2 :address :type (s/schema-name))
 (clojure.pprint/pprint Order2)
-
+)
