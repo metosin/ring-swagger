@@ -156,12 +156,6 @@
                                                                    :kikka java.lang.String}}
   (string-path-parameters "/api/ping") => nil)
 
-(fact "scrict-schema strips open keys"
-  (strict-schema {s/Keyword s/Any :s String}) => {:s String})
-
-(fact "loose-schema adds open keys to top-level"
-  (loose-schema {:s String}) => {s/Keyword s/Any :s String})
-
 (defmodel Query {:id Long (s/optional-key :q) String})
 (defmodel Body {:name String :age Long})
 (defmodel Path {:p Long})

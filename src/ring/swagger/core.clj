@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
             [ring.util.response :refer :all]
+            [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [plumbing.core :refer [fn->]]
             [schema.utils :as su]
@@ -112,9 +113,6 @@
                  (IllegalArgumentException.
                    (str "error converting to json schema [" k " " (s/explain v) "]") e)))))])))
 
-(defn required-keys [schema]
-  (filterv s/required-key? (keys schema)))
-
 ;;
 ;; public Api
 ;;
@@ -204,18 +202,6 @@
 ;;
 ;; Convert parameters
 ;;
-
-(defn strict-schema
-  "removes open keys from schema"
-  [schema]
-  {:pre [(map? schema)]}
-  (dissoc schema s/Keyword))
-
-(defn loose-schema
-  "add open keys for top level schema"
-  [schema]
-  {:pre [(map? schema)]}
-  (assoc schema s/Keyword s/Any))
 
 (defn- convert-extracted-parameter [{:keys [model type] :as it}]
   (assert (#{:query :path} type) (str "wrong type: " type "<-- " it))

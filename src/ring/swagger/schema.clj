@@ -5,6 +5,7 @@
             [clojure.pprint :as pprint]
             [slingshot.slingshot :refer [throw+]]
             [ring.swagger.common :refer :all]
+            [ring.swagger.impl :refer :all]
             [ring.swagger.data :refer :all]
             [camel-snake-kebab :refer [->CamelCase]]
             [ring.swagger.coerce :as coerce])
@@ -27,19 +28,9 @@
 ;; Internals
 ;;
 
-(defn- collection-with-one-element [x y]
-  (assert (= (count x) 1) "nested sequences and set can only one element.")
-  (cond
-    (set? x) #{y}
-    (sequential? x) [y]))
-
 (defn- plain-map? [x]
   (and (instance? clojure.lang.APersistentMap x) ;; need to filter out Schema records
        (not (s/schema-name x)))) ;; and predefined models
-
-(defn- valid-container? [x]
-  (or (sequential? x)
-      (set? x)))
 
 (defn- sub-model-symbol [model k]
   (symbol (str model (->CamelCase (name (s/explicit-schema-key k))))))
@@ -63,7 +54,7 @@
                     (and (valid-container? v) (plain-map? (first v)))
                     (let [sub-model (sub-model-symbol model k)]
                       (eval `(defmodel ~sub-model ~(first v)))
-                      (collection-with-one-element v (value-of sub-model)))
+                      (contain v (value-of sub-model)))
 
                     ;; pass-through
                     :else v)]]

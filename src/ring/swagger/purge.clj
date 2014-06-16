@@ -50,29 +50,3 @@
 
 (defn with-sub-schemas [schema]
   (collect-schemas [(s/schema-name schema)] schema))
-
-;;
-;; Spiking
-;;
-
-
-(s/defschema OrderType {:name String})
-
-(s/defschema Order {:id String
-                    :name String
-                    :type OrderType
-                    :mass [{:unit (s/enum :kg :g)
-                            :value Long}]
-                    :mass2 #{{:a Long}}
-                    :address {:street String
-                              :zip Long
-                              ;; :country (s/enum :fi :po)
-                              :type {:a :b}}})
-
-(def Order2 (with-sub-schemas Order))
-
-(-> Order2 (s/schema-name))
-(-> Order2 :mass first (s/schema-name))
-(-> Order2 :mass2 first (s/schema-name))
-(-> Order2 :address :type (s/schema-name))
-(clojure.pprint/pprint Order2)
