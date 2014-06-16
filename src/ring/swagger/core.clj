@@ -126,7 +126,6 @@
   (letfn [(plain-map? [x] (instance? clojure.lang.APersistentMap x))
           (full-name [path] (->> path (map name) (map ->CamelCase) (apply str) symbol))
           (collect-schemas [keys schema]
-                           (println keys ":" schema)
                            (cond
                              (plain-map? schema)
                              (if (and (seq (pop keys)) (s/schema-name schema))
@@ -162,9 +161,7 @@
     @schemas))
 
 (defn transform-models [schemas]
-  (doseq [s schemas] (println "***" s "***"))
   (->> schemas
-       #_(map with-named-sub-schemas)
        (map collect-models)
        (apply merge)
        (map (juxt key (comp transform val)))
@@ -174,7 +171,7 @@
   (let [route-meta (->> details :routes (map :metadata))
         return-models (->> route-meta (keep :return) flatten)
         body-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)
-        all-models (flatten (into return-models body-models))]
+        all-models (->> body-models (into return-models) flatten (map with-named-sub-schemas))]
     (into {} (map (juxt s/schema-name identity) all-models))))
 
 ;;
