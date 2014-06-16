@@ -132,9 +132,9 @@
   (collect-models String) => {})
 
 (fact "transform-models"
-  (transform-models Pet) => {'Pet Pet'
-                             'Tag Tag'
-                             'Category Category'})
+  (transform-models [Pet]) => {'Pet Pet'
+                               'Tag Tag'
+                               'Category Category'})
 
 ;;
 ;; Route generation
