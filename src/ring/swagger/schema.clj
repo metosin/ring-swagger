@@ -7,7 +7,6 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.impl :refer :all]
             [ring.swagger.data :refer :all]
-            [camel-snake-kebab :refer [->CamelCase]]
             [ring.swagger.coerce :as coerce])
   (:import  [java.io StringWriter]
             [java.util Date]

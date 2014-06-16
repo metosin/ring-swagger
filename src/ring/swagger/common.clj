@@ -1,5 +1,6 @@
 (ns ring.swagger.common
-  (:require [plumbing.core :refer [fn->]]))
+  (:require [plumbing.core :refer [fn->]]
+            [camel-snake-kebab :as csk]))
 
 (defn remove-empty-keys
   "removes empty keys from a map"
@@ -41,3 +42,6 @@
             form       (drop (* 2 (count parameters)) c)]
         [parameters form])
       [{} c])))
+
+(defn ->CamelCase [x]
+  (csk/->CamelCase x))
