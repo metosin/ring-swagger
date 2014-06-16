@@ -3,6 +3,7 @@
             [clojure.walk :as walk]
             [ring.util.response :refer :all]
             [schema.core :as s]
+            [plumbing.core :refer [fn->]]
             [schema.utils :as su]
             [ring.swagger.data :as data]
             [ring.swagger.schema :as schema]

@@ -1,12 +1,5 @@
-(ns ring.swagger.common)
-
-(defmacro fn->
-  "Creates a function that threads on input with some->"
-  [& body] `(fn [x#] (some-> x# ~@body)))
-
-(defmacro fn->>
-  "Creates a function that threads on input with some->>"
-  [& body] `(fn [x#] (some->> x# ~@body)))
+(ns ring.swagger.common
+  (:require [plumbing.core :refer [fn->]]))
 
 (defn remove-empty-keys
   "removes empty keys from a map"
