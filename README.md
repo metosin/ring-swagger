@@ -158,7 +158,7 @@ JSON Schema generation is implemented using multimethods. You can register your 
 - pluggable web schemas (protocol to define both json generation & coercion)
 - consumes
 - authorization
-- files
+- support for Files
 - non-json produces & consumes
 - full spec
 
