@@ -1,8 +1,7 @@
 ## 0.9.0 (17.6.2014)
 
 - `defmodel` with nested anonymous submodels works now with AOT
-- `defmodel` doesn't contain the `model` metadata -> removed the model var-resolutions
-  - lot's of internal fn's removed related to this
+- `defmodel` doesn't contain the `model` metadata -> removed all the model var-resolutions
 - support for vanilla `schema.core/defschema`s as the models
 
 ## 0.8.8 (1.6.2014)
