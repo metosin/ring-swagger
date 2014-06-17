@@ -5,8 +5,8 @@
             [clojure.pprint :as pprint]
             [slingshot.slingshot :refer [throw+]]
             [ring.swagger.common :refer :all]
+            [ring.swagger.impl :refer :all]
             [ring.swagger.data :refer :all]
-            [camel-snake-kebab :refer [->CamelCase]]
             [ring.swagger.coerce :as coerce])
   (:import  [java.io StringWriter]
             [java.util Date]
@@ -27,32 +27,41 @@
 ;; Internals
 ;;
 
-(declare model?)
-
-(defn- collection-with-one-element [x y]
-  (assert (= (count x) 1) "nested sequences and set can only one element.")
-  (cond
-    (set? x) #{y}
-    (sequential? x) [y]))
-
 (defn- plain-map? [x]
   (and (instance? clojure.lang.APersistentMap x) ;; need to filter out Schema records
-       (not (model? x)))) ;; and predefined models
-
-(defn- valid-container? [x]
-  (or (sequential? x)
-      (set? x)))
+       (not (s/schema-name x)))) ;; and predefined models
 
 (defn- sub-model-symbol [model k]
   (symbol (str model (->CamelCase (name (s/explicit-schema-key k))))))
 
+(defn extract-schema-name
+  "Returns model name or nil"
+  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) s/schema-name))
+
+(defn- create-sub-models! [model form]
+  (into {}
+    (for [[k v] form
+          :let [v (cond
+
+                    ;; direct anonymous map
+                    (plain-map? v)
+                    (let [sub-model (sub-model-symbol model k)]
+                      (eval `(defmodel ~sub-model ~v))
+                      (value-of sub-model))
+
+                    ;; anonymous map within a valid container
+                    (and (valid-container? v) (plain-map? (first v)))
+                    (let [sub-model (sub-model-symbol model k)]
+                      (eval `(defmodel ~sub-model ~(first v)))
+                      (contain v (value-of sub-model)))
+
+                    ;; pass-through
+                    :else v)]]
+      [k v])))
+
 ;;
 ;; Public Api
 ;;
-
-(defn model?
-  "Checks weather input is a model."
-  [x] (and (map? x) (var? (:model (meta x)))))
 
 (defmacro defmodel
   "Defines a new Schema model (a Map) and attaches the model var
@@ -63,33 +72,12 @@
   ([model form]
     `(defmodel ~model ~(str model " (Model)\n\n" (let [w (StringWriter.)] (pprint/pprint form w)(.toString w))) ~form))
   ([model docstring form]
-    (letfn [(sub-models! [model form]
-                         (into {}
-                               (for [[k v] form
-                                     :let [v (cond
-
-                                               ;; direct anonymous map
-                                               (plain-map? v)
-                                               (let [sub-model (sub-model-symbol model k)]
-                                                 (eval `(defmodel ~sub-model ~v))
-                                                 (value-of sub-model))
-
-                                               ;; anonymous map within a valid container
-                                               (and (valid-container? v) (plain-map? (first v)))
-                                               (let [sub-model (sub-model-symbol model k)]
-                                                 (eval `(defmodel ~sub-model ~(first v)))
-                                                 (collection-with-one-element v (value-of sub-model)))
-
-                                               ;; pass-through
-                                               :else v)]]
-                                 [k v])))]
-      `(do
-         (assert (map? ~form))
-         (def ~model ~docstring
-           (with-meta
-             (~sub-models! '~model ~form)
-             {:model (var ~model)
-              :name '~model}))))))
+   `(do
+      (assert (map? ~form))
+      (def ~model ~docstring
+        (with-meta
+          (~create-sub-models! '~model ~form)
+          {:name '~model})))))
 
 (defn field
   "Defines a Schema predicate and attaches meta-data into it.
@@ -103,6 +91,10 @@
 (defn error?
   "Checks weather input is an Schema error."
   [x] (su/error? x))
+
+(defn named-schema?
+  "Checks weather input is a named schema."
+  [x] (boolean (s/schema-name x)))
 
 (defn coerce
   "Coerces a value against a schema using enhanced json-coercion.
@@ -121,19 +113,4 @@
       (if (error? result)
         (throw+ {:type ::validation :error (:error result)})
         result))))
-
-(defn model-var
-  "Returns models var."
-  [x]
-  (let [value (value-of x)]
-    (if (model? value)
-      (:model (meta value)))))
-
-(defn model-name
-  "Returns model name or nil"
-  [x] (some-> x model-var name-of))
-
-(defn find-model-name
-  "Returns model name or nil"
-  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) model-var name-of))
 

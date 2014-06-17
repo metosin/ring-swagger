@@ -8,7 +8,7 @@
   (:import  [java.util Date]
             [org.joda.time DateTime LocalDate]))
 
-(defmodel Model {})
+(defmodel Model {:value String})
 
 (facts "type transformations"
 
@@ -59,30 +59,14 @@
       (->json (s/eq "kikka")) => (->json String))))
 
 ;;
-;; Schema Transformations
+;; Schemas
 ;;
 
 (defmodel Tag {(s/optional-key :id)   (field s/Int {:description "Unique identifier for the tag"})
                (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
 
-(def Tag' {:id "Tag"
-           :properties {:id {:type "integer"
-                             :format "int64"
-                             :description "Unique identifier for the tag"}
-                        :name {:type "string"
-                               :description "Friendly name for the tag"}}})
-
 (defmodel Category {(s/optional-key :id)   (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
                     (s/optional-key :name) (field s/Str {:description "Name of the category"})})
-
-(def Category' {:id "Category"
-                :properties {:id {:type "integer"
-                                  :format "int64"
-                                  :description "Category unique identifier"
-                                  :minimum "0.0"
-                                  :maximum "100.0"}
-                             :name {:type "string"
-                                    :description "Name of the category"}}})
 
 (defmodel Pet  {:id                         (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
                 :name                       (field s/Str {:description "Friendly name of the pet"})
@@ -91,14 +75,34 @@
                 (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
                 (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
 
-(def Pet' {:id "Pet"
+;;
+;; Excepcted JSON Schemas
+;;
+
+(def Tag' {:id 'Tag
+           :properties {:id {:type "integer"
+                             :format "int64"
+                             :description "Unique identifier for the tag"}
+                        :name {:type "string"
+                               :description "Friendly name for the tag"}}})
+
+(def Category' {:id 'Category
+                :properties {:id {:type "integer"
+                                  :format "int64"
+                                  :description "Category unique identifier"
+                                  :minimum "0.0"
+                                  :maximum "100.0"}
+                             :name {:type "string"
+                                    :description "Name of the category"}}})
+
+(def Pet' {:id 'Pet
            :required [:id :name]
            :properties {:id {:type "integer"
                              :format "int64"
                              :description "Unique identifier for the Pet"
                              :minimum "0.0"
                              :maximum "100.0"}
-                        :category {:$ref "Category"
+                        :category {:$ref 'Category
                                    :description "Category the pet is in"}
                         :name {:type "string"
                                :description "Friendly name of the pet"}
@@ -107,24 +111,30 @@
                                     :items {:type "string"}}
                         :tags {:type "array"
                                :description "Tags assigned to this pet"
-                               :items {:$ref "Tag"}}
+                               :items {:$ref 'Tag}}
                         :status {:type "string"
                                  :description "pet status in the store"
                                  :enum [:pending :sold :available]}}})
 
+;;
+;; Facts
+;;
+
 (facts "simple schemas"
-  (transform 'Tag) => Tag'
-  (transform 'Category) => Category'
-  (transform 'Pet) => Pet')
+  (transform Tag) => Tag'
+  (transform Category) => Category'
+  (transform Pet) => Pet')
 
 (fact "collect-models"
-  (collect-models 'Pet) => #{#'Pet #'Tag #'Category}
-  (collect-models String) => #{})
+  (collect-models Pet) => {'Pet Pet
+                           'Tag Tag
+                           'Category Category}
+  (collect-models String) => {})
 
 (fact "transform-models"
-  (transform-models 'Pet) => {:Pet Pet'
-                              :Tag Tag'
-                              :Category Category'})
+  (transform-models [Pet]) => {'Pet Pet'
+                               'Tag Tag'
+                               'Category Category'})
 
 ;;
 ;; Route generation
@@ -145,12 +155,6 @@
                                                                    :kakka java.lang.String
                                                                    :kikka java.lang.String}}
   (string-path-parameters "/api/ping") => nil)
-
-(fact "scrict-schema strips open keys"
-  (strict-schema {s/Keyword s/Any :s String}) => {:s String})
-
-(fact "loose-schema adds open keys to top-level"
-  (loose-schema {:s String}) => {s/Keyword s/Any :s String})
 
 (defmodel Query {:id Long (s/optional-key :q) String})
 (defmodel Body {:name String :age Long})
@@ -180,7 +184,7 @@
                             :description ""
                             :paramType :body
                             :required true
-                            :type #'Body}
+                            :type 'Body}
                            {:name "p"
                             :description ""
                             :format "int64"
@@ -208,7 +212,19 @@
              :format "int64"
              :paramType type
              :required false
-             :type "integer"}]))))
+             :type "integer"}])))
+
+  (fact "Array body parameters"
+    (convert-parameters
+      [{:type :body
+        :model [Body]}])
+
+    => [{:name "body"
+         :description ""
+         :paramType :body
+         :required true
+         :items {:$ref 'Body}
+         :type "array"}]))
 
 ;;
 ;; Helpers
@@ -226,26 +242,26 @@
                   :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
 (fact "extract-models"
-  (fact "returns both return and body-parameters but now query or path parameter types"
-    (extract-models {:routes [{:metadata {:return ['Tag]
-                                          :parameters [{:model 'Tag
+  (fact "returns both return and body-parameters but not query or path parameter types"
+    (extract-models {:routes [{:metadata {:return [Tag]
+                                          :parameters [{:model Tag
                                                         :type :body}
-                                                       {:model ['Category]
+                                                       {:model [Category]
                                                         :type :body}
-                                                       {:model 'Pet
+                                                       {:model Pet
                                                         :type :path}
-                                                       {:model 'Pet
+                                                       {:model Pet
                                                         :type :query}]}}
-                              {:metadata {:return 'Tag}}]}) => ['Category 'Tag]))
+                              {:metadata {:return Tag}}]}) => {'Category Category
+                                                               'Tag Tag}))
 
 (facts "generating return types from models, list & set of models"
-  (doseq [x [Tag 'Tag #'Tag]]
-    (fact {:midje/description (str "returning " x)}
-      (->json x :top true) => {:type "Tag"})
-    (fact {:midje/description (str "returning [" x "]")}
-      (->json [x] :top true) => {:items {:$ref "Tag"}, :type "array"})
-    (fact {:midje/description (str "returning #{" x "}")}
-      (->json #{x} :top true) => {:items {:$ref "Tag"}, :type "array" :uniqueItems true})))
+  (fact "returning Tag"
+    (->json Tag :top true) => {:type 'Tag})
+  (fact "returning [Tag]"
+    (->json [Tag] :top true) => {:items {:$ref 'Tag}, :type "array"})
+  (fact "returning #{Tag}"
+    (->json #{Tag} :top true) => {:items {:$ref 'Tag}, :type "array" :uniqueItems true}))
 
 ;;
 ;; Final json
@@ -302,28 +318,27 @@
                                   :consumes ["application/json"]
                                   :models {}
                                   :apis []}))
-  (fact "full api"
+  (fact "more full api"
     (defmodel Q {:q String})
-    (let [uri "/pets/:id"]
-      (api-declaration
-        {:apiVersion ..version..
-         :produces ["application/json"
-                    "application/xml"]
-         :consumes ["application/json"
-                    "application/xml"]}
-        {..api.. {:routes [{:method :get
-                            :uri uri
-                            :metadata {:return 'Pet
-                                       :summary ..summary..
-                                       :notes ..notes..
-                                       :parameters [(string-path-parameters uri)]}}
-                           {:method :get
-                            :uri "/pets"
-                            :metadata {:return ['Pet]
-                                       :summary ..summary2..
-                                       :notes ..notes2..
-                                       :parameters [{:model Q
-                                                     :type :query}]}}]}}
+    (api-declaration
+      {:apiVersion ..version..
+       :produces ["application/json"
+                  "application/xml"]
+       :consumes ["application/json"
+                  "application/xml"]}
+      {..api.. {:routes [{:method :get
+                          :uri "/pets/:id"
+                          :metadata {:return Pet
+                                     :summary ..summary..
+                                     :notes ..notes..
+                                     :parameters [(string-path-parameters "/pets/:id")]}}
+                         {:method :get
+                          :uri "/pets"
+                          :metadata {:return [Pet]
+                                     :summary ..summary2..
+                                     :notes ..notes2..
+                                     :parameters [{:model Q
+                                                   :type :query}]}}]}}
         ..api..
         ..basepath..)
 
@@ -336,9 +351,9 @@
                      "application/xml"]
           :consumes ["application/json"
                      "application/xml"]
-          :models {:Pet Pet'
-                   :Tag Tag'
-                   :Category Category'}
+          :models {'Pet Pet'
+                   'Tag Tag'
+                   'Category Category'}
           :apis [{:operations [{:method "GET"
                                 :nickname "getPetsById"
                                 :notes ..notes..
@@ -349,7 +364,7 @@
                                               :required true
                                               :type "string"}]
                                 :summary ..summary..
-                                :type "Pet"}]
+                                :type 'Pet}]
                   :path "/pets/{id}"}
                  {:operations [{:method "GET"
                                 :nickname "getPets"
@@ -362,16 +377,8 @@
                                               :type "string"}]
                                 :summary ..summary2..
                                 :type "array"
-                                :items {:$ref "Pet"}}]
-                  :path "/pets"}]}))))
-
-(fact "resolve-model-vars"
-  (resolve-model-vars Tag) => #'Tag
-  (resolve-model-vars 'Tag) => #'Tag
-  (resolve-model-vars #'Tag) => #'Tag
-  (resolve-model-vars [Tag, 'Tag, #'Tag]) => [#'Tag, #'Tag, #'Tag]
-  (resolve-model-vars #{Tag, 'Tag, #'Tag}) => #{#'Tag}
-  (resolve-model-vars {:a Tag, :b 'Tag, :c #'Tag}) => {:a #'Tag, :b #'Tag, :c #'Tag})
+                                :items {:$ref 'Pet}}]
+                  :path "/pets"}]})))
 
 (fact join-paths
   (join-paths "/foo" nil "index.html") => "/foo/index.html"

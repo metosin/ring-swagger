@@ -2,13 +2,6 @@
   (:require [midje.sweet :refer :all]
             [ring.swagger.common :refer :all]))
 
-(fact "fn-> & fn->>"
-  (let [inc-x  (fn-> :x inc)
-        sum-vals (fn->> vals (apply +))
-        m {:x 1 :y 2 :z 3}]
-    (inc-x m) => 2
-    (sum-vals m) => 6))
-
 (fact "remove-empty-keys"
   (remove-empty-keys {:a nil :b false :c 0}) => {:b false :c 0})
 
