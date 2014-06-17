@@ -3,6 +3,7 @@
 - `defmodel` with nested anonymous submodels works now with AOT
 - `defmodel` doesn't contain the `model` metadata -> removed all the model var-resolutions
 - support for vanilla `schema.core/defschema`s as the models
+- update to use `[ring "1.3.0"]`
 
 ## 0.8.8 (1.6.2014)
 
