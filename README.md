@@ -12,7 +12,8 @@
 ## Latest version
 
 ```clojure
-[metosin/ring-swagger "0.8.8"]
+[metosin/ring-swagger "0.9.0
+"]
 ```
 
 ## Web libs using Ring-Swagger
@@ -31,7 +32,11 @@ If your favourite web lib doesn't have an client adapter, you could write an it 
 
 ## Models
 
-The building blocks for creating Web Schemas are found in package `ring.swagger.schema`. All schemas must be declared by `defmodel`, which set up the needed meta-data. Otherwise, it's just a normal [Schema](https://github.com/Prismatic/schema).
+From version `0.9.0` onwards, vanilla `schema.core/defschema` is used to define the web schemas. See [Schema](https://github.com/Prismatic/schema) for more details on building the schemas.
+
+The Swagger/JSON Schema Spec 1.2 is more more limited compared to the Clojure Schema, so not all possible Schema predicates and structures are possible to use.
+
+In namespace `ring.swagger.schema` there are some helpers for creating the schemas.
 
 ### Supported Schema elements
 
@@ -49,11 +54,27 @@ The building blocks for creating Web Schemas are found in package `ring.swagger.
 | `(schema/both X Y Z)`       | *type of X*
 | `(schema/recursive Var)`    | *Ref to (model) Var*
 | `(schema/eq X)`    | *type of class of X*
+| `(schema/optional-key X)`    | *optional key*
+| `(schema/required-key X)`    | *required key*
+
 
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references
-    - Nested maps can be within valid containers (as only element - heregenous schema sequences not supported)
+    - Nested maps can be within valid containers (as only element - heregenous schema sequences not supported by the spec)
+
+### Currently Non-supported Schema elements
+
+- `s/either` (can't work with the swagger 1.2 json schema?)
+- `s/conditional`
+- `s/if`
+
+these should work, just need the mappings (feel free to contribute!):
+
+- `s/Symbol`
+- `s/Inst`
+- `s/Regex`
+- `s/Uuid`
 
 ### Schema coercion
 
@@ -77,17 +98,17 @@ extends the json-coercion with the following transformations:
 ### A Sample Model usage
 
 ```clojure
-(require '[ring.swagger.schema :refer :all])
+(require '[ring.swagger.schema :refer [coerce coerce!]])
 (require '[schema.core :as s])
 
-(defmodel Country {:code (s/enum :fi :sv)
-                   :name String})
+(s/defschema Country {:code (s/enum :fi :sv)
+                      :name String})
 ; #'user/Country
 
-(defmodel Customer {:id Long
-                    :name String
-                    (s/optional-key :address) {:street String
-                                               :country Country}})
+(s/defschema Customer {:id Long
+                       :name String
+                       (s/optional-key :address) {:street String
+                                                  :country Country}})
 ; #'user/Customer
 
 Country
@@ -96,16 +117,13 @@ Country
 Customer
 ; {:id java.lang.Long, :name java.lang.String, #schema.core.OptionalKey{:k :address} {:street java.lang.String, :country {:code (enum :fi :sv), :name java.lang.String}}}
 
-CustomerAddress
-; {:street java.lang.String, :country {:code (enum :fi :sv), :name java.lang.String}}
-
 (def matti {:id 1 :name "Matti Mallikas"})
 (def finland {:code :fi :name "Finland"})
 
 (coerce Customer matti)
 ; {:name "Matti Mallikas", :id 1}
 
-(coerce Customer (assoc matti :address {:street "Leipätie 1" :country finland}))
+(coerce Customer (assoc matti :address {:street "Leipätie 1":country finland}))
 ; {:address {:country {:name "Finland", :code :fi}, :street "Leipätie 1"}, :name "Matti Mallikas", :id 1}
 
 (coerce Customer {:id 007})
@@ -114,6 +132,7 @@ CustomerAddress
 (coerce! Customer {:id 007})
 ; ExceptionInfo throw+: {:type :ring.swagger.schema/validation, :error {:name missing-required-key}}  ring.swagger.schema/coerce! (schema.clj:89)
 ```
+
 ## Creating your own schema-types
 
 JSON Schema generation is implemented using multimethods. You can register your own schema types by installing new methods to the multimethods.
@@ -136,7 +155,8 @@ JSON Schema generation is implemented using multimethods. You can register your 
 
 ## TODO
 
-- support for vanilla schemas (removes the Var-resolving)
+- web schema validation ("can this be transformed to json & back")
+- pluggable web schemas (protocol to define both json generation & coercion)
 - consumes
 - authorization
 - files
@@ -152,4 +172,3 @@ Pull Requests welcome. Please run the tests (`lein midje`) and make sure they pa
 Copyright © 2014 Metosin Oy
 
 Distributed under the Eclipse Public License, the same as Clojure.
-
