@@ -1,9 +1,13 @@
+## 0.9.1 (17.6.2014)
+
+- 'cos the deployment of `0.9.0` failed to clojars
+
 ## 0.9.0 (17.6.2014)
 
 - `defmodel` with nested anonymous submodels works now with AOT
 - `defmodel` doesn't contain the `model` metadata -> removed all the model var-resolutions
 - support for vanilla `schema.core/defschema`s as the models
-- update to use `[ring "1.3.0"]`
+- update to use `[ring "1.3.0"]
 
 ## 0.8.8 (1.6.2014)
 
