@@ -263,6 +263,14 @@
   (fact "returning #{Tag}"
     (->json #{Tag} :top true) => {:items {:$ref 'Tag}, :type "array" :uniqueItems true}))
 
+(facts "properties"
+  (fact "s/Any -values are ignored"
+    (keys (properties {:a String
+                       :b s/Any})) => [:a]
+  (fact "s/Keyword -keys are ignored"
+    (keys (properties {:a String
+                       s/Keyword s/Any})) => [:a])))
+
 ;;
 ;; Final json
 ;;
@@ -379,6 +387,10 @@
                                 :type "array"
                                 :items {:$ref 'Pet}}]
                   :path "/pets"}]})))
+
+;;
+;; Web stuff
+;;
 
 (fact join-paths
   (join-paths "/foo" nil "index.html") => "/foo/index.html"

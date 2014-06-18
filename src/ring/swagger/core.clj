@@ -78,6 +78,7 @@
 (defmethod json-type data/Keyword*  [_] {:type "string"})
 (defmethod json-type data/DateTime* [_] {:type "string" :format "date-time"})
 (defmethod json-type data/Date*     [_] {:type "string" :format "date"})
+(defmethod json-type s/Any          [_] nil)
 
 (defmethod json-type :default [e]
   (or
@@ -104,14 +105,16 @@
 (defn properties [schema]
   (into {}
     (for [[k v] schema
-          :let [k (s/explicit-schema-key k)]]
-      [k (merge
+              :when (not= (class k) schema.core.Predicate)
+              :let [k (s/explicit-schema-key k)
+                    v (merge
            (dissoc (meta v) :model :name)
            (try (->json v)
              (catch Exception e
                (throw
                  (IllegalArgumentException.
-                   (str "error converting to json schema [" k " " (s/explain v) "]") e)))))])))
+                                   (str "error converting to json schema [" k " " (s/explain v) "]") e)))))]]
+          (and v [k v]))))
 
 ;;
 ;; Schema transformations
