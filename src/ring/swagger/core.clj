@@ -4,7 +4,7 @@
             [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
-            [plumbing.core :refer [fn->]]
+            [plumbing.core :refer :all]
             [schema.utils :as su]
             [ring.swagger.data :as data]
             [ring.swagger.schema :as schema]
@@ -21,6 +21,10 @@
 (s/defschema Route {:method   s/Keyword
                     :uri      [s/Any]
                     :metadata {s/Keyword s/Any}})
+
+(s/defschema ResponseMessage {:code Long
+                              (s/optional-key :message) String
+                              (s/optional-key :responseModel) s/Any})
 
 ;;
 ;; JSON Encoding
@@ -104,15 +108,15 @@
 
 (defn properties [schema]
   (into {}
-    (for [[k v] schema
+        (for [[k v] schema
               :when (not= (class k) schema.core.Predicate)
               :let [k (s/explicit-schema-key k)
                     v (merge
-           (dissoc (meta v) :model :name)
-           (try (->json v)
-             (catch Exception e
-               (throw
-                 (IllegalArgumentException.
+                        (dissoc (meta v) :model :name)
+                        (try (->json v)
+                             (catch Exception e
+                               (throw
+                                 (IllegalArgumentException.
                                    (str "error converting to json schema [" k " " (s/explain v) "]") e)))))]]
           (and v [k v]))))
 
@@ -171,10 +175,26 @@
        (into {})))
 
 (defn extract-models [details]
-  (let [route-meta (->> details :routes (map :metadata))
-        return-models (->> route-meta (keep :return) flatten)
-        body-models (->> route-meta (mapcat :parameters) (filter (fn-> :type (= :body))) (keep :model) flatten)
-        all-models (->> body-models (into return-models) flatten (map with-named-sub-schemas))]
+  (let [route-meta (->> details
+                        :routes
+                        (map :metadata))
+        return-models (->> route-meta
+                           (keep :return)
+                           flatten)
+        body-models (->> route-meta
+                         (mapcat :parameters)
+                         (filter (fn-> :type (= :body)))
+                         (keep :model)
+                         flatten)
+        response-models (->> route-meta
+                             (mapcat :responseMessages)
+                             (keep :responseModel)
+                             flatten)
+        all-models (->> body-models
+                        (into return-models)
+                        (into response-models)
+                        flatten
+                        (map with-named-sub-schemas))]
     (into {} (map (juxt s/schema-name identity) all-models))))
 
 ;;
@@ -265,6 +285,12 @@
             (convert-body-parameter parameter)
             (convert-extracted-parameter parameter))))))
 
+(s/defn ^:always-validate convert-response-messages [messages :- [ResponseMessage]]
+  (for [{:keys [responseModel] :as message} messages]
+    (if (and responseModel (schema/named-schema? responseModel))
+      (update-in message [:responseModel] (fn [x] (:type (->json x :top true))))
+      (dissoc message :responseModel))))
+
 ;;
 ;; Routing
 ;;
@@ -290,7 +316,7 @@
          :resourcePath ""
          :models (transform-models (extract-models details))
          :apis (for [{:keys [method uri metadata] :as route} (:routes details)
-                     :let [{:keys [return summary notes nickname parameters]} metadata]]
+                     :let [{:keys [return summary notes nickname parameters responseMessages]} metadata]]
                  {:path (swagger-path uri)
                   :operations [(merge
                                  (->json return :top true)
@@ -298,5 +324,5 @@
                                   :summary (or summary "")
                                   :notes (or notes "")
                                   :nickname (or nickname (generate-nick route))
-                                  :responseMessages [] ;; TODO
+                                  :responseMessages (convert-response-messages responseMessages)
                                   :parameters (convert-parameters parameters)})]})}))))

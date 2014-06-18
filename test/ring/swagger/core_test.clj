@@ -59,8 +59,9 @@
       (->json (s/eq "kikka")) => (->json String))
 
     (fact "top level ->json"
+      (s/defschema TopModel {:name String})
       (fact "for named schema"
-        (->json Pet :top true) => {:type 'Pet})
+        (->json TopModel :top true) => {:type 'TopModel})
       (fact "for non-named schema"
         (->json s/Any :top true) => {:type "void"}))))
 
@@ -80,6 +81,8 @@
                 (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
                 (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
                 (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
+
+(s/defschema PetError {:message String})
 
 ;;
 ;; Excepcted JSON Schemas
@@ -122,6 +125,9 @@
                                  :description "pet status in the store"
                                  :enum [:pending :sold :available]}}})
 
+(def PetError' {:id 'PetError
+                :required [:message]
+                :properties {:message {:type "string"}}})
 ;;
 ;; Facts
 ;;
@@ -317,7 +323,6 @@
                                                                             :description ""}
                                                                            {:path "/api2"
                                                                             :description ..desc..}]))))
-
 (fact "api-declaration"
   (fact "empty api"
     (api-declaration
@@ -333,7 +338,7 @@
                                   :models {}
                                   :apis []}))
   (fact "more full api"
-    (defmodel Q {:q String})
+    (s/defschema Q {:q String})
     (api-declaration
       {:apiVersion ..version..
        :produces ["application/json"
@@ -345,6 +350,12 @@
                           :metadata {:return Pet
                                      :summary ..summary..
                                      :notes ..notes..
+                                     :responseMessages [{:code 200
+                                                         :message "the Pet"
+                                                         :responseModel Pet}
+                                                        {:code 404
+                                                         :message "pet not found"
+                                                         :responseModel PetError}]
                                      :parameters [(string-path-parameters "/pets/:id")]}}
                          {:method :get
                           :uri "/pets"
@@ -367,11 +378,17 @@
                      "application/xml"]
           :models {'Pet Pet'
                    'Tag Tag'
-                   'Category Category'}
+                   'Category Category'
+                   'PetError PetError'}
           :apis [{:operations [{:method "GET"
                                 :nickname "getPetsById"
                                 :notes ..notes..
-                                :responseMessages []
+                                :responseMessages [{:code 200
+                                                    :message "the Pet"
+                                                    :responseModel 'Pet}
+                                                   {:code 404
+                                                    :message "pet not found"
+                                                    :responseModel 'PetError}]
                                 :parameters [{:description ""
                                               :name "id"
                                               :paramType :path
