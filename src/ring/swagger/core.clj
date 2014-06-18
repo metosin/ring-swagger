@@ -58,7 +58,7 @@
                        :uniqueItems true
                        :items (type-of (first x))}
       :else           (if top
-                        {:type (s/schema-name x)}
+                        {:type (or (s/schema-name x) "void")}
                         (type-of x)))))
 ;;
 ;; dispatch

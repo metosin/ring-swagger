@@ -56,7 +56,13 @@
       (->json (s/recursive #'Model)) => (->json #'Model))
 
     (fact "s/eq -> type of class of value"
-      (->json (s/eq "kikka")) => (->json String))))
+      (->json (s/eq "kikka")) => (->json String))
+
+    (fact "top level ->json"
+      (fact "for named schema"
+        (->json Pet :top true) => {:type 'Pet})
+      (fact "for non-named schema"
+        (->json s/Any :top true) => {:type "void"}))))
 
 ;;
 ;; Schemas
