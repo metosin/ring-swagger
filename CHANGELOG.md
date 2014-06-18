@@ -1,3 +1,9 @@
+## 0.10.0 (18.6.2014)
+
+- support for ResponseModels
+- support for `s/Any` (maps to `void` as a return type, fields of this type are ignored)
+- support for `s/Keyword` (or any other `schema.core.Predicate`) as a key -> fields are ignored
+
 ## 0.9.1 (17.6.2014)
 
 - 'cos the deployment of `0.9.0` failed to clojars
@@ -102,7 +108,7 @@ ItemsData
 
 ## 0.7.0 (26.2.2014)
 
-- support for `schema/maybe` and `schema/both`
+- support for `s/maybe` and `s/both`
 - consume `Date` & `DateTime` both with and without millis: `"2014-02-18T18:25:37.456Z"` & `"2014-02-18T18:25:37Z"`
 - updated docs
 - more tests

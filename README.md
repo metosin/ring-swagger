@@ -12,7 +12,7 @@
 ## Latest version
 
 ```clojure
-[metosin/ring-swagger "0.9.1"]
+[metosin/ring-swagger "0.10.0"]
 ```
 
 ## Web libs using Ring-Swagger
@@ -41,20 +41,20 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
-| `Long`, `schema/Int`        | integer, int64 | `1`|
+| `Long`, `s/Int`        | integer, int64 | `1`|
 | `Double`                    | number, double | `1.2`
-| `String`, `schema/Str`, Keyword, `schema/Keyword`      | string | `"kikka"`
+| `String`, `s/Str`, Keyword, `s/Keyword`      | string | `"kikka"`
 | `Boolean`                   | boolean | `true`
-| `nil`                       | void |
+| `nil`, `s/Any`              | void |
 | `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`, consumes also without millis: `"2014-02-18T18:25:37Z"`
 | `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
-| `(schema/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
-| `(schema/maybe X)`          | *type of X*
-| `(schema/both X Y Z)`       | *type of X*
-| `(schema/recursive Var)`    | *Ref to (model) Var*
-| `(schema/eq X)`    | *type of class of X*
-| `(schema/optional-key X)`    | *optional key*
-| `(schema/required-key X)`    | *required key*
+| `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
+| `(s/maybe X)`          | *type of X*
+| `(s/both X Y Z)`       | *type of X*
+| `(s/recursive Var)`    | *Ref to (model) Var*
+| `(s/eq X)`    | *type of class of X*
+| `(s/optional-key X)`    | *optional key*
+| `(s/required-key X)`    | *required key*
 
 
 - Vectors, Sets and Maps can be used as containers
@@ -77,7 +77,24 @@ these should work, just need the mappings (feel free to contribute!):
 
 ### Schema coercion
 
-Ring-swagger utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back. There are two modes for coercions: json and query.
+Ring-swagger utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back.
+
+```clojure
+(require '[schema.core :as s])
+(require '[ring.swagger.schema :refer [coerce!]])
+
+(s/defschema Bone {:size Long
+                   :animal (s/enum :cow :tyrannosaurus)})
+
+(coerce! Bone {:size 12
+               :animal :cow})
+; {:animal :cow, :size 12}
+
+(coerce! Bone {:animal :sheep})
+; ExceptionInfo throw+: {:type :ring.swagger.schema/validation, :error {:animal (not (#{:tyrannosaurus :cow} :sheep)), :size missing-required-key}}  ring.swagger.schema/coerce! (schema.clj:114)
+```
+
+There are two modes for coercions: json and query:
 
 #### Json-coercion
 
