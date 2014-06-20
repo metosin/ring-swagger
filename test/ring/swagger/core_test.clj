@@ -82,7 +82,7 @@
                 (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
                 (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
 
-(s/defschema PetError {:message String})
+(s/defschema PetError {:message String s/Keyword s/Any})
 
 ;;
 ;; Excepcted JSON Schemas

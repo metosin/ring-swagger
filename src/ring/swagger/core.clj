@@ -106,10 +106,13 @@
 ;; Schema -> Json Schema
 ;;
 
+(defn not-predicate? [x]
+  (not= (class x) schema.core.Predicate))
+
 (defn properties [schema]
   (into {}
         (for [[k v] schema
-              :when (not= (class k) schema.core.Predicate)
+              :when (not-predicate? k)
               :let [k (s/explicit-schema-key k)
                     v (merge
                         (dissoc (meta v) :model :name)
@@ -139,6 +142,7 @@
                                schema
                                (with-meta
                                  (merge (into {} (for [[k v] schema
+                                                       :when (not-predicate? k)
                                                        :let [keys (conj keys (s/explicit-schema-key k))]]
                                                    [k (collect-schemas keys v)])))
                                  {:name (full-name keys)}))

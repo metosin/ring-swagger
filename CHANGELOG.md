@@ -1,3 +1,14 @@
+## 0.10.1 (20.6.2014)
+
+- fix bug: with-named-sub-schemas does not fail with `s/Keyword`s.
+- updated deps:
+
+```clojure
+[prismatic/schema "0.2.4"] is available but we use "0.2.3"
+[prismatic/plumbing "0.3.2"] is available but we use "0.3.1"
+[lein-ring "0.8.11"] is available but we use "0.8.10"
+```
+
 ## 0.10.0 (18.6.2014)
 
 - support for ResponseModels
