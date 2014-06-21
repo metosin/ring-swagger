@@ -55,6 +55,8 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 | `(s/eq X)`    | *type of class of X*
 | `(s/optional-key X)`    | *optional key*
 | `(s/required-key X)`    | *required key*
+| `s/Keyword` (as a key)  | *ignored in visualizations*
+
 
 
 - Vectors, Sets and Maps can be used as containers
