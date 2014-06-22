@@ -12,7 +12,7 @@
 ## Latest version
 
 ```clojure
-[metosin/ring-swagger "0.10.1"]
+[metosin/ring-swagger "0.10.2"]
 ```
 
 ## Web libs using Ring-Swagger

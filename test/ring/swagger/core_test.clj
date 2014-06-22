@@ -409,7 +409,45 @@
                                 :summary ..summary2..
                                 :type "array"
                                 :items {:$ref 'Pet}}]
-                  :path "/pets"}]})))
+                  :path "/pets"}]}))
+
+  (fact "primitive responses"
+    (api-declaration
+      {}
+      {..api.. {:routes [{:method :get
+                            :uri "/primitive"
+                            :metadata {:return String}}
+                           {:method :get
+                            :uri "/primitiveArray"
+                            :metadata {:return [String]}}]}}
+        ..api..
+        ..basepath..)
+
+      => (has-body
+           {:swaggerVersion "1.2"
+            :apiVersion "0.0.1"
+            :basePath ..basepath..
+            :resourcePath ""
+            :produces ["application/json"]
+            :consumes ["application/json"]
+            :models {}
+            :apis [{:operations [{:method "GET"
+                                  :nickname "getPrimitive"
+                                  :notes ""
+                                  :parameters []
+                                  :responseMessages []
+                                  :summary ""
+                                  :type "string"}]
+                    :path "/primitive"}
+                   {:operations [{:method "GET"
+                                  :nickname "getPrimitiveArray"
+                                  :notes ""
+                                  :parameters []
+                                  :responseMessages []
+                                  :summary ""
+                                  :type "array"
+                                  :items {:type "string"}}]
+                    :path "/primitiveArray"}]})))
 
 ;;
 ;; Web stuff

@@ -1,3 +1,7 @@
+## 0.10.2 (22.6.2014)
+
+- allow primitives as return types (fixes #9)
+
 ## 0.10.1 (20.6.2014)
 
 - fix bug: with-named-sub-schemas does not fail with `s/Keyword`s.
