@@ -7,7 +7,7 @@
 
 ;;
 ;; These are just internal mappings from Classes to predicates
-;; don't use in clint code.
+;; don't use in client code.
 ;;
 
 (def Long*     s/Int)
