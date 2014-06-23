@@ -5,7 +5,7 @@
             [ring.swagger.schema :refer :all]
             [ring.swagger.data :refer :all]
             [ring.swagger.core :refer :all])
-  (:import  [java.util Date]
+  (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
 
 (defmodel Model {:value String})
@@ -19,7 +19,8 @@
     (->json Boolean) => {:type "boolean"}
     (->json Date) => {:type "string" :format "date-time"}
     (->json DateTime) => {:type "string" :format "date-time"}
-    (->json LocalDate) => {:type "string" :format "date"})
+    (->json LocalDate) => {:type "string" :format "date"}
+    (->json UUID) => {:type "string" :format "uuid"})
 
   (facts "datatypes"
     (->json Long*) => {:type "integer" :format "int64"}
@@ -27,7 +28,8 @@
     (->json String*) => {:type "string"}
     (->json Boolean*) => {:type "boolean"}
     (->json DateTime*) => {:type "string" :format "date-time"}
-    (->json Date*) => {:type "string" :format "date"})
+    (->json Date*) => {:type "string" :format "date"}
+    (->json UUID*) => {:type "string" :format "uuid"})
 
   (fact "schema types"
     (->json s/Int) => {:type "integer" :format "int64"}
