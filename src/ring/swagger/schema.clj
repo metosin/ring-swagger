@@ -89,11 +89,11 @@
     (with-meta pred (merge old-meta metadata))))
 
 (defn error?
-  "Checks weather input is an Schema error."
+  "Checks whether input is an Schema error."
   [x] (su/error? x))
 
 (defn named-schema?
-  "Checks weather input is a named schema."
+  "Checks whether input is a named schema."
   [x] (boolean (s/schema-name x)))
 
 (defn coerce
