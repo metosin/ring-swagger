@@ -260,7 +260,6 @@
 ;;
 
 (defn- convert-extracted-parameter [{:keys [model type] :as it}]
-  (assert (#{:query :path} type) (str "wrong type: " type "<-- " it))
   (if model
     (for [[k v] (-> model value-of strict-schema)
           :when (s/specific-key? k)
