@@ -1,3 +1,7 @@
+## 0.10.3 (xx.x.xxxx)
+
+- support for `header`-params.
+
 ## 0.10.2 (22.6.2014)
 
 - allow primitives as return types (fixes #9)
