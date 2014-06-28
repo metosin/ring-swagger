@@ -25,3 +25,8 @@
 
   (fact "only response-exceptions are caught"
     ((catch-validation-errors (fail ..request..))) => (throws Exception)))
+
+(fact "stringify-error"
+  (stringify-error (s/check P {:b {:bad 1}})) => {:a "missing-required-key"
+                                                  :b {:bad "disallowed-key"
+                                                      :c "missing-required-key"}})
