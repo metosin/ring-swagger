@@ -6,7 +6,7 @@
             [ring.swagger.schema :refer :all]
             [ring.swagger.common :refer :all]
             ring.swagger.core) ;; transformers
-  (:import  [java.util Date]
+  (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
 
 (defmodel SubType  {:alive Boolean})
@@ -23,7 +23,8 @@
                         :l (s/maybe String)
                         :m (s/both Long (s/pred odd? 'odd?))
                         :n SubType
-                        :o [{:p #{{:q String}}}]}})
+                        :o [{:p #{{:q String}}}]
+                        :u UUID}})
 
 (def model {:a true
             :b 2.2
@@ -38,7 +39,8 @@
                 :l nil
                 :m 1
                 :n {:alive true}
-                :o [{:p #{{:q "abba"}}}]}})
+                :o [{:p #{{:q "abba"}}}]
+                :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
@@ -166,15 +168,15 @@
 
 (facts "parameter coercion"
 
-  (let [Model {:a Long :b Double :c Boolean :d Keyword}
-        query {:a "1"  :b "2.2"  :c "true"  :d "kikka"}
-        value {:a 1    :b 2.2    :c true    :d :kikka}]
+  (let [Model {:a Long :b Double :c Boolean :d Keyword :u UUID}
+        query {:a "1"  :b "2.2"  :c "true"  :d "kikka" :u "77e70512-1337-dead-beef-0123456789ab"}
+        value {:a 1    :b 2.2    :c true    :d :kikka  :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}]
 
-    (fact "query-coercion can convert string to Longs, Doubles and Booleans"
+    (fact "query-coercion can convert string to Longs, Doubles, Booleans and UUIDs"
       (coerce! Model query :query) => value)
 
-    (fact "json-coercion cant convert string to Longs,Doubles and Booleans"
+    (fact "json-coercion cant convert string to Longs,Doubles, Booleans and UUIDs"
       (coerce! Model query :json) => (throws Exception))
 
-    #_(fact "both-coercion can also convert string to Longs, Doubles and Booleans"
+    #_(fact "both-coercion can also convert string to Longs, Doubles, Booleans and UUIDs"
        (coerce! Model query :both) => value)))

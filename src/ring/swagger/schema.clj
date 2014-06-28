@@ -9,7 +9,7 @@
             [ring.swagger.data :refer :all]
             [ring.swagger.coerce :as coerce])
   (:import  [java.io StringWriter]
-            [java.util Date]
+            [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
 
 (def Keyword  s/Keyword)
@@ -21,6 +21,7 @@
                Date      DateTime*
                DateTime  DateTime*
                LocalDate Date*
+               UUID      UUID*
                clojure.lang.Keyword Keyword*})
 
 ;;

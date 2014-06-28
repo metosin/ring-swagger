@@ -85,6 +85,7 @@
 (defmethod json-type data/Keyword*  [_] {:type "string"})
 (defmethod json-type data/DateTime* [_] {:type "string" :format "date-time"})
 (defmethod json-type data/Date*     [_] {:type "string" :format "date"})
+(defmethod json-type data/UUID*     [_] {:type "string" :format "uuid"})
 (defmethod json-type s/Any          [_] nil)
 
 (defmethod json-type :default [e]

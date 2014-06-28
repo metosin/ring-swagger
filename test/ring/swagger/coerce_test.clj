@@ -3,7 +3,7 @@
             [schema.core :as s]
             [ring.swagger.coerce :refer :all])
   (:import [org.joda.time LocalDate DateTime]
-    [java.util Date]))
+           [java.util Date UUID]))
 
 (fact "json coercions"
   (let [c (coercer :json)]
@@ -17,7 +17,10 @@
       ((c DateTime) "2014-02-18T18:25:37Z") => (partial instance? DateTime))
 
     (fact "LocalDate"
-      ((c LocalDate) "2014-02-19") => (partial instance? LocalDate))))
+      ((c LocalDate) "2014-02-19") => (partial instance? LocalDate))
+
+    (fact "UUID"
+      ((c UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))))
 
 (fact "query coercions"
   (let [c (coercer :query)]
@@ -37,4 +40,8 @@
     (fact "Boolean"
       ((c Boolean) "true") => true
       ((c Boolean) "false") => false
-      ((c Boolean) "invalid") => "invalid")))
+      ((c Boolean) "invalid") => "invalid")
+
+    (fact "UUID"
+      ((c UUID) "77e70512-1337-dead-beef-0123456789ab") => (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")
+      ((c UUID) "invalid") => "invalid")))

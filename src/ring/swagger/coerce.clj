@@ -50,16 +50,21 @@
 (defn string->double [^String x]
   (try (java.lang.Double/valueOf x) (catch Exception e x)))
 
+(defn string->uuid [^String x]
+  (try (java.util.UUID/fromString x) (catch Exception e x)))
+
 (def json-coersions {s/Keyword sc/string->keyword
                      clojure.lang.Keyword sc/string->keyword
                      s/Int sc/safe-long-cast
                      Long sc/safe-long-cast
-                     Double double})
+                     Double double
+                     java.util.UUID string->uuid})
 
 (def query-coercions {s/Int string->long
                       Long string->long
                       Double string->double
-                      Boolean string->boolean})
+                      Boolean string->boolean
+                      java.util.UUID string->uuid})
 
 (defn json-schema-coercion-matcher
   [schema]
