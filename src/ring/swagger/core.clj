@@ -4,6 +4,7 @@
             [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
+            [schema.macros :as sm]
             [plumbing.core :refer :all]
             [schema.utils :as su]
             [ring.swagger.data :as data]
@@ -290,7 +291,7 @@
             (convert-body-parameter parameter)
             (convert-extracted-parameter parameter))))))
 
-(s/defn ^:always-validate convert-response-messages [messages :- [ResponseMessage]]
+(sm/defn ^:always-validate convert-response-messages [messages :- [ResponseMessage]]
   (for [{:keys [responseModel] :as message} messages]
     (if (and responseModel (schema/named-schema? responseModel))
       (update-in message [:responseModel] (fn [x] (:type (->json x :top true))))

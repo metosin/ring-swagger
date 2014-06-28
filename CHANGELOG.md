@@ -1,6 +1,7 @@
-## 0.10.3 (xx.x.xxxx)
+## 0.10.3 (28.6.2014)
 
 - support for `header`-params.
+- change `s/defn` to `sm/defn, might fix #12 (https://github.com/Prismatic/schema/issues/21)
 
 ## 0.10.2 (22.6.2014)
 
