@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.10.3"
+(defproject metosin/ring-swagger "0.10.5"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -19,5 +19,5 @@
                              [lein-midje "3.1.3"]]
                    :dependencies [[midje "1.6.3"]
                                   [ring-mock "0.1.5"]
-                                  [metosin/ring-swagger-ui "2.0.16-2"]
+                                  [metosin/ring-swagger-ui "2.0.16-3"]
                                   [javax.servlet/servlet-api "2.5"]]}})

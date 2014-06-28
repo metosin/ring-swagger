@@ -1,3 +1,7 @@
+## 0.10.5 (28.6.2014)
+
+- support for `s/Uuid`, thanks to @phadej!
+
 ## 0.10.3 (28.6.2014)
 
 - support for `header`-params.
