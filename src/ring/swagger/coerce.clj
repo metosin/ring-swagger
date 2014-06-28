@@ -58,13 +58,13 @@
                      s/Int sc/safe-long-cast
                      Long sc/safe-long-cast
                      Double double
-                     java.util.UUID string->uuid})
+                     s/Uuid string->uuid})
 
 (def query-coercions {s/Int string->long
                       Long string->long
                       Double string->double
                       Boolean string->boolean
-                      java.util.UUID string->uuid})
+                      s/Uuid string->uuid})
 
 (defn json-schema-coercion-matcher
   [schema]
