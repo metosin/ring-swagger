@@ -32,14 +32,16 @@
 (defn html? [{{content-type "Content-Type"} :headers :as res}]
   (and (status? res 200) (= content-type "text/html")))
 
+(defn javascript? [{{content-type "Content-Type"} :headers :as res}]
+  (and (status? res 200) (= content-type "application/javascript")))
+
 (facts "Swagger-UI"
   (facts "(swagger-ui)"
     (let [handler (swagger-ui)
           GET (partial GET handler)]
       ;; Uri will always start with "/"
       (GET "/") => (redirect? "/index.html")
-      (GET "/index.html") => html?
-      ))
+      (GET "/index.html") => html?))
   (facts "(swagger-ui \"/ui-docs\")"
     (let [handler (swagger-ui "/ui-docs")
           GET (partial GET handler)]
@@ -49,14 +51,13 @@
       (GET "/ui-docs/") => (redirect? "/ui-docs/index.html")
       (GET "/ui-docs") => (redirect? "/ui-docs/index.html")
       (GET "/ui-docs/index.html") => html?
-      ))
+      (GET "/ui-docs/conf.js") => javascript?))
   ;; Some possible envinronments
   (facts "Compojure"
     (fact "(context \"/compojure\" [] (swagger-ui))"
       (GET (swagger-ui) "/compojure" :context "/compojure") => (redirect? "/compojure/index.html"))
     (fact "(context \"/compojure\" [] (swagger-ui \"/docs\"))"
-      (GET (swagger-ui "/docs") "/compojure/docs" :context "/compojure") => (redirect? "/compojure/docs/index.html"))
-    )
+      (GET (swagger-ui "/docs") "/compojure/docs" :context "/compojure") => (redirect? "/compojure/docs/index.html")))
   (facts "Servlet context"
     ;; Servlet context:
     ;; - uri will contain full path
@@ -72,5 +73,4 @@
         (fact "(context \"/compojure\" [] (swagger-ui))"
           (GET (swagger-ui) "/servlet/compojure" :context "/servlet/compojure" :servlet-context fake-context) => (redirect? "/servlet/compojure/index.html"))
         (fact "(context \"/compojure\" [] (swagger-ui \"/docs\"))"
-          (GET (swagger-ui "/docs") "/servlet/compojure/docs" :context "/servlet/compojure" :servlet-context fake-context) => (redirect? "/servlet/compojure/docs/index.html"))
-        ))))
+          (GET (swagger-ui "/docs") "/servlet/compojure/docs" :context "/servlet/compojure" :servlet-context fake-context) => (redirect? "/servlet/compojure/docs/index.html"))))))

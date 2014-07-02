@@ -33,7 +33,7 @@
             (when-let [req-path (get-path path uri)]
               (condp = req-path
                 "" (response/redirect (swagger/join-paths uri "index.html"))
-                "conf.js" (response/response (conf-js req options))
+                "conf.js" (response/content-type (response/response (conf-js req options)) "application/javascript")
                 (response/resource-response (str root "/" req-path))))))
         (wrap-content-type options)
         (wrap-not-modified)
