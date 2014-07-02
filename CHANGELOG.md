@@ -1,3 +1,7 @@
+## 0.10.6 (xx.x.xxxx)
+
+- `ring.swagger.ui/swagger-ui` always set content-type of `application/javascript` for `conf.js`
+
 ## 0.10.5 (28.6.2014)
 
 - support for `s/Uuid`, thanks to @phadej!
