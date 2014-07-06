@@ -38,3 +38,11 @@
         (wrap-content-type options)
         (wrap-not-modified)
         (wrap-head))))
+
+;; TODO: add test
+(defn swagger-ui-support
+  "Middleware to serve the swagger-ui."
+  [handler & params]
+  (let [ui (apply swagger-ui params)]
+    (fn [request]
+      (or (ui request) (handler request)))))

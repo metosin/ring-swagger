@@ -22,7 +22,10 @@
 
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
 
-1. Define routes to serve the `ring.swagger.core/api-listing` and `ring.swagger.core/api-declaration` (and optionally the `ring.swagger.ui/swagger-ui`)
+1. Define routes to serve the following:
+  - *api listing*: `ring.swagger.core/api-listing`
+  - *api declaration*: `ring.swagger.core/api-declaration`
+  - (optionally) *swagger-ui*: `ring.swagger.ui/swagger-ui`
 2. Create code to collect routes from your web lib and to pass them to Ring-Swagger fns. Sample adapter [Here](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger.clj)
 3. Publish it.
 4. Pull Request to list your adapter here
@@ -96,7 +99,7 @@ Ring-swagger utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/
 ; ExceptionInfo throw+: {:type :ring.swagger.schema/validation, :error {:animal (not (#{:tyrannosaurus :cow} :sheep)), :size missing-required-key}}  ring.swagger.schema/coerce! (schema.clj:114)
 ```
 
-There are two modes for coercions: json and query:
+There are two modes for coercions: `:json` and `:query`. Both `coerce` and `coerce!` take an optional third parameter (default to `:json`) to denote which coercer to use. You can also use the two coercers directly from namespace `ring.swagger.coerce`.
 
 #### Json-coercion
 
@@ -175,7 +178,6 @@ JSON Schema generation is implemented using multimethods. You can register your 
 
 - web schema validation ("can this be transformed to json & back")
 - pluggable web schemas (protocol to define both json generation & coercion)
-- consumes
 - authorization
 - support for Files
 - non-json produces & consumes

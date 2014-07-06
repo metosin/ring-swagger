@@ -1,6 +1,7 @@
 ## 0.10.6 (xx.x.xxxx)
 
 - `ring.swagger.ui/swagger-ui` always set content-type of `application/javascript` for `conf.js`
+- `ring.swagger.ui/swagger-ui-support` to package swagger-ui as middleware.
 
 ## 0.10.5 (28.6.2014)
 
