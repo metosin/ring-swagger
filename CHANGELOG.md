@@ -1,7 +1,14 @@
-## 0.10.6 (xx.x.xxxx)
+## 0.10.6 (9.7.2014)
 
 - `ring.swagger.ui/swagger-ui` always set content-type of `application/javascript` for `conf.js`
-- `ring.swagger.ui/swagger-ui-support` to package swagger-ui as middleware.
+- `ring.swagger.ui/wrap-swagger-ui` to package swagger-ui as middleware.
+- updated deps:
+
+```
+[prismatic/plumbing "0.3.3"] is available but we use "0.3.2"
+[metosin/ring-swagger-ui "2.0.17"] is available but we use "2.0.16-3"
+2 artifacts were upgraded.
+```
 
 ## 0.10.5 (28.6.2014)
 

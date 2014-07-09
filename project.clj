@@ -10,7 +10,7 @@
                  [slingshot "0.10.3"]
                  [metosin/ring-http-response "0.4.0"]
                  [prismatic/schema "0.2.4"]
-                 [prismatic/plumbing "0.3.2"]
+                 [prismatic/plumbing "0.3.3"]
                  [clj-time "0.7.0"]
                  [camel-snake-kebab "0.1.5"]
                  [ring/ring-core "1.3.0"]]
@@ -19,5 +19,5 @@
                              [lein-midje "3.1.3"]]
                    :dependencies [[midje "1.6.3"]
                                   [ring-mock "0.1.5"]
-                                  [metosin/ring-swagger-ui "2.0.16-3"]
+                                  [metosin/ring-swagger-ui "2.0.17"]
                                   [javax.servlet/servlet-api "2.5"]]}})

@@ -12,7 +12,7 @@
 ## Latest version
 
 ```clojure
-[metosin/ring-swagger "0.10.5"]
+[metosin/ring-swagger "0.10.6"]
 ```
 
 ## Web libs using Ring-Swagger
@@ -23,9 +23,9 @@
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
 
 1. Define routes to serve the following:
-  - *api listing*: `ring.swagger.core/api-listing`
-  - *api declaration*: `ring.swagger.core/api-declaration`
-  - (optionally) *swagger-ui*: `ring.swagger.ui/swagger-ui`
+  - **api listing**: `ring.swagger.core/api-listing`
+  - **api declaration**: `ring.swagger.core/api-declaration`
+  - (optionally) **swagger-ui**: `ring.swagger.ui/swagger-ui`
 2. Create code to collect routes from your web lib and to pass them to Ring-Swagger fns. Sample adapter [Here](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger.clj)
 3. Publish it.
 4. Pull Request to list your adapter here
