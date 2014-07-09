@@ -74,3 +74,12 @@
           (GET (swagger-ui) "/servlet/compojure" :context "/servlet/compojure" :servlet-context fake-context) => (redirect? "/servlet/compojure/index.html"))
         (fact "(context \"/compojure\" [] (swagger-ui \"/docs\"))"
           (GET (swagger-ui "/docs") "/servlet/compojure/docs" :context "/servlet/compojure" :servlet-context fake-context) => (redirect? "/servlet/compojure/docs/index.html"))))))
+
+(facts "wrap-swagger-ui"
+  (let [handler (wrap-swagger-ui (fn [_] ..response..))
+        GET (partial GET handler)]
+    (fact "servers swagger-ui resources"
+      (GET "/") => (redirect? "/index.html")
+      (GET "/index.html") => html?)
+    (fact "forwards non-swagger-ui resources"
+      (GET "/NON-SWAGGER-FILE") => ..response..)))

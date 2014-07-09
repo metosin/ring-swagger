@@ -26,7 +26,7 @@
                      ["/" params])
         options (apply hash-map kvs)
         root (:root options "swagger-ui")]
-    (-> (fn [{:keys [http-method uri] :as req}]
+    (-> (fn [{:keys [uri] :as req}]
           (let [;; Prefix path with servlet-context and compojure context
                 path (swagger/join-paths (:context req) path)]
             ;; Check if requested uri is under swagger-ui path and what file is requested
@@ -39,8 +39,7 @@
         (wrap-not-modified)
         (wrap-head))))
 
-;; TODO: add test
-(defn swagger-ui-support
+(defn wrap-swagger-ui
   "Middleware to serve the swagger-ui."
   [handler & params]
   (let [ui (apply swagger-ui params)]
