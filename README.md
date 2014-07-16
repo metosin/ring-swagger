@@ -180,12 +180,7 @@ JSON Schema generation is implemented using multimethods. You can register your 
 - pluggable web schemas (protocol to define both json generation & coercion)
 - authorization
 - support for Files
-- non-json produces & consumes
 - full spec
-
-## Contributing
-
-Pull Requests welcome. Please run the tests (`lein midje`) and make sure they pass before you submit one.
 
 ## License
 
