@@ -214,7 +214,8 @@
         (convert-parameters
           [{:type type
             :model {s/Keyword s/Any
-                    :q String (s/optional-key :l) Long}}])
+                    :q String
+                    (s/optional-key :l) Long}}])
 
         => [{:name "q"
              :description ""
