@@ -5,8 +5,8 @@
             [ring.swagger.middleware :refer :all]
             [ring.util.http-response :refer :all]))
 
-(defmodel P {:a Long
-             :b {:c (s/enum :kikka :kakka)}})
+(s/defschema P {:a Long
+                :b {:c (s/enum :kikka :kakka)}})
 
 (defn bad  [_] (coerce! P {:b {:c nil}}))
 (defn good [_] (coerce! P {:a 1

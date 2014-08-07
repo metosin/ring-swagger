@@ -1,3 +1,7 @@
+## 0.11.0 (x.x.2014)
+
+- Removed `ring.swagger.schema/defmodel`, please use `schema.core/defschema`.
+
 ## 0.10.6 (9.7.2014)
 
 - `ring.swagger.ui/swagger-ui` always set content-type of `application/javascript` for `conf.js`

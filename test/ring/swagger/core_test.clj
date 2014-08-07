@@ -8,7 +8,7 @@
   (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
 
-(defmodel Model {:value String})
+(s/defschema Model {:value String})
 
 (facts "type transformations"
 
@@ -71,18 +71,18 @@
 ;; Schemas
 ;;
 
-(defmodel Tag {(s/optional-key :id)   (field s/Int {:description "Unique identifier for the tag"})
-               (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
+(s/defschema Tag {(s/optional-key :id)   (field s/Int {:description "Unique identifier for the tag"})
+                  (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
 
-(defmodel Category {(s/optional-key :id)   (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
-                    (s/optional-key :name) (field s/Str {:description "Name of the category"})})
+(s/defschema Category {(s/optional-key :id)   (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
+                       (s/optional-key :name) (field s/Str {:description "Name of the category"})})
 
-(defmodel Pet  {:id                         (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
-                :name                       (field s/Str {:description "Friendly name of the pet"})
-                (s/optional-key :category)  (field Category {:description "Category the pet is in"})
-                (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
-                (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
-                (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
+(s/defschema Pet {:id                         (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
+                  :name                       (field s/Str {:description "Friendly name of the pet"})
+                  (s/optional-key :category)  (field Category {:description "Category the pet is in"})
+                  (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
+                  (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
+                  (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
 
 (s/defschema PetError {:message String s/Keyword s/Any})
 
@@ -170,9 +170,9 @@
                                                                    :kikka java.lang.String}}
   (string-path-parameters "/api/ping") => nil)
 
-(defmodel Query {:id Long (s/optional-key :q) String})
-(defmodel Body {:name String :age Long})
-(defmodel Path {:p Long})
+(s/defschema Query {:id Long (s/optional-key :q) String})
+(s/defschema Body {:name String :age Long})
+(s/defschema Path {:p Long})
 
 (fact "convert-parameters"
 

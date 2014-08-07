@@ -9,22 +9,23 @@
   (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
 
-(defmodel SubType  {:alive Boolean})
-(defmodel AllTypes {:a Boolean
-                    :b Double
-                    :c Long
-                    :d String
-                    :e {:f [Keyword]
-                        :g #{String}
-                        :h #{(s/enum :kikka :kakka :kukka)}
-                        :i Date
-                        :j DateTime
-                        :k LocalDate
-                        :l (s/maybe String)
-                        :m (s/both Long (s/pred odd? 'odd?))
-                        :n SubType
-                        :o [{:p #{{:q String}}}]
-                        :u UUID}})
+(s/defschema SubType  {:alive Boolean})
+(s/defschema AllTypes
+  {:a Boolean
+   :b Double
+   :c Long
+   :d String
+   :e {:f [Keyword]
+       :g #{String}
+       :h #{(s/enum :kikka :kakka :kukka)}
+       :i Date
+       :j DateTime
+       :k LocalDate
+       :l (s/maybe String)
+       :m (s/both Long (s/pred odd? 'odd?))
+       :n SubType
+       :o [{:p #{{:q String}}}]
+       :u UUID}})
 
 (def model {:a true
             :b 2.2
@@ -76,24 +77,6 @@
 
 (defn has-meta [expected] (chatty-checker [x] (= (meta x) expected)))
 
-(fact "defmodel"
-
-  (fact "Map is allowed as a model"
-    (defmodel MapModel {:x String
-                        :y String}))
-
-  (fact "Something that evaluates as a map is allowed as a model"
-    (defmodel PimpedMapModel (dissoc MapModel :y)))
-
-  (fact "Non-map is not allowed as a model"
-    (eval '(defmodel MapModel [String])) => (throws AssertionError))
-
-  (fact "has meta-data"
-    MapModel => (has-meta {:name 'MapModel}))
-  (fact "model?"
-    (s/schema-name MapModel) => 'MapModel
-    (s/schema-name {:a String}) => falsey))
-
 (fact "field"
 
   (fact "field set meta-data to it"
@@ -116,10 +99,6 @@
     (s/defschema AbbaSchema {:s String})
     AbbaSchema => named-schema?)
 
-  (fact "model is named"
-    (defmodel AbbaModel {:s String})
-    AbbaModel => named-schema?)
-
   (fact "def is not named"
     (def AbbaDef {:s String})
     AbbaDef =not=> named-schema?))
@@ -128,7 +107,7 @@
   (let [valid {:a "kikka"}
         invalid {}]
 
-    (defmodel MapModel {:a String})
+    (s/defschema MapModel {:a String})
 
     (fact "coerce works for both models and schemas"
       (coerce MapModel valid) => valid
@@ -149,25 +128,7 @@
         (coerce OddModel 1) => 1
         (coerce OddModel 2) => error?))))
 
-(defmodel Customer {:id Long
-                    :address {:street String
-                              (s/optional-key :country) {:code #{(s/enum :fi :sv)}
-                                                         :name String}}})
-
-(facts "nested models"
-  (fact ".. have generated sub-models and are referenced from parent"
-    (s/schema-name (get-in Customer [:address])) => 'CustomerAddress
-    CustomerAddress => {:street String
-                        (s/optional-key :country) {:code #{(s/enum :fi :sv)}
-                                                   :name String}})
-
-  (fact ".. for deeper level also"
-    (s/schema-name (get-in Customer [:address (s/optional-key :country)])) => 'CustomerAddressCountry
-    CustomerAddressCountry => {:code #{(s/enum :fi :sv)}
-                               :name String}))
-
 (facts "parameter coercion"
-
   (let [Model {:a Long :b Double :c Boolean :d Keyword :u UUID}
         query {:a "1"  :b "2.2"  :c "true"  :d "kikka" :u "77e70512-1337-dead-beef-0123456789ab"}
         value {:a 1    :b 2.2    :c true    :d :kikka  :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}]
