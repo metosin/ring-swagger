@@ -3,8 +3,6 @@
   (:import [java.util Date UUID]
            [org.joda.time DateTime LocalDate]))
 
-(defn date-time? [x] (#{Date DateTime} x))
-
 ;;
 ;; These are just internal mappings from Classes to predicates
 ;; don't use in client code.

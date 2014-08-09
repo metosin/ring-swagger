@@ -8,6 +8,7 @@
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date]))
 
+(defn date-time? [x] (#{Date DateTime} x))
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
 
 (defn parse-date-time ^DateTime [date] (tf/parse (tf/formatters :date-time-parser) (->DateTime date)))
