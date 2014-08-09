@@ -79,11 +79,26 @@
   (transform Category) => Category'
   (transform Pet) => Pet')
 
+(s/defschema RootModel
+  {:sub {:foo Long}})
+
+(fact "with-named-sub-schemas"
+  (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+
 (fact "collect-models"
-  (collect-models Pet) => {'Pet Pet
-                           'Tag Tag
-                           'Category Category}
-  (collect-models String) => {})
+  (fact "Sub-schemas are collected"
+    (collect-models Pet)
+    => {'Pet Pet
+        'Tag Tag
+        'Category Category})
+
+  (fact "No schemas are collected if all are unnamed"
+    (collect-models String) => {})
+
+  (fact "Inline-sub-schemas as collected after they are nameed"
+    (collect-models (with-named-sub-schemas RootModel))
+    => {'RootModel RootModel
+        'RootModelSub (:sub RootModel)}))
 
 (fact "transform-models"
   (transform-models [Pet]) => {'Pet Pet'

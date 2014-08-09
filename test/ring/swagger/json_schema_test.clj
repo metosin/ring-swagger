@@ -48,14 +48,12 @@
     (fact "s/eq -> type of class of value"
       (->json (s/eq "kikka"))         => (->json String))
 
-    (fact "top level ->json"
-      (s/defschema TopModel {:name String})
-      (fact "for named schema"
-        (->json TopModel :top true) => {:type 'TopModel})
-      (fact "for non-named schema"
-        (->json s/Any :top true) => {:type "void"}))))
+    (fact "s/Any -> nil"
+      (->json s/Any) => nil)))
 
 (facts "generating return types from models, list & set of models"
+  (fact "non-named schema"
+    (->json s/Any :top true)    => {:type "void"})
   (fact "returning Model"
     (->json Model :top true)    => {:type 'Model})
   (fact "returning [Model]"
