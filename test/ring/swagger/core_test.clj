@@ -207,8 +207,9 @@
                                                         :type :path}
                                                        {:model Pet
                                                         :type :query}]}}
-                              {:metadata {:return Tag}}]}) => {'Category Category
-                                                               'Tag Tag}))
+                              {:metadata {:return Tag}}]})
+    => {'Category Category
+        'Tag Tag}))
 
 ;;
 ;; Final json
