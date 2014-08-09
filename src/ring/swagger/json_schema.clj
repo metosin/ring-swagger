@@ -3,6 +3,12 @@
             [ring.swagger.schema :as schema]
             [ring.swagger.data :as data]))
 
+(defn ->parameter [base json]
+  (merge {:description ""
+          :required true}
+         base
+         json))
+
 ;;
 ;; Json Schema transformations
 ;;
