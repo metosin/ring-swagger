@@ -3,8 +3,7 @@
             [schema.coerce :as sc]
             [clj-time.format :as tf]
             [clj-time.coerce :as tc]
-            [ring.swagger.common :refer :all]
-            [ring.swagger.data :refer :all])
+            [ring.swagger.common :refer :all])
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date]))
 

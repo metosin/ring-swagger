@@ -98,7 +98,11 @@
   (fact "Inline-sub-schemas as collected after they are nameed"
     (collect-models (with-named-sub-schemas RootModel))
     => {'RootModel RootModel
-        'RootModelSub (:sub RootModel)}))
+        'RootModelSub (:sub RootModel)})
+
+  (fact "Described anonymous models are collected"
+    (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
+      (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
 
 (fact "transform-models"
   (transform-models [Pet]) => {'Pet Pet'
@@ -194,7 +198,12 @@
          :paramType :body
          :required true
          :items {:$ref 'Body}
-         :type "array"}]))
+         :type "array"}])
+
+  (fact "Body param with desc"
+    (convert-parameters [{:type :body
+                          :model (describe Body "foo")}])
+    => [{:description "foo" :name "body" :paramType :body :required true :type 'Body}]))
 
 ;;
 ;; Helpers

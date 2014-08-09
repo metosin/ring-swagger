@@ -1,7 +1,6 @@
 (ns ring.swagger.json-schema-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
-            [ring.swagger.data :refer :all]
             [ring.swagger.json-schema :refer :all])
   (:import [java.util Date UUID]
            [org.joda.time DateTime LocalDate]))
@@ -30,8 +29,7 @@
   (facts "nil"
     (->json nil)       => {:type "void"})
 
-  (fact "special predicates"
-
+  (fact "schema predicates"
     (fact "s/enum"
       (->json (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
       (->json (s/enum 1 2 3))         => {:type "integer" :format "int64" :enum (seq #{1 2 3})})
@@ -60,6 +58,29 @@
     (->json [Model] :top true)  => {:items {:$ref 'Model}, :type "array"})
   (fact "returning #{Model}"
     (->json #{Model} :top true) => {:items {:$ref 'Model}, :type "array" :uniqueItems true}))
+
+(fact "Describe"
+  (tabular
+    (fact "Basic classes"
+      (let [schema (describe ?class ..desc.. :minimum ..val..)]
+        (json-schema-meta schema) => {:description ..desc.. :minimum ..val..}
+        (->json schema) => (contains {:description ..desc..})))
+    ?class
+    Long
+    Double
+    String
+    Boolean
+    Date
+    DateTime
+    LocalDate
+    UUID
+    clojure.lang.Keyword)
+
+  (fact "Describe Model"
+    (let [schema (describe Model ..desc..)]
+      (json-schema-meta schema) => {:description ..desc..}
+      (->json schema) => (contains {:description ..desc..})
+      )))
 
 (facts "properties"
   (fact "s/Any -values are ignored"

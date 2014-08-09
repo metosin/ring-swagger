@@ -63,36 +63,6 @@
   (fact "without millis"
     (coerce! {:d Date} {:d "2014-02-24T21:37:40Z"}) =not=> (throws Exception)))
 
-(facts "types"
-
-  (fact "basic types can act as fields"
-    (doseq [type (vals type-map)]
-      (fact {:midje/description (s/explain type)}
-        (meta (field type {:a 1})) => {:a 1})))
-
-  (fact "derived types can act as fields"
-    (doseq [type (keys type-map)]
-      (fact {:midje/description (s/explain type)}
-        (meta (field type {:a 1})) => {:a 1}))))
-
-(defn has-meta [expected] (chatty-checker [x] (= (meta x) expected)))
-
-(fact "field"
-
-  (fact "field set meta-data to it"
-    (field String {:kikka :kakka}) => (has-meta {:kikka :kakka}))
-
-  (doseq [c (keys type-map)]
-    (fact {:midje/description (str "can't set meta-data to " c)}
-      (with-meta c {:a 1}) => (throws Exception)))
-
-  (doseq [c (vals type-map)]
-    (fact {:midje/description (str "can set meta-data to " (s/explain c))}
-      (with-meta c {:a 1}) =not=> (throws Exception)))
-
-  (fact "field set meta-data to it"
-    (field String {:kikka :kakka}) => (has-meta {:kikka :kakka})))
-
 (fact "named-schema"
 
   (fact "schema is named"
