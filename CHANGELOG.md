@@ -1,6 +1,10 @@
 ## 0.11.0 (x.x.2014)
 
 - Removed `ring.swagger.schema/defmodel`, please use `schema.core/defschema`.
+- Refactored Json schema transformations
+  - New `describe` helper:
+    - Instead of `(field Long {:description "The description"})` you can use
+    - `(describe Long "The description")`
 
 ## 0.10.6 (9.7.2014)
 
