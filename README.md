@@ -11,9 +11,7 @@
 
 ## Latest version
 
-```clojure
-[metosin/ring-swagger "0.11.0"]
-```
+[![Clojars Project](http://clojars.org/metosin/ring-swagger/latest-version.svg)](http://clojars.org/metosin/ring-swagger)
 
 ## Web libs using Ring-Swagger
 
