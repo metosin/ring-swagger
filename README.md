@@ -12,7 +12,7 @@
 ## Latest version
 
 ```clojure
-[metosin/ring-swagger "0.10.6"]
+[metosin/ring-swagger "0.11.0"]
 ```
 
 ## Web libs using Ring-Swagger
@@ -158,20 +158,27 @@ Customer
 
 JSON Schema generation is implemented using multimethods. You can register your own schema types by installing new methods to the multimethods.
 
-### Class-based dispatch
-
 ```clojure
-(require '[ring.swagger.core :as swagger])
+(require '[ring.swagger.json-schema :as jsons])
 (require '[schema.core :as s])
-(defmethod swagger/json-type-class s/Maybe [e] (swagger/->json (:schema e)))
+(defmethod jsons/json-type s/Maybe [e] (swagger/->json (:schema e)))
+(defmethod jsons/json-type s/Any [_] {:type "string"})
 ```
 
-### Identity-based dispatch
+## Describing schemas
+
+You can add e.g. description to you schemas using `ring.swagger.schema/field` and `ring.swagger.schema/describe` functions.
+These work by adding meta-data to schema under `:json-schema`-key. Objects which don't support meta-data, like Java classes, are
+wrapped into `s/both`.
 
 ```clojure
-(require '[ring.swagger.core :as swagger])
-(require '[schema.core :as s])
-(defmethod swagger/json-type s/Any [_] {:type "string"})
+(s/defschema Customer {:id Long
+                       :name (describe String "the name")
+                       (s/optional-key :address) (describe {:street String
+                                                            :country Country}
+                                                           "The Address")})
+
+(= (jsons/json-schema-meta (describe Customer "The Customer")) {:description "The Customer"})
 ```
 
 ## TODO
