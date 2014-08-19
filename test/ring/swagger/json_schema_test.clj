@@ -1,7 +1,9 @@
 (ns ring.swagger.json-schema-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
-            [ring.swagger.json-schema :refer :all])
+            [ring.swagger.json-schema :refer :all]
+            [ring.swagger.core :refer [with-named-sub-schemas]]
+            [flatland.ordered.map :refer :all])
   (:import [java.util Date UUID]
            [org.joda.time DateTime LocalDate]))
 
@@ -91,4 +93,21 @@
   (fact "s/Keyword -keys are ignored"
     (keys (properties {:a String
                        s/Keyword s/Any}))
-    => [:a]))
+    => [:a])
+
+  (fact "Keeps the order of properties intact"
+    (keys (properties (ordered-map :a String
+                                   :b String
+                                   :c String
+                                   :d String
+                                   :e String
+                                   :f String
+                                   :g String
+                                   :h String)))
+    => [:a :b :c :d :e :f :g :h])
+
+  (fact "Ordered-map works with sub-schemas"
+    (properties (with-named-sub-schemas (ordered-map :a String
+                                                     :b {:foo String}
+                                                     :c [{:bar String}])))
+    => anything))

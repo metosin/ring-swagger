@@ -50,7 +50,12 @@
 ;; Schema transformations
 ;;
 
-(defn- plain-map? [x] (instance? clojure.lang.APersistentMap x))
+(defn- plain-map?
+  [x]
+  (or
+    (instance? clojure.lang.APersistentMap x)
+    (instance? flatland.ordered.map.OrderedMap x)))
+
 (defn- full-name [path] (->> path (map name) (map ->CamelCase) (apply str) symbol))
 (defn- collect-schemas [keys schema]
   (cond
@@ -58,10 +63,11 @@
     (if (and (seq (pop keys)) (s/schema-name schema))
       schema
       (with-meta
-        (into {} (for [[k v] schema
-                       :when (jsons/not-predicate? k)
-                       :let [keys (conj keys (s/explicit-schema-key k))]]
-                   [k (collect-schemas keys v)]))
+        (into (empty schema)
+              (for [[k v] schema
+                    :when (jsons/not-predicate? k)
+                    :let [keys (conj keys (s/explicit-schema-key k))]]
+                [k (collect-schemas keys v)]))
         {:name (full-name keys)}))
 
     (valid-container? schema)
