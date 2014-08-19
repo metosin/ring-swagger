@@ -1,3 +1,9 @@
+## 0.12.0 (19.8.2014)
+
+- Should now keep order of properties in Schemas if using `ordered-map`
+  - Use `ordered-map` from [flatland.ordered.map](https://github.com/flatland/ordered)
+  - `(s/defschema (ordered-map :a String ...))`
+
 ## 0.11.0 (10.8.2014)
 
 - Removed `ring.swagger.schema/defmodel`, please use `schema.core/defschema`.
