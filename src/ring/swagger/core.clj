@@ -63,10 +63,11 @@
     (if (and (seq (pop keys)) (s/schema-name schema))
       schema
       (with-meta
-        (into {} (for [[k v] schema
-                       :when (jsons/not-predicate? k)
-                       :let [keys (conj keys (s/explicit-schema-key k))]]
-                   [k (collect-schemas keys v)]))
+        (into (empty schema)
+              (for [[k v] schema
+                    :when (jsons/not-predicate? k)
+                    :let [keys (conj keys (s/explicit-schema-key k))]]
+                [k (collect-schemas keys v)]))
         {:name (full-name keys)}))
 
     (valid-container? schema)

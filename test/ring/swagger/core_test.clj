@@ -3,7 +3,8 @@
             [schema.core :as s]
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
-            [ring.swagger.core :refer :all])
+            [ring.swagger.core :refer :all]
+            [flatland.ordered.map :refer :all])
   (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
 
@@ -25,6 +26,21 @@
                   (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
 
 (s/defschema PetError {:message String s/Keyword s/Any})
+
+(s/defschema OrderedSchema (ordered-map
+                             :id Long
+                             :hot Boolean
+                             :tag (s/enum :kikka :kukka)
+                             :chief [{:name String
+                                      :type #{{:id String}}}]
+                             :a String
+                             :b String
+                             :c String
+                             :d String
+                             :e String
+                             :f String))
+
+(def ordered-schema-order (keys OrderedSchema))
 
 ;;
 ;; Excepcted JSON Schemas
@@ -83,7 +99,11 @@
   {:sub {:foo Long}})
 
 (fact "with-named-sub-schemas"
-  (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+  (fact "add :name meta-data to sub-schemas"
+    (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+
+  (fact "Keeps the order"
+    (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
 
 (fact "collect-models"
   (fact "Sub-schemas are collected"
