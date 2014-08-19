@@ -50,7 +50,12 @@
 ;; Schema transformations
 ;;
 
-(defn- plain-map? [x] (instance? clojure.lang.APersistentMap x))
+(defn- plain-map?
+  [x]
+  (or
+    (instance? clojure.lang.APersistentMap x)
+    (instance? flatland.ordered.map.OrderedMap x)))
+
 (defn- full-name [path] (->> path (map name) (map ->CamelCase) (apply str) symbol))
 (defn- collect-schemas [keys schema]
   (cond

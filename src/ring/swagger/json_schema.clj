@@ -1,5 +1,6 @@
 (ns ring.swagger.json-schema
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [flatland.ordered.map :refer :all]))
 
 (defn json-schema-meta
   "Select interesting keys from meta-data of schema."
@@ -100,8 +101,12 @@
 (defn not-predicate? [x]
   (not= (class x) schema.core.Predicate))
 
-(defn properties [schema]
-  (into {}
+(defn properties
+  "Take properties of schema and turn them into json-schema properties.
+   The result is put into collection of same type as input schema.
+   Thus ordered-map should keep the order of items."
+  [schema]
+  (into (empty schema)
         (for [[k v] schema
               :when (not-predicate? k)
               :let [k (s/explicit-schema-key k)
