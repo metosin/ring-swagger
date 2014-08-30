@@ -237,7 +237,7 @@
         resource-defaults
         (select-keys parameters [:apiVersion :produces :consumes])
         {:basePath basepath
-         :resourcePath ""
+         :resourcePath (str "/" api)
          :models (transform-models (extract-models details))
          :apis (for [{:keys [method uri metadata] :as route} (:routes details)
                      :let [{:keys [return summary notes nickname parameters responseMessages]} metadata]]
