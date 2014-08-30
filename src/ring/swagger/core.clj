@@ -12,7 +12,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [cheshire.generate :refer [add-encoder]]
-            [camel-snake-kebab :refer [->camelCase]])
+            [camel-snake-kebab.core :refer [->camelCase]])
   (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 ;;

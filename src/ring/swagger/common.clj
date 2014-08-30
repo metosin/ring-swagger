@@ -1,6 +1,6 @@
 (ns ring.swagger.common
   (:require [plumbing.core :refer [fn->]]
-            [camel-snake-kebab :as csk]))
+            [camel-snake-kebab.core :as csk]))
 
 (defn remove-empty-keys
   "removes empty keys from a map"

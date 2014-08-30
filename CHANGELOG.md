@@ -1,3 +1,8 @@
+## 0.13.0 (x.x.2014)
+
+- Updated dependencies
+  - camel-snake-kebab 0.2.0 renamed the ns camel-snake-kebab to camel-snake-kebab.core
+
 ## 0.12.0 (19.8.2014)
 
 - Should now keep order of properties in Schemas if using `ordered-map`
