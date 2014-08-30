@@ -96,7 +96,7 @@
     (walk/prewalk
       (fn [x]
         (when-let [schema (s/schema-name x)]
-          (swap! schemas assoc schema x))
+          (swap! schemas assoc schema (if (var? x) @x x)))
         x)
       x)
     @schemas))
