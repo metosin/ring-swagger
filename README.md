@@ -75,8 +75,6 @@ But be warned that Swagger-UI might not display these correctly and code generat
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
-| `(s/both X)` | *type of X*
-| `(s/both X Y Z)` | allOf: *type of X*, *type of Y*, *type of Z*
 | `(s/either X Y Z)`| oneOf: *type of X*, *type of Y*, *type of Z*
 | `(s/conditional pred X pred Y pred Z)` | oneOf: *type of X*, *type of X*, *type of Z*
 | `(s/if pred X Y)` | oneOf: *type of X*, *type of Y*

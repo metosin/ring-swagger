@@ -15,10 +15,4 @@
 
   (fact "s/either"
     (->json (s/either Long String))
-    => {:type "void" :oneOf [(->json Long) (->json String)]})
-
-  (fact "s/both"
-    (->json (s/both String)) => (->json String)
-    (->json (s/both Long String))
-    => {:type "void" :allOf [(->json Long) (->json String)]})
-  )
+    => {:type "void" :oneOf [(->json Long) (->json String)]}))
