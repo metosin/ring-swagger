@@ -1,7 +1,10 @@
-## 0.13.0 (x.x.2014)
+## 0.13.0 (4.9.2014)
 
 - Updated dependencies
-  - camel-snake-kebab 0.2.0 renamed the ns camel-snake-kebab to camel-snake-kebab.core
+  - camel-snake-kebab 0.2.0 renamed the ns `camel-snake-kebab` to `camel-snake-kebab.core`
+- `ring.swagger.json-schema-dirty` namespace now provides experimental
+implementation for `s/if`, `s/conditional` and `s/either` Schema transformations.
+- Fixed a bug with `s/recursive`
 
 ## 0.12.0 (19.8.2014)
 
