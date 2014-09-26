@@ -250,3 +250,88 @@
                                   :nickname (or nickname (generate-nick route))
                                   :responseMessages (convert-response-messages responseMessages)
                                   :parameters (convert-parameters parameters)})]})}))))
+
+;;
+;; 2.0
+;;
+
+;;
+;; schemas
+;;
+
+(defn regexp [r n] (s/pred (partial re-find r) n))
+
+; TODO: add support for Vendor extensions
+
+(s/defschema ExternalDocs {:url s/Str
+                           (s/optional-key :description) s/Str})
+
+(s/defschema Info {:version s/Str
+                   :title   s/Str
+                   (s/optional-key :description) s/Str
+                   (s/optional-key :termsOfService) s/Str
+                   (s/optional-key :contact) {(s/optional-key :name) s/Str
+                                              (s/optional-key :email) s/Str
+                                              (s/optional-key :url) s/Str}
+                   (s/optional-key :licence) {:name s/Str
+                                              (s/optional-key :url) s/Str}})
+
+(s/defschema Schema s/Any)
+(s/defschema Scheme (s/enum :http :https :ws :wss))
+(s/defschema SerializableType {(s/optional-key :type) (s/enum :string :number :boolean :integer :array :file)
+                               (s/optional-key :format) s/Str
+                               (s/optional-key :items) s/Any
+                               (s/optional-key :collectionFormat) s/Str})
+(s/defschema Example s/Any)                                 ; TODO
+(s/defschema Parameter s/Any)                               ; TODO
+(s/defschema Schema s/Any)                                  ; TODO
+(s/defschema Response {:description s/Str
+                       (s/optional-key :schema) Schema
+                       (s/optional-key :headers) [SerializableType]
+                       (s/optional-key :examples) Example})
+(s/defschema Responses {s/Any Response})
+
+
+(s/defschema Operation {(s/optional-key :tags) [s/Str]
+                        (s/optional-key :summary) s/Str
+                        (s/optional-key :description) s/Str
+                        (s/optional-key :externalDocs) ExternalDocs
+                        (s/optional-key :operationId) s/Str
+                        (s/optional-key :consumes) [s/Str]
+                        (s/optional-key :produces) [s/Str]
+                        (s/optional-key :parameters) [s/Any] ;TODO
+                        :responses Responses
+                        (s/optional-key :schemes) [Scheme]
+                        ;(s/optional-key :security) s/Any
+                        })
+(s/defschema PathItem {(s/optional-key :ref) s/Str
+                       (s/optional-key :get) Operation
+                       (s/optional-key :put) Operation
+                       (s/optional-key :post) Operation
+                       (s/optional-key :delete) Operation
+                       (s/optional-key :options) Operation
+                       (s/optional-key :head) Operation
+                       (s/optional-key :patch) Operation
+                       (s/optional-key :parameters) [Parameter]})
+(s/defschema Paths {(regexp #"^/.*[^\/]$" "starts with slash") PathItem})
+(s/defschema Definitions {s/Keyword {s/Keyword s/Any}})
+#_(s/defschema Parameters s/Any)
+#_(s/defschema Security s/Any)
+#_(s/defschema Tag {(s/optional-key :externalDocs) ExternalDocs
+                  (s/optional-key ) s/Str})
+
+(s/defschema SwaggerDocs {:swagger (s/enum 2.0)
+                          :info Info
+                          ;(s/optional-key :externalDocs) ExternalDocs
+                          (s/optional-key :host) s/Str
+                          (s/optional-key :basePath) s/Str
+                          (s/optional-key :schemes) [Scheme]
+                          (s/optional-key :consumes) [s/Str]
+                          (s/optional-key :produces) [s/Str]
+                          :paths Paths
+                          (s/optional-key :definitions) Definitions
+                          ;(s/optional-key :parameters) Parameters
+                          ;(s/optional-key :responses) Responses
+                          ;(s/optional-key :security) Security
+                          ;(s/optional-key :tags) [Tag]
+                          })
