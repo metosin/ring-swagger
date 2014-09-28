@@ -260,21 +260,24 @@
 ;;
 
 (defn regexp [r n] (s/pred (partial re-find r) n))
+(defn valid-response-key? [x] (or (= :default x) (integer? x)))
 
-; TODO: add support for Vendor extensions
+(def VendorExtension {(s/pred (fn->> name (re-find #"^x-")) "vendor extension") s/Any})
 
 (s/defschema ExternalDocs {:url s/Str
                            (s/optional-key :description) s/Str})
 
-(s/defschema Info {:version s/Str
-                   :title   s/Str
-                   (s/optional-key :description) s/Str
-                   (s/optional-key :termsOfService) s/Str
-                   (s/optional-key :contact) {(s/optional-key :name) s/Str
-                                              (s/optional-key :email) s/Str
-                                              (s/optional-key :url) s/Str}
-                   (s/optional-key :licence) {:name s/Str
-                                              (s/optional-key :url) s/Str}})
+(s/defschema Info (merge
+                    VendorExtension
+                    {:version s/Str
+                     :title   s/Str
+                     (s/optional-key :description) s/Str
+                     (s/optional-key :termsOfService) s/Str
+                     (s/optional-key :contact) {(s/optional-key :name) s/Str
+                                                (s/optional-key :url) s/Str
+                                                (s/optional-key :email) s/Str}
+                     (s/optional-key :licence) {:name s/Str
+                                                (s/optional-key :url) s/Str}}))
 
 (s/defschema Schema s/Any)
 (s/defschema Scheme (s/enum :http :https :ws :wss))
@@ -282,15 +285,34 @@
                                (s/optional-key :format) s/Str
                                (s/optional-key :items) s/Any
                                (s/optional-key :collectionFormat) s/Str})
-(s/defschema Example s/Any)                                 ; TODO
-(s/defschema Parameter s/Any)                               ; TODO
-(s/defschema Schema s/Any)                                  ; TODO
+
+(s/defschema Example s/Any)   ; TODO
+(s/defschema Schema s/Any)    ; TODO
+
+(s/defschema Parameter
+             (let [base ])
+             (merge
+                         VendorExtension
+                         {:name s/Str
+                          :in (s/enum :query, :header, :path, :formData)
+                          (s/optional-key :description) s/Str
+                          (s/optional-key :required) s/Bool
+                          (s/optional-key :type) (s/enum :string, :number, :boolean, :integer, :array)
+                          (s/optional-key :format) s/Str
+                          (s/optional-key :items) s/Any ; TODO https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L401
+                          (s/optional-key :collectionFormat) s/Str}))
+
 (s/defschema Response {:description s/Str
                        (s/optional-key :schema) Schema
                        (s/optional-key :headers) [SerializableType]
                        (s/optional-key :examples) Example})
-(s/defschema Responses {s/Any Response})
 
+(s/defschema Responses (merge
+                         ;VendorExtension TODO: More than one non-optional/required key schemata
+                         {(s/pred valid-response-key?) Response}))
+
+
+(s/defschema Ref {:$ref s/Str})
 
 (s/defschema Operation {(s/optional-key :tags) [s/Str]
                         (s/optional-key :summary) s/Str
@@ -299,7 +321,7 @@
                         (s/optional-key :operationId) s/Str
                         (s/optional-key :consumes) [s/Str]
                         (s/optional-key :produces) [s/Str]
-                        (s/optional-key :parameters) [s/Any] ;TODO
+                        (s/optional-key :parameters) [(s/either Parameter Ref)] ;TODO https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L236
                         :responses Responses
                         (s/optional-key :schemes) [Scheme]
                         ;(s/optional-key :security) s/Any
@@ -313,12 +335,12 @@
                        (s/optional-key :head) Operation
                        (s/optional-key :patch) Operation
                        (s/optional-key :parameters) [Parameter]})
-(s/defschema Paths {(regexp #"^/.*[^\/]$" "starts with slash") PathItem})
+(s/defschema Paths {(regexp #"^/.*[^\/]$" "valid path") PathItem})
 (s/defschema Definitions {s/Keyword {s/Keyword s/Any}})
+
 #_(s/defschema Parameters s/Any)
 #_(s/defschema Security s/Any)
-#_(s/defschema Tag {(s/optional-key :externalDocs) ExternalDocs
-                  (s/optional-key ) s/Str})
+#_(s/defschema Tag s/Any)
 
 (s/defschema SwaggerDocs {:swagger (s/enum 2.0)
                           :info Info
@@ -335,3 +357,43 @@
                           ;(s/optional-key :security) Security
                           ;(s/optional-key :tags) [Tag]
                           })
+
+;;
+;; defaults
+;;
+
+(def info-defaults {:version "0.0.1"
+                    :title ""})
+
+(defn swagger-docs [swagger #_basepath]
+  (response
+    {:swagger 2.0
+     :info (merge
+             info-defaults
+             (:info swagger))
+     :paths (:paths swagger)}))
+
+(s/validate SwaggerDocs
+            (:body (swagger-docs
+                     {:info {:version "version"
+                             :title "title"
+                             :description "description"
+                             :termsOfService "jeah"
+                             :contact {:name "name"
+                                       :url "url"
+                                       :email "email"}
+                             :licence {:name "name"
+                                       :url "url"}
+                             :x-kikka "jeah"}
+                      :paths {"/api" {:get {:description "description"
+                                            :operationId "operationId"
+                                            :produces ["produces"]
+                                            :parameters [{:name "name"
+                                                          :in :query
+                                                          :description "description"
+                                                          :required true
+                                                          :type :integer
+                                                          :format "format"}
+                                                         {:}]
+                                            :responses {200 {:description "description"}
+                                                        :default {:description "description"}}}}}})))
