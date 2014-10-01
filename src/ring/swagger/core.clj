@@ -5,7 +5,7 @@
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [schema.macros :as sm]
-            [plumbing.core :refer :all]
+            [plumbing.core :refer :all :exclude [update]]
             [schema.utils :as su]
             [ring.swagger.schema :as schema]
             [ring.swagger.coerce :as coerce]
