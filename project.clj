@@ -22,4 +22,6 @@
                    :dependencies [[midje "1.6.3"]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "2.0.17"]
-                                  [javax.servlet/servlet-api "2.5"]]}})
+                                  [javax.servlet/servlet-api "2.5"]]}
+             :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha2"]]}}
+  :aliases {"all" ["with-profile" "dev:dev,1.7"]})
