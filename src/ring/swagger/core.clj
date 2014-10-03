@@ -290,7 +290,6 @@
 (s/defschema Schema s/Any)    ; TODO
 
 (s/defschema Parameter
-             (let [base ])
              (merge
                          VendorExtension
                          {:name s/Str
@@ -393,7 +392,6 @@
                                                           :description "description"
                                                           :required true
                                                           :type :integer
-                                                          :format "format"}
-                                                         {:}]
+                                                          :format "format"}]
                                             :responses {200 {:description "description"}
                                                         :default {:description "description"}}}}}})))
