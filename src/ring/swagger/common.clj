@@ -44,8 +44,8 @@
         [parameters form])
       [{} c])))
 
-(defn ->CamelCase [x]
-  (csk/->CamelCase x))
+(defn ->CamelCase [x] (csk/->CamelCase x))
+(defn ->camelCase [x] (csk/->camelCase x))
 
 (defn schema-dissoc
   "dissociates keys from schema"

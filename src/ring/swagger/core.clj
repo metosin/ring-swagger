@@ -12,8 +12,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.spec :as spec]
-            [cheshire.generate :refer [add-encoder]]
-            [camel-snake-kebab.core :refer [->camelCase]])
+            [cheshire.generate :refer [add-encoder]])
   (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 ;;
@@ -258,10 +257,6 @@
 
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
-
-(defn schema-dissoc
-  "dissociates keys from schema"
-  [m & ks] (reduce dissoc m (for [k ks, k [k (s/optional-key k)]] k)))
 
 (s/defschema Operation (-> spec/Operation
                            (schema-dissoc :parameters)
