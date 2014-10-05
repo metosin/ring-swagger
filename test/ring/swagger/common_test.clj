@@ -1,6 +1,7 @@
 (ns ring.swagger.common-test
   (:require [midje.sweet :refer :all]
-            [ring.swagger.common :refer :all]))
+            [ring.swagger.common :refer :all]
+            [schema.core :as s]))
 
 (fact "remove-empty-keys"
   (remove-empty-keys {:a nil :b false :c 0}) => {:b false :c 0})
@@ -39,3 +40,6 @@
 
   (fact "extract none"
     (extract-parameters [..any..]) => [{} [..any..]]))
+
+(fact "schema-dissoc removes keys weather they are plain, optional or required"
+  (schema-dissoc {:a 1 :b 1 (s/optional-key :c) 1 (s/required-key :d) 1} :b :c :d) => {:a 1})

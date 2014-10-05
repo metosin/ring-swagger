@@ -1,5 +1,6 @@
 (ns ring.swagger.common
   (:require [plumbing.core :refer [fn->]]
+            [schema.core :as s]
             [camel-snake-kebab.core :as csk]))
 
 (defn remove-empty-keys
@@ -45,3 +46,7 @@
 
 (defn ->CamelCase [x]
   (csk/->CamelCase x))
+
+(defn schema-dissoc
+  "dissociates keys from schema"
+  [m & ks] (reduce dissoc m (for [k ks, k [k (s/optional-key k)]] k)))
