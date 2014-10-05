@@ -290,16 +290,24 @@
 (s/defschema Schema s/Any)    ; TODO
 
 (s/defschema Parameter
-             (merge
-                         VendorExtension
-                         {:name s/Str
-                          :in (s/enum :query, :header, :path, :formData)
-                          (s/optional-key :description) s/Str
-                          (s/optional-key :required) s/Bool
-                          (s/optional-key :type) (s/enum :string, :number, :boolean, :integer, :array)
-                          (s/optional-key :format) s/Str
-                          (s/optional-key :items) s/Any ; TODO https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L401
-                          (s/optional-key :collectionFormat) s/Str}))
+             (s/either
+               (merge
+                 VendorExtension
+                 {:name s/Str
+                  :in (s/enum :query, :header, :path, :formData)
+                  (s/optional-key :description) s/Str
+                  (s/optional-key :required) s/Bool
+                  (s/optional-key :type) (s/enum :string, :number, :boolean, :integer, :array)
+                  (s/optional-key :format) s/Str
+                  (s/optional-key :items) s/Any ; TODO https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L401
+                  (s/optional-key :collectionFormat) s/Str})
+               (merge
+                 VendorExtension
+                 {:name s/Str
+                  :in (s/enum :body)
+                  (s/optional-key :description) s/Str
+                  (s/optional-key :required) s/Bool
+                  (s/optional-key :schema) String}))) ; TODO should be a valid model ref
 
 (s/defschema Response {:description s/Str
                        (s/optional-key :schema) Schema
@@ -335,7 +343,7 @@
                        (s/optional-key :patch) Operation
                        (s/optional-key :parameters) [Parameter]})
 (s/defschema Paths {(regexp #"^/.*[^\/]$" "valid path") PathItem})
-(s/defschema Definitions {s/Keyword {s/Keyword s/Any}})
+(s/defschema Definitions {s/Keyword {s/Keyword s/Any}}) ; TODO validate for real?
 
 #_(s/defschema Parameters s/Any)
 #_(s/defschema Security s/Any)
@@ -392,6 +400,12 @@
                                                           :description "description"
                                                           :required true
                                                           :type :integer
-                                                          :format "format"}]
+                                                          :format "format"}
+                                                         {:name "name2"
+                                                          :in :body
+                                                          :description "description"
+                                                          :required true
+                                                          :schema "#/definitions/Pet"}]
                                             :responses {200 {:description "description"}
-                                                        :default {:description "description"}}}}}})))
+                                                        :default {:description "description"}}}}}
+                      :definitions {}})))
