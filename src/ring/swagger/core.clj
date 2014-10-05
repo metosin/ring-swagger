@@ -259,6 +259,8 @@
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
 
+(s/defschema Info spec/Info)
+
 ;;
 ;; defaults
 ;;
@@ -309,31 +311,34 @@
                                    :schemes [:http]}]}})
 
 (s/validate spec/SwaggerDocs
-            (:body (swagger-docs
-                     {:info {:version "version"
-                             :title "title"
-                             :description "description"
-                             :termsOfService "jeah"
-                             :contact {:name "name"
-                                       :url "url"
-                                       :email "email"}
-                             :licence {:name "name"
-                                       :url "url"}
-                             :x-kikka "jeah"}
-                      :paths {"/api" {:get {:description "description"
-                                            :operationId "operationId"
-                                            :produces ["produces"]
-                                            :parameters [{:name "name"
-                                                          :in :query
-                                                          :description "description"
-                                                          :required true
-                                                          :type :integer
-                                                          :format "format"}
-                                                         {:name "name2"
-                                                          :in :body
-                                                          :description "description"
-                                                          :required true
-                                                          :schema "#/definitions/Pet"}]
-                                            :responses {200 {:description "description"}
-                                                        :default {:description "description"}}}}}
-                      :definitions {}})))
+            {:swagger 2.0
+             :info {:version "version"
+                    :title "title"
+                    :description "description"
+                    :termsOfService "jeah"
+                    :contact {:name "name"
+                              :url "url"
+                              :email "email"}
+                    :licence {:name "name"
+                              :url "url"}
+                    :x-kikka "jeah"}
+             :basePath "/"
+             :consumes ["application/json" "application/edn"]
+             :produces ["application/json" "application/edn"]
+             :paths  {"/api" {:get {:description "description"
+                                   :operationId "operationId"
+                                   :produces ["produces"]
+                                   :parameters [{:name "name"
+                                                 :in :query
+                                                 :description "description"
+                                                 :required true
+                                                 :type :integer
+                                                 :format "format"}
+                                                {:name "name2"
+                                                 :in :body
+                                                 :description "description"
+                                                 :required true
+                                                 :schema "#/definitions/Pet"}]
+                                   :responses {200 {:description "description"}
+                                               :default {:description "description"}}}}}
+             :definitions {}})

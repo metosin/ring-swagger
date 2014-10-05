@@ -104,9 +104,9 @@
 (s/defschema SwaggerDocs {:swagger (s/enum 2.0)
                           :info Info
                           ;(s/optional-key :externalDocs) ExternalDocs
-                          (s/optional-key :host) s/Str
+                          ;(s/optional-key :host) s/Str
                           (s/optional-key :basePath) s/Str
-                          (s/optional-key :schemes) [Scheme]
+                          ;(s/optional-key :schemes) [Scheme]
                           (s/optional-key :consumes) [s/Str]
                           (s/optional-key :produces) [s/Str]
                           :paths Paths
@@ -114,4 +114,5 @@
                           ;(s/optional-key :parameters) Parameters
                           ;(s/optional-key :responses) Responses
                           ;(s/optional-key :security) Security
-                          (s/optional-key :tags) [Tag]})
+                          ;(s/optional-key :tags) [Tag]
+                          })
