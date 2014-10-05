@@ -256,11 +256,18 @@
 ;;
 
 ;;
-;; schemas
+;; helpers
 ;;
 
 (defn regexp [r n] (s/pred (partial re-find r) n))
 (defn valid-response-key? [x] (or (= :default x) (integer? x)))
+(def Anything {s/Keyword s/Any})
+(def Nothing {})
+
+;;
+;; schemas
+;;
+
 
 (def VendorExtension {(s/pred (fn->> name (re-find #"^x-")) "vendor extension") s/Any})
 
@@ -279,6 +286,7 @@
                      (s/optional-key :licence) {:name s/Str
                                                 (s/optional-key :url) s/Str}}))
 
+(s/defschema Tag (s/either s/Str s/Keyword))
 (s/defschema Schema s/Any)
 (s/defschema Scheme (s/enum :http :https :ws :wss))
 (s/defschema SerializableType {(s/optional-key :type) (s/enum :string :number :boolean :integer :array :file)
@@ -321,14 +329,14 @@
 
 (s/defschema Ref {:$ref s/Str})
 
-(s/defschema Operation {(s/optional-key :tags) [s/Str]
+(s/defschema Operation {(s/optional-key :tags) [Tag]
                         (s/optional-key :summary) s/Str
                         (s/optional-key :description) s/Str
                         (s/optional-key :externalDocs) ExternalDocs
                         (s/optional-key :operationId) s/Str
                         (s/optional-key :consumes) [s/Str]
                         (s/optional-key :produces) [s/Str]
-                        (s/optional-key :parameters) [(s/either Parameter Ref)] ;TODO https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L236
+                        (s/optional-key :parameters) [Parameter] ;TODO: (s/either Parameter Ref) -> https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L236
                         :responses Responses
                         (s/optional-key :schemes) [Scheme]
                         ;(s/optional-key :security) s/Any
@@ -347,7 +355,7 @@
 
 #_(s/defschema Parameters s/Any)
 #_(s/defschema Security s/Any)
-#_(s/defschema Tag s/Any)
+
 
 (s/defschema SwaggerDocs {:swagger (s/enum 2.0)
                           :info Info
@@ -362,7 +370,7 @@
                           ;(s/optional-key :parameters) Parameters
                           ;(s/optional-key :responses) Responses
                           ;(s/optional-key :security) Security
-                          ;(s/optional-key :tags) [Tag]
+                          (s/optional-key :tags) [Tag]
                           })
 
 ;;
@@ -379,6 +387,40 @@
              info-defaults
              (:info swagger))
      :paths (:paths swagger)}))
+
+;;
+;; Learning spike
+;;
+
+(def swagger {:info {:version "version"
+                     :title "title"
+                     :description "description"
+                     :termsOfService "jeah"
+                     :contact {:name "name"
+                               :url "url"
+                               :email "email"}
+                     :licence {:name "name"
+                               :url "url"}
+                     :x-kikka "jeah"}
+              :paths {"/api/:id" {:method :get
+                                  :tags [:tag1 :tag2 :tag3]
+                                  :summary "summary"
+                                  :description "description"
+                                  :externalDocs {:url "url"
+                                                 :description "more info"}
+                                  :operationId "operationId"
+                                  :consumes ["application/xyz"]
+                                  :produces ["application/xyz"]
+                                  :parameters {:body Nothing
+                                               :query (merge Anything {:x Long :y Long})
+                                               :path {:id String}
+                                               :header Anything
+                                               :form Anything}
+                                  :responses {200 {:description "ok"
+                                                   :schema {:sum Long}}
+                                              :default {:description "error"
+                                                        :schema {:code Long}}}
+                                  :schemes [:http]}}})
 
 (s/validate SwaggerDocs
             (:body (swagger-docs

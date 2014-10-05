@@ -3,7 +3,7 @@
             [schema.core :as s]
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
-            [ring.swagger.core :refer :all]
+            [ring.swagger.core :refer :all :exclude [Tag]]
             [flatland.ordered.map :refer :all])
   (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
