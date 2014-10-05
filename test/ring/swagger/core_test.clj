@@ -149,19 +149,19 @@
                                                                    :kikka java.lang.String}}
   (string-path-parameters "/api/ping") => nil)
 
-(s/defschema Query {:id Long (s/optional-key :q) String})
-(s/defschema Body {:name String :age Long})
-(s/defschema Path {:p Long})
+(s/defschema QueryModel {:id Long (s/optional-key :q) String})
+(s/defschema BodyModel {:name String :age Long})
+(s/defschema PathModel {:p Long})
 
 (fact "convert-parameters"
 
   (fact "all parameter types can be converted"
     (convert-parameters
-      [{:model Query
+      [{:model QueryModel
         :type :query}
-       {:model Body
+       {:model BodyModel
         :type :body}
-       {:model Path
+       {:model PathModel
         :type :path}]) => [{:name "id"
                             :description ""
                             :format "int64"
@@ -173,11 +173,11 @@
                             :paramType :query
                             :required false
                             :type "string"}
-                           {:name "body"
+                           {:name "bodymodel"
                             :description ""
                             :paramType :body
                             :required true
-                            :type 'Body}
+                            :type 'BodyModel}
                            {:name "p"
                             :description ""
                             :format "int64"
@@ -211,19 +211,19 @@
   (fact "Array body parameters"
     (convert-parameters
       [{:type :body
-        :model [Body]}])
+        :model [BodyModel]}])
 
-    => [{:name "body"
+    => [{:name "bodymodel"
          :description ""
          :paramType :body
          :required true
-         :items {:$ref 'Body}
+         :items {:$ref 'BodyModel}
          :type "array"}])
 
   (fact "Body param with desc"
     (convert-parameters [{:type :body
-                          :model (describe Body "foo")}])
-    => [{:description "foo" :name "body" :paramType :body :required true :type 'Body}]))
+                          :model (describe BodyModel "foo")}])
+    => [{:description "foo" :name "bodymodel" :paramType :body :required true :type 'BodyModel}]))
 
 ;;
 ;; Helpers

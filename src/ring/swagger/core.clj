@@ -259,7 +259,10 @@
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
 
-(s/defschema Info spec/Info)
+(s/defschema Path s/Any)
+(s/defschema Swagger (-> spec/Swagger
+                         (dissoc :paths :definitions)
+                         (assoc :paths {s/Str Path})))
 
 ;;
 ;; defaults
@@ -270,17 +273,18 @@
 
 (defn swagger-docs [swagger #_basepath]
   (response
-    {:swagger 2.0
+    {:swagger 2.0 
      :info (merge
              info-defaults
              (:info swagger))
      :paths (:paths swagger)}))
 
 ;;
-;; Learning spike
+;; spike
 ;;
 
-(def swagger {:info {:version "version"
+(def swagger {:swagger 2.0
+              :info {:version "version"
                      :title "title"
                      :description "description"
                      :termsOfService "jeah"
@@ -290,6 +294,9 @@
                      :licence {:name "name"
                                :url "url"}
                      :x-kikka "jeah"}
+              :basePath "/"
+              :consumes ["application/json" "application/edn"]
+              :produces ["application/json" "application/edn"]
               :paths {"/api/:id" [{:method :get
                                    :tags [:tag1 :tag2 :tag3]
                                    :summary "summary"
@@ -310,35 +317,4 @@
                                                          :schema {:code Long}}}
                                    :schemes [:http]}]}})
 
-(s/validate spec/SwaggerDocs
-            {:swagger 2.0
-             :info {:version "version"
-                    :title "title"
-                    :description "description"
-                    :termsOfService "jeah"
-                    :contact {:name "name"
-                              :url "url"
-                              :email "email"}
-                    :licence {:name "name"
-                              :url "url"}
-                    :x-kikka "jeah"}
-             :basePath "/"
-             :consumes ["application/json" "application/edn"]
-             :produces ["application/json" "application/edn"]
-             :paths  {"/api" {:get {:description "description"
-                                   :operationId "operationId"
-                                   :produces ["produces"]
-                                   :parameters [{:name "name"
-                                                 :in :query
-                                                 :description "description"
-                                                 :required true
-                                                 :type :integer
-                                                 :format "format"}
-                                                {:name "name2"
-                                                 :in :body
-                                                 :description "description"
-                                                 :required true
-                                                 :schema "#/definitions/Pet"}]
-                                   :responses {200 {:description "description"}
-                                               :default {:description "description"}}}}}
-             :definitions {}})
+(s/validate Swagger swagger)
