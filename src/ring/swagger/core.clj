@@ -32,9 +32,9 @@
 ;;
 
 (add-encoder schema.utils.ValidationError
-  (fn [x ^JsonGenerator jg]
-    (.writeString jg
-      (str (su/validation-error-explain x)))))
+             (fn [x ^JsonGenerator jg]
+               (.writeString jg
+                             (str (su/validation-error-explain x)))))
 
 (defn date-time-encoder [x ^JsonGenerator jg]
   (.writeString jg (coerce/unparse-date-time x)))
@@ -43,8 +43,8 @@
 (add-encoder org.joda.time.DateTime date-time-encoder)
 
 (add-encoder org.joda.time.LocalDate
-  (fn [x ^JsonGenerator jg]
-    (.writeString jg (coerce/unparse-date x))))
+             (fn [x ^JsonGenerator jg]
+               (.writeString jg (coerce/unparse-date x))))
 
 ;;
 ;; Schema transformations
@@ -147,10 +147,10 @@
 
 (defn generate-nick [{:keys [method uri]}]
   (-> (str (name method) " " uri)
-    (str/replace #"/" " ")
-    (str/replace #"-" "_")
-    (str/replace #":" " by ")
-    ->camelCase))
+      (str/replace #"/" " ")
+      (str/replace #"-" "_")
+      (str/replace #":" " by ")
+      ->camelCase))
 
 (def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
 (def resource-defaults     {:produces ["application/json"]
@@ -186,8 +186,8 @@
 ;;
 
 (defmulti ^:private extract-parameter
-  (fn [{:keys [type]}]
-    type))
+          (fn [{:keys [type]}]
+            type))
 
 (defmethod extract-parameter :body [{:keys [model type]}]
   (if model
@@ -339,7 +339,7 @@
                         (s/optional-key :parameters) [Parameter] ;TODO: (s/either Parameter Ref) -> https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L236
                         :responses Responses
                         (s/optional-key :schemes) [Scheme]
-                        ;(s/optional-key :security) s/Any
+                                                                 ;(s/optional-key :security) s/Any
                         })
 (s/defschema PathItem {(s/optional-key :ref) s/Str
                        (s/optional-key :get) Operation
@@ -402,25 +402,25 @@
                      :licence {:name "name"
                                :url "url"}
                      :x-kikka "jeah"}
-              :paths {"/api/:id" {:method :get
-                                  :tags [:tag1 :tag2 :tag3]
-                                  :summary "summary"
-                                  :description "description"
-                                  :externalDocs {:url "url"
-                                                 :description "more info"}
-                                  :operationId "operationId"
-                                  :consumes ["application/xyz"]
-                                  :produces ["application/xyz"]
-                                  :parameters {:body Nothing
-                                               :query (merge Anything {:x Long :y Long})
-                                               :path {:id String}
-                                               :header Anything
-                                               :form Anything}
-                                  :responses {200 {:description "ok"
-                                                   :schema {:sum Long}}
-                                              :default {:description "error"
-                                                        :schema {:code Long}}}
-                                  :schemes [:http]}}})
+              :paths {"/api/:id" [{:method :get
+                                   :tags [:tag1 :tag2 :tag3]
+                                   :summary "summary"
+                                   :description "description"
+                                   :externalDocs {:url "url"
+                                                  :description "more info"}
+                                   :operationId "operationId"
+                                   :consumes ["application/xyz"]
+                                   :produces ["application/xyz"]
+                                   :parameters {:body Nothing
+                                                :query (merge Anything {:x Long :y Long})
+                                                :path {:id String}
+                                                :header Anything
+                                                :form Anything}
+                                   :responses {200 {:description "ok"
+                                                    :schema {:sum Long}}
+                                               :default {:description "error"
+                                                         :schema {:code Long}}}
+                                   :schemes [:http]}]}})
 
 (s/validate SwaggerDocs
             (:body (swagger-docs
