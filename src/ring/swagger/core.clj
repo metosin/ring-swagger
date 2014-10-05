@@ -259,10 +259,22 @@
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
 
-(s/defschema Path s/Any)
+(defn schema-dissoc
+  "dissociates keys from schema"
+  [m & ks] (reduce dissoc m (for [k ks, k [k (s/optional-key k)]] k)))
+
+(s/defschema Operation (-> spec/Operation
+                           (schema-dissoc :parameters)
+                           (assoc :parameters {(s/optional-key :body) s/Any
+                                               (s/optional-key :query) s/Any
+                                               (s/optional-key :path) s/Any
+                                               (s/optional-key :header) s/Any
+                                               (s/optional-key :form) s/Any})
+                           (assoc :method (s/enum :get :put :post :delete :options :head :patch))))
+
 (s/defschema Swagger (-> spec/Swagger
                          (dissoc :paths :definitions)
-                         (assoc :paths {s/Str Path})))
+                         (assoc :paths {s/Str [Operation]})))
 
 ;;
 ;; defaults
@@ -273,7 +285,7 @@
 
 (defn swagger-docs [swagger #_basepath]
   (response
-    {:swagger 2.0 
+    {:swagger 2.0
      :info (merge
              info-defaults
              (:info swagger))
@@ -314,7 +326,6 @@
                                    :responses {200 {:description "ok"
                                                     :schema {:sum Long}}
                                                :default {:description "error"
-                                                         :schema {:code Long}}}
-                                   :schemes [:http]}]}})
+                                                         :schema {:code Long}}}}]}})
 
 (s/validate Swagger swagger)
