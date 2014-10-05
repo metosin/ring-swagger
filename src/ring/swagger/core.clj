@@ -275,16 +275,14 @@
 ;; defaults
 ;;
 
-(def info-defaults {:version "0.0.1"
-                    :title ""})
+; TODO: implement
+(defn extract-path-and-definitions [swagger])
 
-(defn swagger-docs [swagger #_basepath]
-  (response
-    {:swagger 2.0
-     :info (merge
-             info-defaults
-             (:info swagger))
-     :paths (:paths swagger)}))
+(defn swagger-json [swagger]
+  (let [[paths definitions] (extract-path-and-definitions swagger)]
+    (-> swagger
+        (assoc :paths paths)
+        (assoc :definitions definitions))))
 
 ;;
 ;; spike
@@ -324,3 +322,5 @@
                                                          :schema {:code Long}}}}]}})
 
 (s/validate Swagger swagger)
+
+#_(s/validate spec/Swagger (swagger-json swagger))
