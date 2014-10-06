@@ -32,9 +32,9 @@
 ;;
 
 (add-encoder schema.utils.ValidationError
-             (fn [x ^JsonGenerator jg]
-               (.writeString jg
-                             (str (su/validation-error-explain x)))))
+  (fn [x ^JsonGenerator jg]
+    (.writeString jg
+      (str (su/validation-error-explain x)))))
 
 (defn date-time-encoder [x ^JsonGenerator jg]
   (.writeString jg (coerce/unparse-date-time x)))
@@ -43,8 +43,8 @@
 (add-encoder org.joda.time.DateTime date-time-encoder)
 
 (add-encoder org.joda.time.LocalDate
-             (fn [x ^JsonGenerator jg]
-               (.writeString jg (coerce/unparse-date x))))
+  (fn [x ^JsonGenerator jg]
+    (.writeString jg (coerce/unparse-date x))))
 
 ;;
 ;; Schema transformations
@@ -186,8 +186,8 @@
 ;;
 
 (defmulti ^:private extract-parameter
-          (fn [{:keys [type]}]
-            type))
+  (fn [{:keys [type]}]
+    type))
 
 (defmethod extract-parameter :body [{:keys [model type]}]
   (if model
