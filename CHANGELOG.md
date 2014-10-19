@@ -1,3 +1,14 @@
+## 0.14.0-SNAPSHOT (x.y.2014)
+
+- Updated deps:
+```clojure
+[slingshot "0.12.0"] is available but we use "0.10.3"
+[metosin/ring-http-response "0.5.1"] is available but we use "0.5.0"
+[prismatic/schema "0.3.1"] is available but we use "0.2.6"
+[prismatic/plumbing "0.3.4"] is available but we use "0.3.3"
+[potemkin "0.3.10"] is available but we use "0.3.8"
+```
+
 ## 0.13.0 (4.9.2014)
 
 - Updated dependencies
