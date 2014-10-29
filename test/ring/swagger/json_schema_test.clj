@@ -11,8 +11,10 @@
 
 (facts "type transformations"
   (facts "java types"
+    (->json Integer)   => {:type "integer" :format "int32"}
     (->json Long)      => {:type "integer" :format "int64"}
     (->json Double)    => {:type "number" :format "double"}
+    (->json Number)    => {:type "number" :format "double"}
     (->json String)    => {:type "string"}
     (->json Boolean)   => {:type "boolean"}
     (->json Date)      => {:type "string" :format "date-time"}
@@ -22,7 +24,8 @@
 
   (fact "schema types"
     (->json s/Int)     => {:type "integer" :format "int64"}
-    (->json s/Str)     => {:type "string"})
+    (->json s/Str)     => {:type "string"}
+    (->json s/Num)     => {:type "number" :format "double"})
 
   (fact "containers"
     (->json [Long])    => {:type "array" :items {:format "int64" :type "integer"}}

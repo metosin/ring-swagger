@@ -1,12 +1,15 @@
-## 0.14.0-SNAPSHOT (x.y.2014)
+## 0.14.0 (29.10.2014)
 
+- support for `java.lang.Number`, `java.lang.Integer`, `s/Num`
 - Updated deps:
 ```clojure
-[slingshot "0.12.0"] is available but we use "0.10.3"
+[slingshot "0.12.1"] is available but we use "0.12.0"
 [metosin/ring-http-response "0.5.1"] is available but we use "0.5.0"
+[prismatic/plumbing "0.3.5"] is available but we use "0.3.4"
+[camel-snake-kebab "0.2.5"] is available but we use "0.2.4"
+[potemkin "0.3.11"] is available but we use "0.3.10"
+[lein-ring "0.8.13"] is available but we use "0.8.11"
 [prismatic/schema "0.3.1"] is available but we use "0.2.6"
-[prismatic/plumbing "0.3.4"] is available but we use "0.3.3"
-[potemkin "0.3.10"] is available but we use "0.3.8"
 ```
 
 ## 0.13.0 (4.9.2014)

@@ -42,8 +42,9 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
-| `Long`, `s/Int`        | integer, int64 | `1`|
-| `Double`                    | number, double | `1.2`
+| `Integer` | integer, int32 | `1` |
+| `Long`, `s/Int` | integer, int64 | `1` |
+| `Double`, `Number, `s/Num`  | number, double | `1.2`
 | `String`, `s/Str`, Keyword, `s/Keyword`      | string | `"kikka"`
 | `Boolean`                   | boolean | `true`
 | `nil`, `s/Any`              | void |

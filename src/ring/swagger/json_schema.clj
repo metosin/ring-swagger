@@ -65,8 +65,10 @@
    :items (json-type (first e))})
 
 ;; Classes
+(defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
 (defmethod json-type java.lang.Long          [_] {:type "integer" :format "int64"})
 (defmethod json-type java.lang.Double        [_] {:type "number" :format "double"})
+(defmethod json-type java.lang.Number        [_] {:type "number" :format "double"})
 (defmethod json-type java.lang.String        [_] {:type "string"})
 (defmethod json-type java.lang.Boolean       [_] {:type "boolean"})
 (defmethod json-type clojure.lang.Keyword    [_] {:type "string"})
