@@ -276,10 +276,92 @@
 ;;
 
 ; TODO: implement
-(defn extract-path-and-definitions [swagger])
+
+
+;;
+;; Schema transformations
+;;
+
+(defn- requires-definition? [schema]
+  (not (contains? #{nil Nothing Anything}
+                  (s/schema-name schema))))
+
+(defn collect-models [swagger]
+  (let [route-meta      (->> swagger
+                             :paths
+                             vals
+                             flatten)
+        body-models     (->> route-meta
+                             (map (comp :body :parameters))
+                             (filter requires-definition?))
+        response-models (->> route-meta
+                             (map :responses)
+                             (mapcat vals)
+                             (map :schema)
+                             (filter requires-definition?))
+        all-models      (concat body-models response-models)]
+    (distinct all-models)))
+
+(defn transform [schema]
+  (let [required (required-keys schema)
+        required (if-not (empty? required) required)]
+    (remove-empty-keys
+      {:properties (jsons/properties schema)
+       :required required})))
+
+(defn transform-models [schemas]
+  (into {}
+        (map (juxt (comp keyword s/schema-name) transform)
+             (distinct schemas))))
+
+;;
+;; Paths, parameters, responses
+;;
+
+;; TODO implement
+(defn convert-parameters [parameters]
+  parameters)
+
+;; TODO validate incoming as in old version,
+;; handle headers etc.
+(defn convert-response-messages [responses]
+  (letfn [(response-schema [schema]
+            (if-let [name (s/schema-name schema)]
+              (str "#/definitions/" name)
+              (transform schema)))]
+    (zipmap (keys responses)
+            (map (fn [r] (update-in r [:schema] response-schema))
+                 (vals responses)))))
+
+(defn transform-path-oprations
+  "Returns a map with methods as keys and the Operation
+   maps with parameters and responses transformed to comply
+   with Swagger JSON spec as values"
+  [operations]
+  (into {} (map (juxt :method #(-> %
+                                   (dissoc :method)
+                                   (update-in [:parameters] convert-parameters)
+                                   (update-in [:responses]  convert-response-messages)))
+                operations)))
+
+
+
+(defn extract-paths-and-definitions [swagger]
+  (let [paths       (->> swagger
+                         :paths
+                         keys
+                         (map swagger-path))
+        methods     (->> swagger
+                         :paths
+                         vals
+                         (map transform-path-oprations))
+        definitions (->> swagger
+                         collect-models
+                         transform-models)]
+    (vector (zipmap paths methods) definitions)))
 
 (defn swagger-json [swagger]
-  (let [[paths definitions] (extract-path-and-definitions swagger)]
+  (let [[paths definitions] (extract-paths-and-definitions swagger)]
     (-> swagger
         (assoc :paths paths)
         (assoc :definitions definitions))))
@@ -287,6 +369,9 @@
 ;;
 ;; spike
 ;;
+
+;; https://github.com/swagger-api/swagger-spec/blob/master/schemas/v2.0/schema.json
+;; https://github.com/swagger-api/swagger-spec/blob/master/examples/v2.0/json/petstore.json
 
 (def swagger {:swagger 2.0
               :info {:version "version"
@@ -320,6 +405,67 @@
                                                     :schema {:sum Long}}
                                                :default {:description "error"
                                                          :schema {:code Long}}}}]}})
+
+;; more test data
+(s/defschema Pet {:id Long
+                  :name String
+                  (s/optional-key :weight) Double})
+(s/defschema NotFound {:message s/Str})
+
+(def swagger-with-models {:swagger 2.0
+              :info {:version "version"
+                     :title "title"
+                     :description "description"
+                     :termsOfService "jeah"
+                     :contact {:name "name"
+                               :url "url"
+                               :email "email"}
+                     :licence {:name "name"
+                               :url "url"}
+                     :x-kikka "jeah"}
+              :basePath "/"
+              :consumes ["application/json" "application/edn"]
+              :produces ["application/json" "application/edn"]
+              :paths {"/api/:id" [{:method :get
+                                   :tags [:tag1 :tag2 :tag3]
+                                   :summary "summary"
+                                   :description "description"
+                                   :externalDocs {:url "url"
+                                                  :description "more info"}
+                                   :operationId "operationId"
+                                   :consumes ["application/xyz"]
+                                   :produces ["application/xyz"]
+                                   :parameters {:body Nothing
+                                                :query (merge Anything {:x Long :y Long})
+                                                :path {:id String}
+                                                :header Anything
+                                                :form Anything}
+                                   :responses {200 {:description "ok"
+                                                    :schema {:sum Long}}
+                                               400 {:description "not found"
+                                                    :schema NotFound}
+                                               :default {:description "error"
+                                                         :schema {:code Long}}}}]
+                      "/api/pets" [{:method :get
+                                   :parameters {:body Pet
+                                                :query (merge Anything {:x Long :y Long})
+                                                :path {:id String}
+                                                :header Anything
+                                                :form Anything}
+                                   :responses {200 {:description "ok"
+                                                    :schema {:sum Long}}
+                                               :default {:description "error"
+                                                         :schema {:code Long}}}}
+                                   {:method :post
+                                    :parameters {:body Pet
+                                                 :query (merge Anything {:x Long :y Long})
+                                                 :path {:id String}
+                                                 :header Anything
+                                                 :form Anything}
+                                    :responses {200 {:description "ok"
+                                                     :schema {:sum Long}}
+                                                :default {:description "error"
+                                                          :schema {:code Long}}}}]}})
 
 (s/validate Swagger swagger)
 
