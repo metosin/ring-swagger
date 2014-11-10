@@ -12,7 +12,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [cheshire.generate :refer [add-encoder]]
-            [camel-snake-kebab.core :refer [->camelCase]])
+            [org.tobereplaced.lettercase :as lc])
   (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 ;;
@@ -56,7 +56,7 @@
     (instance? clojure.lang.APersistentMap x)
     (instance? flatland.ordered.map.OrderedMap x)))
 
-(defn- full-name [path] (->> path (map name) (map ->CamelCase) (apply str) symbol))
+(defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 (defn- collect-schemas [keys schema]
   (cond
     (plain-map? schema)
@@ -150,7 +150,7 @@
     (str/replace #"/" " ")
     (str/replace #"-" "_")
     (str/replace #":" " by ")
-    ->camelCase))
+    lc/mixed))
 
 (def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
 (def resource-defaults     {:produces ["application/json"]
