@@ -275,6 +275,28 @@
             :properties {:bar {:$ref 'Bar}}
             :required [:bar]}})
 
+(fact "with-named-sub-schemas"
+  (fact "nested maps"
+    (transform (with-named-sub-schemas  {:a String
+                                         :b {:c String}})) => truthy)
+  (fact "nested vectors"
+    (transform (with-named-sub-schemas {:a String
+                                        :b [{:c String}]})) => truthy)
+  (fact "nested sets"
+    (transform (with-named-sub-schemas {:a String
+                                        :b #{{:c String}}})) => truthy)
+  #_(fact "nested sets"
+    (transform {:a String
+                :b {:c String}}) => truthy)
+
+  #_(fact "nested sets"
+    (transform {:a String
+                :b (s/maybe {:c String})}) => truthy)
+
+  #_(fact "nested maybe"
+    (transform (with-named-sub-schemas {:a String
+                                        :b (s/maybe {:c String})})) => truthy))
+
 ;;
 ;; Final json
 ;;

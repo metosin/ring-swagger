@@ -11,8 +11,7 @@
             [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [cheshire.generate :refer [add-encoder]]
-            [camel-snake-kebab.core :refer [->camelCase]])
+            [cheshire.generate :refer [add-encoder]])
   (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 ;;

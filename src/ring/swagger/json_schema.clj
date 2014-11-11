@@ -82,13 +82,13 @@
 (def predicate-to-class {integer? java.lang.Long
                          keyword? clojure.lang.Keyword
                          symbol?  clojure.lang.Symbol})
-(defmethod json-type schema.core.Predicate  [e] (if-let [c (predicate-to-class (:p? e))]
-                                                  (->json c)))
+(defmethod json-type schema.core.Predicate      [e] (if-let [c (predicate-to-class (:p? e))] (->json c)))
 (defmethod json-type schema.core.EnumSchema [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
 (defmethod json-type schema.core.Maybe      [e] (->json (:schema e)))
 (defmethod json-type schema.core.Both       [e] (->json (first (:schemas e))))
 (defmethod json-type schema.core.Recursive  [e] (->json (:derefable e)))
 (defmethod json-type schema.core.EqSchema   [e] (->json (class (:v e))))
+(defmethod json-type schema.core.NamedSchema    [e] (->json (:schema e)))
 (defmethod json-type schema.core.AnythingSchema [_] nil)
 
 (defmethod json-type :default [e]

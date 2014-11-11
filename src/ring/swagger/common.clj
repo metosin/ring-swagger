@@ -45,3 +45,6 @@
 
 (defn ->CamelCase [x]
   (csk/->CamelCase x))
+
+(defn ->camelCase [x]
+  (csk/->camelCase x))
