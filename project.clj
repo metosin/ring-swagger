@@ -9,7 +9,7 @@
                  [cheshire "5.3.1"]
                  [slingshot "0.12.1"]
                  [metosin/ring-http-response "0.5.1"]
-                 [prismatic/schema "0.3.1"]
+                 [prismatic/schema "0.3.2"]
                  [prismatic/plumbing "0.3.5"]
                  [clj-time "0.8.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
@@ -24,4 +24,5 @@
                                   [metosin/ring-swagger-ui "2.0.17"]
                                   [javax.servlet/servlet-api "2.5"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha2"]]}}
-  :aliases {"all" ["with-profile" "dev:dev,1.7"]})
+  :aliases {"all" ["with-profile" "dev:dev,1.7"]
+            "test-ancient" ["midje"]})
