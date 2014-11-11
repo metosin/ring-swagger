@@ -5,6 +5,7 @@
             [potemkin :refer [import-vars]]
             [clojure.pprint :as pprint]
             [slingshot.slingshot :refer [throw+]]
+            [org.tobereplaced.lettercase :as lc]
             [ring.swagger.common :refer :all]
             [ring.swagger.impl :refer :all]
             [ring.swagger.coerce :as coerce]
@@ -24,7 +25,7 @@
        (not (s/schema-name x)))) ;; and predefined models
 
 (defn- sub-model-symbol [model k]
-  (symbol (str model (->CamelCase (name (s/explicit-schema-key k))))))
+  (symbol (str model (lc/capitalized (name (s/explicit-schema-key k))))))
 
 (defn extract-schema-name
   "Returns model name or nil"

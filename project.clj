@@ -12,7 +12,7 @@
                  [prismatic/schema "0.3.1"]
                  [prismatic/plumbing "0.3.5"]
                  [clj-time "0.8.0"]
-                 [camel-snake-kebab "0.2.5"]
+                 [org.tobereplaced/lettercase "1.0.0"]
                  [ring/ring-core "1.3.1"]
                  [potemkin "0.3.11"]
                  [org.flatland/ordered "1.5.2"]]
