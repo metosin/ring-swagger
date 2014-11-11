@@ -1,3 +1,12 @@
+## 0.14.1 (11.10.2014)
+
+- support for `s/Named`
+- use `[org.tobereplaced/lettercase "1.0.0"]` in favour of `[camel-snake-kebab "0.2.5"]`
+- update deps:
+```clojure
+[prismatic/schema "0.3.2"] is available but we use "0.3.1"
+```
+
 ## 0.14.0 (29.10.2014)
 
 - support for `java.lang.Number`, `java.lang.Integer`, `s/Num`

@@ -54,6 +54,7 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 | `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
 | `(s/maybe X)`          | *type of X*
 | `(s/both X Y Z)`       | *type of X*
+| `(s/named X name)`     | *type of X*
 | `(s/recursive Var)`    | *Ref to (model) Var*
 | `(s/eq X)`    | *type of class of X*
 | `(s/optional-key X)`    | *optional key*
