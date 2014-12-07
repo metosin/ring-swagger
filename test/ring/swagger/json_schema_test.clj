@@ -35,7 +35,11 @@
     (->json nil)       => {:type "void"})
 
   (facts "unknowns"
-    (->json java.util.Vector) => nil)
+    (fact "throw exception by default"
+      (->json java.util.Vector) => (throws IllegalArgumentException))
+    (fact "are ignored with *ignore-missing-mappings*"
+      (binding [*ignore-missing-mappings* true]
+        (->json java.util.Vector)) => nil))
 
   (fact "schema predicates"
     (fact "s/enum"
@@ -104,6 +108,15 @@
                        s/Keyword s/Any}))
     => [:a])
 
+  (fact "with unknown mappings"
+    (fact "by default, exception is thrown"
+      (properties {:a String
+                   :b java.util.Vector}) => (throws IllegalArgumentException))
+    (fact "unknown fields are ignored ig *ignore-missing-mappings* is set"
+      (binding [*ignore-missing-mappings* true]
+        (keys (properties {:a String
+                           :b java.util.Vector})) => [:a])))
+
   (fact "Keeps the order of properties intact"
     (keys (properties (ordered-map :a String
                                    :b String
@@ -119,4 +132,14 @@
     (properties (with-named-sub-schemas (ordered-map :a String
                                                      :b {:foo String}
                                                      :c [{:bar String}])))
-    => anything))
+    => anything)
+
+  (fact "referenced record-schemas"
+    (s/defschema Foo (s/enum :one :two))
+    (s/defschema Bar {:key Foo})
+
+    (fact "can't get properties out of record schemas"
+      (properties Foo)) => (throws AssertionError)
+
+    (fact "nested properties work ok"
+      (keys (properties Bar)) => [:key])))

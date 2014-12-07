@@ -1,6 +1,9 @@
 (ns ring.swagger.json-schema
   (:require [schema.core :as s]
+            [ring.swagger.common :refer [plain-map?]]
             [flatland.ordered.map :refer :all]))
+
+(def ^:dynamic *ignore-missing-mappings* false)
 
 (defn json-schema-meta
   "Select interesting keys from meta-data of schema."
@@ -82,19 +85,21 @@
 (def predicate-to-class {integer? java.lang.Long
                          keyword? clojure.lang.Keyword
                          symbol?  clojure.lang.Symbol})
+
 (defmethod json-type schema.core.Predicate      [e] (if-let [c (predicate-to-class (:p? e))] (->json c)))
-(defmethod json-type schema.core.EnumSchema [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
-(defmethod json-type schema.core.Maybe      [e] (->json (:schema e)))
-(defmethod json-type schema.core.Both       [e] (->json (first (:schemas e))))
-(defmethod json-type schema.core.Recursive  [e] (->json (:derefable e)))
-(defmethod json-type schema.core.EqSchema   [e] (->json (class (:v e))))
+(defmethod json-type schema.core.EnumSchema     [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+(defmethod json-type schema.core.Maybe          [e] (->json (:schema e)))
+(defmethod json-type schema.core.Both           [e] (->json (first (:schemas e))))
+(defmethod json-type schema.core.Recursive      [e] (->json (:derefable e)))
+(defmethod json-type schema.core.EqSchema       [e] (->json (class (:v e))))
 (defmethod json-type schema.core.NamedSchema    [e] (->json (:schema e)))
 (defmethod json-type schema.core.AnythingSchema [_] nil)
 
 (defmethod json-type :default [e]
   (if (s/schema-name e)
     {:$ref (s/schema-name e)}
-    (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
+    (and (not *ignore-missing-mappings*)
+         (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
 
 ;;
 ;; Schema -> Json Schema
@@ -103,18 +108,22 @@
 (defn not-predicate? [x]
   (not= (class x) schema.core.Predicate))
 
+(defn try->json [v k]
+  (try (->json v)
+       (catch Exception e
+         (throw
+           (IllegalArgumentException.
+             (str "error converting to json schema [" k " " (s/explain v) "]") e)))))
+
 (defn properties
-  "Take properties of schema and turn them into json-schema properties.
+  "Take a map schema and turn them into json-schema properties.
    The result is put into collection of same type as input schema.
    Thus ordered-map should keep the order of items."
   [schema]
+  {:pre [(plain-map? schema)]}
   (into (empty schema)
         (for [[k v] schema
               :when (not-predicate? k)
               :let [k (s/explicit-schema-key k)
-                    v (try (->json v)
-                           (catch Exception e
-                             (throw
-                               (IllegalArgumentException.
-                                 (str "error converting to json schema [" k " " (s/explain v) "]") e))))]]
+                    v (try->json v k)]]
           (and v [k v]))))
