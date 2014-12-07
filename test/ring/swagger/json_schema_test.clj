@@ -34,6 +34,9 @@
   (facts "nil"
     (->json nil)       => {:type "void"})
 
+  (facts "unknowns"
+    (->json java.util.Vector) => nil)
+
   (fact "schema predicates"
     (fact "s/enum"
       (->json (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
