@@ -127,7 +127,10 @@
         all-models (->> (concat body-models return-models response-models)
                         flatten
                         (map with-named-sub-schemas))]
-    (into {} (map (juxt s/schema-name identity) all-models))))
+    (->> all-models
+         (map (juxt s/schema-name identity))
+         (filter (fn-> first))
+         (into {}))))
 
 ;;
 ;; Route generation
