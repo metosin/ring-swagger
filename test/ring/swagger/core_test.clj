@@ -127,7 +127,45 @@
 (fact "transform-models"
   (transform-models [Pet]) => {'Pet Pet'
                                'Tag Tag'
-                               'Category Category'})
+                               'Category Category'}
+
+  (s/defschema Foo (s/enum :a :b))
+  (s/defschema Bar {:key Foo})
+  (s/defschema Baz s/Keyword)
+
+  (fact "record-schemas are not transformed"
+    (transform-models [Foo]) => {})
+
+  (fact "non-map schemas are not transformed"
+    (transform-models [Baz]) => {})
+
+  (fact "nested record-schemas are inlined"
+    (transform-models [Bar]) => {'Bar {:id 'Bar,
+                                       :properties {:key {:enum [:b :a]
+                                                          :type "string"}}
+                                       :required [:key]}})
+
+  (s/defschema Nested {:id s/Str
+                       :address {:country (s/enum :fi :pl)
+                                 :street {:name s/Str}}})
+
+  (fact "nested schemas with anonymous sub-schemas"
+    (transform-models [(with-named-sub-schemas Nested)])
+
+    =>
+
+    {'Nested {:id 'Nested
+              :properties {:address {:$ref 'NestedAddress}
+                           :id {:type "string"}}
+              :required [:id :address]}
+     'NestedAddress {:id 'NestedAddress
+                     :properties {:country {:enum [:fi :pl]
+                                            :type "string"}
+                                  :street {:$ref 'NestedAddressStreet}}
+                     :required [:country :street]}
+     'NestedAddressStreet {:id 'NestedAddressStreet
+                           :properties {:name {:type "string"}}
+                           :required [:name]}}))
 
 ;;
 ;; Route generation

@@ -50,12 +50,6 @@
 ;; Schema transformations
 ;;
 
-(defn- plain-map?
-  [x]
-  (or
-    (instance? clojure.lang.APersistentMap x)
-    (instance? flatland.ordered.map.OrderedMap x)))
-
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 (defn- collect-schemas [keys schema]
   (cond
@@ -95,7 +89,9 @@
   (let [schemas (atom {})]
     (walk/prewalk
       (fn [x]
-        (when-let [schema (s/schema-name x)]
+        (when-let [schema (and
+                            (plain-map? x)
+                            (s/schema-name x))]
           (swap! schemas assoc schema (if (var? x) @x x)))
         x)
       x)
