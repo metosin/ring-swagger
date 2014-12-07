@@ -41,3 +41,7 @@
             form       (drop (* 2 (count parameters)) c)]
         [parameters form])
       [{} c])))
+
+(defn plain-map?
+  "checks whether input is a map, but not a record"
+  [x] (and (map? x) (not (record? x))))
