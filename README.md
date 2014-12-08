@@ -61,12 +61,18 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 | `(s/required-key X)`    | *required key*
 | `s/Keyword` (as a key)  | *ignored in visualizations*
 
-
-
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references
     - Nested maps can be within valid containers (as only element - heregenous schema sequences not supported by the spec)
+
+### Missing Schema elements
+
+If ring-swagger can't transform the Schemas into JSON Schemas,
+by default a `IllegalArgumentException` will be thrown. By binding
+`ring.swagger.json-schema/*ignore-missing-mappings*` to true, one
+can ingore the errors (missing schema elements will be ignored from
+the generated JSON Schema).
 
 ### Schema elements supported by `ring.swagger.json-schema-dirty`
 

@@ -1,3 +1,9 @@
+## 0.15.0 (8.12.2014)
+
+- **new feature**: binding dynamic variable `ring.swagger.json-schema/*ignore-missing-mappings*`
+  to true will cause unknown json-schema mappings to be ignored
+- fixed #42
+
 ## 0.14.1 (11.10.2014)
 
 - support for `s/Named`
