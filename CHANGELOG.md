@@ -3,6 +3,12 @@
 - **new feature**: binding dynamic variable `ring.swagger.json-schema/*ignore-missing-mappings*`
   to true will cause unknown json-schema mappings to be ignored
 - fixed #42
+- updated dependencies:
+```clojure
+[metosin/ring-http-response "0.5.2"] is available but we use "0.5.1"
+[prismatic/schema "0.3.3"] is available but we use "0.3.2"
+[ring/ring-core "1.3.2"] is available but we use "1.3.1"
+```
 
 ## 0.14.1 (11.10.2014)
 
