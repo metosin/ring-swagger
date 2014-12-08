@@ -286,7 +286,7 @@
   (not (contains? #{nil Nothing Anything}
                   (s/schema-name schema))))
 
-(defn collect-models [swagger]
+(defn extract-models [swagger]
   (let [route-meta      (->> swagger
                              :paths
                              vals
@@ -309,10 +309,22 @@
       {:properties (jsons/properties schema)
        :required required})))
 
+(defn collect-models [x]
+  (let [schemas (atom {})]
+    (walk/prewalk
+      (fn [x]
+        (when (requires-definition? x)
+          (swap! schemas assoc (s/schema-name x) (if (var? x) @x x)))
+        x)
+      x)
+    @schemas))
+
 (defn transform-models [schemas]
-  (into {}
-        (map (juxt (comp keyword s/schema-name) transform)
-             (distinct schemas))))
+  (->> schemas
+       (map collect-models)
+       (apply merge)
+       (map (juxt (comp keyword key) (comp transform val)))
+       (into {})))
 
 ;;
 ;; Paths, parameters, responses
@@ -356,7 +368,7 @@
                          vals
                          (map transform-path-oprations))
         definitions (->> swagger
-                         collect-models
+                         extract-models
                          transform-models)]
     (vector (zipmap paths methods) definitions)))
 
@@ -372,6 +384,7 @@
 
 ;; https://github.com/swagger-api/swagger-spec/blob/master/schemas/v2.0/schema.json
 ;; https://github.com/swagger-api/swagger-spec/blob/master/examples/v2.0/json/petstore.json
+;; https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
 
 (def swagger {:swagger 2.0
               :info {:version "version"
@@ -407,8 +420,11 @@
                                                          :schema {:code Long}}}}]}})
 
 ;; more test data
+(s/defschema LegOfPet {:length Long})
+
 (s/defschema Pet {:id Long
                   :name String
+                  :leg LegOfPet
                   (s/optional-key :weight) Double})
 (s/defschema NotFound {:message s/Str})
 
