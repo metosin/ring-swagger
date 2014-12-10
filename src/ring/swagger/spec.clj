@@ -69,6 +69,7 @@
                   (s/optional-key :required) s/Bool
                   (s/optional-key :schema) String}))) ; TODO: should be a valid model ref
 
+;; TODO why headers [SerializableType]
 (s/defschema Response {:description s/Str
                        (s/optional-key :schema) Schema
                        (s/optional-key :headers) [SerializableType]
