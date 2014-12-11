@@ -56,7 +56,8 @@
                   :in (s/enum :query, :header, :path, :formData)
                   (s/optional-key :description) s/Str
                   (s/optional-key :required) s/Bool
-                  (s/optional-key :type) (s/enum :string, :number, :boolean, :integer, :array)
+                  (s/optional-key :type) #_(s/enum :string, :number, :boolean, :integer, :array)
+                                         (s/enum "string" "number" "boolean" "integer" "array" "file")
                   (s/optional-key :format) s/Str
                   (s/optional-key :items) s/Any ; TODO: https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L401
                   (s/optional-key :collectionFormat) s/Str})
@@ -130,7 +131,7 @@
 ;; spike
 ;;
 
-(s/validate Swagger
+#_(s/validate Swagger
             {:swagger 2.0
              :info {:version "version"
                     :title "title"
@@ -161,4 +162,7 @@
                                                   :schema "#/definitions/Pet"}]
                                     :responses {200 {:description "description"}
                                                 :default {:description "description"}}}}}
-             :definitions {}})
+             :definitions {:Pet {:required   [:id :name]
+                                 :properties {:id {:type :integer :format "int64"}
+                                              :name {:type :string}
+                                              :tag {:type :string}}}}})

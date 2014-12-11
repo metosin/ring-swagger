@@ -11,8 +11,10 @@
 
 (facts "type transformations"
   (facts "java types"
+    (->json Integer)   => {:type "integer" :format "int32"}
     (->json Long)      => {:type "integer" :format "int64"}
     (->json Double)    => {:type "number" :format "double"}
+    (->json Number)    => {:type "number" :format "double"}
     (->json String)    => {:type "string"}
     (->json Boolean)   => {:type "boolean"}
     (->json Date)      => {:type "string" :format "date-time"}
@@ -22,7 +24,8 @@
 
   (fact "schema types"
     (->json s/Int)     => {:type "integer" :format "int64"}
-    (->json s/Str)     => {:type "string"})
+    (->json s/Str)     => {:type "string"}
+    (->json s/Num)     => {:type "number" :format "double"})
 
   (fact "containers"
     (->json [Long])    => {:type "array" :items {:format "int64" :type "integer"}}
@@ -30,6 +33,13 @@
 
   (facts "nil"
     (->json nil)       => {:type "void"})
+
+  (facts "unknowns"
+    (fact "throw exception by default"
+      (->json java.util.Vector) => (throws IllegalArgumentException))
+    (fact "are ignored with *ignore-missing-mappings*"
+      (binding [*ignore-missing-mappings* true]
+        (->json java.util.Vector)) => nil))
 
   (fact "schema predicates"
     (fact "s/enum"
@@ -41,6 +51,9 @@
 
     (fact "s/both -> type of the first element"
       (->json (s/both Long String))   => (->json Long))
+
+    (fact "s/named -> type of schema"
+      (->json (s/named Long "long"))  => (->json Long))
 
     (fact "s/recursive -> type of internal schema"
       (->json (s/recursive #'Model))  => (->json #'Model))
@@ -95,6 +108,15 @@
                        s/Keyword s/Any}))
     => [:a])
 
+  (fact "with unknown mappings"
+    (fact "by default, exception is thrown"
+      (properties {:a String
+                   :b java.util.Vector}) => (throws IllegalArgumentException))
+    (fact "unknown fields are ignored ig *ignore-missing-mappings* is set"
+      (binding [*ignore-missing-mappings* true]
+        (keys (properties {:a String
+                           :b java.util.Vector})) => [:a])))
+
   (fact "Keeps the order of properties intact"
     (keys (properties (ordered-map :a String
                                    :b String
@@ -110,4 +132,14 @@
     (properties (with-named-sub-schemas (ordered-map :a String
                                                      :b {:foo String}
                                                      :c [{:bar String}])))
-    => anything))
+    => anything)
+
+  (fact "referenced record-schemas"
+    (s/defschema Foo (s/enum :one :two))
+    (s/defschema Bar {:key Foo})
+
+    (fact "can't get properties out of record schemas"
+      (properties Foo)) => (throws AssertionError)
+
+    (fact "nested properties work ok"
+      (keys (properties Bar)) => [:key])))

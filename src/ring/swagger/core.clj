@@ -5,14 +5,14 @@
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [schema.macros :as sm]
-            [plumbing.core :refer :all]
+            [plumbing.core :refer :all :exclude [update]]
             [schema.utils :as su]
             [ring.swagger.schema :as schema]
             [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [ring.swagger.spec :as spec]
-            [cheshire.generate :refer [add-encoder]])
+            [cheshire.generate :refer [add-encoder]]
+            [org.tobereplaced.lettercase :as lc])
   (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 ;;
@@ -50,13 +50,7 @@
 ;; Schema transformations
 ;;
 
-(defn- plain-map?
-  [x]
-  (or
-    (instance? clojure.lang.APersistentMap x)
-    (instance? flatland.ordered.map.OrderedMap x)))
-
-(defn- full-name [path] (->> path (map name) (map ->CamelCase) (apply str) symbol))
+(defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 (defn- collect-schemas [keys schema]
   (cond
     (plain-map? schema)
@@ -95,7 +89,9 @@
   (let [schemas (atom {})]
     (walk/prewalk
       (fn [x]
-        (when-let [schema (s/schema-name x)]
+        (when-let [schema (and
+                            (plain-map? x)
+                            (s/schema-name x))]
           (swap! schemas assoc schema (if (var? x) @x x)))
         x)
       x)
@@ -127,7 +123,10 @@
         all-models (->> (concat body-models return-models response-models)
                         flatten
                         (map with-named-sub-schemas))]
-    (into {} (map (juxt s/schema-name identity) all-models))))
+    (->> all-models
+         (map (juxt s/schema-name identity))
+         (filter (fn-> first))
+         (into {}))))
 
 ;;
 ;; Route generation
@@ -147,10 +146,10 @@
 
 (defn generate-nick [{:keys [method uri]}]
   (-> (str (name method) " " uri)
-      (str/replace #"/" " ")
-      (str/replace #"-" "_")
-      (str/replace #":" " by ")
-      ->camelCase))
+    (str/replace #"/" " ")
+    (str/replace #"-" "_")
+    (str/replace #":" " by ")
+    lc/mixed))
 
 (def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
 (def resource-defaults     {:produces ["application/json"]
@@ -251,76 +250,4 @@
                                   :responseMessages (convert-response-messages responseMessages)
                                   :parameters (convert-parameters parameters)})]})}))))
 
-;;
-;; 2.0
-;;
 
-(def Anything {s/Keyword s/Any})
-(def Nothing {})
-
-(s/defschema Operation (-> spec/Operation
-                           (schema-dissoc :parameters)
-                           (assoc :parameters {(s/optional-key :body) s/Any
-                                               (s/optional-key :query) s/Any
-                                               (s/optional-key :path) s/Any
-                                               (s/optional-key :header) s/Any
-                                               (s/optional-key :form) s/Any})
-                           (assoc :method (s/enum :get :put :post :delete :options :head :patch))))
-
-(s/defschema Swagger (-> spec/Swagger
-                         (dissoc :paths :definitions)
-                         (assoc :paths {s/Str [Operation]})))
-
-;;
-;; defaults
-;;
-
-; TODO: implement
-(defn extract-path-and-definitions [swagger])
-
-(defn swagger-json [swagger]
-  (let [[paths definitions] (extract-path-and-definitions swagger)]
-    (-> swagger
-        (assoc :paths paths)
-        (assoc :definitions definitions))))
-
-;;
-;; spike
-;;
-
-(def swagger {:swagger 2.0
-              :info {:version "version"
-                     :title "title"
-                     :description "description"
-                     :termsOfService "jeah"
-                     :contact {:name "name"
-                               :url "url"
-                               :email "email"}
-                     :licence {:name "name"
-                               :url "url"}
-                     :x-kikka "jeah"}
-              :basePath "/"
-              :consumes ["application/json" "application/edn"]
-              :produces ["application/json" "application/edn"]
-              :paths {"/api/:id" [{:method :get
-                                   :tags [:tag1 :tag2 :tag3]
-                                   :summary "summary"
-                                   :description "description"
-                                   :externalDocs {:url "url"
-                                                  :description "more info"}
-                                   :operationId "operationId"
-                                   :consumes ["application/xyz"]
-                                   :produces ["application/xyz"]
-                                   :parameters {:body Nothing
-                                                :query (merge Anything {:x Long :y Long})
-                                                :path {:id String}
-                                                :header Anything
-                                                :form Anything}
-                                   :responses {200 {:description "ok"
-                                                    :schema {:sum Long}}
-                                               :default {:description "error"
-                                                         :schema {:code Long}}}}]}})
-
-(s/validate Swagger swagger)
-
-#_(s/validate spec/Swagger (swagger-json swagger))

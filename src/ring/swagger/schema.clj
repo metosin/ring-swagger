@@ -3,28 +3,14 @@
             [schema.coerce :as sc]
             [schema.utils :as su]
             [potemkin :refer [import-vars]]
-            [clojure.pprint :as pprint]
             [slingshot.slingshot :refer [throw+]]
+            [org.tobereplaced.lettercase :as lc]
             [ring.swagger.common :refer :all]
             [ring.swagger.impl :refer :all]
             [ring.swagger.coerce :as coerce]
-            ring.swagger.json-schema)
-  (:import  [java.io StringWriter]
-            [java.util Date UUID]
-            [org.joda.time DateTime LocalDate]))
+            ring.swagger.json-schema))
 
 (def Keyword  s/Keyword)
-
-;;
-;; Internals
-;;
-
-(defn- plain-map? [x]
-  (and (instance? clojure.lang.APersistentMap x) ;; need to filter out Schema records
-       (not (s/schema-name x)))) ;; and predefined models
-
-(defn- sub-model-symbol [model k]
-  (symbol (str model (->CamelCase (name (s/explicit-schema-key k))))))
 
 (defn extract-schema-name
   "Returns model name or nil"
