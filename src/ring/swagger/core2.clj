@@ -146,9 +146,11 @@
 
 (defn swagger-json [swagger]
   (let [[paths definitions] (extract-paths-and-definitions swagger)]
-    (-> swagger
-        (assoc :paths paths)
-        (assoc :definitions definitions))))
+    (merge
+     swagger-defaults
+     (-> swagger
+          (assoc :paths paths)
+          (assoc :definitions definitions)))))
 
 ;;
 ;; For dev
