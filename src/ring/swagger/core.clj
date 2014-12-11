@@ -5,14 +5,14 @@
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [schema.macros :as sm]
-            [plumbing.core :refer :all]
+            [plumbing.core :refer :all :exclude [update]]
             [schema.utils :as su]
             [ring.swagger.schema :as schema]
             [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [ring.swagger.spec :as spec]
-            [cheshire.generate :refer [add-encoder]])
+            [cheshire.generate :refer [add-encoder]]
+            [org.tobereplaced.lettercase :as lc])
   (:import [com.fasterxml.jackson.core JsonGenerator]))
 
 
@@ -47,13 +47,7 @@
 ;; Schema transformations
 ;;
 
-(defn- plain-map?
-  [x]
-  (or
-    (instance? clojure.lang.APersistentMap x)
-    (instance? flatland.ordered.map.OrderedMap x)))
-
-(defn- full-name [path] (->> path (map name) (map ->CamelCase) (apply str) symbol))
+(defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 (defn- collect-schemas [keys schema]
   (cond
     (plain-map? schema)
@@ -92,7 +86,9 @@
   (let [schemas (atom {})]
     (walk/prewalk
       (fn [x]
-        (when-let [schema (s/schema-name x)]
+        (when-let [schema (and
+                            (plain-map? x)
+                            (s/schema-name x))]
           (swap! schemas assoc schema (if (var? x) @x x)))
         x)
       x)
@@ -124,7 +120,10 @@
         all-models (->> (concat body-models return-models response-models)
                         flatten
                         (map with-named-sub-schemas))]
-    (into {} (map (juxt s/schema-name identity) all-models))))
+    (->> all-models
+         (map (juxt s/schema-name identity))
+         (filter (fn-> first))
+         (into {}))))
 
 ;;
 ;; Route generation
@@ -144,10 +143,10 @@
 
 (defn generate-nick [{:keys [method uri]}]
   (-> (str (name method) " " uri)
-      (str/replace #"/" " ")
-      (str/replace #"-" "_")
-      (str/replace #":" " by ")
-      ->camelCase))
+    (str/replace #"/" " ")
+    (str/replace #"-" "_")
+    (str/replace #":" " by ")
+    lc/mixed))
 
 (def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
 (def resource-defaults     {:produces ["application/json"]

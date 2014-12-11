@@ -99,12 +99,12 @@
 (s/defschema RootModel
   {:sub {:foo Long}})
 
-(fact "with-named-sub-schemas"
-  (fact "add :name meta-data to sub-schemas"
-    (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+;; (fact "with-named-sub-schemas"
+;;   (fact "add :name meta-data to sub-schemas"
+;;     (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
 
-  (fact "Keeps the order"
-    (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
+;;   (fact "Keeps the order"
+;;     (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
 
 ;; (fact "collect-models"
 ;;   (fact "Sub-schemas are collected"

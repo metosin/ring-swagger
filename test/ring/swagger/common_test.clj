@@ -1,7 +1,7 @@
 (ns ring.swagger.common-test
   (:require [midje.sweet :refer :all]
             [ring.swagger.common :refer :all]
-            [schema.core :as s]))
+            [flatland.ordered.map :as om]))
 
 (fact "remove-empty-keys"
   (remove-empty-keys {:a nil :b false :c 0}) => {:b false :c 0})
@@ -21,7 +21,7 @@
   (value-of Abba)   => "jabba"
   (value-of 'Abba)  => "jabba"
   (value-of #'Abba) => "jabba"
-  (value-of :abba   => :abba))
+  (value-of :abba)   => :abba)
 
 (fact "extractors"
 
@@ -41,5 +41,9 @@
   (fact "extract none"
     (extract-parameters [..any..]) => [{} [..any..]]))
 
-(fact "schema-dissoc removes keys weather they are plain, optional or required"
-  (schema-dissoc {:a 1 :b 1 (s/optional-key :c) 1 (s/required-key :d) 1} :b :c :d) => {:a 1})
+(defrecord ARecord [x])
+
+(fact "plain-map?"
+  (plain-map? {}) => true
+  (plain-map? (->ARecord 1)) => false
+  (plain-map? (om/ordered-map :a 1)) => true)

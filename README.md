@@ -42,8 +42,9 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
-| `Long`, `s/Int`        | integer, int64 | `1`|
-| `Double`                    | number, double | `1.2`
+| `Integer` | integer, int32 | `1` |
+| `Long`, `s/Int` | integer, int64 | `1` |
+| `Double`, `Number, `s/Num`  | number, double | `1.2`
 | `String`, `s/Str`, Keyword, `s/Keyword`      | string | `"kikka"`
 | `Boolean`                   | boolean | `true`
 | `nil`, `s/Any`              | void |
@@ -53,18 +54,25 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 | `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
 | `(s/maybe X)`          | *type of X*
 | `(s/both X Y Z)`       | *type of X*
+| `(s/named X name)`     | *type of X*
 | `(s/recursive Var)`    | *Ref to (model) Var*
 | `(s/eq X)`    | *type of class of X*
 | `(s/optional-key X)`    | *optional key*
 | `(s/required-key X)`    | *required key*
 | `s/Keyword` (as a key)  | *ignored in visualizations*
 
-
-
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references
     - Nested maps can be within valid containers (as only element - heregenous schema sequences not supported by the spec)
+
+### Missing Schema elements
+
+If ring-swagger can't transform the Schemas into JSON Schemas,
+by default a `IllegalArgumentException` will be thrown. By binding
+`ring.swagger.json-schema/*ignore-missing-mappings*` to true, one
+can ingore the errors (missing schema elements will be ignored from
+the generated JSON Schema).
 
 ### Schema elements supported by `ring.swagger.json-schema-dirty`
 

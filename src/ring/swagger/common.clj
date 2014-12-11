@@ -1,7 +1,5 @@
 (ns ring.swagger.common
-  (:require [plumbing.core :refer [fn->]]
-            [schema.core :as s]
-            [camel-snake-kebab.core :as csk]))
+  (:require [plumbing.core :refer [fn->]]))
 
 (defn remove-empty-keys
   "removes empty keys from a map"
@@ -44,9 +42,6 @@
         [parameters form])
       [{} c])))
 
-(defn ->CamelCase [x] (csk/->CamelCase x))
-(defn ->camelCase [x] (csk/->camelCase x))
-
-(defn schema-dissoc
-  "dissociates keys from schema"
-  [m & ks] (reduce dissoc m (for [k ks, k [k (s/optional-key k)]] k)))
+(defn plain-map?
+  "checks whether input is a map, but not a record"
+  [x] (and (map? x) (not (record? x))))
