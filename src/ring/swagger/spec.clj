@@ -132,7 +132,7 @@
 ;; spike
 ;;
 
-(s/validate Swagger
+#_(s/validate Swagger
             {:swagger 2.0
              :info {:version "version"
                     :title "title"
