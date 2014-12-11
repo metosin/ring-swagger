@@ -15,6 +15,9 @@
             [org.tobereplaced.lettercase :as lc])
   (:import [com.fasterxml.jackson.core JsonGenerator]))
 
+;;
+;; Models
+;;
 
 (s/defschema Route {:method   s/Keyword
                     :uri      [s/Any]
