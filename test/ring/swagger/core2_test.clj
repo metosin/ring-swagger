@@ -99,6 +99,7 @@
 (s/defschema RootModel
   {:sub {:foo Long}})
 
+;; TODO needed?
 ;; (fact "with-named-sub-schemas"
 ;;   (fact "add :name meta-data to sub-schemas"
 ;;     (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
@@ -106,16 +107,17 @@
 ;;   (fact "Keeps the order"
 ;;     (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
 
-;; (fact "collect-models"
-;;   (fact "Sub-schemas are collected"
-;;     (collect-models Pet)
-;;     => {'Pet Pet
-;;         'Tag Tag
-;;         'Category Category})
+(fact "collect-models"
+  (fact "Sub-schemas are collected"
+    (collect-models Pet)
+    => {'Pet Pet
+        'Tag Tag
+        'Category Category})
 
-;;   (fact "No schemas are collected if all are unnamed"
-;;     (collect-models String) => {})
+  (fact "No schemas are collected if all are unnamed"
+    (collect-models String) => {}))
 
+;;   TODO needed?
 ;;   (fact "Inline-sub-schemas as collected after they are nameed"
 ;;     (collect-models (with-named-sub-schemas RootModel))
 ;;     => {'RootModel RootModel
@@ -125,15 +127,16 @@
 ;;     (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
 ;;       (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
 
-;; (fact "transform-models"
-;;   (transform-models [Pet]) => {'Pet Pet'
-;;                                'Tag Tag'
-;;                                'Category Category'})
+(fact "transform-models"
+  (transform-models [Pet]) => {:Pet Pet'
+                               :Tag Tag'
+                               :Category Category'})
 
-;; ;;
-;; ;; Route generation
-;; ;;
+;;
+;; Route generation
+;;
 
+;; TODO needed?
 ;; (tabular
 ;;   (fact path-params
 ;;     (path-params ?input) => ?output)
@@ -150,9 +153,9 @@
 ;;                                                                    :kikka java.lang.String}}
 ;;   (string-path-parameters "/api/ping") => nil)
 
-;; (s/defschema Query {:id Long (s/optional-key :q) String})
-;; (s/defschema Body {:name String :age Long})
-;; (s/defschema Path {:p Long})
+(s/defschema Query {:id Long (s/optional-key :q) String})
+(s/defschema Body {:name String :age Long})
+(s/defschema Path {:p Long})
 
 ;; (fact "convert-parameters"
 
@@ -185,6 +188,48 @@
 ;;                             :paramType :path
 ;;                             :required true
 ;;                             :type "integer"}])
+
+(fact "convert-parameters"
+
+  (fact "all parameter types can be converted"
+    (convert-parameters
+      {:body   Pet
+       :query  Query 
+       :path   {:p Long}
+       :header {:h String}
+       :form   {:f Integer}}) => [{:name        "Pet"
+                                   :in          :body
+                                   :description ""
+                                   :required    true
+                                   :schema      "#/definitions/Pet"}
+                                  {:name        "id"
+                                   :in          :query
+                                   :description ""
+                                   :required    true
+                                   :type        "integer"
+                                   :format      "int64"}
+                                  {:name        "q"
+                                   :in          :query
+                                   :description ""
+                                   :required    false
+                                   :type        "string"}
+                                  {:name        "p"
+                                   :in          :path
+                                   :description ""
+                                   :required    true
+                                   :type        "integer"
+                                   :format      "int64"}
+                                  {:name        "h"
+                                   :in          :header
+                                   :description ""
+                                   :required    true
+                                   :type        "string"}
+                                  {:name        "f"
+                                   :in          :form
+                                   :description ""
+                                   :required    true
+                                   :type        "integer"
+                                   :format      "int32"}]))
 
 ;;   (fact "anonymous schemas can be used with ..."
 
