@@ -4,6 +4,7 @@
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
             [ring.swagger.core2 :refer :all]
+            [ring.swagger.core :as core]
             [flatland.ordered.map :refer :all])
   (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
@@ -47,14 +48,14 @@
 ;; Excepcted JSON Schemas
 ;;
 
-(def Tag' 
+(def Tag'
   {:properties {:id {:type "integer"
                      :format "int64"
                      :description "Unique identifier for the tag"}
                 :name {:type "string"
                        :description "Friendly name for the tag"}}})
 
-(def Category' 
+(def Category'
   {:properties {:id {:type "integer"
                       :format "int64"
                       :description "Category unique identifier"
@@ -63,7 +64,7 @@
                  :name {:type "string"
                         :description "Name of the category"}}})
 
-(def Pet' 
+(def Pet'
   {:required [:id :name]
    :properties {:id {:type "integer"
                      :format "int64"
@@ -84,9 +85,10 @@
                          :description "pet status in the store"
                          :enum [:pending :sold :available]}}})
 
-(def PetError' {:id 'PetError
-                :required [:message]
-                :properties {:message {:type "string"}}})
+(def PetError'
+  {:required [:message]
+   :properties {:message {:type "string"}}})
+
 ;;
 ;; Facts
 ;;
@@ -99,92 +101,64 @@
 (s/defschema RootModel
   {:sub {:foo Long}})
 
-;; (fact "with-named-sub-schemas"
-;;   (fact "add :name meta-data to sub-schemas"
-;;     (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+(fact "with-named-sub-schemas"
+   (fact "add :name meta-data to sub-schemas"
+     (meta (:sub (core/with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
 
-;;   (fact "Keeps the order"
-;;     (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
+   (fact "Keeps the order"
+     (keys (core/with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
 
-;; (fact "collect-models"
-;;   (fact "Sub-schemas are collected"
-;;     (collect-models Pet)
-;;     => {'Pet Pet
-;;         'Tag Tag
-;;         'Category Category})
+(fact "collect-models"
+  (fact "Sub-schemas are collected"
+    (collect-models Pet)
+    => {'Pet Pet
+        'Tag Tag
+        'Category Category})
 
-;;   (fact "No schemas are collected if all are unnamed"
-;;     (collect-models String) => {})
+   (fact "No schemas are collected if all are unnamed"
+     (collect-models String) => {})
 
-;;   (fact "Inline-sub-schemas as collected after they are nameed"
-;;     (collect-models (with-named-sub-schemas RootModel))
-;;     => {'RootModel RootModel
-;;         'RootModelSub (:sub RootModel)})
+   (fact "Inline-sub-schemas as collected after they are nameed"
+     (collect-models (core/with-named-sub-schemas RootModel))
+     => {'RootModel RootModel
+         'RootModelSub (:sub RootModel)})
 
-;;   (fact "Described anonymous models are collected"
-;;     (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
-;;       (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
+   (fact "Described anonymous models are collected"
+     (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
+       (keys (collect-models (core/with-named-sub-schemas schema))) => (two-of symbol?))))
 
-;; (fact "transform-models"
-;;   (transform-models [Pet]) => {'Pet Pet'
-;;                                'Tag Tag'
-;;                                'Category Category'})
+(s/defschema Body {:name String :age Long})
 
-;; ;;
-;; ;; Route generation
-;; ;;
+#_(fact "convert-parameters"
 
-;; (tabular
-;;   (fact path-params
-;;     (path-params ?input) => ?output)
-;;   ?input                        ?output
-;;   "/api/:kikka/:kakka/:kukka"   [:kikka :kakka :kukka]
-;;   "/api/:kikka/kakka/:kukka"    [:kikka :kukka]
-;;   "/:foo-bar/:foo_bar"          [:foo-bar :foo_bar]
-;;   "/api/ping"                   empty?)
+   (fact "all parameter types can be converted"
+     (convert-parameters
+       {:query (merge Anything {:id Long (s/optional-key :q) String})
+        :path  {:name String :age Long}
+        :body  Body})
 
-;; (fact "string-path-parameters"
-;;   (string-path-parameters "/api/:kikka/:kakka/:kukka") => {:type :path
-;;                                                            :model {:kukka java.lang.String
-;;                                                                    :kakka java.lang.String
-;;                                                                    :kikka java.lang.String}}
-;;   (string-path-parameters "/api/ping") => nil)
-
-;; (s/defschema Query {:id Long (s/optional-key :q) String})
-;; (s/defschema Body {:name String :age Long})
-;; (s/defschema Path {:p Long})
-
-;; (fact "convert-parameters"
-
-;;   (fact "all parameter types can be converted"
-;;     (convert-parameters
-;;       [{:model Query
-;;         :type :query}
-;;        {:model Body
-;;         :type :body}
-;;        {:model Path
-;;         :type :path}]) => [{:name "id"
-;;                             :description ""
-;;                             :format "int64"
-;;                             :paramType :query
-;;                             :required true
-;;                             :type "integer"}
-;;                            {:name "q"
-;;                             :description ""
-;;                             :paramType :query
-;;                             :required false
-;;                             :type "string"}
-;;                            {:name "body"
-;;                             :description ""
-;;                             :paramType :body
-;;                             :required true
-;;                             :type 'Body}
-;;                            {:name "p"
-;;                             :description ""
-;;                             :format "int64"
-;;                             :paramType :path
-;;                             :required true
-;;                             :type "integer"}])
+     => (contains [{:name             "id"
+                    :description ""
+                    :format      "int64"
+                    :in          :query
+                    :required    true
+                    :type        "integer"}
+                   {:name "q"
+                    :description ""
+                    :in :query
+                    :required false
+                    :type "string"}
+                   {:name "body"
+                    :description ""
+                    :in :body
+                    :required true
+                    :schema {:$ref "#/definitions/Body"}}
+                   {:name "p"
+                    :description ""
+                    :format "int64"
+                    :in :path
+                    :required true
+                    :type "integer"} :in-any-order])))
 
 ;;   (fact "anonymous schemas can be used with ..."
 
@@ -441,32 +415,3 @@
 ;;                                   :type "array"
 ;;                                   :items {:type "string"}}]
 ;;                     :path "/primitiveArray"}]})))
-
-;; ;;
-;; ;; Web stuff
-;; ;;
-
-;; (fact join-paths
-;;   (join-paths "/foo" nil "index.html") => "/foo/index.html"
-;;   (join-paths nil "/foo/" "index.html") => "/foo/index.html"
-;;   (join-paths nil "" "/foo" "" "" "index.html") => "/foo/index.html"
-;;   (join-paths "/foo" "") => "/foo")
-
-;; (fact "(servlet-)context"
-;;   (context {}) => ""
-;;   (context {:servlet-context (fake-servlet-context "/kikka")}) => "/kikka")
-
-;; (fact "basepath"
-;;   (fact "http"
-;;     (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 80 :headers {}}) => "http://www.metosin.fi"
-;;     (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 8080 :headers {}}) => "http://www.metosin.fi:8080")
-;;   (fact "https"
-;;     (basepath {:scheme "https" :server-name "www.metosin.fi" :server-port 443 :headers {}}) => "https://www.metosin.fi"
-;;     (basepath {:scheme "https" :server-name "www.metosin.fi" :server-port 8443 :headers {}}) => "https://www.metosin.fi:8443")
-;;   (fact "with servlet-context"
-;;     (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 80 :headers {} :servlet-context (fake-servlet-context "/kikka")}) => "http://www.metosin.fi/kikka")
-;;   (fact "x-forwarded-proto"
-;;     (fact "we trust the given 'x-forwarded-proto'"
-;;       (basepath {:scheme "http" :server-name "www.metosin.fi" :server-port 443 :headers {"x-forwarded-proto" "https"}}) => "https://www.metosin.fi")
-;;     (fact "can't fake the protocol from https to http"
-;;       (basepath {:scheme "https" :server-name "www.metosin.fi" :server-port 443 :headers {"x-forwarded-proto" "http"}}) => "https://www.metosin.fi")))

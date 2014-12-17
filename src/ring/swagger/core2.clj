@@ -4,17 +4,10 @@
             [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
-            [schema.macros :as sm]
             [plumbing.core :refer :all]
-            [schema.utils :as su]
-            [ring.swagger.schema :as schema]
-            [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [ring.swagger.spec :as spec]
-            [cheshire.generate :refer [add-encoder]])
-  (:import [com.fasterxml.jackson.core JsonGenerator]))
-
+            [ring.swagger.core :as core]))
 
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
@@ -49,8 +42,11 @@
                              (map :responses)
                              (mapcat vals)
                              (map :schema)
+                             flatten
                              (filter requires-definition?))
-        all-models      (concat body-models response-models)]
+        all-models      (->> (concat body-models response-models)
+                             flatten
+                             (map core/with-named-sub-schemas))]
     (distinct all-models)))
 
 (defn transform [schema]
@@ -152,114 +148,6 @@
           (assoc :paths paths)
           (assoc :definitions definitions)))))
 
-;;
-;; For dev
-;;
-
 ;; https://github.com/swagger-api/swagger-spec/blob/master/schemas/v2.0/schema.json
 ;; https://github.com/swagger-api/swagger-spec/blob/master/examples/v2.0/json/petstore.json
 ;; https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
-
-#_(def swagger {:swagger 2.0
-              :info {:version "version"
-                     :title "title"
-                     :description "description"
-                     :termsOfService "jeah"
-                     :contact {:name "name"
-                               :url "url"
-                               :email "email"}
-                     :licence {:name "name"
-                               :url "url"}
-                     :x-kikka "jeah"}
-              :basePath "/"
-              :consumes ["application/json" "application/edn"]
-              :produces ["application/json" "application/edn"]
-              :paths {"/api/:id" [{:method :get
-                                   :tags [:tag1 :tag2 :tag3]
-                                   :summary "summary"
-                                   :description "description"
-                                   :externalDocs {:url "url"
-                                                  :description "more info"}
-                                   :operationId "operationId"
-                                   :consumes ["application/xyz"]
-                                   :produces ["application/xyz"]
-                                   :parameters {:body Nothing
-                                                :query (merge Anything {:x Long :y Long})
-                                                :path {:id String}
-                                                :header Anything
-                                                :form Anything}
-                                   :responses {200 {:description "ok"
-                                                    :schema {:sum Long}}
-                                               :default {:description "error"
-                                                         :schema {:code Long}}}}]}})
-
-
-#_(s/defschema LegOfPet {:length Long})
-
-#_(s/defschema Pet {:id Long
-                  :name String
-                  :leg LegOfPet
-                  (s/optional-key :weight) Double})
-#_(s/defschema NotFound {:message s/Str})
-
-;; TODO how to define descriptions for params
-;; TODO :form or :formData here 
-#_(def swagger-with-models {:swagger 2.0
-              :info {:version "version"
-                     :title "title"
-                     :description "description"
-                     :termsOfService "jeah"
-                     :contact {:name "name"
-                               :url "url"
-                               :email "email"}
-                     :licence {:name "name"
-                               :url "url"}
-                     :x-kikka "jeah"}
-              :basePath "/"
-              :consumes ["application/json" "application/edn"]
-              :produces ["application/json" "application/edn"]
-              :paths {"/api/:id" [{:method :get
-                                   :tags [:tag1 :tag2 :tag3]
-                                   :summary "summary"
-                                   :description "description"
-                                   :externalDocs {:url "url"
-                                                  :description "more info"}
-                                   :operationId "operationId"
-                                   :consumes ["application/xyz"]
-                                   :produces ["application/xyz"]
-                                   :parameters {:body Nothing
-                                                :query (merge Anything {:x Long :y Long})
-                                                :path {:id String}
-                                                :header Anything
-                                                :form Anything}
-                                   :responses {200 {:description "ok"
-                                                    :schema {:sum Long}}
-                                               400 {:description "not found"
-                                                    :schema NotFound}
-                                               :default {:description "error"
-                                                         :schema {:code Long}}}}]
-                      "/api/pets" [{:method :get
-                                   :parameters {:body Pet
-                                                :query (merge Anything {:x Long :y Long})
-                                                :path {:id String}
-                                                :header Anything
-                                                :form Anything}
-                                   :responses {200 {:description "ok"
-                                                    :schema {:sum Long}}
-                                               :default {:description "error"
-                                                         :schema {:code Long}}}}
-                                   {:method :post
-                                    :parameters {:body Pet
-                                                 :query (merge Anything {:x Long :y Long})
-                                                 :path {:id String}
-                                                 :header Anything
-                                                 :form Anything}
-                                    :responses {200 {:description "ok"
-                                                     :schema {:sum Long}}
-                                                :default {:description "error"
-                                                          :schema {:code Long}
-                                                          #_#_:headers {:Access-Control-Allow-Origin {:description "CORS Header"
-                                                                                                      :type        :string}}
-                                                          }}}]}})
-
-#_(s/validate spec/Swagger (swagger-json swagger-with-models))
