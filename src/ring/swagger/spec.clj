@@ -48,6 +48,8 @@
 ; TODO
 (s/defschema Schema s/Any)
 
+(s/defschema Ref {:$ref s/Str})
+
 (s/defschema Parameter
              (s/either
                (merge
@@ -56,8 +58,7 @@
                   :in (s/enum :query, :header, :path, :formData)
                   (s/optional-key :description) s/Str
                   (s/optional-key :required) s/Bool
-                  (s/optional-key :type) #_(s/enum :string, :number, :boolean, :integer, :array)
-                                         (s/enum "string" "number" "boolean" "integer" "array" "file")
+                  (s/optional-key :type) (s/enum "string" "number" "boolean" "integer" "array" "file")
                   (s/optional-key :format) s/Str
                   (s/optional-key :items) s/Any ; TODO: https://github.com/reverb/swagger-spec/blob/master/schemas/v2.0/schema.json#L401
                   (s/optional-key :collectionFormat) s/Str})
@@ -67,7 +68,11 @@
                   :in (s/enum :body)
                   (s/optional-key :description) s/Str
                   (s/optional-key :required) s/Bool
-                  (s/optional-key :schema) String}))) ; TODO: should be a valid model ref
+                  (s/optional-key :schema) (s/either
+                                             Ref
+                                             {:type (s/enum "array")
+                                              (s/optional-key :uniqueItems) s/Bool
+                                              :items [Ref]})})))
 
 (s/defschema Response {:description s/Str
                        (s/optional-key :schema) Schema
@@ -78,8 +83,6 @@
                          ;VendorExtension TODO: More than one non-optional/required key schemata
                          {(s/pred valid-response-key?) Response}))
 
-
-(s/defschema Ref {:$ref s/Str})
 
 (s/defschema Operation {(s/optional-key :tags) [Tag]
                         (s/optional-key :summary) s/Str

@@ -2,7 +2,8 @@
   (:require [schema.core :as s]
             [ring.swagger.core2 :refer :all]
             [ring.swagger.spec :as spec]
-            [midje.sweet :refer :all]))
+            [midje.sweet :refer :all]
+            [clojure.pprint :refer [pprint]]))
 
 (s/defschema LegOfPet {:length Long})
 
@@ -16,8 +17,6 @@
 
 (s/defschema NotFound {:message s/Str})
 
-;; TODO how to define descriptions for params
-;; TODO :form or :formData here
 (def swagger-with-models
   {:swagger 2.0
    :info {:version "version"
@@ -46,7 +45,7 @@
                                      :query (merge Anything {:x Long :y Long})
                                      :path {:id String}
                                      :header Anything
-                                     :form Anything}
+                                     :formData Anything}
                         :responses {200 {:description "ok"
                                          :schema {:sum Long}}
                                     400 {:description "not found"
@@ -58,7 +57,7 @@
                                          :query Anything
                                          :path {}
                                          :header Anything
-                                         :form Anything}
+                                         :formData Anything}
                             :responses {200 {:schema Parrot
                                              :description ""}}}]
            "/api/pets" [{:method :get
@@ -66,7 +65,7 @@
                                       :query (merge Anything {:x Long :y Long})
                                       :path {:id String}
                                       :header Anything
-                                      :form Anything}
+                                      :formData Anything}
                          :responses {200 {:description "ok"
                                           :schema {:sum Long}}
                                      :default {:description "error"
@@ -76,7 +75,7 @@
                                       :query (merge Anything {:x Long :y Long})
                                       :path {:id String}
                                       :header Anything
-                                      :form Anything}
+                                      :formData Anything}
                          :responses {200 {:description "ok"
                                           :schema {:sum Long}}
                                      :default {:description "error"
@@ -85,7 +84,7 @@
                                                                                            :type        :string}}
                                                }}}]}})
 
-(./pprint (swagger-json swagger-with-models))
+#_(clojure.pprint/pprint (swagger-json swagger-with-models))
 
 (fact "swagger 2.0 spec"
   (s/check spec/Swagger (swagger-json swagger-with-models)) => nil)

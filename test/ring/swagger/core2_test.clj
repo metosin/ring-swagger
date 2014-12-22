@@ -4,7 +4,6 @@
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
             [ring.swagger.core2 :refer :all]
-            [ring.swagger.core :as core]
             [flatland.ordered.map :refer :all])
   (:import  [java.util Date UUID]
             [org.joda.time DateTime LocalDate]))
@@ -103,10 +102,10 @@
 
 (fact "with-named-sub-schemas"
    (fact "add :name meta-data to sub-schemas"
-     (meta (:sub (core/with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+     (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
 
    (fact "Keeps the order"
-     (keys (core/with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
+     (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
 
 (fact "collect-models"
   (fact "Sub-schemas are collected"
@@ -119,116 +118,135 @@
      (collect-models String) => {})
 
    (fact "Inline-sub-schemas as collected after they are nameed"
-     (collect-models (core/with-named-sub-schemas RootModel))
+     (collect-models (with-named-sub-schemas RootModel))
      => {'RootModel RootModel
          'RootModelSub (:sub RootModel)})
 
    (fact "Described anonymous models are collected"
      (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
-       (keys (collect-models (core/with-named-sub-schemas schema))) => (two-of symbol?))))
+       (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
 
+(s/defschema Query {:id Long (s/optional-key :q) String})
+(s/defschema Path {:p Long})
 (s/defschema Body {:name String :age Long})
 
-#_(fact "convert-parameters"
+(fact "convert-parameters"
 
-   (fact "all parameter types can be converted"
-     (convert-parameters
-       {:query (merge Anything {:id Long (s/optional-key :q) String})
-        :path  {:name String :age Long}
-        :body  Body})
+  (fact "all parameter types can be converted"
+    (convert-parameters
+     {:body     Pet
+      :query    Query 
+      :path     Path
+      :header   {:h String}
+      :formData {:f Integer}}) => [{:name       "Pet"
+                                   :in          :body
+                                   :description ""
+                                   :required    true
+                                   :schema      {:$ref "#/definitions/Pet"}}
+                                  {:name        "id"
+                                   :in          :query
+                                   :description ""
+                                   :required    true
+                                   :type        "integer"
+                                   :format      "int64"}
+                                  {:name        "q"
+                                   :in          :query
+                                   :description ""
+                                   :required    false
+                                   :type        "string"}
+                                  {:name        "p"
+                                   :in          :path
+                                   :description ""
+                                   :required    true
+                                   :type        "integer"
+                                   :format      "int64"}
+                                  {:name        "h"
+                                   :in          :header
+                                   :description ""
+                                   :required    true
+                                   :type        "string"}
+                                  {:name        "f"
+                                   :in          :formData
+                                   :description ""
+                                   :required    true
+                                   :type        "integer"
+                                   :format      "int32"}])
 
-     => (contains [{:name             "id"
-                    :description ""
-                    :format      "int64"
-                    :in          :query
-                    :required    true
-                    :type        "integer"}
-                   {:name "q"
-                    :description ""
-                    :in :query
-                    :required false
-                    :type "string"}
-                   {:name "body"
-                    :description ""
-                    :in :body
-                    :required true
-                    :schema {:$ref "#/definitions/Body"}}
-                   {:name "p"
-                    :description ""
-                    :format "int64"
-                    :in :path
-                    :required true
-                    :type "integer"} :in-any-order])))
 
-;;   (fact "anonymous schemas can be used with ..."
 
-;;     (doseq [type [:query :path]]
-;;       (fact {:midje/description (str "... " type "-parameters")}
 
-;;         (convert-parameters
-;;           [{:type type
-;;             :model {s/Keyword s/Any
-;;                     :q String
-;;                     (s/optional-key :l) Long}}])
+  (fact "anonymous schemas can be used with ..."
 
-;;         => [{:name "q"
-;;              :description ""
-;;              :paramType type
-;;              :required true
-;;              :type "string"}
-;;             {:name "l"
-;;              :description ""
-;;              :format "int64"
-;;              :paramType type
-;;              :required false
-;;              :type "integer"}])))
+        (doseq [type [:query :path]]
+          (fact {:midje/description (str "... " type "-parameters")}
 
-;;   (fact "Array body parameters"
-;;     (convert-parameters
-;;       [{:type :body
-;;         :model [Body]}])
+                (convert-parameters
+                 {type {s/Keyword s/Any
+                        :q String
+                        (s/optional-key :l) Long}})
 
-;;     => [{:name "body"
-;;          :description ""
-;;          :paramType :body
-;;          :required true
-;;          :items {:$ref 'Body}
-;;          :type "array"}])
+                => [{:name "q"
+                     :description ""
+                     :in type
+                     :required true
+                     :type "string"}
+                    {:name "l"
+                     :description ""
+                     :format "int64"
+                     :in type
+                     :required false
+                     :type "integer"}])))
 
-;;   (fact "Body param with desc"
-;;     (convert-parameters [{:type :body
-;;                           :model (describe Body "foo")}])
-;;     => [{:description "foo" :name "body" :paramType :body :required true :type 'Body}]))
+  (fact "Array body parameters"
+        (convert-parameters
+         {:body [Body]})
+
+        => [{:name "Body"
+             :description ""
+             :in :body
+             :required true
+             :schema {:type  "array"
+                      :items {:$ref "#/definitions/Body"}}}])
+
+  (fact "Set body parameters"
+        (convert-parameters
+         {:body #{Body}})
+
+        => [{:name "Body"
+             :description ""
+             :in :body
+             :required true
+             :schema {:type        "array"
+                      :uniqueItems true
+                      :items       {:$ref "#/definitions/Body"}}}])
+  
+
+  (fact "Body param with desc"
+        (convert-parameters {:body (describe Body "foo")})
+        => [{:description "foo" :name "Body" :in :body :required true :schema {:$ref "#/definitions/Body"}}])
+
+  (fact "Array body param with desc"
+        (convert-parameters {:body [(describe Body "foo")]})
+        => [{:description "foo" :name "Body" :in :body :required true :schema {:type "array"
+                                                                               :items {:$ref "#/definitions/Body"}}}]))
 
 ;; ;;
 ;; ;; Helpers
 ;; ;;
 
-;; (fact "swagger-path"
-;;   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
+(fact "swagger-path"
+  (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
 
-;; (fact "generate-nick"
-;;   (generate-nick {:method :get
-;;                   :uri "/api/pizzas/:id"
-;;                   :metadata ..meta..}) => "getApiPizzasById"
-;;   (generate-nick {:method :delete
-;;                   :uri "/api/:version/pizzas/:id"
-;;                   :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
-;; (fact "extract-models"
-;;   (fact "returns both return and body-parameters but not query or path parameter types"
-;;     (extract-models {:routes [{:metadata {:return [Tag]
-;;                                           :parameters [{:model Tag
-;;                                                         :type :body}
-;;                                                        {:model [Category]
-;;                                                         :type :body}
-;;                                                        {:model Pet
-;;                                                         :type :path}
-;;                                                        {:model Pet
-;;                                                         :type :query}]}}
-;;                               {:metadata {:return Tag}}]})
-;;     => {'Category Category
-;;         'Tag Tag}))
+;; TODO returns only Category or Tag, not as distinct
+(fact "extract-models"
+  (fact "returns both return and body-parameters but not query or path parameter types"
+        (extract-models {:paths {"/foo" [{:method :get
+                                          :parameters {:body Category
+                                                       :query Pet
+                                                       :path Pet}
+                                          :responses {200 {:schema Tag}}}]}})
+        => [Category]))
 
 
 ;; (declare Bar)
