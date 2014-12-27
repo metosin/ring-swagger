@@ -1,6 +1,4 @@
-# Ring-Swagger
-
-[![Build Status](https://travis-ci.org/metosin/ring-swagger.png?branch=master)](https://travis-ci.org/metosin/ring-swagger)
+# Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.png?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Dependencies Status](http://jarkeeper.com/metosin/ring-swagger/status.png)](http://jarkeeper.com/metosin/ring-swagger)
 
 [Swagger](https://helloreverb.com/developers/swagger) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data models and coercion.
 
