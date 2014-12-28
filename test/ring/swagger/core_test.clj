@@ -358,7 +358,8 @@
                              {:swaggerVersion "1.2"
                               :apiVersion "0.0.1"
                               :apis []
-                              :info {}}))
+                              :info {}
+                              :authorizations {}}))
   (fact "with parameters"
     (api-listing {:apiVersion ...version...
                   :title ..title..
@@ -375,7 +376,8 @@
                                                                :contact ..contact..
                                                                :license ..licence..
                                                                :licenseUrl ..licenceUrl..}
-                                                        :apis []}))
+                                                        :apis []
+                                                        :authorizations {}}))
   (fact "apis"
     (fact "none"
       (api-listing ..map.. {}) => (has-apis []))
@@ -456,6 +458,7 @@
                                               :paramType :path
                                               :required true
                                               :type "string"}]
+                                :authorizations {}
                                 :summary ..summary..
                                 :type 'Pet}]
                   :path "/pets/{id}"}
@@ -468,6 +471,7 @@
                                               :paramType :query
                                               :required true
                                               :type "string"}]
+                                :authorizations {}
                                 :summary ..summary2..
                                 :type "array"
                                 :items {:$ref 'Pet}}]
@@ -498,6 +502,7 @@
                                   :notes ""
                                   :parameters []
                                   :responseMessages []
+                                  :authorizations {}
                                   :summary ""
                                   :type "string"}]
                     :path "/primitive"}
@@ -506,6 +511,7 @@
                                   :notes ""
                                   :parameters []
                                   :responseMessages []
+                                  :authorizations {}
                                   :summary ""
                                   :type "array"
                                   :items {:type "string"}}]
