@@ -198,7 +198,6 @@ wrapped into `s/both`.
 
 - web schema validation ("can this be transformed to json & back")
 - pluggable web schemas (protocol to define both json generation & coercion)
-- authorization
 - support for Files
 - full spec
 

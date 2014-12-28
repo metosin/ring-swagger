@@ -360,6 +360,7 @@
                               :apis []
                               :info {}
                               :authorizations {}}))
+
   (fact "with parameters"
     (api-listing {:apiVersion ...version...
                   :title ..title..
@@ -367,17 +368,21 @@
                   :termsOfServiceUrl ..terms..
                   :contact ..contact..
                   :license ..licence..
-                  :licenseUrl ..licenceUrl..} {}) => (has-body
-                                                       {:swaggerVersion "1.2"
-                                                        :apiVersion ...version...
-                                                        :info {:title ..title..
-                                                               :description ..description..
-                                                               :termsOfServiceUrl ..terms..
-                                                               :contact ..contact..
-                                                               :license ..licence..
-                                                               :licenseUrl ..licenceUrl..}
-                                                        :apis []
-                                                        :authorizations {}}))
+                  :licenseUrl ..licenceUrl..
+                  :authorizations {:not :validated}} {})
+
+    => (has-body
+         {:swaggerVersion "1.2"
+          :apiVersion ...version...
+          :info {:title ..title..
+                 :description ..description..
+                 :termsOfServiceUrl ..terms..
+                 :contact ..contact..
+                 :license ..licence..
+                 :licenseUrl ..licenceUrl..}
+          :apis []
+          :authorizations {:not :validated}}))
+
   (fact "apis"
     (fact "none"
       (api-listing ..map.. {}) => (has-apis []))
