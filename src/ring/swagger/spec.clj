@@ -72,7 +72,7 @@
                                              Ref
                                              {:type (s/enum "array")
                                               (s/optional-key :uniqueItems) s/Bool
-                                              :items [Ref]})})))
+                                              :items Ref})})))
 
 (s/defschema Response {:description s/Str
                        (s/optional-key :schema) Schema

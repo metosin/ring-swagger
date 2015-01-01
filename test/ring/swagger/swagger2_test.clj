@@ -55,15 +55,16 @@
            "/api/parrots" [{:method :get
                             :parameters {:body Nothing
                                          :query Anything
-                                         :path {}
+                                         :path Nothing
                                          :header Anything
                                          :formData Anything}
                             :responses {200 {:schema Parrot
-                                             :description ""}}}]
+                                             :description ""}}}
+                           ]
            "/api/pets" [{:method :get
                          :parameters {:body Pet
                                       :query (merge Anything {:x Long :y Long})
-                                      :path {:id String}
+                                      :path Nothing
                                       :header Anything
                                       :formData Anything}
                          :responses {200 {:description "ok"
@@ -71,18 +72,25 @@
                                      :default {:description "error"
                                                :schema {:code Long}}}}
                         {:method :post
-                         :parameters {:body Pet
+                         :parameters {:body #{Pet}
                                       :query (merge Anything {:x Long :y Long})
-                                      :path {:id String}
+                                      :path Nothing
                                       :header Anything
                                       :formData Anything}
                          :responses {200 {:description "ok"
                                           :schema {:sum Long}}
                                      :default {:description "error"
-                                               :schema {:code Long}
-                                               #_#_:headers {:Access-Control-Allow-Origin {:description "CORS Header"
-                                                                                           :type        :string}}
-                                               }}}]}})
+                                               :schema {:code Long}}}}
+                        {:method :put
+                         :parameters {:body [Pet]
+                                      :query (merge Anything {:x Long :y Long})
+                                      :path Nothing
+                                      :header Anything
+                                      :formData Anything}
+                         :responses {200 {:description "ok"
+                                          :schema {:sum Long}}
+                                     :default {:description "error"
+                                               :schema {:code Long}}}}]}})
 
 #_(clojure.pprint/pprint (swagger-json swagger-with-models))
 
