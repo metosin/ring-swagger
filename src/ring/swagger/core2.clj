@@ -3,6 +3,7 @@
             [clojure.walk :as walk]
             [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
+            [ring.swagger.core] ;; needed for the json-encoders
             [schema.core :as s]
             [plumbing.core :refer :all]
             [ring.swagger.common :refer :all]
@@ -38,8 +39,10 @@
 ;; Schema transformations
 ;;
 
+;; COPY from 1.2
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 
+;; COPY from 1.2
 (defn- collect-schemas [keys schema]
   (cond
     (plain-map? schema)
@@ -58,6 +61,7 @@
 
     :else schema))
 
+;; COPY from 1.2
 (defn with-named-sub-schemas
   "Traverses a schema tree of Maps, Sets and Sequences and add Schema-name to all
    anonymous maps between the root and any named schemas in thre tree. Names of the
@@ -147,7 +151,6 @@
               :description (or (:description schema-json) "")
               :required    true
               :schema      (dissoc schema-json :description)}))))
-
 
 (defmulti ^:private extract-parameter first)
 
