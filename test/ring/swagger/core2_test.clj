@@ -238,7 +238,6 @@
   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
 
 
-;; TODO returns only Category or Tag, not as distinct
 (fact "extract-models"
   (fact "returns both return and body-parameters but not query or path parameter types"
         (extract-models {:paths {"/foo" [{:method :get
@@ -246,7 +245,7 @@
                                                        :query Pet
                                                        :path Pet}
                                           :responses {200 {:schema Tag}}}]}})
-        => [Category]))
+        => [Category Tag]))
 
 
 ;; (declare Bar)

@@ -77,7 +77,10 @@
         all-models      (->> (concat body-models response-models)
                              flatten
                              (map with-named-sub-schemas))]
-    (distinct all-models)))
+    (->> all-models
+         (map (juxt s/schema-name identity))
+         (into {})
+         vals)))
 
 (defn transform [schema]
   (let [required (required-keys schema)
