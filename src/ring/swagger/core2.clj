@@ -76,18 +76,14 @@
                              vals
                              flatten)
         body-models     (->> route-meta
-                             (map (comp :body :parameters))
-                             (filter requires-definition?))
+                             (map (comp :body :parameters)))
         response-models (->> route-meta
                              (map :responses)
                              (mapcat vals)
-                             (map :schema)
-                             flatten
-                             (filter requires-definition?))
-        all-models      (->> (concat body-models response-models)
-                             flatten
-                             (map with-named-sub-schemas))]
-    (->> all-models
+                             (map :schema))]
+    (->> (concat body-models response-models)
+         flatten
+         (map with-named-sub-schemas)
          (map (juxt s/schema-name identity))
          (into {})
          vals)))
