@@ -173,14 +173,16 @@
 (defn convert-parameters [parameters]
   (into [] (mapcat extract-parameter parameters)))
 
+;; TODO can we transform anonymous maps like this without $ref
 (defn convert-response-messages [responses]
-  (letfn [(response-schema [schema]
-            (if-let [name (s/schema-name schema)]
-              (str "#/definitions/" name)
-              (transform schema)))]
-    (zipmap (keys responses)
-            (map (fn [r] (update-in r [:schema] response-schema))
-                 (vals responses)))))
+  (binding [jsons/*ignore-missing-mappings* true]
+   (letfn [(response-schema [schema]
+             (if-let [json-schema (->json schema)]
+               json-schema
+               (transform schema)))]
+     (zipmap (keys responses)
+             (map (fn [r] (update-in r [:schema] response-schema))
+                  (vals responses))))))
 
 (defn transform-path-operations
   "Returns a map with methods as keys and the Operation
