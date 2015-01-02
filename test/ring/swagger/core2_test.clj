@@ -14,7 +14,7 @@
 ;;
 
 (s/defschema Tag {(s/optional-key :id)   (field s/Int {:description "Unique identifier for the tag"})
-                 (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
+                  (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
 
 (s/defschema Category {(s/optional-key :id)   (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
                        (s/optional-key :name) (field s/Str {:description "Name of the category"})})
@@ -56,12 +56,12 @@
 
 (def Category'
   {:properties {:id {:type "integer"
-                      :format "int64"
-                      :description "Category unique identifier"
-                      :minimum "0.0"
-                      :maximum "100.0"}
-                 :name {:type "string"
-                        :description "Name of the category"}}})
+                     :format "int64"
+                     :description "Category unique identifier"
+                     :minimum "0.0"
+                     :maximum "100.0"}
+                :name {:type "string"
+                       :description "Name of the category"}}})
 
 (def Pet'
   {:required [:id :name]
@@ -93,19 +93,19 @@
 ;;
 
 (facts "simple schemas"
-       (transform-models [Tag Category Pet]) => {:Tag Tag'
-                                                 :Category Category'
-                                                 :Pet Pet'})
+  (transform-models [Tag Category Pet]) => {:Tag Tag'
+                                            :Category Category'
+                                            :Pet Pet'})
 
 (s/defschema RootModel
   {:sub {:foo Long}})
 
 (fact "with-named-sub-schemas"
-   (fact "add :name meta-data to sub-schemas"
-     (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+  (fact "add :name meta-data to sub-schemas"
+    (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
 
-   (fact "Keeps the order"
-     (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
+  (fact "Keeps the order"
+    (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
 
 (fact "collect-models"
   (fact "Sub-schemas are collected"
@@ -114,17 +114,17 @@
         'Tag Tag
         'Category Category})
 
-   (fact "No schemas are collected if all are unnamed"
-     (collect-models String) => {})
+  (fact "No schemas are collected if all are unnamed"
+    (collect-models String) => {})
 
-   (fact "Inline-sub-schemas as collected after they are nameed"
-     (collect-models (with-named-sub-schemas RootModel))
-     => {'RootModel RootModel
-         'RootModelSub (:sub RootModel)})
+  (fact "Inline-sub-schemas as collected after they are nameed"
+    (collect-models (with-named-sub-schemas RootModel))
+    => {'RootModel RootModel
+        'RootModelSub (:sub RootModel)})
 
-   (fact "Described anonymous models are collected"
-     (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
-       (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
+  (fact "Described anonymous models are collected"
+    (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
+      (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
 
 (s/defschema Query {:id Long (s/optional-key :q) String})
 (s/defschema Path {:p Long})
@@ -134,101 +134,101 @@
 
   (fact "all parameter types can be converted"
     (convert-parameters
-     {:body     Pet
-      :query    Query 
-      :path     Path
-      :header   {:h String}
-      :formData {:f Integer}}) => [{:name       "Pet"
-                                   :in          :body
-                                   :description ""
-                                   :required    true
-                                   :schema      {:$ref "#/definitions/Pet"}}
-                                  {:name        "id"
-                                   :in          :query
-                                   :description ""
-                                   :required    true
-                                   :type        "integer"
-                                   :format      "int64"}
-                                  {:name        "q"
-                                   :in          :query
-                                   :description ""
-                                   :required    false
-                                   :type        "string"}
-                                  {:name        "p"
-                                   :in          :path
-                                   :description ""
-                                   :required    true
-                                   :type        "integer"
-                                   :format      "int64"}
-                                  {:name        "h"
-                                   :in          :header
-                                   :description ""
-                                   :required    true
-                                   :type        "string"}
-                                  {:name        "f"
-                                   :in          :formData
-                                   :description ""
-                                   :required    true
-                                   :type        "integer"
-                                   :format      "int32"}])
+      {:body     Pet
+       :query    Query
+       :path     Path
+       :header   {:h String}
+       :formData {:f Integer}}) => [{:name       "Pet"
+                                     :in          :body
+                                     :description ""
+                                     :required    true
+                                     :schema      {:$ref "#/definitions/Pet"}}
+                                    {:name        "id"
+                                     :in          :query
+                                     :description ""
+                                     :required    true
+                                     :type        "integer"
+                                     :format      "int64"}
+                                    {:name        "q"
+                                     :in          :query
+                                     :description ""
+                                     :required    false
+                                     :type        "string"}
+                                    {:name        "p"
+                                     :in          :path
+                                     :description ""
+                                     :required    true
+                                     :type        "integer"
+                                     :format      "int64"}
+                                    {:name        "h"
+                                     :in          :header
+                                     :description ""
+                                     :required    true
+                                     :type        "string"}
+                                    {:name        "f"
+                                     :in          :formData
+                                     :description ""
+                                     :required    true
+                                     :type        "integer"
+                                     :format      "int32"}])
 
 
 
 
   (fact "anonymous schemas can be used with ..."
 
-        (doseq [type [:query :path]]
-          (fact {:midje/description (str "... " type "-parameters")}
+    (doseq [type [:query :path]]
+      (fact {:midje/description (str "... " type "-parameters")}
 
-                (convert-parameters
-                 {type {s/Keyword s/Any
-                        :q String
-                        (s/optional-key :l) Long}})
+        (convert-parameters
+          {type {s/Keyword s/Any
+                 :q String
+                 (s/optional-key :l) Long}})
 
-                => [{:name "q"
-                     :description ""
-                     :in type
-                     :required true
-                     :type "string"}
-                    {:name "l"
-                     :description ""
-                     :format "int64"
-                     :in type
-                     :required false
-                     :type "integer"}])))
+        => [{:name "q"
+             :description ""
+             :in type
+             :required true
+             :type "string"}
+            {:name "l"
+             :description ""
+             :format "int64"
+             :in type
+             :required false
+             :type "integer"}])))
 
   (fact "Array body parameters"
-        (convert-parameters
-         {:body [Body]})
+    (convert-parameters
+      {:body [Body]})
 
-        => [{:name "Body"
-             :description ""
-             :in :body
-             :required true
-             :schema {:type  "array"
-                      :items {:$ref "#/definitions/Body"}}}])
+    => [{:name "Body"
+         :description ""
+         :in :body
+         :required true
+         :schema {:type  "array"
+                  :items {:$ref "#/definitions/Body"}}}])
 
   (fact "Set body parameters"
-        (convert-parameters
-         {:body #{Body}})
+    (convert-parameters
+      {:body #{Body}})
 
-        => [{:name "Body"
-             :description ""
-             :in :body
-             :required true
-             :schema {:type        "array"
-                      :uniqueItems true
-                      :items       {:$ref "#/definitions/Body"}}}])
-  
+    => [{:name "Body"
+         :description ""
+         :in :body
+         :required true
+         :schema {:type        "array"
+                  :uniqueItems true
+                  :items       {:$ref "#/definitions/Body"}}}])
+
 
   (fact "Body param with desc"
-        (convert-parameters {:body (describe Body "foo")})
-        => [{:description "foo" :name "Body" :in :body :required true :schema {:$ref "#/definitions/Body"}}])
+    (convert-parameters {:body (describe Body "foo")})
+    => [{:description "foo" :name "Body" :in :body :required true :schema {:$ref "#/definitions/Body"}}])
 
   (fact "Array body param with desc"
-        (convert-parameters {:body [(describe Body "foo")]})
-        => [{:description "foo" :name "Body" :in :body :required true :schema {:type "array"
-                                                                               :items {:$ref "#/definitions/Body"}}}]))
+    (convert-parameters {:body [(describe Body "foo")]})
+    => [{:description "foo" :name "Body" :in :body :required true :schema {:type "array"
+                                                                           :items {:$ref "#/definitions/Body"}}}]))
 
 ;; ;;
 ;; ;; Helpers
@@ -240,12 +240,12 @@
 
 (fact "extract-models"
   (fact "returns both return and body-parameters but not query or path parameter types"
-        (extract-models {:paths {"/foo" [{:method :get
-                                          :parameters {:body Category
-                                                       :query Pet
-                                                       :path Pet}
-                                          :responses {200 {:schema Tag}}}]}})
-        => [Category Tag]))
+    (extract-models {:paths {"/foo" [{:method :get
+                                      :parameters {:body Category
+                                                   :query Pet
+                                                   :path Pet}
+                                      :responses {200 {:schema Tag}}}]}})
+    => [Category Tag]))
 
 
 (declare Bar)
