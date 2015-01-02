@@ -9,10 +9,20 @@
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]))
 
-(alter-var-root #'jsons/*swagger-spec-version* (constantly "2.0"))
-
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
+
+;;
+;; 2.0 Json Schema changes
+;;
+
+(defn ->json [& args]
+  (binding [jsons/*swagger-spec-version* "2.0"]
+    (apply jsons/->json args)))
+
+(defn properties [schema]
+  (binding [jsons/*swagger-spec-version* "2.0"]
+    (jsons/properties schema)))
 
 ;;
 ;; defaults
@@ -86,7 +96,7 @@
   (let [required (required-keys schema)
         required (if-not (empty? required) required)]
     (remove-empty-keys
-      {:properties (jsons/properties schema)
+      {:properties (properties schema)
        :required required})))
 
 (defn collect-models [x]
@@ -118,7 +128,7 @@
 
 (defmethod extract-body-paramter clojure.lang.Sequential [e]
   (let [model (first e)
-        schema-json (jsons/->json model)]
+        schema-json (->json model)]
     (vector {:in          :body
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
@@ -128,7 +138,7 @@
 
 (defmethod extract-body-paramter clojure.lang.IPersistentSet [e]
   (let [model (first e)
-        schema-json (jsons/->json model)]
+        schema-json (->json model)]
     (vector {:in          :body
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
@@ -139,7 +149,7 @@
 
 (defmethod extract-body-paramter :default [model]
   (if-let [schema-name (s/schema-name model)]
-    (let [schema-json (jsons/->json model)]
+    (let [schema-json (->json model)]
      (vector {:in          :body
               :name        (name schema-name)
               :description (or (:description schema-json) "")
@@ -160,7 +170,7 @@
       (jsons/->parameter {:in type
                           :name (name rk)
                           :required (s/required-key? k)}
-                         (jsons/->json v)))))
+                         (->json v)))))
 
 (defn convert-parameters [parameters]
   (into [] (mapcat extract-parameter parameters)))
@@ -205,8 +215,8 @@
 (defn swagger-json [swagger]
   (let [[paths definitions] (extract-paths-and-definitions swagger)]
     (merge
-     swagger-defaults
-     (-> swagger
+      swagger-defaults
+      (-> swagger
           (assoc :paths paths)
           (assoc :definitions definitions)))))
 
