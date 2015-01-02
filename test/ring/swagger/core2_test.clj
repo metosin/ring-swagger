@@ -248,24 +248,22 @@
         => [Category Tag]))
 
 
-;; (declare Bar)
+(declare Bar)
 
-;; (s/defschema Foo {:bar (s/recursive #'Bar)})
+(s/defschema Foo {:bar (s/recursive #'Bar)})
 
-;; (s/defschema Bar {:foo (s/maybe #'Foo)})
+(s/defschema Bar {:foo (s/maybe #'Foo)})
 
-;; (fact "recursive"
-;;   (collect-models [Foo Bar])
-;;   => {'Bar {:foo (s/maybe #'Foo)}
-;;       'Foo {:bar (s/recursive #'Bar)}}
+(fact "recursive"
+  (collect-models [Foo Bar])
+  => {'Bar {:foo (s/maybe #'Foo)}
+      'Foo {:bar (s/recursive #'Bar)}}
 
-;;   (transform-models [Foo Bar])
-;;   => {'Bar {:id 'Bar
-;;             :properties {:foo {:$ref 'Foo}}
-;;             :required [:foo]}
-;;       'Foo {:id 'Foo
-;;             :properties {:bar {:$ref 'Bar}}
-;;             :required [:bar]}})
+  (transform-models [Foo Bar])
+  => {:Bar {:properties {:foo {:$ref "#/definitions/Foo"}}
+            :required [:foo]}
+      :Foo {:properties {:bar {:$ref "#/definitions/Bar"}}
+            :required [:bar]}})
 
 ;; ;;
 ;; ;; Final json
