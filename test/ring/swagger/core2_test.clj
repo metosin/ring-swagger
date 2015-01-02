@@ -90,9 +90,9 @@
 ;;
 
 (facts "simple schemas"
-  (transform-models [Tag Category Pet]) => {:Tag Tag'
-                                            :Category Category'
-                                            :Pet Pet'})
+  (transform Tag) => Tag'
+  (transform Category) => Category'
+  (transform Pet) => Pet')
 
 (s/defschema RootModel
   {:sub {:foo Long}})
@@ -122,6 +122,59 @@
   (fact "Described anonymous models are collected"
     (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
       (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
+
+(fact "transform-models"
+  (transform-models [Pet]) => {:Pet Pet'
+                               :Tag Tag'
+                               :Category Category'}
+
+  (s/defschema Foo (s/enum :a :b))
+  (s/defschema Bar {:key Foo})
+  (s/defschema Baz s/Keyword)
+
+  (fact "record-schemas are not transformed"
+    (transform-models [Foo]) => {})
+
+  (fact "non-map schemas are not transformed"
+    (transform-models [Baz]) => {})
+
+  (fact "nested record-schemas are inlined"
+    (transform-models [Bar]) => {:Bar {:properties {:key {:enum [:b :a]
+                                                          :type "string"}}
+                                       :required [:key]}})
+
+  (fact "nested schemas"
+
+    (fact "with anonymous sub-schemas"
+      (s/defschema Nested {:id s/Str
+                           :address {:country (s/enum :fi :pl)
+                                     :street {:name s/Str}}})
+      (transform-models [(with-named-sub-schemas Nested)])
+
+      =>
+
+      {:Nested {:properties {:address {:$ref "#/definitions/NestedAddress"}
+                             :id {:type "string"}}
+                :required [:id :address]}
+       :NestedAddress {:properties {:country {:enum [:fi :pl]
+                                              :type "string"}
+                                    :street {:$ref "#/definitions/NestedAddressStreet"}}
+                       :required [:country :street]}
+       :NestedAddressStreet {:properties {:name {:type "string"}}
+                             :required [:name]}})
+
+    (fact "nested named sub-schemas"
+
+      (s/defschema Boundary
+        {:type (s/enum "MultiPolygon" "Polygon" "MultiPoint" "Point")
+         :coordinates [s/Any]})
+
+      (s/defschema ReturnValue
+        {:boundary (s/maybe Boundary)})
+
+      (keys
+        (transform-models
+          [(with-named-sub-schemas ReturnValue)])) => [:Boundary :ReturnValue])))
 
 (s/defschema Query {:id Long (s/optional-key :q) String})
 (s/defschema Path {:p Long})
