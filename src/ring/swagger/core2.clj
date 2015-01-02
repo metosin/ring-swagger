@@ -9,7 +9,7 @@
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]))
 
-;; (alter-var-root #'jsons/*swagger-spec-version* (constantly "2.0"))
+(alter-var-root #'jsons/*swagger-spec-version* (constantly "2.0"))
 
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
@@ -107,9 +107,6 @@
 ;; Paths, parameters, responses
 ;;
 
-(defn qualify-schema-ref [ref-map]
-  (update-in ref-map [:$ref] #(str "#/definitions/" %)))
-
 (defmulti ^:private extract-body-paramter
   (fn [e]
     (if (instance? java.lang.Class e)
@@ -118,7 +115,7 @@
 
 (defmethod extract-body-paramter clojure.lang.Sequential [e]
   (let [model (first e)
-        schema-json (qualify-schema-ref (jsons/->json model))]
+        schema-json (jsons/->json model)]
     (vector {:in          :body
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
@@ -128,7 +125,7 @@
 
 (defmethod extract-body-paramter clojure.lang.IPersistentSet [e]
   (let [model (first e)
-        schema-json (qualify-schema-ref (jsons/->json model))]
+        schema-json (jsons/->json model)]
     (vector {:in          :body
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
@@ -139,7 +136,7 @@
 
 (defmethod extract-body-paramter :default [model]
   (if-let [schema-name (s/schema-name model)]
-   (let [schema-json (qualify-schema-ref (jsons/->json model))]
+    (let [schema-json (jsons/->json model)]
      (vector {:in          :body
               :name        (name schema-name)
               :description (or (:description schema-json) "")

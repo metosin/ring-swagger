@@ -4,6 +4,7 @@
             [flatland.ordered.map :refer :all]))
 
 (def ^:dynamic *ignore-missing-mappings* false)
+(def ^:dynamic *swagger-spec-version* "1.2")
 
 (defn json-schema-meta
   "Select interesting keys from meta-data of schema."
@@ -97,7 +98,9 @@
 
 (defmethod json-type :default [e]
   (if (s/schema-name e)
-    {:$ref (s/schema-name e)}
+    (case *swagger-spec-version*
+      "1.2" {:$ref (s/schema-name e)}
+      "2.0" {:$ref (str "#/definitions/" (s/schema-name e))})
     (and (not *ignore-missing-mappings*)
          (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
 

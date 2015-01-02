@@ -70,7 +70,7 @@
                      :description "Unique identifier for the Pet"
                      :minimum "0.0"
                      :maximum "100.0"}
-                :category {:$ref 'Category
+                :category {:$ref "#/definitions/Category"
                            :description "Category the pet is in"}
                 :name {:type "string"
                        :description "Friendly name of the pet"}
@@ -79,7 +79,7 @@
                             :items {:type "string"}}
                 :tags {:type "array"
                        :description "Tags assigned to this pet"
-                       :items {:$ref 'Tag}}
+                       :items {:$ref "#/definitions/Tag"}}
                 :status {:type "string"
                          :description "pet status in the store"
                          :enum [:pending :sold :available]}}})
