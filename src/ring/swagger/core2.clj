@@ -38,10 +38,6 @@
 ;; Schema transformations
 ;;
 
-(defn- requires-definition? [schema]
-  (not (contains? #{nil Nothing Anything}
-                  (s/schema-name schema))))
-
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 
 (defn- collect-schemas [keys schema]
@@ -99,7 +95,7 @@
   (let [schemas (atom {})]
     (walk/prewalk
       (fn [x]
-        (when (requires-definition? x)
+        (when (s/schema-name x)
           (swap! schemas assoc (s/schema-name x) (if (var? x) @x x)))
         x)
       x)
