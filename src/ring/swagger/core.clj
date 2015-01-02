@@ -85,6 +85,7 @@
        :properties (jsons/properties schema)
        :required required})))
 
+;; NOTE: silently ignores non-map schemas
 (defn collect-models [x]
   (let [schemas (atom {})]
     (walk/prewalk
@@ -97,11 +98,12 @@
       x)
     @schemas))
 
+;; TODO: use keywords instead of symbols
 (defn transform-models [schemas]
   (->> schemas
        (map collect-models)
        (apply merge)
-       (map (juxt key (comp transform val)))
+       (map (juxt key #_(comp keyword key) (comp transform val)))
        (into {})))
 
 (defn extract-models [details]

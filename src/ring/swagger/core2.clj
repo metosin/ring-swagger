@@ -35,7 +35,7 @@
                        :produces ["application/json"]
                        :consumes ["application/json"]})
 
-;
+;;
 ;; Schema transformations
 ;;
 
@@ -95,12 +95,15 @@
       {:properties (properties schema)
        :required required})))
 
+; COPY from 1.2
 (defn collect-models [x]
   (let [schemas (atom {})]
     (walk/prewalk
       (fn [x]
-        (when (s/schema-name x)
-          (swap! schemas assoc (s/schema-name x) (if (var? x) @x x)))
+        (when-let [schema (and
+                            (plain-map? x)
+                            (s/schema-name x))]
+          (swap! schemas assoc schema (if (var? x) @x x)))
         x)
       x)
     @schemas))
@@ -116,13 +119,13 @@
 ;; Paths, parameters, responses
 ;;
 
-(defmulti ^:private extract-body-paramter
+(defmulti ^:private extract-body-parameter
   (fn [e]
     (if (instance? java.lang.Class e)
       e
       (class e))))
 
-(defmethod extract-body-paramter clojure.lang.Sequential [e]
+(defmethod extract-body-parameter clojure.lang.Sequential [e]
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
@@ -132,7 +135,7 @@
              :schema      {:type  "array"
                            :items (dissoc schema-json :description)}})))
 
-(defmethod extract-body-paramter clojure.lang.IPersistentSet [e]
+(defmethod extract-body-parameter clojure.lang.IPersistentSet [e]
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
@@ -143,7 +146,7 @@
                            :uniqueItems true
                            :items       (dissoc schema-json :description)}})))
 
-(defmethod extract-body-paramter :default [model]
+(defmethod extract-body-parameter :default [model]
   (if-let [schema-name (s/schema-name model)]
     (let [schema-json (->json model)]
      (vector {:in          :body
@@ -155,7 +158,7 @@
 (defmulti ^:private extract-parameter first)
 
 (defmethod extract-parameter :body [[_ model]]
-  (extract-body-paramter model))
+  (extract-body-parameter model))
 
 (defmethod extract-parameter :default [[type model]]
   (if model
