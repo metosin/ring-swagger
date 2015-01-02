@@ -215,11 +215,11 @@
 ;; Routing
 ;;
 
-(s/defschema SwaggerData (-> spec/Swagger
+(s/defschema Swagger (-> spec/Swagger
                              (dissoc :paths :definitions)
                              (assoc :paths {s/Str s/Any})))
 
-(s/defn swagger-json [swagger :- SwaggerData] :- spec/Swagger
+(s/defn swagger-json [swagger :- Swagger] :- spec/Swagger
   (let [[paths definitions] (extract-paths-and-definitions swagger)]
     (merge
       swagger-defaults
