@@ -114,7 +114,7 @@
   (fact "No schemas are collected if all are unnamed"
     (collect-models String) => {})
 
-  (fact "Inline-sub-schemas as collected after they are nameed"
+  (fact "Inline-sub-schemas as collected after they are named"
     (collect-models (with-named-sub-schemas RootModel))
     => {'RootModel RootModel
         'RootModelSub (:sub RootModel)})
