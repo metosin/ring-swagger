@@ -114,6 +114,7 @@
 #_(s/defschema Parameters s/Any)
 #_(s/defschema Security s/Any)
 
+; TODO: Authorizations: https://github.com/metosin/ring-swagger/commit/0525294dc87c0f179244c61504ed990460041349
 (s/defschema Swagger {:swagger (s/enum 2.0)
                       :info Info
                       ;(s/optional-key :externalDocs) ExternalDocs
@@ -129,43 +130,3 @@
                       ;(s/optional-key :security) Security
                       ;(s/optional-key :tags) [Tag]
                       })
-
-;;
-;; spike
-;;
-
-#_(s/validate Swagger
-            {:swagger 2.0
-             :info {:version "version"
-                    :title "title"
-                    :description "description"
-                    :termsOfService "jeah"
-                    :contact {:name "name"
-                              :url "url"
-                              :email "email"}
-                    :licence {:name "name"
-                              :url "url"}
-                    :x-kikka "jeah"}
-             :basePath "/"
-             :consumes ["application/json" "application/edn"]
-             :produces ["application/json" "application/edn"]
-             :paths  {"/api" {:get {:description "description"
-                                    :operationId "operationId"
-                                    :produces ["produces"]
-                                    :parameters [{:name "name"
-                                                  :in :query
-                                                  :description "description"
-                                                  :required true
-                                                  :type :integer
-                                                  :format "format"}
-                                                 {:name "name2"
-                                                  :in :body
-                                                  :description "description"
-                                                  :required true
-                                                  :schema "#/definitions/Pet"}]
-                                    :responses {200 {:description "description"}
-                                                :default {:description "description"}}}}}
-             :definitions {:Pet {:required   [:id :name]
-                                 :properties {:id {:type :integer :format "int64"}
-                                              :name {:type :string}
-                                              :tag {:type :string}}}}})

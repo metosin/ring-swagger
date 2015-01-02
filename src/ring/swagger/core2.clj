@@ -8,7 +8,8 @@
             [plumbing.core :refer :all]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [org.tobereplaced.lettercase :as lc]))
+            [org.tobereplaced.lettercase :as lc]
+            [ring.swagger.spec :as spec]))
 
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
@@ -212,7 +213,15 @@
                          transform-models)]
     (vector (zipmap paths methods) definitions)))
 
-(defn swagger-json [swagger]
+;;
+;; Routing
+;;
+
+(s/defschema Swagger (-> spec/Swagger
+                         (dissoc :paths :definitions)
+                         (assoc :paths {s/Str s/Any})))
+
+(s/defn swagger-json [swagger :- Swagger] :- spec/Swagger
   (let [[paths definitions] (extract-paths-and-definitions swagger)]
     (merge
       swagger-defaults

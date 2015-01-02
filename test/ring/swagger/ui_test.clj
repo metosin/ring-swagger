@@ -83,3 +83,18 @@
       (GET "/index.html") => html?)
     (fact "forwards non-swagger-ui resources"
       (GET "/NON-SWAGGER-FILE") => ..response..)))
+
+(facts "conf.js"
+
+  (fact "with default parameters"
+    (conf-js nil {})
+    => "window.API_CONF = {\"url\":\"/api/api-docs\"};")
+
+  (fact "with swagger-docs & oauth2 set"
+    (conf-js nil {:swagger-docs "/lost"
+                  :oauth2       {:client-id "1" :app-name "2" :realm "3"}})
+    => "window.API_CONF = {\"oauth2\":{\"realm\":\"3\",\"app-name\":\"2\",\"client-id\":\"1\"},\"url\":\"/lost\"};")
+
+  (fact "does not fail with crappy input"
+    (conf-js nil {:kikka "kukka"
+                  :oauth2 {:abba "jabba"}}) => string?))

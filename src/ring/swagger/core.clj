@@ -226,6 +226,7 @@
       swagger-defaults
       (select-keys parameters [:apiVersion])
       {:info (select-keys parameters api-declaration-keys)
+       :authorizations (:authorizations parameters {})
        :apis (for [[api details] swagger]
                {:path (str "/" (name api))
                 :description (or (:description details) "")})})))
@@ -241,11 +242,13 @@
          :resourcePath "/"
          :models (transform-models (extract-models details))
          :apis (for [{:keys [method uri metadata] :as route} (:routes details)
-                     :let [{:keys [return summary notes nickname parameters responseMessages]} metadata]]
+                     :let [{:keys [return summary notes nickname parameters
+                                   responseMessages authorizations]} metadata]]
                  {:path (swagger-path uri)
                   :operations [(merge
                                  (jsons/->json return :top true)
                                  {:method (-> method name .toUpperCase)
+                                  :authorizations (or authorizations {})
                                   :summary (or summary "")
                                   :notes (or notes "")
                                   :nickname (or nickname (generate-nick route))

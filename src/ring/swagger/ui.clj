@@ -1,5 +1,6 @@
 (ns ring.swagger.ui
-  (:require [ring.util.response :as response]
+  (:require [cheshire.core :as json]
+            [ring.util.response :as response]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.not-modified :refer [wrap-not-modified]]
             [ring.middleware.head :refer [wrap-head]]
@@ -8,9 +9,14 @@
 (defn get-path [root uri]
   (second (re-find (re-pattern (str "^" root "[/]?(.*)")) uri)))
 
-(defn conf-js [req {:keys [swagger-docs] :or {swagger-docs "/api/api-docs"}}]
-  (let [swagger-docs (swagger/join-paths (swagger/context req) swagger-docs)]
-    (str "window.API_CONF = {url: \"" swagger-docs "\"};")))
+(defn conf-js [req {:keys [swagger-docs oauth2]
+                    :or {swagger-docs "/api/api-docs"
+                         oauth2 nil}}]
+  (let [swagger-docs (swagger/join-paths (swagger/context req) swagger-docs)
+        oauth2-data (select-keys oauth2 [:client-id :app-name :realm])
+        conf (cond-> {:url swagger-docs}
+                     oauth2 (assoc :oauth2 oauth2-data))]
+    (str "window.API_CONF = " (json/encode conf) ";")))
 
 (defn swagger-ui
   "This function creates a ring handler which can be used to serve swagger-ui.
@@ -19,7 +25,8 @@
 
    Other options can be given using keyword-value pairs.
    :root - the root prefix to get resources from. Default 'swagger-ui'
-   :swagger-docs - the endpoint to get swagger data from. Default '/api/docs'"
+   :swagger-docs - the endpoint to get swagger data from. Default '/api/docs'
+   :oauth2 - map with oauth2 params, namely :client-id, :realm and :app-name"
   [& params]
   (let [[path kvs] (if (string? (first params))
                      [(first params) (rest params)]
