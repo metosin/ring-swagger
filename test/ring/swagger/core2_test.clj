@@ -4,10 +4,7 @@
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
             [ring.swagger.core2 :refer :all]
-            [flatland.ordered.map :refer :all])
-  (:import  [java.util Date UUID]
-            [org.joda.time DateTime LocalDate]))
-
+            [flatland.ordered.map :refer :all]))
 
 ;;
 ;; Schemas
@@ -171,9 +168,6 @@
                                      :required    true
                                      :type        "integer"
                                      :format      "int32"}])
-
-
-
 
   (fact "anonymous schemas can be used with ..."
 
