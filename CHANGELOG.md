@@ -1,3 +1,14 @@
+## 0.16.0-SNAPSHOT (xx.xx.xxxx)
+
+- support for `authorization` parameters by [Dmitry Groshev](https://github.com/si14)
+- oauth2-configs for swagger-ui by [Dmitry Groshev](https://github.com/si14)
+- updated dependencies:
+
+```
+[cheshire "5.4.0"] is available but we use "5.3.1"
+[clj-time "0.9.0"] is available but we use "0.8.0"
+``
+
 ## 0.15.0 (8.12.2014)
 
 - **new feature**: binding dynamic variable `ring.swagger.json-schema/*ignore-missing-mappings*`

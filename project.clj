@@ -6,12 +6,12 @@
             :distribution :repo
             :comments "same as Clojure"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [cheshire "5.3.1"]
+                 [cheshire "5.4.0"]
                  [slingshot "0.12.1"]
                  [metosin/ring-http-response "0.5.2"]
                  [prismatic/schema "0.3.3"]
                  [prismatic/plumbing "0.3.5"]
-                 [clj-time "0.8.0"]
+                 [clj-time "0.9.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
                  [ring/ring-core "1.3.2"]
                  [potemkin "0.3.11"]
@@ -23,6 +23,6 @@
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "2.0.17"]
                                   [javax.servlet/servlet-api "2.5"]]}
-             :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha2"]]}}
+             :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha4"]]}}
   :aliases {"all" ["with-profile" "dev:dev,1.7"]
             "test-ancient" ["midje"]})
