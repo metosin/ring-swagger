@@ -19,7 +19,7 @@
   :plugins [[lein-ring "0.8.13"]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-midje "3.1.3"]]
-                   :dependencies [[midje "1.6.3"]
+                   :dependencies [[midje "1.7.0-SNAPSHOT"]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "2.0.17"]
                                   [javax.servlet/servlet-api "2.5"]]}
