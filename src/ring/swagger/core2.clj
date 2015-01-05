@@ -27,16 +27,6 @@
     (jsons/properties schema)))
 
 ;;
-;; defaults
-;;
-
-(def swagger-defaults {:swagger  "2.0"
-                       :info     {:title "Swagger API"
-                                  :version "0.0.1"}
-                       :produces ["application/json"]
-                       :consumes ["application/json"]})
-
-;;
 ;; Schema transformations
 ;;
 
@@ -214,14 +204,31 @@
     (vector (zipmap paths methods) definitions)))
 
 ;;
-;; Routing
+;; Schema
 ;;
+
+(def swagger-defaults {:swagger  "2.0"
+                       :info     {:title "Swagger API"
+                                  :version "0.0.1"}
+                       :produces ["application/json"]
+                       :consumes ["application/json"]})
 
 (s/defschema Swagger (-> spec/Swagger
                          (dissoc :paths :definitions)
                          (assoc :paths {s/Str s/Any})))
 
-(s/defn swagger-json [swagger :- Swagger] :- spec/Swagger
+;;
+;; Public API
+;;
+
+(defn validate
+  "validates input against the ring-swagger spec"
+  [swagger]
+  (s/check Swagger (merge swagger-defaults swagger)))
+
+(s/defn swagger-json
+  "produces the swagger-json from ring-swagger spec"
+  [swagger :- Swagger] :- spec/Swagger
   (let [[paths definitions] (extract-paths-and-definitions swagger)]
     (merge
       swagger-defaults
