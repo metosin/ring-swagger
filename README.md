@@ -222,6 +222,6 @@ wrapped into `s/both`.
 
 ## License
 
-Copyright © 2014 Metosin Oy
+Copyright © 2014,2015 Metosin Oy
 
 Distributed under the Eclipse Public License, the same as Clojure.
