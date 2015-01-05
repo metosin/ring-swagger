@@ -18,7 +18,7 @@
 (s/defschema NotFound {:message s/Str})
 
 (def swagger-with-models
-  {:swagger 2.0
+  {:swagger "2.0"
    :info {:version "version"
           :title "title"
           :description "description"
