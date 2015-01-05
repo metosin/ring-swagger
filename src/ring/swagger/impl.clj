@@ -17,6 +17,7 @@
   (and (or (sequential? x) (set? x))
        (asserted-container x)))
 
+; TODO: still needed?
 (defn update-schema [x f]
   (if (valid-container? x)
     (contain x (f (first x)))

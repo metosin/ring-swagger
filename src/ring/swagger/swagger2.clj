@@ -1,4 +1,4 @@
-(ns ring.swagger.spec2
+(ns ring.swagger.swagger2
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
             [ring.util.response :refer :all]
@@ -10,7 +10,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]
-            [ring.swagger.schema-remove :as spec]))
+            [ring.swagger.swagger2-spec :as spec]))
 
 (def Anything {s/Keyword s/Any})
 (def Nothing {})

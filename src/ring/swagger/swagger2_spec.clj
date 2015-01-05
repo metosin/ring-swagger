@@ -1,4 +1,4 @@
-(ns ring.swagger.schema-remove
+(ns ring.swagger.swagger2-spec
   (require [schema.core :as s]
            [plumbing.core :refer [fn->>]]))
 

@@ -107,7 +107,4 @@
       (coerce! Model query :query) => value)
 
     (fact "json-coercion cant convert string to Longs,Doubles, Booleans and UUIDs"
-      (coerce! Model query :json) => (throws Exception))
-
-    #_(fact "both-coercion can also convert string to Longs, Doubles, Booleans and UUIDs"
-       (coerce! Model query :both) => value)))
+      (coerce! Model query :json) => (throws Exception))))

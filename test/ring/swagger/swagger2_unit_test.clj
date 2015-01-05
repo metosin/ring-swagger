@@ -1,9 +1,9 @@
-(ns ring.swagger.spec2-test
+(ns ring.swagger.swagger2-unit-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
-            [ring.swagger.spec2 :refer :all]
+            [ring.swagger.swagger2 :refer :all]
             [flatland.ordered.map :refer :all]))
 
 ;;
@@ -80,10 +80,6 @@
                 :status {:type "string"
                          :description "pet status in the store"
                          :enum [:pending :sold :available]}}})
-
-(def PetError'
-  {:required [:message]
-   :properties {:message {:type "string"}}})
 
 ;;
 ;; Facts

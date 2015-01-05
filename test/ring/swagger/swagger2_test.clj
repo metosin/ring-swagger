@@ -1,7 +1,7 @@
 (ns ring.swagger.swagger2-test
   (:require [schema.core :as s]
-            [ring.swagger.spec2 :refer :all]
-            [ring.swagger.schema-remove :as spec]
+            [ring.swagger.swagger2 :refer :all]
+            [ring.swagger.swagger2-spec :as spec]
             [midje.sweet :refer :all]
             [clojure.pprint :refer [pprint]]))
 
