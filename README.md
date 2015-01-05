@@ -1,11 +1,19 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.png?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Dependencies Status](http://jarkeeper.com/metosin/ring-swagger/status.png)](http://jarkeeper.com/metosin/ring-swagger)
 
-[Swagger](https://helloreverb.com/developers/swagger) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data models and coercion.
+[Swagger](https://helloreverb.com/developers/swagger) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data modeling.
 
-- Provides functions to create Swagger [Resource listing](https://github.com/wordnik/swagger-core/wiki/Resource-Listing), [Api declarations](https://github.com/wordnik/swagger-core/wiki/API-Declaration) and the [Swagger-UI](https://github.com/metosin/ring-swagger-ui).
-- Schema extensions for modelling, coercion and Swagger [JSON Schema](http://json-schema.org/) generation
-- Does **not** cover how the routes and models are actually collected from your web app
-   - Provides a Map-based API for web libs to create Swagger Spec out of their route definitions
+- Supports both 1.2 and 2.0 Swagger Specs
+- For web library developers:
+  - A Schema-based contract for collectiong documentation for the web apps
+  - Extendable Schema->JSON Schema conversion with out-of-the-box support for most Schema predicates
+  - Common middleware for handling Schemas and Validation Errors.
+  - Ring-handlers for exposing the swaggers artifacts
+    - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for `2.0`
+    - [Resource listing](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#51-resource-listing) and [Api declarations](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#52-api-declaration) for `1.2`.
+    - [Swagger-UI](https://github.com/metosin/ring-swagger-ui) bindings. (the UI itself is packaged for [separately](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
+ - For web developers
+  - Extendable Schema->JSON Mappings
+  - Schema coersion utilities
 
 ## Latest version
 
@@ -15,6 +23,8 @@
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 - [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
+- [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger)
+- [rook](https://github.com/AvisoNovate/rook)
 
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
 
