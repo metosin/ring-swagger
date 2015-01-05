@@ -115,7 +115,7 @@
 #_(s/defschema Security s/Any)
 
 ; TODO: Authorizations: https://github.com/metosin/ring-swagger/commit/0525294dc87c0f179244c61504ed990460041349
-(s/defschema Swagger {:swagger (s/enum 2.0)
+(s/defschema Swagger {:swagger (s/enum "2.0")
                       :info Info
                       ;(s/optional-key :externalDocs) ExternalDocs
                       ;(s/optional-key :host) s/Str
