@@ -44,12 +44,7 @@
                 :n {:alive true}
                 :o [{:p #{{:q "abba"}}}]
                 :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")
-                :v (re-pattern "[a-z0-9]")}})
-
-;; since every java.util.regex.Pattern is not equal
-(defn- pattern-to-str
-  [model]
-  (update-in model [:e :v] str))
+                :v "a10"}})
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
@@ -63,7 +58,7 @@
       jmodel =not=> model)
 
     (fact "coerce! makes models match"
-      (pattern-to-str (coerce! AllTypes jmodel)) => (pattern-to-str model))))
+      (pattern-to-str (coerce! AllTypes jmodel)) => model)))
 
 (fact "date-time coercion"
   (fact "with millis"
