@@ -1,16 +1,16 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.png?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Dependencies Status](http://jarkeeper.com/metosin/ring-swagger/status.png)](http://jarkeeper.com/metosin/ring-swagger)
 
-[Swagger](https://helloreverb.com/developers/swagger) implementation for Ring using Prismatic [Schema](https://github.com/Prismatic/schema) for data modeling.
+[Swagger](http://swagger.io/) implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema) for data modeling.
 
 - Supports both 1.2 and 2.0 Swagger Specs
 - For web library developers:
-  - A Schema-based contract for collectiong documentation for the web apps
+  - A Schema-based contract for collecting route documentation from the web apps
   - Extendable Schema->JSON Schema conversion with out-of-the-box support for most Schema predicates
   - Common middleware for handling Schemas and Validation Errors.
   - Ring-handlers for exposing the swaggers artifacts
-    - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for `2.0`
-    - [Resource listing](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#51-resource-listing) and [Api declarations](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#52-api-declaration) for `1.2`.
-    - [Swagger-UI](https://github.com/metosin/ring-swagger-ui) bindings. (the UI itself is packaged for [separately](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
+    - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
+    - [Resource listing](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#51-resource-listing) and [Api declarations](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#52-api-declaration) for 1.2.
+    - [Swagger-UI](https://github.com/metosin/ring-swagger-ui) bindings. (the UI itself is jar-packaged [separately](https://github.com/metosin/ring-swagger-ui) or you can get it from [NPM](https://www.npmjs.com/package/swagger-ui))
 - For web developers
   - Extendable Schema->JSON Mappings with out-of-the-box support for most common types
   - Utilities for input & output Schema validation & coercion
@@ -23,7 +23,7 @@
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 - [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
-- [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger)
+- [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [rook](https://github.com/AvisoNovate/rook)
 
 ## Adapting Ring-Swagger
@@ -38,20 +38,18 @@ If your favourite web lib doesn't have an client adapter, you could write an it 
 3. Publish it.
 4. Pull Request to list your adapter here
 
-If you need help in adoption, feel free to ping us (say `ring-swagger` at #clojure at Freenode or find `ikitommi`)
+If you need help in adoption, feel free to ping us (try `ring-swagger` at #clojure or firstname.lastname@metosin.fi)
 
 ### Adopting 1.2
 
-Example adoption in fnhouse-swagger [src](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger12.clj) & [tst](https://github.com/metosin/fnhouse-swagger/blob/master/test/fnhouse/swagger12_test.clj)
+Example adoption found in [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger12.clj).
 
 ## Web Schemas
 
-[Prismatic Schema](https://github.com/Prismatic/schema) is used to model the web apis.
+[Prismatic Schema](https://github.com/Prismatic/schema) is used to model the web apis. The Swagger Spec uses a deterministic
+subset of JSON Schema, so not all Clojure Schema predicates are possible to use in documentation.
 
-For Input & Output schema coersion, you can use the full Schema API. Remember to ensure serialization & deserialization facilities to support transferring the s
-
-For Swagger-documentation and code-generation,
-you can only use a (pragmatic) subset of Schema. Below is the list of currently supported Schema predicates.
+Below is the list of currently supported Schema predicates.
 
 ### Supported Schema elements
 
@@ -112,7 +110,7 @@ these should work, just need the mappings (feel free to contribute!):
 - `s/Inst`
 - `s/Regex`
 
-## Creating your own schema-types
+## Adding support for your own schema-types
 
 JSON Schema generation is implemented using multimethods. You can register your own schema types by installing new methods to the multimethods.
 
