@@ -7,7 +7,7 @@
 ```
 [cheshire "5.4.0"] is available but we use "5.3.1"
 [clj-time "0.9.0"] is available but we use "0.8.0"
-``
+```
 
 ## 0.15.0 (8.12.2014)
 
