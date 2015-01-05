@@ -11,9 +11,9 @@
     - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for `2.0`
     - [Resource listing](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#51-resource-listing) and [Api declarations](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#52-api-declaration) for `1.2`.
     - [Swagger-UI](https://github.com/metosin/ring-swagger-ui) bindings. (the UI itself is packaged for [separately](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
- - For web developers
-  - Extendable Schema->JSON Mappings
-  - Schema coersion utilities
+- For web developers
+  - Extendable Schema->JSON Mappings with out-of-the-box support for most common types
+  - Utilities for input & output Schema validation & coercion
 
 ## Latest version
 
@@ -26,19 +26,23 @@
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger)
 - [rook](https://github.com/AvisoNovate/rook)
 
-If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto:
+## Adapting Ring-Swagger
 
-1. Define routes to serve the following:
-  - **api listing**: `ring.swagger.core/api-listing`
-  - **api declaration**: `ring.swagger.core/api-declaration`
-  - (optionally) **swagger-ui**: `ring.swagger.ui/swagger-ui`
-2. Create code to collect routes from your web lib and to pass them to Ring-Swagger fns. Sample adapter [Here](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger.clj)
+If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto (Swagger 2.0):
+
+1. Create code to collect route information from your web lib and to pass them to Ring-Swagger (ring.swagger.spec2)
+  - See sample adapter from [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger.clj) with [tests](https://github.com/metosin/fnhouse-swagger/blob/master/test/fnhouse/swagger_test.clj)
+2. Create routes for the Swagger artifacts:
+  - `swagger.json` via `ring.swagger.spec2/swagger-json`
+  - `swagger-ui` via `ring.swagger.ui/swagger-ui` (the ring handler) or `ring-swagger.ui/wrap-swagger-ui` (middleware)
 3. Publish it.
 4. Pull Request to list your adapter here
 
-# Usage
+If you need help in adoption, feel free to ping us (say `ring-swagger` at #clojure at Freenode or find `ikitommi`)
 
-## Models
+## Web Schemas
+
+Vanilla [Schemas](https://github.com/Prismatic/schema) can be used to publish the web apis.
 
 From version `0.9.0` onwards, vanilla `schema.core/defschema` is used to define the web schemas. See [Schema](https://github.com/Prismatic/schema) for more details on building the schemas.
 
