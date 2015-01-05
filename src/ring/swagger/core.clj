@@ -7,44 +7,20 @@
             [schema.macros :as sm]
             [plumbing.core :refer :all :exclude [update]]
             [schema.utils :as su]
+            ring.swagger.json ;; needed for the json-encoders
             [ring.swagger.schema :as schema]
             [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [cheshire.generate :refer [add-encoder]]
-            [org.tobereplaced.lettercase :as lc])
-  (:import [com.fasterxml.jackson.core JsonGenerator]))
+            [org.tobereplaced.lettercase :as lc]))
 
 ;;
 ;; Models
 ;;
 
-(s/defschema Route {:method   s/Keyword
-                    :uri      [s/Any]
-                    :metadata {s/Keyword s/Any}})
-
 (s/defschema ResponseMessage {:code Long
                               (s/optional-key :message) String
                               (s/optional-key :responseModel) s/Any})
-
-;;
-;; JSON Encoding
-;;
-
-(add-encoder schema.utils.ValidationError
-  (fn [x ^JsonGenerator jg]
-    (.writeString jg
-      (str (su/validation-error-explain x)))))
-
-(defn date-time-encoder [x ^JsonGenerator jg]
-  (.writeString jg (coerce/unparse-date-time x)))
-
-(add-encoder java.util.Date date-time-encoder)
-(add-encoder org.joda.time.DateTime date-time-encoder)
-
-(add-encoder org.joda.time.LocalDate
-  (fn [x ^JsonGenerator jg]
-    (.writeString jg (coerce/unparse-date x))))
 
 ;;
 ;; Schema transformations

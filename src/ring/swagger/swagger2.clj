@@ -3,10 +3,9 @@
             [clojure.walk :as walk]
             [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
-            [ring.swagger.core] ;; needed for the json-encoders
             [schema.core :as s]
-            [schema-tools.core :as st]
-            [plumbing.core :refer :all]
+            [plumbing.core :refer :all :exclude [update]]
+            ring.swagger.json ;; needed for the json-encoders
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]
