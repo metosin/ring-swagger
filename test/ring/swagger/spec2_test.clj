@@ -351,7 +351,9 @@
                                          :produces     ["application/xyz"]
                                          :parameters   {:path {:id Integer}}
                                          :responses    {200 {:description "ok"
-                                                             :schema Pet}}}}}})
+                                                             :schema Pet}
+                                                        404 {:description "fail"
+                                                             :schema PetError}}}}}})
     => {:swagger     "2.0"
         :info        {:version        ..version..
                       :title          ..title..
@@ -381,7 +383,9 @@
                                                               :type        "integer"
                                                               :format      "int32"}]
                                               :responses    {200 {:description "ok"
-                                                                  :schema {:$ref "#/definitions/Pet"}}}}}}
+                                                                  :schema {:$ref "#/definitions/Pet"}}
+                                                             404 {:description "fail"
+                                                                  :schema {:$ref "#/definitions/PetError"}}}}}}
         :definitions {:Pet      {:required   [:id :name]
                                  :properties {:id        {:type        "integer"
                                                           :format      "int64"
@@ -412,4 +416,6 @@
                                                      :format      "int64"
                                                      :description "Unique identifier for the tag"}
                                               :name {:type        "string"
-                                                     :description "Friendly name for the tag"}}}}}))
+                                                     :description "Friendly name for the tag"}}}
+                      :PetError {:properties {:message {:type "string"}}
+                                 :required [:message]}}}))
