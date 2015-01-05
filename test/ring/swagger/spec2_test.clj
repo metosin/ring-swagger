@@ -1,9 +1,9 @@
-(ns ring.swagger.core2-test
+(ns ring.swagger.spec2-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
-            [ring.swagger.core2 :refer :all]
+            [ring.swagger.spec2 :refer :all]
             [flatland.ordered.map :refer :all]))
 
 ;;
