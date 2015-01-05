@@ -5,7 +5,8 @@
             [ring.swagger.core :refer [with-named-sub-schemas]]
             [flatland.ordered.map :refer :all])
   (:import [java.util Date UUID]
-           [org.joda.time DateTime LocalDate]))
+           [org.joda.time DateTime LocalDate]
+           [java.util.regex Pattern]))
 
 (s/defschema Model {:value String})
 
@@ -20,6 +21,7 @@
     (->json Date)      => {:type "string" :format "date-time"}
     (->json DateTime)  => {:type "string" :format "date-time"}
     (->json LocalDate) => {:type "string" :format "date"}
+    (->json Pattern)   => {:type "string" :format "regex"}
     (->json UUID)      => {:type "string" :format "uuid"})
 
   (fact "schema types"
@@ -88,6 +90,7 @@
     Date
     DateTime
     LocalDate
+    Pattern
     UUID
     clojure.lang.Keyword)
 

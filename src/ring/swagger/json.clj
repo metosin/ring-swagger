@@ -5,6 +5,7 @@
   (:import [com.fasterxml.jackson.core JsonGenerator]
            [schema.utils ValidationError]
            [java.util Date]
+           [java.util.regex Pattern]
            [org.joda.time DateTime LocalDate]))
 
 (defn date-time-encoder [x ^JsonGenerator jg]
@@ -26,3 +27,7 @@
 (add-encoder LocalDate
   (fn [x ^JsonGenerator jg]
     (.writeString jg (coerce/unparse-date x))))
+
+(add-encoder Pattern
+  (fn [x ^JsonGenerator jg]
+    (.writeString jg (coerce/unparse-pattern x))))

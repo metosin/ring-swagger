@@ -80,6 +80,7 @@
 (defmethod json-type java.util.Date          [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.DateTime  [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
+(defmethod json-type java.util.regex.Pattern [_] {:type "string" :format "regex"})
 
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class
