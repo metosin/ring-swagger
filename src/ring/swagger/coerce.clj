@@ -5,7 +5,8 @@
             [clj-time.coerce :as tc]
             [ring.swagger.common :refer :all])
   (:import [org.joda.time LocalDate DateTime]
-           [java.util Date]))
+           [java.util Date]
+           [java.util.regex Pattern]))
 
 (defn date-time? [x] (#{Date DateTime} x))
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
@@ -15,6 +16,9 @@
 
 (defn unparse-date-time ^String [date] (tf/unparse (tf/formatters :date-time) (->DateTime date)))
 (defn unparse-date ^String [date] (tf/unparse-local-date (tf/formatters :date) (->DateTime date)))
+
+(defn parse-pattern ^Pattern [pattern] (re-pattern pattern))
+(defn unparse-pattern ^String [pattern] (.toString pattern))
 
 (defn date-time-matcher
   [schema]
@@ -31,6 +35,14 @@
     (fn [x]
       (if (string? x)
         (parse-date x)
+        x))))
+
+(defn pattern-matcher
+  [schema]
+  (if (= Pattern schema)
+    (fn [x]
+      (if (string? x)
+        (parse-pattern x)
         x))))
 
 (defn set-matcher
@@ -72,7 +84,8 @@
       (sc/keyword-enum-matcher schema)
       (set-matcher schema)
       (date-time-matcher schema)
-      (date-matcher schema)))
+      (date-matcher schema)
+      (pattern-matcher schema)))
 
 (defn query-schema-coercion-matcher
   [schema]

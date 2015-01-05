@@ -46,6 +46,10 @@
   (fn [x ^JsonGenerator jg]
     (.writeString jg (coerce/unparse-date x))))
 
+(add-encoder java.util.regex.Pattern
+ (fn [x ^JsonGenerator jg]
+   (.writeString jg (coerce/unparse-pattern x))))
+
 ;;
 ;; Schema transformations
 ;;

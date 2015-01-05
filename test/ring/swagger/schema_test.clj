@@ -7,7 +7,8 @@
             [ring.swagger.common :refer :all]
             ring.swagger.core) ;; transformers
   (:import  [java.util Date UUID]
-            [org.joda.time DateTime LocalDate]))
+            [org.joda.time DateTime LocalDate]
+            [java.util.regex Pattern]))
 
 (s/defschema SubType  {:alive Boolean})
 (s/defschema AllTypes
@@ -25,7 +26,8 @@
        :m (s/both Long (s/pred odd? 'odd?))
        :n SubType
        :o [{:p #{{:q String}}}]
-       :u UUID}})
+       :u UUID
+       :v Pattern}})
 
 (def model {:a true
             :b 2.2
@@ -41,7 +43,13 @@
                 :m 1
                 :n {:alive true}
                 :o [{:p #{{:q "abba"}}}]
-                :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}})
+                :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")
+                :v (re-pattern "[a-z0-9]")}})
+
+;; since every java.util.regex.Pattern is not equal
+(defn- pattern-to-str
+  [model]
+  (update-in model [:e :v] str))
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
@@ -55,7 +63,7 @@
       jmodel =not=> model)
 
     (fact "coerce! makes models match"
-      (coerce! AllTypes jmodel) => model)))
+      (pattern-to-str (coerce! AllTypes jmodel)) => (pattern-to-str model))))
 
 (fact "date-time coercion"
   (fact "with millis"

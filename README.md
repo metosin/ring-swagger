@@ -47,6 +47,7 @@ In namespace `ring.swagger.schema` there are some helpers for creating the schem
 | `Boolean`                   | boolean | `true`
 | `nil`, `s/Any`              | void |
 | `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`, consumes also without millis: `"2014-02-18T18:25:37Z"`
+| `java.util.regex.Pattern`  | string, regex | `#"[a-z0-9]+"`
 | `s/uuid`, `java.util.UUID`        | string, uuid | `"77e70512-1337-dead-beef-0123456789ab"`
 | `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
 | `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
@@ -119,6 +120,7 @@ There are two modes for coercions: `:json` and `:query`. Both `coerce` and `coer
 - numbers -> `Long` or `Double`
 - string -> Keyword
 - string -> `java.util.Date`, `org.joda.time.DateTime` or `org.joda.time.LocalDate`
+- string -> `java.util.regex.Pattern`
 - vectors -> Sets
 
 #### Query-coercion:
