@@ -32,67 +32,62 @@
    :basePath "/"
    :consumes ["application/json" "application/edn"]
    :produces ["application/json" "application/edn"]
-   :paths {"/api/:id" [{:method :get
-                        :tags [:tag1 :tag2 :tag3]
-                        :summary "summary"
-                        :description "description"
-                        :externalDocs {:url "url"
-                                       :description "more info"}
-                        :operationId "operationId"
-                        :consumes ["application/xyz"]
-                        :produces ["application/xyz"]
-                        :parameters {:body Nothing
-                                     :query (merge Anything {:x Long :y Long})
-                                     :path {:id String}
-                                     :header Anything
-                                     :formData Anything}
-                        :responses {200 {:description "ok"
-                                         :schema {:sum Long}}
-                                    400 {:description "not found"
-                                         :schema NotFound}
-                                    :default {:description "error"
-                                              :schema {:code Long}}}}]
-           "/api/parrots" [{:method :get
-                            :parameters {:body Nothing
-                                         :query Anything
-                                         :path Nothing
-                                         :header Anything
-                                         :formData Anything}
-                            :responses {200 {:schema Parrot
-                                             :description ""}}}
-                           ]
-           "/api/pets" [{:method :get
-                         :parameters {:body Pet
-                                      :query (merge Anything {:x Long :y Long})
-                                      :path Nothing
-                                      :header Anything
-                                      :formData Anything}
-                         :responses {200 {:description "ok"
-                                          :schema {:sum Long}}
-                                     :default {:description "error"
-                                               :schema {:code Long}}}}
-                        {:method :post
-                         :parameters {:body #{Pet}
-                                      :query (merge Anything {:x Long :y Long})
-                                      :path Nothing
-                                      :header Anything
-                                      :formData Anything}
-                         :responses {200 {:description "ok"
-                                          :schema {:sum Long}}
-                                     :default {:description "error"
-                                               :schema {:code Long}}}}
-                        {:method :put
-                         :parameters {:body [Pet]
-                                      :query (merge Anything {:x Long :y Long})
-                                      :path Nothing
-                                      :header Anything
-                                      :formData Anything}
-                         :responses {200 {:description "ok"
-                                          :schema {:sum Long}}
-                                     :default {:description "error"
-                                               :schema {:code Long}}}}]}})
+   :paths {"/api/:id" {:get {:tags [:tag1 :tag2 :tag3]
+                             :summary "summary"
+                             :description "description"
+                             :externalDocs {:url "url"
+                                            :description "more info"}
+                             :operationId "operationId"
+                             :consumes ["application/xyz"]
+                             :produces ["application/xyz"]
+                             :parameters {:body Nothing
+                                          :query (merge Anything {:x Long :y Long})
+                                          :path {:id String}
+                                          :header Anything
+                                          :formData Anything}
+                             :responses {200 {:description "ok"
+                                              :schema {:sum Long}}
+                                         400 {:description "not found"
+                                              :schema NotFound}
+                                         :default {:description "error"
+                                                   :schema {:code Long}}}}}
+           "/api/parrots" {:get {:parameters {:body Nothing
+                                              :query Anything
+                                              :path Nothing
+                                              :header Anything
+                                              :formData Anything}
+                                 :responses {200 {:schema Parrot
+                                                  :description ""}}}}
+           "/api/pets" {:get {:parameters {:body Pet
+                                           :query (merge Anything {:x Long :y Long})
+                                           :path Nothing
+                                           :header Anything
+                                           :formData Anything}
+                              :responses {200 {:description "ok"
+                                               :schema {:sum Long}}
+                                          :default {:description "error"
+                                                    :schema {:code Long}}}}
+                        :post {:parameters {:body #{Pet}
+                                            :query (merge Anything {:x Long :y Long})
+                                            :path Nothing
+                                            :header Anything
+                                            :formData Anything}
+                               :responses {200 {:description "ok"
+                                                :schema {:sum Long}}
+                                           :default {:description "error"
+                                                     :schema {:code Long}}}}
+                        :put {:parameters {:body [Pet]
+                                           :query (merge Anything {:x Long :y Long})
+                                           :path Nothing
+                                           :header Anything
+                                           :formData Anything}
+                              :responses {200 {:description "ok"
+                                               :schema {:sum Long}}
+                                          :default {:description "error"
+                                                    :schema {:code Long}}}}}}})
 
-#_(clojure.pprint/pprint (swagger-json swagger-with-models))
+(fact "is valid"
+  (validate swagger-with-models) => nil)
 
 (fact "swagger 2.0 spec"
   (s/check spec/Swagger (swagger-json swagger-with-models)) => nil)

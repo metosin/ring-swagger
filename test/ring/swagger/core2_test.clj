@@ -287,11 +287,10 @@
 
 (fact "extract-models"
   (fact "returns both return and body-parameters but not query or path parameter types"
-    (extract-models {:paths {"/foo" [{:method :get
-                                      :parameters {:body Category
-                                                   :query Pet
-                                                   :path Pet}
-                                      :responses {200 {:schema Tag}}}]}})
+    (extract-models {:paths {"/foo" {:get {:parameters {:body Category
+                                                        :query Pet
+                                                        :path Pet}
+                                           :responses {200 {:schema Tag}}}}}})
     => [Category Tag]))
 
 
@@ -342,18 +341,17 @@
        :basePath ..basepath..
        :consumes ["application/json" "application/edn"]
        :produces ["application/json" "application/edn"]
-       :paths    {"/api/path/:id" [{:method       :get
-                                    :tags         [:tag1 :tag2 :tag3]
-                                    :summary      ..summary1..
-                                    :description  ..description2..
-                                    :externalDocs {:url ..url3..
-                                                   :description ..description3..}
-                                    :operationId  ..operationid..
-                                    :consumes     ["application/xyz"]
-                                    :produces     ["application/xyz"]
-                                    :parameters   {:path {:id Integer}}
-                                    :responses    {200 {:description "ok"
-                                                        :schema Pet}}}]}})
+       :paths    {"/api/path/:id" {:get {:tags         [:tag1 :tag2 :tag3]
+                                         :summary      ..summary1..
+                                         :description  ..description2..
+                                         :externalDocs {:url ..url3..
+                                                        :description ..description3..}
+                                         :operationId  ..operationid..
+                                         :consumes     ["application/xyz"]
+                                         :produces     ["application/xyz"]
+                                         :parameters   {:path {:id Integer}}
+                                         :responses    {200 {:description "ok"
+                                                             :schema Pet}}}}}})
     => {:swagger     "2.0"
         :info        {:version        ..version..
                       :title          ..title..

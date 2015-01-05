@@ -5,6 +5,7 @@
             [ring.swagger.impl :refer :all]
             [ring.swagger.core] ;; needed for the json-encoders
             [schema.core :as s]
+            [schema-tools.core :as st]
             [plumbing.core :refer :all]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
@@ -65,6 +66,7 @@
   (let [route-meta      (->> swagger
                              :paths
                              vals
+                             (map vals)
                              flatten)
         body-models     (->> route-meta
                              (map (comp :body :parameters)))
@@ -175,16 +177,15 @@
              (map (fn [r] (update-in r [:schema] response-schema))
                   (vals responses))))))
 
-(defn transform-path-operations
+(defn transform-operation
   "Returns a map with methods as keys and the Operation
    maps with parameters and responses transformed to comply
    with Swagger JSON spec as values"
-  [operations]
-  (into {} (map (juxt :method #(-> %
-                                   (dissoc :method)
-                                   (update-in [:parameters] convert-parameters)
-                                   (update-in [:responses]  convert-response-messages)))
-                operations)))
+  [operation]
+  (for-map [[k v] operation]
+    k (-> v
+          (update-in [:parameters] convert-parameters)
+          (update-in [:responses] convert-response-messages))))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
@@ -194,14 +195,14 @@
                          :paths
                          keys
                          (map swagger-path))
-        methods     (->> swagger
+        operations  (->> swagger
                          :paths
                          vals
-                         (map transform-path-operations))
+                         (map transform-operation))
         definitions (->> swagger
                          extract-models
                          transform-models)]
-    (vector (zipmap paths methods) definitions)))
+    (vector (zipmap paths operations) definitions)))
 
 ;;
 ;; Schema
@@ -213,9 +214,18 @@
                        :produces ["application/json"]
                        :consumes ["application/json"]})
 
+(s/defschema Parameters {(s/optional-key :body) s/Any
+                         (s/optional-key :query) s/Any
+                         (s/optional-key :path) s/Any
+                         (s/optional-key :header) s/Any
+                         (s/optional-key :formData) s/Any})
+
+(s/defschema Operation (-> spec/Operation
+                           (assoc (s/optional-key :parameters) Parameters)))
+
 (s/defschema Swagger (-> spec/Swagger
                          (dissoc :paths :definitions)
-                         (assoc :paths {s/Str s/Any})))
+                         (assoc :paths {s/Str {s/Keyword Operation}})))
 
 ;;
 ;; Public API
