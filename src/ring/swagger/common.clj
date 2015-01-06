@@ -1,5 +1,5 @@
 (ns ring.swagger.common
-  (:require [plumbing.core :refer [fn->]]))
+  (:require [plumbing.core :refer [fn-> dissoc-in]]))
 
 (defn remove-empty-keys
   "removes empty keys from a map"
@@ -45,3 +45,11 @@
 (defn plain-map?
   "checks whether input is a map, but not a record"
   [x] (and (map? x) (not (record? x))))
+
+(defn update-in-or-remove-key
+  ([m ks f] (update-in-or-remove-key m ks f nil?))
+  ([m ks f iff]
+    (let [v (f (get-in m ks))]
+      (if-not (iff v)
+        (assoc-in m ks v)
+        (dissoc-in m ks)))))

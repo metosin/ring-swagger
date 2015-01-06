@@ -183,8 +183,8 @@
   [operation]
   (for-map [[k v] operation]
     k (-> v
-          (update-in [:parameters] convert-parameters)
-          (update-in [:responses] convert-response-messages))))
+          (update-in-or-remove-key [:parameters] convert-parameters empty?)
+          (update-in-or-remove-key [:responses] convert-response-messages empty?))))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
