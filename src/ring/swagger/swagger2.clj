@@ -156,7 +156,7 @@
   (if model
     (for [[k v] (-> model value-of strict-schema)
           :when (s/specific-key? k)
-          :let [rk (s/explicit-schema-key (eval k))]]
+          :let [rk (s/explicit-schema-key k)]]
       (jsons/->parameter {:in type
                           :name (name rk)
                           :required (s/required-key? k)}
