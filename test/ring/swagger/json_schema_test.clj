@@ -22,6 +22,7 @@
     (->json DateTime)  => {:type "string" :format "date-time"}
     (->json LocalDate) => {:type "string" :format "date"}
     (->json Pattern)   => {:type "string" :format "regex"}
+    (->json #"[6-9]")  => {:type "string" :pattern "[6-9]"}
     (->json UUID)      => {:type "string" :format "uuid"})
 
   (fact "schema types"

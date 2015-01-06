@@ -53,7 +53,7 @@
 
 (defmulti json-type
   (fn [e]
-    (if (instance? java.lang.Class e)
+    (if (instance? Class e)
       e
       (class e))))
 
@@ -80,7 +80,10 @@
 (defmethod json-type java.util.Date          [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.DateTime  [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
-(defmethod json-type java.util.regex.Pattern [_] {:type "string" :format "regex"})
+(defmethod json-type java.util.regex.Pattern [e]
+  (if (instance? java.util.regex.Pattern e)
+    {:type "string" :pattern (str e)}
+    {:type "string" :format "regex"}))
 
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class

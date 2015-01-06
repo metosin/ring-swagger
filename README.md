@@ -62,8 +62,9 @@ Below is the list of currently supported Schema predicates.
 | `Boolean`                   | boolean | `true`
 | `nil`, `s/Any`              | void |
 | `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`, consumes also without millis: `"2014-02-18T18:25:37Z"`
-| `java.util.regex.Pattern`, `#"[a-z0-9]+"` | string, regex | `"a6"`
-| `s/uuid`, `java.util.UUID`        | string, uuid | `"77e70512-1337-dead-beef-0123456789ab"`
+| `java.util.regex.Pattern`,  | string, regex | `[a-z0-9]`
+| `#"[a-z0-9]+"`              | string, pattern | `"a6"`
+| `s/uuid`, `java.util.UUID`  | string, uuid | `"77e70512-1337-dead-beef-0123456789ab"`
 | `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
 | `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
 | `(s/maybe X)`          | *type of X*
@@ -109,7 +110,6 @@ these should work, just need the mappings (feel free to contribute!):
 
 - `s/Symbol`
 - `s/Inst`
-- `s/Regex`
 
 ## Adding support for your own schema-types
 

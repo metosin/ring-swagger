@@ -17,8 +17,7 @@
 
 (add-encoder ValidationError
   (fn [x ^JsonGenerator jg]
-    (.writeString jg
-                  (str (su/validation-error-explain x)))))
+    (.writeString jg (str (su/validation-error-explain x)))))
 
 (add-encoder Date date-time-encoder)
 

@@ -5,10 +5,10 @@
             [clj-time.core :as t]
             [ring.swagger.schema :refer :all]
             [ring.swagger.common :refer :all]
-            ring.swagger.core) ;; transformers
+            ring.swagger.json)
   (:import  [java.util Date UUID]
-            [org.joda.time DateTime LocalDate]
-            [java.util.regex Pattern]))
+            [java.util.regex Pattern]
+            [org.joda.time DateTime LocalDate]))
 
 (s/defschema SubType  {:alive Boolean})
 (s/defschema AllTypes
@@ -27,7 +27,8 @@
        :n SubType
        :o [{:p #{{:q String}}}]
        :u UUID
-       :v Pattern}})
+       :v Pattern
+       :w #"a[6-9]"}})
 
 (def model {:a true
             :b 2.2
@@ -44,7 +45,13 @@
                 :n {:alive true}
                 :o [{:p #{{:q "abba"}}}]
                 :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")
-                :v "a10"}})
+                :v "a[6-9]"
+                :w "a9"}})
+
+;; since every java.util.regex.Pattern is not equal
+(defn- pattern-to-str
+  [model]
+  (update-in model [:e :v] str))
 
 (fact "All types can be read from json"
   (let [json   (cheshire/generate-string model)
