@@ -190,18 +190,17 @@
   (str/replace uri #":([^/]+)" "{$1}"))
 
 (defn extract-paths-and-definitions [swagger]
-  (let [paths       (->> swagger
-                         :paths
-                         keys
-                         (map swagger-path))
-        operations  (->> swagger
-                         :paths
-                         vals
-                         (map transform-operation))
+  (let [paths (->> swagger
+                   :paths
+                   (reduce-kv (fn [acc k v]
+                                (assoc acc
+                                  (swagger-path k)
+                                  (transform-operation v))) {}))
         definitions (->> swagger
                          extract-models
                          transform-models)]
-    (vector (zipmap paths operations) definitions)))
+    [paths definitions]))
+
 
 ;;
 ;; Schema
