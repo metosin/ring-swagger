@@ -26,12 +26,12 @@
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [rook](https://github.com/AvisoNovate/rook)
 
-## Adapting Ring-Swagger
+## Creating your own adapter
 
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto (Swagger 2.0):
 
 1. Create code to collect route information from your web lib and to pass them to Ring-Swagger (in Schema `ring.swagger.swagger2/Swagger`)
-  - See sample adapter from [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger.clj) with [tests](https://github.com/metosin/fnhouse-swagger/blob/master/test/fnhouse/swagger_test.clj)
+  - See sample adapter from [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger2.clj) with [tests](https://github.com/metosin/fnhouse-swagger/blob/master/test/fnhouse/swagger2_test.clj)
 2. Create routes for the Swagger artifacts:
   - `swagger.json` via `ring.swagger.swagger2/swagger-json`
   - `swagger-ui` via `ring.swagger.ui/swagger-ui` (the ring handler) or `ring-swagger.ui/wrap-swagger-ui` (middleware)
@@ -42,7 +42,7 @@ If you need help in adoption, feel free to ping us (try `ring-swagger` at #cloju
 
 ### Adopting 1.2
 
-Example adoption found in [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger12.clj).
+Example adoption found in [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger.clj).
 
 ## Web Schemas
 
