@@ -9,7 +9,8 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]
-            [ring.swagger.swagger2-spec :as spec]))
+            [ring.swagger.swagger2-spec :as spec]
+            [instar.core :as instar]))
 
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
@@ -165,16 +166,14 @@
 (defn convert-parameters [parameters]
   (into [] (mapcat extract-parameter parameters)))
 
-;; TODO can we transform anonymous maps like this without $ref
 (defn convert-response-messages [responses]
-  (binding [jsons/*ignore-missing-mappings* true]
-   (letfn [(response-schema [schema]
-             (if-let [json-schema (->json schema)]
-               json-schema
-               (transform schema)))]
-     (zipmap (keys responses)
-             (map (fn [r] (update-in r [:schema] response-schema))
-                  (vals responses))))))
+  (letfn [(response-schema [schema]
+            (if-let [json-schema (->json schema)]
+              json-schema
+              (transform schema)))]
+    (zipmap (keys responses)
+            (map (fn [r] (update-in r [:schema] response-schema))
+                 (vals responses)))))
 
 (defn transform-operation
   "Returns a map with methods as keys and the Operation
@@ -202,6 +201,33 @@
                          extract-models
                          transform-models)]
     (vector (zipmap paths operations) definitions)))
+
+;;
+;; Named top level schemas in body parameters and responses
+;;
+
+(defn direct-or-contained [f x]
+  (if (valid-container? x) (f (first x)) (f x)))
+
+(defn ensure-model-schema-name [model prefix]
+  (if-not (or (direct-or-contained s/schema-name model)
+              (direct-or-contained (comp not map?) model))
+    (update-schema model (fn-> (s/schema-with-name (gensym (or prefix "Model")))))
+    model))
+
+(defn ensure-named-top-level-models
+  "Takes a ring-swagger spec and returns a new version
+   with a generated name added for all the top level maps
+   that come as body parameters or response models and are
+   not named schemas already"
+  [swagger]
+  (let [swagger (instar/transform swagger
+                                  [:paths * * :parameters :body]
+                                  (fn-> (ensure-model-schema-name "Body")))
+        swagger (instar/transform swagger
+                                  [:paths * * :responses * :schema]
+                                  (fn-> (ensure-model-schema-name "Response")))]
+    swagger))
 
 ;;
 ;; Schema
@@ -238,14 +264,11 @@
 (s/defn swagger-json
   "produces the swagger-json from ring-swagger spec"
   [swagger :- Swagger] :- spec/Swagger
-  (let [[paths definitions] (extract-paths-and-definitions swagger)]
+  (let [[paths definitions] (-> swagger
+                                ensure-named-top-level-models
+                                extract-paths-and-definitions)]
     (merge
       swagger-defaults
       (-> swagger
           (assoc :paths paths)
           (assoc :definitions definitions)))))
-
-;; https://github.com/swagger-api/swagger-spec/blob/master/schemas/v2.0/schema.json
-;; https://github.com/swagger-api/swagger-spec/blob/master/examples/v2.0/json/petstore.json
-;; https://github.com/swagger-api/swagger-spec/blob/master/examples/v2.0/json/petstore-with-external-docs.json
-;; https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
