@@ -49,12 +49,7 @@
                                               :schema NotFound}
                                          :default {:description "error"
                                                    :schema {:code Long}}}}}
-           "/api/parrots" {:get {:parameters {:body Nothing
-                                              :query Anything
-                                              :path Nothing
-                                              :header Anything
-                                              :formData Anything}
-                                 :responses {200 {:schema Parrot
+           "/api/parrots" {:get {:responses {200 {:schema Parrot
                                                   :description ""}}}}
            "/api/pets" {:get {:parameters {:body Pet
                                            :query (merge Anything {:x Long :y Long})
