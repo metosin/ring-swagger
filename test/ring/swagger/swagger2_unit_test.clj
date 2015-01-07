@@ -273,6 +273,31 @@
     => [{:description "foo" :name "Body" :in :body :required true :schema {:type "array"
                                                                            :items {:$ref "#/definitions/Body"}}}]))
 
+(fact "ensure-named-top-level-models"
+
+  (let [[paths definitions] (extract-paths-and-definitions
+                             (ensure-named-top-level-models
+                              {:paths {"/api" {:post {:parameters {:body {:foo s/Str}}
+                                                      :responses  {200 {:description "ok"
+                                                                        :schema [{:bar Long}]}}}}}}))]
+
+    (fact "anonymous map as body parameter is named and refers to correct definition"
+          (let [body-schema-ref  (-> paths
+                                     (get-in ["/api" :post :parameters])
+                                     first
+                                     (get-in [:schema :$ref]))
+                body-schema-name (last (re-find #"\#\/definitions\/(.+)$" body-schema-ref))]
+            (get definitions (keyword body-schema-name))) => {:properties {:foo {:type "string"}}
+                                                              :required   [:foo]})
+
+    (fact "array of anonymous map as response model is named and refers to correct definition"
+          (let [response-schema-ref  (-> paths
+                                         (get-in ["/api" :post :responses 200 :schema :items :$ref]))
+                response-schema-name (last (re-find #"\#\/definitions\/(.+)$" response-schema-ref))]
+            (get definitions (keyword response-schema-name))) => {:properties {:bar {:type "integer"
+                                                                                     :format "int64"}}
+                                                                  :required   [:bar]})))
+
 ;; ;;
 ;; ;; Helpers
 ;; ;;
