@@ -9,7 +9,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]
-            [ring.swagger.swagger2-spec :as spec]
+            [ring.swagger.swagger2-schema :as schema]
             [instar.core :as instar]))
 
 (def Anything {s/Keyword s/Any})
@@ -238,32 +238,19 @@
                        :produces ["application/json"]
                        :consumes ["application/json"]})
 
-(s/defschema Parameters {(s/optional-key :body) s/Any
-                         (s/optional-key :query) s/Any
-                         (s/optional-key :path) s/Any
-                         (s/optional-key :header) s/Any
-                         (s/optional-key :formData) s/Any})
-
-(s/defschema Operation (-> spec/Operation
-                           (assoc (s/optional-key :parameters) Parameters)))
-
-;; TODO: make all swagger-defaults optional
-(s/defschema Swagger (-> spec/Swagger
-                         (dissoc :paths :definitions)
-                         (assoc :paths {s/Str {s/Keyword Operation}})))
-
 ;;
 ;; Public API
 ;;
 
+(def Swagger schema/Swagger)
+
 (defn validate
   "validates input against the ring-swagger spec"
-  [swagger]
-  (s/check Swagger (merge swagger-defaults swagger)))
+  [swagger] (s/check Swagger swagger))
 
 (s/defn swagger-json
   "produces the swagger-json from ring-swagger spec"
-  [swagger :- Swagger] :- spec/Swagger
+  [swagger :- Swagger]
   (let [[paths definitions] (-> swagger
                                 ensure-named-top-level-models
                                 extract-paths-and-definitions)]
