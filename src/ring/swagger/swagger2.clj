@@ -247,6 +247,7 @@
 (s/defschema Operation (-> spec/Operation
                            (assoc (s/optional-key :parameters) Parameters)))
 
+;; TODO: make all swagger-defaults optional
 (s/defschema Swagger (-> spec/Swagger
                          (dissoc :paths :definitions)
                          (assoc :paths {s/Str {s/Keyword Operation}})))

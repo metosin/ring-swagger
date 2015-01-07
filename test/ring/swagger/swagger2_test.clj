@@ -89,5 +89,6 @@
 (fact "is valid"
   (validate swagger-with-models) => nil)
 
+;; TODO: use real validator (https://github.com/swagger-api/validator-badge) here
 (fact "swagger 2.0 spec"
   (s/check spec/Swagger (swagger-json swagger-with-models)) => nil)

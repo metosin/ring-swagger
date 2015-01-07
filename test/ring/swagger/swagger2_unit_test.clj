@@ -439,4 +439,13 @@
                                               :name {:type        "string"
                                                      :description "Friendly name for the tag"}}}
                       :PetError {:properties {:message {:type "string"}}
-                                 :required [:message]}}}))
+                                 :required [:message]}}})
+
+  ;; TODO: is this valid?
+  (fact "missing parameters & responses"
+    (swagger-json
+      {:paths {"/ping" {:get {}}}})
+
+    => (merge swagger-defaults
+              {:definitions {}}
+              {:paths {"/ping" {:get nil}}})))
