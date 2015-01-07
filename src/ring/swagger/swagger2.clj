@@ -142,11 +142,11 @@
 (defmethod extract-body-parameter :default [model]
   (if-let [schema-name (s/schema-name model)]
     (let [schema-json (->json model)]
-     (vector {:in          :body
-              :name        (name schema-name)
-              :description (or (:description schema-json) "")
-              :required    true
-              :schema      (dissoc schema-json :description)}))))
+      (vector {:in          :body
+               :name        (name schema-name)
+               :description (or (:description schema-json) "")
+               :required    true
+               :schema      (dissoc schema-json :description)}))))
 
 (defmulti ^:private extract-parameter first)
 
