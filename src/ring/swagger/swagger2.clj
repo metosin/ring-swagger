@@ -5,12 +5,14 @@
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [plumbing.core :refer :all :exclude [update]]
-            ring.swagger.json ;; needed for the json-encoders
+            ring.swagger.json
+            ;; needed for the json-encoders
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]
             [ring.swagger.swagger2-schema :as schema]
-            [instar.core :as instar]))
+            [instar.core :as instar])
+  (:import (clojure.lang Sequential IPersistentSet)))
 
 (def Anything {s/Keyword s/Any})
 (def Nothing {})
@@ -114,11 +116,11 @@
 
 (defmulti ^:private extract-body-parameter
   (fn [e]
-    (if (instance? java.lang.Class e)
+    (if (instance? Class e)
       e
       (class e))))
 
-(defmethod extract-body-parameter clojure.lang.Sequential [e]
+(defmethod extract-body-parameter Sequential [e]
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
@@ -128,7 +130,7 @@
              :schema      {:type  "array"
                            :items (dissoc schema-json :description)}})))
 
-(defmethod extract-body-parameter clojure.lang.IPersistentSet [e]
+(defmethod extract-body-parameter IPersistentSet [e]
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
@@ -201,7 +203,6 @@
                          extract-models
                          transform-models)]
     [paths definitions]))
-
 
 ;;
 ;; Named top level schemas in body parameters and responses
