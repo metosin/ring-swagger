@@ -93,7 +93,7 @@
   (fact "with swagger-docs & oauth2 set"
     (conf-js nil {:swagger-docs "/lost"
                   :oauth2       {:client-id "1" :app-name "2" :realm "3"}})
-    => "window.API_CONF = {\"oauth2\":{\"realm\":\"3\",\"app-name\":\"2\",\"client-id\":\"1\"},\"url\":\"/lost\"};")
+    => "window.API_CONF = {\"oauth2\":{\"clientId\":\"1\",\"appName\":\"2\",\"realm\":\"3\"},\"url\":\"/lost\"};")
 
   (fact "does not fail with crappy input"
     (conf-js nil {:kikka "kukka"

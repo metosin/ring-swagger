@@ -13,9 +13,10 @@
                     :or {swagger-docs "/swagger.json"
                          oauth2 nil}}]
   (let [swagger-docs (swagger/join-paths (swagger/context req) swagger-docs)
-        oauth2-data (select-keys oauth2 [:client-id :app-name :realm])
         conf (cond-> {:url swagger-docs}
-                     oauth2 (assoc :oauth2 oauth2-data))]
+                     oauth2 (assoc :oauth2 {"clientId" (:client-id oauth2)
+                                            "appName" (:app-name oauth2)
+                                            "realm" (:realm oauth2)}))]
     (str "window.API_CONF = " (json/encode conf) ";")))
 
 (defn swagger-ui
