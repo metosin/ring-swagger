@@ -332,9 +332,9 @@
       :Foo {:properties {:bar {:$ref "#/definitions/Bar"}}
             :required [:bar]}})
 
-;; ;;
-;; ;; Final json
-;; ;;
+;;
+;; Final json TODO: (duplicate tests to ring.swagger.swagger2-test?
+;;
 
 (facts "swagger json"
   (fact "without parameters"
