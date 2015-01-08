@@ -80,7 +80,7 @@
                                                     :schema {:code Long}}}}}}})
 
 (fact "is valid"
-  (validate swagger-with-models) => nil)
+  (s/check Swagger swagger-with-models) => nil)
 
 ;; TODO: use real validator (https://github.com/swagger-api/validator-badge) here
 #_(fact "swagger 2.0 spec"

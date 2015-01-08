@@ -244,10 +244,6 @@
 
 (def Swagger schema/Swagger)
 
-(defn validate
-  "validates input against the ring-swagger spec"
-  [swagger] (s/check Swagger swagger))
-
 (s/defn swagger-json
   "produces the swagger-json from ring-swagger spec"
   [swagger :- Swagger]
