@@ -1,6 +1,8 @@
 (ns ring.swagger.swagger2-test
   (:require [schema.core :as s]
             [ring.swagger.swagger2 :refer :all]
+            [ring.swagger.validator :refer [validate]]
+            [cheshire.core :as json]
             [midje.sweet :refer :all]))
 
 (s/defschema LegOfPet {:length Long})
@@ -82,6 +84,6 @@
 (fact "is valid"
   (s/check Swagger swagger-with-models) => nil)
 
-;; TODO: use real validator (https://github.com/swagger-api/validator-badge) here
-#_(fact "swagger 2.0 spec"
-  (s/check spec/Swagger (swagger-json swagger-with-models)) => nil)
+(fact "swagger 2.0 spec"
+  (validate (json/generate-string (swagger-json swagger-with-models))) => nil)
+

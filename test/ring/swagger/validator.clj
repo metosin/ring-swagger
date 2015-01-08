@@ -14,7 +14,6 @@
         report        (.validate schema (JsonLoader/fromString input-doc))
         lp            (ListProcessingReport.)
         _             (.mergeWith lp report)
-        errors        (map #(bean (.asJson %)) (iterator-seq (.iterator lp)))]
-    (if (seq errors) errors)))
-
-; https://github.com/swagger-api/validator-badge/blob/master/src/main/java/com/wordnik/swagger/models/SchemaValidationError.java
+        errors        (iterator-seq (.iterator lp))]
+    (if (seq errors)
+      (map str errors))))
