@@ -167,18 +167,15 @@
   (into [] (mapcat extract-parameter parameters)))
 
 (defn convert-response-messages [responses]
-  (let [r (letfn [(response-schema [schema]
-                    (if-let [json-schema (->json schema)]
-                      json-schema
-                      (transform schema)))]
-            (zipmap (keys responses)
-                    (map (fn [r] (update-in r [:schema] response-schema))
-                         (vals responses))))]
-    (if-not (empty? r)
-      r
-      {200 {:description "" :schema s/Any}})))
-
-
+  (let [convert (fn [schema]
+                  (if-let [json-schema (->json schema)]
+                    json-schema
+                    (transform schema)))
+        responses (for-map [[k v] responses]
+                    k (update-in v [:schema] convert))]
+    (if-not (empty? responses)
+      responses
+      {:default {:description "" :schema s/Any}})))
 
 (defn transform-operation
     "Returns a map with methods as keys and the Operation
