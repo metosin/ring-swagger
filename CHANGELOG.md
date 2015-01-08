@@ -3,17 +3,19 @@
 - Swagger 2.0 support!!
   - new namespace `ring.swagger.swagger2` with clean public API with Schemas
 - **breaking change**: default spec location changed from `/api/docs` to `/swagger.json` (2.0 standard)
+- use real swagger json schema validator for tests (`ring.swagger.validator`)
 - potential **breaking changes** for library developers due massive refactoring
 - support for Regexp schemas:
    - `java.util.regex Pattern` / `s/Regex` (as a class)
    - `#"^[a-9]$"` (as a instance)
-- support for `authorization` parameters by [Dmitry Groshev](https://github.com/si14)
+- support for 1.2 spec `authorization` parameters by [Dmitry Groshev](https://github.com/si14)
 - oauth2-configs for swagger-ui by [Dmitry Groshev](https://github.com/si14)
 - updated dependencies:
 ```clojure
 [cheshire "5.4.0"] is available but we use "5.3.1"
 [clj-time "0.9.0"] is available but we use "0.8.0"
 [metosin/ring-swagger-ui "2.0.24"] is available but we use "2.0.17"
+[com.github.fge/json-schema-validator "2.2.6"] is available but we use "2.2.5"
 ```
 
 ## 0.15.0 (8.12.2014)
