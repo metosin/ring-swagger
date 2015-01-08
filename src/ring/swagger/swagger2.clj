@@ -167,23 +167,28 @@
   (into [] (mapcat extract-parameter parameters)))
 
 (defn convert-response-messages [responses]
-  (letfn [(response-schema [schema]
-            (if-let [json-schema (->json schema)]
-              json-schema
-              (transform schema)))]
-    (zipmap (keys responses)
-            (map (fn [r] (update-in r [:schema] response-schema))
-                 (vals responses)))))
+  (let [r (letfn [(response-schema [schema]
+                    (if-let [json-schema (->json schema)]
+                      json-schema
+                      (transform schema)))]
+            (zipmap (keys responses)
+                    (map (fn [r] (update-in r [:schema] response-schema))
+                         (vals responses))))]
+    (if-not (empty? r)
+      r
+      {200 {:description "" :schema s/Any}})))
+
+
 
 (defn transform-operation
-  "Returns a map with methods as keys and the Operation
-   maps with parameters and responses transformed to comply
-   with Swagger JSON spec as values"
-  [operation]
-  (for-map [[k v] operation]
-    k (-> v
-          (update-in-or-remove-key [:parameters] convert-parameters empty?)
-          (update-in-or-remove-key [:responses] convert-response-messages empty?))))
+    "Returns a map with methods as keys and the Operation
+     maps with parameters and responses transformed to comply
+     with Swagger JSON spec as values"
+    [operation]
+    (for-map [[k v] operation]
+      k (-> v
+            (update-in-or-remove-key [:parameters] convert-parameters empty?)
+            (update-in [:responses] convert-response-messages))))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))

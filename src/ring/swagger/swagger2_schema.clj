@@ -73,7 +73,7 @@
                         (s/optional-key :consumes) [s/Str]
                         (s/optional-key :produces) [s/Str]
                         (s/optional-key :parameters) Parameters
-                        :responses Responses
+                        (s/optional-key :responses) Responses
                         ;(s/optional-key :schemes) [Scheme]
                         ;(s/optional-key :security) s/Any
                         })
@@ -90,7 +90,7 @@
                       ;(s/optional-key :schemes) [Scheme]
                       (s/optional-key :consumes) [s/Str]
                       (s/optional-key :produces) [s/Str]
-                      :paths {s/Str {s/Keyword Operation}}
+                      (s/optional-key :paths) {s/Str {s/Keyword Operation}}
                       ;(s/optional-key :parameters) Parameters
                       ;(s/optional-key :responses) Responses
                       ;(s/optional-key :security) Security
