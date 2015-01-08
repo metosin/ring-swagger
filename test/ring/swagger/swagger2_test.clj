@@ -25,7 +25,7 @@
           :termsOfService "jeah"
           :contact {:name "name"
                     :url "url"
-                    :email "email"}
+                    :email "tommi@example.com"}
           :license {:name "name"
                     :url "url"}
           :x-kikka "jeah"}
