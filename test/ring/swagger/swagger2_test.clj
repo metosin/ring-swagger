@@ -81,9 +81,9 @@
                                           :default {:description "error"
                                                     :schema {:code Long}}}}}}})
 
-(fact "is valid"
+(fact "schema is a valid (ring-swagger) Swagger model"
   (s/check Swagger swagger-with-models) => nil)
 
-(fact "swagger 2.0 spec"
+(fact "valid swagger 2.0 schema will be generated"
   (validate (json/generate-string (swagger-json swagger-with-models))) => nil)
 

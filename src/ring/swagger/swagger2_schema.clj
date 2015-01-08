@@ -1,4 +1,5 @@
 (ns ring.swagger.swagger2-schema
+  "Schemas that Ring-Swagger expects from it's clients"
   (require [schema.core :as s]
            [plumbing.core :refer [fn->>]]))
 
