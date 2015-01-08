@@ -166,7 +166,7 @@
 (defn convert-parameters [parameters]
   (into [] (mapcat extract-parameter parameters)))
 
-(defn convert-response-messages [responses]
+(defn convert-responses [responses]
   (let [convert (fn [schema]
                   (if-let [json-schema (->json schema)]
                     json-schema
@@ -185,7 +185,7 @@
     (for-map [[k v] operation]
       k (-> v
             (update-in-or-remove-key [:parameters] convert-parameters empty?)
-            (update-in [:responses] convert-response-messages))))
+            (update-in [:responses] convert-responses))))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
