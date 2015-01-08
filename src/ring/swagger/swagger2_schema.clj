@@ -27,7 +27,7 @@
                      (s/optional-key :contact) {(s/optional-key :name) s/Str
                                                 (s/optional-key :url) s/Str
                                                 (s/optional-key :email) s/Str}
-                     (s/optional-key :licence) {:name s/Str
+                     (s/optional-key :license) {:name s/Str
                                                 (s/optional-key :url) s/Str}}))
 
 (s/defschema Tag (s/either s/Str s/Keyword))

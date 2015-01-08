@@ -24,7 +24,7 @@
           :contact {:name "name"
                     :url "url"
                     :email "email"}
-          :licence {:name "name"
+          :license {:name "name"
                     :url "url"}
           :x-kikka "jeah"}
    :basePath "/"

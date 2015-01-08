@@ -356,7 +356,7 @@
                   :contact {:name ..name1..
                             :url ..url1..
                             :email ..email1..}
-                  :licence {:name ..name2..
+                  :license {:name ..name2..
                             :url  ..url2..}
                   :x-kikka ..kikka..}
        :basePath ..basepath..
@@ -383,7 +383,7 @@
                       :contact        {:name ..name1..
                                        :url  ..url1..
                                        :email ..email1..}
-                      :licence        {:name ..name2..
+                      :license        {:name ..name2..
                                        :url ..url2..}
                       :x-kikka        ..kikka..}
         :basePath    ..basepath..

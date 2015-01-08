@@ -365,8 +365,8 @@
                   :description ..description..
                   :termsOfServiceUrl ..terms..
                   :contact ..contact..
-                  :license ..licence..
-                  :licenseUrl ..licenceUrl..
+                  :license ..license..
+                  :licenseUrl ..licenseUrl..
                   :authorizations {:not :validated}} {})
 
     => (has-body
@@ -376,8 +376,8 @@
                  :description ..description..
                  :termsOfServiceUrl ..terms..
                  :contact ..contact..
-                 :license ..licence..
-                 :licenseUrl ..licenceUrl..}
+                 :license ..license..
+                 :licenseUrl ..licenseUrl..}
           :apis []
           :authorizations {:not :validated}}))
 
