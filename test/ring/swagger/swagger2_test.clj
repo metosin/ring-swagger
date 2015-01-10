@@ -91,7 +91,8 @@
                                                    :responses  {200      {:description "ok"
                                                                           :schema      {:sum Long}}
                                                                 :default {:description "error"
-                                                                          :schema      {:code Long}}}}
+                                                                          :schema      {:code Long}
+                                                                          :headers     {:location String}}}}
                                             :put  {:parameters {:body     [Pet]
                                                                 :query    (merge Anything {:x Long :y Long})
                                                                 :path     Nothing
@@ -107,4 +108,3 @@
 
     (fact "produces valid swagger json"
       (validate-swagger-json swagger) => nil)))
-

@@ -173,8 +173,13 @@
                   (if-let [json-schema (->json schema)]
                     json-schema
                     (transform schema)))
-        responses (for-map [[k v] responses]
-                    k (update-in v [:schema] convert))]
+        responses (for-map [[k v] responses
+                            :let [{:keys [schema headers description]} v]]
+                    k (merge v
+                             (when schema
+                               {:schema (convert schema)})
+                             (when headers
+                               {:headers (properties headers)})))]
     (if-not (empty? responses)
       responses
       {:default {:description "" :schema s/Any}})))
