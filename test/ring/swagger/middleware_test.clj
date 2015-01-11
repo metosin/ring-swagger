@@ -13,15 +13,20 @@
                            :b {:c :kikka}}))
 (defn fail [_] (throw (RuntimeException.)))
 
-(fact "catch-response"
+(facts "catch-response"
 
-  (facts "without middleware exception is thrown for validation error"
+  (fact "without middleware exception is thrown for validation error"
     (good ..request..) =not=> (throws Exception)
     (bad  ..request..)   =>   (throws Exception))
 
-  (facts "with middleware exceptions are converted into bad-request"
-    ((wrap-validation-errors bad) ..request..) => (bad-request {:errors {:a "missing-required-key"
-                                                                         :b {:c "(not (#{:kikka :kakka} nil))"}}}))
+  (fact "with middleware exceptions are converted into bad-request"
+    ((wrap-validation-errors bad) ..request..) =>
+    (bad-request {:errors {:a "missing-required-key"
+                           :b {:c "(not (#{:kikka :kakka} nil))"}}}))
+
+  (fact "using custom :error-handler"
+    ((wrap-validation-errors bad :error-handler (constantly "FAIL")) ..request..) =>
+    "FAIL")
 
   (fact "only response-exceptions are caught"
     ((wrap-validation-errors (fail ..request..))) => (throws Exception)))

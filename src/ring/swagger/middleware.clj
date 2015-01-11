@@ -18,7 +18,7 @@
               :else v))))
     error))
 
-(defn default-error-handler [error]
+(defn default-error-handler [{:keys [error]}]
   (bad-request {:errors (stringify-error error)}))
 
 (defn wrap-validation-errors
@@ -30,5 +30,5 @@
   (fn [request]
     (try+
       (handler request)
-      (catch [:type :ring.swagger.schema/validation] {:keys [error]}
-        (error-handler error)))))
+      (catch [:type :ring.swagger.schema/validation] error-container
+        (error-handler error-container)))))
