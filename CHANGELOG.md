@@ -3,6 +3,8 @@
 - Swagger 2.0 support!!
   - new namespace `ring.swagger.swagger2` with clean public API with Schemas
 - **breaking change**: default spec location changed from `/api/docs` to `/swagger.json` (2.0 standard)
+- **breaking change**: in `ring.swagger.middleware` the `catch-validation-error` is now `wrap-validation-error`
+  - takes an extra option: `:error-handler` to allow error response customization
 - use real swagger json schema validator for tests (`ring.swagger.validator`)
 - potential **breaking changes** for library developers due massive refactoring
 - support for Regexp schemas:

@@ -20,11 +20,11 @@
     (bad  ..request..)   =>   (throws Exception))
 
   (facts "with middleware exceptions are converted into bad-request"
-    ((catch-validation-errors bad) ..request..) => (bad-request {:errors {:a "missing-required-key"
-                                                                          :b {:c "(not (#{:kikka :kakka} nil))"}}}))
+    ((wrap-validation-errors bad) ..request..) => (bad-request {:errors {:a "missing-required-key"
+                                                                         :b {:c "(not (#{:kikka :kakka} nil))"}}}))
 
   (fact "only response-exceptions are caught"
-    ((catch-validation-errors (fail ..request..))) => (throws Exception)))
+    ((wrap-validation-errors (fail ..request..))) => (throws Exception)))
 
 (fact "stringify-error"
   (stringify-error (s/check P {:b {:bad 1}})) => {:a "missing-required-key"

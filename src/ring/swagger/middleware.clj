@@ -21,9 +21,9 @@
 (defn default-error-handler [error]
   (bad-request {:errors (stringify-error error)}))
 
-(defn catch-validation-errors
-  "Catches thrown ring-swagger validation errors and turns them into valid
-   error respones. Accepts the following options:
+(defn wrap-validation-errors
+  "Middleware that catches thrown ring-swagger validation errors turning them
+   into valid error respones. Accepts the following options:
 
    :error-handler - a function of schema.utils.ErrorContainer -> response"
   [handler & {:keys [error-handler] :or {error-handler default-error-handler}}]
