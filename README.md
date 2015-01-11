@@ -10,7 +10,7 @@
   - Ring-handlers for exposing the swaggers artifacts
     - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
     - [Resource listing](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#51-resource-listing) and [Api declarations](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#52-api-declaration) for 1.2.
-    - [Swagger-UI](https://github.com/metosin/ring-swagger-ui) bindings. (the UI itself is jar-packaged [separately](https://github.com/metosin/ring-swagger-ui) or you can get it from [NPM](https://www.npmjs.com/package/swagger-ui))
+    - [Swagger-UI](https://github.com/swagger-api/swagger-ui) bindings. (the UI itself is jar-packaged [separately](https://github.com/metosin/ring-swagger-ui) or you can get it from [NPM](https://www.npmjs.com/package/swagger-ui))
 - For web developers
   - Extendable Schema->JSON Mappings with out-of-the-box support for most common types
   - Utilities for input & output Schema validation & coercion
@@ -31,7 +31,8 @@
 If your favourite web lib doesn't have an client adapter, you could write an it yourself. Here's howto (Swagger 2.0):
 
 1. Create code to collect route information from your web lib and to pass them to Ring-Swagger (in Schema `ring.swagger.swagger2/Swagger`)
-  - See sample adapter from [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger2.clj) with [tests](https://github.com/metosin/fnhouse-swagger/blob/master/test/fnhouse/swagger2_test.clj)
+  - Check out the [samples](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/swagger2_test.clj)
+  - See also real sample adapter from [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger/blob/master/src/fnhouse/swagger2.clj) with [tests](https://github.com/metosin/fnhouse-swagger/blob/master/test/fnhouse/swagger2_test.clj)
 2. Create routes for the Swagger artifacts:
   - `swagger.json` via `ring.swagger.swagger2/swagger-json`
   - `swagger-ui` via `ring.swagger.ui/swagger-ui` (the ring handler) or `ring-swagger.ui/wrap-swagger-ui` (middleware)
