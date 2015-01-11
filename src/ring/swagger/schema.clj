@@ -36,16 +36,16 @@
   "Coerces a value against a schema using enhanced json-coercion.
    If no errors, returns the value, otherwise returns ValidationError."
   ([model value] (coerce model value :json))
-  ([model value type]   
+  ([model value type]
     ((sc/coercer (value-of model) (coerce/coercer type)) value)))
 
 (defn coerce!
   "Coerces a value against a schema using enhanced json-coercion.
    If no errors, returns the value, otherwise slingshots a
-   validation exception."
+   schema.utils.ErrorContainer enriched with :type ::validation"
   ([model value] (coerce! model value :json))
   ([model value type]
     (let [result (coerce model value type)]
       (if (error? result)
-        (throw+ {:type ::validation :error (:error result)})
+        (throw+ (assoc result :type ::validation))
         result))))
