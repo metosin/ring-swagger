@@ -108,13 +108,24 @@
         (coerce OddModel 1) => 1
         (coerce OddModel 2) => error?))))
 
-(facts "parameter coercion"
-  (let [Model {:a Long :b Double :c Boolean :d Keyword :u UUID}
-        query {:a "1"  :b "2.2"  :c "true"  :d "kikka" :u "77e70512-1337-dead-beef-0123456789ab"}
-        value {:a 1    :b 2.2    :c true    :d :kikka  :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}]
+(facts "schema coercion"
+  (let [Schema {:a Long :b Double :c Boolean :d Keyword :u UUID}
+        value  {:a "1"  :b "2.2"  :c "true"  :d "kikka" :u "77e70512-1337-dead-beef-0123456789ab"}
+        target {:a 1    :b 2.2    :c true    :d :kikka  :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}]
 
-    (fact "query-coercion can convert string to Longs, Doubles, Booleans and UUIDs"
-      (coerce! Model query :query) => value)
+    (fact ":query coercion can convert string to Longs, Doubles, Booleans and UUIDs"
+      (coerce! Schema value :query) => target)
 
-    (fact "json-coercion cant convert string to Longs,Doubles, Booleans and UUIDs"
-      (coerce! Model query :json) => (throws Exception))))
+    (fact ":json coercion cant convert string to Longs,Doubles, Booleans and UUIDs"
+      (coerce! Schema value :json) => (throws Exception))
+
+    (fact "custom coersion"
+      (coerce! {:a String :b String}
+               {:a "kikka" :b "kukka"}
+               (fn [_]
+                 (fn [x]
+                   (if (string? x) (.toUpperCase x) x))))
+
+      => {:a "KIKKA" :b "KUKKA"})))
+
+

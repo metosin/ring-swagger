@@ -5,8 +5,9 @@
             [clj-time.coerce :as tc]
             [ring.swagger.common :refer :all])
   (:import [org.joda.time LocalDate DateTime]
-           [java.util Date]
-           [java.util.regex Pattern]))
+           [java.util Date UUID]
+           [java.util.regex Pattern]
+           (clojure.lang APersistentSet Keyword)))
 
 (defn date-time? [x] (#{Date DateTime} x))
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
@@ -47,7 +48,7 @@
 
 (defn set-matcher
   [schema]
-  (if (instance? clojure.lang.APersistentSet schema)
+  (if (instance? APersistentSet schema)
     (fn [x] (if (sequential? x) (set x) x))))
 
 (defn string->boolean [x]
@@ -57,16 +58,16 @@
     x))
 
 (defn string->long [^String x]
-  (try (java.lang.Long/valueOf x) (catch Exception e x)))
+  (try (Long/valueOf x) (catch Exception e x)))
 
 (defn string->double [^String x]
-  (try (java.lang.Double/valueOf x) (catch Exception e x)))
+  (try (Double/valueOf x) (catch Exception e x)))
 
 (defn string->uuid [^String x]
-  (try (java.util.UUID/fromString x) (catch Exception e x)))
+  (try (UUID/fromString x) (catch Exception e x)))
 
 (def json-coersions {s/Keyword sc/string->keyword
-                     clojure.lang.Keyword sc/string->keyword
+                     Keyword sc/string->keyword
                      s/Int sc/safe-long-cast
                      Long sc/safe-long-cast
                      Double double
@@ -102,8 +103,8 @@
 ;; Public Api
 ;;
 
-(defn coercer [name]
-  (condp = name
-    :json  json-schema-coercion-matcher
-    ;;:both  (all-matchers [query-schema-coercion-matcher json-schema-coercion-matcher])
-    :query query-schema-coercion-matcher))
+(defmulti coercer identity)
+
+(defmethod coercer :json    [_] json-schema-coercion-matcher)
+(defmethod coercer :query   [_] query-schema-coercion-matcher)
+(defmethod coercer :default [c] c)
