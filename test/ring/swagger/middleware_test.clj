@@ -9,9 +9,7 @@
                 :b {:c (s/enum :kikka :kakka)}})
 
 (defn bad  [_] (coerce! P {:b {:c nil}}))
-(defn good [_] (coerce! P {:a 1
-                           :b {:c :kikka}}))
-(defn fail [_] (throw (RuntimeException.)))
+(defn good [_] (coerce! P {:a 1, :b {:c :kikka}}))
 
 (facts "catch-response"
 
@@ -29,7 +27,16 @@
     "FAIL")
 
   (fact "only response-exceptions are caught"
-    ((wrap-validation-errors (fail ..request..))) => (throws Exception)))
+    ((wrap-validation-errors (fn [_] (throw (RuntimeException.)))) ..request..) => (throws Exception))
+
+  (let [failing-handler (fn [_] (s/validate {:a String} {}))]
+    (fact "by default, schema.core validation errors are not caught"
+      ((wrap-validation-errors failing-handler)) => (throws Exception))
+    (fact "with :catch-core-errors? false, schema.core validation errors are not caught"
+      ((wrap-validation-errors failing-handler :catch-core-errors? false)) => (throws Exception))
+    (fact "with :catch-core-errors? truem, schema.core validation errors are caught"
+      ((wrap-validation-errors failing-handler :catch-core-errors? true) ..request..) =>
+      (bad-request {:errors {:a "missing-required-key"}}))))
 
 (fact "stringify-error"
   (stringify-error (s/check P {:b {:bad 1}})) => {:a "missing-required-key"

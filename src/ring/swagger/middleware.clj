@@ -1,5 +1,5 @@
 (ns ring.swagger.middleware
-  (:require [slingshot.slingshot :refer [try+]]
+  (:require [slingshot.slingshot :refer [try+ throw+]]
             [schema.utils :as su]
             [plumbing.core :refer [for-map]]
             [clojure.walk :refer :all]
@@ -25,10 +25,17 @@
   "Middleware that catches thrown ring-swagger validation errors turning them
    into valid error respones. Accepts the following options:
 
-   :error-handler - a function of schema.utils.ErrorContainer -> response"
-  [handler & {:keys [error-handler] :or {error-handler default-error-handler}}]
+   :error-handler - a function of schema.utils.ErrorContainer -> response
+   :catch-core-errors? - consume also :schema.core/errors (default to false)"
+  [handler & {:keys [error-handler catch-core-errors?]
+              :or   {error-handler default-error-handler
+                     catch-core-errors? false}}]
   (fn [request]
     (try+
       (handler request)
+      (catch [:type :schema.core/error] validation-error
+        (if catch-core-errors?
+          (error-handler validation-error)
+          (throw+ validation-error)))
       (catch [:type :ring.swagger.schema/validation] error-container
         (error-handler error-container)))))
