@@ -18,8 +18,10 @@
 ```clojure
 [cheshire "5.4.0"] is available but we use "5.3.1"
 [clj-time "0.9.0"] is available but we use "0.8.0"
-[metosin/ring-swagger-ui "2.0.24"] is available but we use "2.0.17"
-[com.github.fge/json-schema-validator "2.2.6"] is available but we use "2.2.5"
+*[metosin/ring-swagger-ui "2.0.24"] is available but we use "2.0.17"
+*[com.github.fge/json-schema-validator "2.2.6"] is available but we use "2.2.5"
+*[lein-ring "0.9.1"] is available but we use "0.8.13"
+[instar "1.0.10"]
 ```
 
 ## 0.15.0 (8.12.2014)

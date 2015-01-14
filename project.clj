@@ -17,7 +17,7 @@
                  [potemkin "0.3.11"]
                  [org.flatland/ordered "1.5.2"]
                  [instar "1.0.10" :exclusions [org.clojure/clojure]]]
-  :plugins [[lein-ring "0.8.13"]]
+  :plugins [[lein-ring "0.9.1"]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-midje "3.1.3"]]
                    :dependencies [[midje "1.7.0-SNAPSHOT"]
