@@ -1,4 +1,4 @@
-## 0.16.0-SNAPSHOT (xx.xx.xxxx)
+## 0.16.0 (14.1.2015)
 
 - Swagger 2.0 support!!
   - new namespace `ring.swagger.swagger2` with clean public API with Schemas
