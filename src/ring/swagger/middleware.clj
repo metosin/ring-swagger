@@ -6,6 +6,10 @@
             [ring.util.http-response :refer [bad-request]])
   (:import (schema.utils ValidationError)))
 
+(defn comp-mw [mw & base-params]
+  (fn [handler & params]
+    (apply mw (concat [handler] base-params params))))
+
 (defn stringify-error [error]
   (postwalk
     (fn [x]
@@ -26,7 +30,7 @@
    into valid error respones. Accepts the following options:
 
    :error-handler - a function of schema.utils.ErrorContainer -> response
-   :catch-core-errors? - consume also :schema.core/errors (default to false)"
+   :catch-core-errors? - consume also :schema.core/errors (defaults to false)"
   [handler & {:keys [error-handler catch-core-errors?]
               :or   {error-handler default-error-handler
                      catch-core-errors? false}}]

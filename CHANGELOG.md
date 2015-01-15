@@ -1,3 +1,12 @@
+## 0.17.0 (15.1.2015)
+- revert default spec location to `/api/docs` to be more backwards compatible. Swagger2-clients should use `swagger.json`.
+- `ring.swagger.middleware/comp-mw` to make middleware parametrization easier:
+
+```clojure
+(def wrap-swagger2-ui
+  (comp-mw wrap-swagger-ui :swagger-docs "swagger.json"))
+```
+
 ## 0.16.0 (14.1.2015)
 
 - Swagger 2.0 support!!
@@ -5,7 +14,7 @@
 - **breaking change**: default spec location changed from `/api/docs` to `/swagger.json` (2.0 standard)
 - **breaking change**: in `ring.swagger.middleware` the `catch-validation-error` is now `wrap-validation-error`
   - takes an extra option: `:error-handler` to allow error response customization & `:catch-core-errors?` for
-    catching `:schema.core/error`s (defaults to `false`). 
+    catching `:schema.core/error`s (defaults to `false`).
 - one can now plug own coercers for `coerce` and `coerce!`
 - use real swagger json schema validator for tests (`ring.swagger.validator`)
 - potential **breaking changes** for library developers due massive refactoring

@@ -11,7 +11,7 @@
 (defn bad  [_] (coerce! P {:b {:c nil}}))
 (defn good [_] (coerce! P {:a 1, :b {:c :kikka}}))
 
-(facts "catch-response"
+(facts "wrap-validation-errors"
 
   (fact "without middleware exception is thrown for validation error"
     (good ..request..) =not=> (throws Exception)
@@ -42,3 +42,13 @@
   (stringify-error (s/check P {:b {:bad 1}})) => {:a "missing-required-key"
                                                   :b {:bad "disallowed-key"
                                                       :c "missing-required-key"}})
+
+(fact "comp-mw"
+  (let [mw1 (fn [_ & params] (fn [_] (apply hash-map params)))
+        mw2 (comp-mw mw1 :abba 2)
+        mw3 (comp-mw mw2 :abba 3 :jabba 3)]
+    ((mw1 identity) ..request..) => {}
+    ((mw1 identity :abba 1) ..request..) => {:abba 1}
+    ((mw2 identity) ..request..) => {:abba 2}
+    ((mw3 identity) ..request..) => {:abba 3 :jabba 3}
+    ((mw3 identity :abba 4 :jabba 4 :doo 4) ..request..) => {:abba 4 :jabba 4 :doo 4}))
