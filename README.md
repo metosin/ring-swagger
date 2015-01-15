@@ -30,7 +30,9 @@ For creating you own adapter, see [Collecting API Documentation](https://github.
 
 ## Web Schemas
 
-[Prismatic Schema](https://github.com/Prismatic/schema) is used for modelling both the input & output schemas for routes. As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schema, so not all Clojure Schema elements can be used.
+[Prismatic Schema](https://github.com/Prismatic/schema) is used for modelling both the input & output schemas for routes. 
+
+As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schema, so not all Clojure Schema elements can be used.
 
 ### Supported Schema elements
 
@@ -65,9 +67,7 @@ For creating you own adapter, see [Collecting API Documentation](https://github.
 
 ### Missing Schema elements
 
-If ring-swagger can't transform the Schemas into JSON Schemas, by default a `IllegalArgumentException` will be thrown.
-
-Binding `ring.swagger.json-schema/*ignore-missing-mappings*` to true, one
+If ring-swagger can't transform the Schemas into JSON Schemas, by default a `IllegalArgumentException` will be thrown. Binding `ring.swagger.json-schema/*ignore-missing-mappings*` to true, one
 can ingore the errors (missing schema elements will be ignored from
 the generated JSON Schema).
 
@@ -139,58 +139,19 @@ extends the json-coercion with the following transformations:
 - string -> Double
 - string -> Boolean
 
-### A Sample Model usage
+## Adding description to Schemas
+
+One can add extra meta-data, including descriptions to schema elements using `ring.swagger.schema/field` and `ring.swagger.schema/describe` functions. These work by adding meta-data to schema under `:json-schema`-key. Objects which don't support meta-data, like Java classes, are wrapped into `s/both`.
 
 ```clojure
-(require '[ring.swagger.schema :refer [coerce coerce!]])
 (require '[schema.core :as s])
+(require '[ring.swagger.schema :as rs])
+(require '[ring.swagger.json-schema :as rjs])
 
-(s/defschema Country {:code (s/enum :fi :sv)
-                      :name String})
-; #'user/Country
+(s/defschema Customer {:id Long, :name (rs/describe String "the name")})
 
-(s/defschema Customer {:id Long
-                       :name String
-                       (s/optional-key :address) {:street String
-                                                  :country Country}})
-; #'user/Customer
-
-Country
-; {:code (enum :fi :sv), :name java.lang.String}
-
-Customer
-; {:id java.lang.Long, :name java.lang.String, #schema.core.OptionalKey{:k :address} {:street java.lang.String, :country {:code (enum :fi :sv), :name java.lang.String}}}
-
-(def matti {:id 1 :name "Matti Mallikas"})
-(def finland {:code :fi :name "Finland"})
-
-(coerce Customer matti)
-; {:name "Matti Mallikas", :id 1}
-
-(coerce Customer (assoc matti :address {:street "Leipätie 1":country finland}))
-; {:address {:country {:name "Finland", :code :fi}, :street "Leipätie 1"}, :name "Matti Mallikas", :id 1}
-
-(coerce Customer {:id 007})
-; #schema.utils.ErrorContainer{:error {:name missing-required-key}}
-
-(coerce! Customer {:id 007})
-; ExceptionInfo throw+: {:type :ring.swagger.schema/validation, :error {:name missing-required-key}}  ring.swagger.schema/coerce! (schema.clj:89)
-```
-
-## Describing schemas
-
-You can add e.g. description to you schemas using `ring.swagger.schema/field` and `ring.swagger.schema/describe` functions.
-These work by adding meta-data to schema under `:json-schema`-key. Objects which don't support meta-data, like Java classes, are
-wrapped into `s/both`.
-
-```clojure
-(s/defschema Customer {:id Long
-                       :name (describe String "the name")
-                       (s/optional-key :address) (describe {:street String
-                                                            :country Country}
-                                                           "The Address")})
-
-(= (jsons/json-schema-meta (describe Customer "The Customer")) {:description "The Customer"})
+(rjs/json-schema-meta (describe Customer "The Customer"))
+; => {:description "The Customer"})
 ```
 
 ## License
