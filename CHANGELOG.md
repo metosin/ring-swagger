@@ -1,3 +1,6 @@
+## x.xx.xx (x.xx.xxxx)
+- fixed Swagger 2.0 response bug #29 
+
 ## 0.17.0 (15.1.2015)
 - revert default spec location to `/api/docs` to be more backwards compatible. Swagger2-clients should use `swagger.json`.
 - `ring.swagger.middleware/comp-mw` to make middleware parametrization easier:

@@ -100,8 +100,7 @@
                                                                 :formData Anything}
                                                    :responses  {200      {:description "ok"
                                                                           :schema      {:sum Long}}
-                                                                :default {:description "error"
-                                                                          :schema      {:code Long}}}}}}}]
+                                                                :default {:description "error"}}}}}}]
 
     (fact "is valid"
       (s/check Swagger swagger) => nil)

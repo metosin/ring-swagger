@@ -75,7 +75,7 @@
         response-models (->> route-meta
                              (map :responses)
                              (mapcat vals)
-                             (map :schema))]
+                             (keep :schema))]
     (->> (concat body-models response-models)
          flatten
          (map with-named-sub-schemas)
@@ -175,11 +175,10 @@
                     (transform schema)))
         responses (for-map [[k v] responses
                             :let [{:keys [schema headers description]} v]]
-                    k (merge v
-                             (when schema
-                               {:schema (convert schema)})
-                             (when headers
-                               {:headers (properties headers)})))]
+                    k (-> v
+                          (cond-> schema (update-in [:schema] convert))
+                          (cond-> headers (update-in [:headers] properties))
+                          remove-empty-keys))]
     (if-not (empty? responses)
       responses
       {:default {:description "" :schema s/Any}})))

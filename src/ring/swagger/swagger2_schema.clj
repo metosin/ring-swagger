@@ -46,7 +46,6 @@
 ; TODO
 (s/defschema Example s/Any)
 
-
 (s/defschema Response {:description s/Str
                        (s/optional-key :schema) Schema
                        (s/optional-key :headers) Schema
