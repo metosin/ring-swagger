@@ -3,7 +3,11 @@
             [ring.swagger.swagger2 :refer :all]
             [ring.swagger.validator :refer [validate]]
             [cheshire.core :as json]
-            [midje.sweet :refer :all]))
+            [midje.sweet :refer :all])
+  (:import  [java.util Date UUID]
+            [java.util.regex Pattern]
+            [org.joda.time DateTime LocalDate]))
+
 
 (s/defschema LegOfPet {:length Long})
 
@@ -74,6 +78,22 @@
                                                                            :schema      {:code Long}}}}}
                             "/api/parrots" {:get {:responses {200 {:schema      Parrot
                                                                    :description ""}}}}
+                            "/api/all-types" {:get {:parameters {:body {:a Boolean
+                                                                        :b Double
+                                                                        :c Long
+                                                                        :d String
+                                                                        :e {:f [s/Keyword]
+                                                                            :g #{String}
+                                                                            :h #{(s/enum :kikka :kakka :kukka)}
+                                                                            :i Date
+                                                                            :j DateTime
+                                                                            :k LocalDate
+                                                                            :l (s/maybe String)
+                                                                            :m (s/both Long (s/pred odd? 'odd?))
+                                                                            :o [{:p #{{:q String}}}]
+                                                                            :u UUID
+                                                                            :v Pattern
+                                                                            :w #"a[6-9]"}}}}}
                             "/api/pets"    {:get  {:parameters {:body     Pet
                                                                 :query    (merge Anything {:x Long :y Long})
                                                                 :path     Nothing
