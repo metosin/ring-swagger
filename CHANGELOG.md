@@ -1,5 +1,11 @@
 ## x.xx.xx (x.xx.xxxx)
-- fixed Swagger 2.0 response bug #29 
+- fixed Swagger 2.0 response bug #29
+- updated deps:
+
+```clojure
+[prismatic/schema "0.3.6"] is available but we use "0.3.3"
+[prismatic/plumbing "0.3.7"] is available but we use "0.3.5"
+```
 
 ## 0.17.0 (15.1.2015)
 - revert default spec location to `/api/docs` to be more backwards compatible. Swagger2-clients should use `swagger.json`.
