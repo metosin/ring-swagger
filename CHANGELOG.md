@@ -3,7 +3,7 @@
 - updated deps:
 
 ```clojure
-[prismatic/schema "0.3.6"] is available but we use "0.3.3"
+[prismatic/schema "0.3.7"] is available but we use "0.3.3"
 [prismatic/plumbing "0.3.7"] is available but we use "0.3.5"
 ```
 
