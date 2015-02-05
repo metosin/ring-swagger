@@ -3,7 +3,8 @@
 - `swagger-json` now takes an optional extra argument, the Options-map. Setting an option `:ignore-missing-mappings?`
  to `true` causes the missing mappings to fail silently, instead of throwing an exception
 - ensured that ignoring missing mappings works for both body- & non-body parameters
-- moved binding of `s/either` from `ring.swagger.json-schema-dirty` to `ring.swagger.json-schema`
+- **BREAKING**: moved binding of `s/either` from `ring.swagger.json-schema-dirty` to
+ `ring.swagger.json-schema`. Uses the first schema element as the source for the mappings
 - updated deps:
 
 ```clojure
