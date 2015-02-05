@@ -442,19 +442,19 @@
                       :PetError {:properties {:message {:type "string"}}
                                  :required [:message]}}}))
 
+(defrecord InvalidElement [])
+
 (fact "transform schemas with missing mappings"
-  (remove-method jsons/json-type schema.core.Either)
 
   (let [schema {:a String
-                :b (s/either String)}]
+                :b (->InvalidElement)}]
 
     (fact "fail by default"
       (transform schema) => (throws IllegalArgumentException))
 
     (fact "drops bad fields from both properties & required"
       (binding [jsons/*ignore-missing-mappings* true]
-        (transform {:a String
-                    :b (s/either String)})
+        (transform schema)
 
         => {:properties {:a {:type "string"}}, :required [:a]}))))
 

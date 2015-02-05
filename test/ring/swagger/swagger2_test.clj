@@ -123,13 +123,12 @@
 
     (validate swagger) => nil))
 
+(defrecord InvalidElement [])
+
 (facts "with missing schema -> json schema mappings"
 
-  ;; need to remove the dispatch fn explicitely for this to work with midje autotest
-  (remove-method jsons/json-type schema.core.Either)
-
   (fact "non-body-parameters"
-    (let [swagger {:paths {"/hello" {:get {:parameters {:query {:name (s/either s/Str s/Num)}}}}}}]
+    (let [swagger {:paths {"/hello" {:get {:parameters {:query {:name (->InvalidElement)}}}}}}]
 
       (fact "dy default, exception is throws when generating json schema"
         (validate swagger) => (throws IllegalArgumentException))
@@ -138,7 +137,7 @@
         (validate swagger {:ignore-missing-mappings? true}) => nil)))
 
   (fact "body-parameters"
-    (let [swagger {:paths {"/hello" {:post {:parameters {:body {:name (s/either s/Str s/Num)
+    (let [swagger {:paths {"/hello" {:post {:parameters {:body {:name (->InvalidElement)
                                                                 :age  s/Num}}}}}}]
       (fact "dy default, exception is throws when generating json schema"
         (validate swagger) => (throws IllegalArgumentException))
