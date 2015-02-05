@@ -260,14 +260,23 @@
 
 (def Swagger schema/Swagger)
 
+(def Options {(s/optional-key :ignore-missing-mappings?) s/Bool})
+
 (s/defn swagger-json
-  "produces the swagger-json from ring-swagger spec"
-  [swagger :- Swagger]
-  (let [[paths definitions] (-> swagger
-                                ensure-named-top-level-models
-                                extract-paths-and-definitions)]
-    (merge
-      swagger-defaults
-      (-> swagger
-          (assoc :paths paths)
-          (assoc :definitions definitions)))))
+  "Produces swagger-json output from ring-swagger spec.
+   Optional second argument is a options map, supporting
+   the following options with defaults:
+
+   :ignore-missing-mappings? (false) - whether to silently ignore
+   missing schema to json-schema mappings."
+  ([swagger :- Swagger] (swagger-json swagger nil))
+  ([swagger :- Swagger, options :- Options]
+    (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
+      (let [[paths definitions] (-> swagger
+                                    ensure-named-top-level-models
+                                    extract-paths-and-definitions)]
+        (merge
+          swagger-defaults
+          (-> swagger
+              (assoc :paths paths)
+              (assoc :definitions definitions)))))))

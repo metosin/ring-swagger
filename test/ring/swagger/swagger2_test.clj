@@ -1,9 +1,10 @@
 (ns ring.swagger.swagger2-test
   (:require [schema.core :as s]
             [ring.swagger.swagger2 :refer :all]
-            [ring.swagger.validator :refer [validate]]
+            [ring.swagger.validator :as validator]
             [cheshire.core :as json]
-            [midje.sweet :refer :all])
+            [midje.sweet :refer :all]
+            [ring.swagger.json-schema :as jsons])
   (:import  [java.util Date UUID]
             [java.util.regex Pattern]
             [org.joda.time DateTime LocalDate]))
@@ -21,8 +22,14 @@
 
 (s/defschema NotFound {:message s/Str})
 
-(defn validate-swagger-json [swagger]
-  (validate (json/generate-string (swagger-json swagger))))
+(defn validate-swagger-json [swagger & [options]]
+  (validator/validate (json/generate-string (swagger-json swagger options))))
+
+(defn validate [swagger & [options]]
+  (if-let [input-errors (s/check Swagger swagger)]
+    {:input-errors input-errors}
+    (if-let [output-errors (validate-swagger-json swagger options)]
+      {:output-errors output-errors})))
 
 ;;
 ;; facts
@@ -30,17 +37,11 @@
 
 (fact "empty spec"
   (let [swagger {}]
-    (fact "is valid"
-      (s/check Swagger swagger) => nil)
-    (fact "produces valid swagger json"
-      (validate-swagger-json swagger) => nil)))
+    (validate swagger) => nil))
 
 (fact "minimalistic spec"
   (let [swagger {:paths {"/ping" {:get {}}}}]
-    (fact "is valid"
-      (s/check Swagger swagger) => nil)
-    (fact "produces valid swagger json"
-      (validate-swagger-json swagger) => nil)))
+    (validate swagger) => nil))
 
 (fact "more complete spec"
   (let [swagger {:swagger  "2.0"
@@ -120,8 +121,27 @@
                                                                           :schema      {:sum Long}}
                                                                 :default {:description "error"}}}}}}]
 
-    (fact "is valid"
-      (s/check Swagger swagger) => nil)
+    (validate swagger) => nil))
 
-    (fact "produces valid swagger json"
-      (validate-swagger-json swagger) => nil)))
+(facts "with missing schema -> json schema mappings"
+
+  ;; need to remove the dispatch fn explicitely for this to work with midje autotest
+  (remove-method jsons/json-type schema.core.Either)
+
+  (fact "non-body-parameters"
+    (let [swagger {:paths {"/hello" {:get {:parameters {:query {:name (s/either s/Str s/Num)}}}}}}]
+
+      (fact "dy default, exception is throws when generating json schema"
+        (validate swagger) => (throws IllegalArgumentException))
+
+      (fact "with :ignore-missing-mappings errors (and mappings) are ignored"
+        (validate swagger {:ignore-missing-mappings? true}) => nil)))
+
+  (fact "body-parameters"
+    (let [swagger {:paths {"/hello" {:post {:parameters {:body {:name (s/either s/Str s/Num)
+                                                                :age  s/Num}}}}}}]
+      (fact "dy default, exception is throws when generating json schema"
+        (validate swagger) => (throws IllegalArgumentException))
+
+      (fact "with :ignore-missing-mappings errors (and mappings) are ignored"
+        (validate swagger {:ignore-missing-mappings? true}) => nil))))
