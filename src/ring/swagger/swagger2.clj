@@ -24,7 +24,7 @@
   (binding [jsons/*swagger-spec-version* "2.0"]
     (apply jsons/->json args)))
 
-(defn properties [schema]
+(defn ->properties [schema]
   (binding [jsons/*swagger-spec-version* "2.0"]
     (jsons/properties schema)))
 
@@ -83,10 +83,12 @@
          vals)))
 
 (defn transform [schema]
-  (let [required (required-keys schema)
-        required (if-not (empty? required) required)]
+  (let [properties (->properties schema)
+        required (->> (required-keys schema)
+                      (filter (partial contains? properties))
+                      seq)]
     (remove-empty-keys
-      {:properties (properties schema)
+      {:properties properties
        :required required})))
 
 ; COPY from 1.2
@@ -158,11 +160,13 @@
   (if model
     (for [[k v] (-> model value-of strict-schema)
           :when (s/specific-key? k)
-          :let [rk (s/explicit-schema-key k)]]
+          :let [rk (s/explicit-schema-key k)
+                json-schema (->json v)]
+          :when json-schema]
       (jsons/->parameter {:in type
                           :name (name rk)
                           :required (s/required-key? k)}
-                         (->json v)))))
+                         json-schema))))
 
 (defn- ->description [status]
   ;; should use ring.util.http-response status description
@@ -181,7 +185,7 @@
                             :let [{:keys [schema headers description]} v]]
                     k (-> v
                           (cond-> schema (update-in [:schema] convert))
-                          (cond-> headers (update-in [:headers] properties))
+                          (cond-> headers (update-in [:headers] ->properties))
                           (assoc :description (or description  (->description k) ""))
                           remove-empty-keys))]
     (if-not (empty? responses)

@@ -1,6 +1,7 @@
 (ns ring.swagger.swagger2-unit-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
+            [ring.swagger.json-schema :as jsons]
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
             [ring.swagger.swagger2 :refer :all]
@@ -85,7 +86,7 @@
 ;; Facts
 ;;
 
-(facts "simple schemas"
+(fact "transform simple schemas"
   (transform Tag) => Tag'
   (transform Category) => Category'
   (transform Pet) => Pet')
@@ -440,4 +441,22 @@
                                                      :description "Friendly name for the tag"}}}
                       :PetError {:properties {:message {:type "string"}}
                                  :required [:message]}}}))
+
+(fact "transform schemas with missing mappings"
+  (remove-method jsons/json-type schema.core.Either)
+
+  (let [schema {:a String
+                :b (s/either String)}]
+
+    (fact "fail by default"
+      (transform schema) => (throws IllegalArgumentException))
+
+    (fact "drops bad fields from both properties & required"
+      (binding [jsons/*ignore-missing-mappings* true]
+        (transform {:a String
+                    :b (s/either String)})
+
+        => {:properties {:a {:type "string"}}, :required [:a]}))))
+
+
 
