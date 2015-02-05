@@ -108,10 +108,8 @@
                                                                 :path     Nothing
                                                                 :header   Anything
                                                                 :formData Anything}
-                                                   :responses  {200      {:description "ok"
-                                                                          :schema      {:sum Long}}
-                                                                :default {:description "error"
-                                                                          :schema      {:code Long}
+                                                   :responses  {200      {:schema      {:sum Long}}
+                                                                :default {:schema      {:code Long}
                                                                           :headers     {:location String}}}}
                                             :put  {:parameters {:body     [Pet]
                                                                 :query    (merge Anything {:x Long :y Long})

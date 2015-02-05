@@ -1,7 +1,6 @@
 (ns ring.swagger.swagger2
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
-            [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [plumbing.core :refer :all :exclude [update]]
@@ -165,6 +164,11 @@
                           :required (s/required-key? k)}
                          (->json v)))))
 
+(defn- ->description [status]
+  ;; should use ring.util.http-response status description
+  ;; e.g. (:description (get statuses status))
+  (str status))
+
 (defn convert-parameters [parameters]
   (into [] (mapcat extract-parameter parameters)))
 
@@ -178,6 +182,7 @@
                     k (-> v
                           (cond-> schema (update-in [:schema] convert))
                           (cond-> headers (update-in [:headers] properties))
+                          (assoc :description (or description  (->description k) ""))
                           remove-empty-keys))]
     (if-not (empty? responses)
       responses
