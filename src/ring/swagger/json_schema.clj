@@ -95,6 +95,7 @@
 (defmethod json-type schema.core.EnumSchema     [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
 (defmethod json-type schema.core.Maybe          [e] (->json (:schema e)))
 (defmethod json-type schema.core.Both           [e] (->json (first (:schemas e))))
+(defmethod json-type schema.core.Either         [e] (->json (first (:schemas e))))
 (defmethod json-type schema.core.Recursive      [e] (->json (:derefable e)))
 (defmethod json-type schema.core.EqSchema       [e] (->json (class (:v e))))
 (defmethod json-type schema.core.NamedSchema    [e] (->json (:schema e)))

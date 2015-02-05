@@ -55,6 +55,9 @@
     (fact "s/both -> type of the first element"
       (->json (s/both Long String))   => (->json Long))
 
+    (fact "s/either -> type of the first element"
+      (->json (s/either Long String))   => (->json Long))
+
     (fact "s/named -> type of schema"
       (->json (s/named Long "long"))  => (->json Long))
 

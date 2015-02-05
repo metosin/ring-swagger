@@ -11,8 +11,4 @@
 
   (fact "s/if"
     (->json (s/if (constantly true) Long String))
-    => {:type "void" :oneOf [(->json Long) (->json String)]})
-
-  (fact "s/either"
-    (->json (s/either Long String))
     => {:type "void" :oneOf [(->json Long) (->json String)]}))
