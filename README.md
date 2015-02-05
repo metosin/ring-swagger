@@ -52,6 +52,7 @@ As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schem
 | `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
 | `(s/maybe X)`          | *type of X*
 | `(s/both X Y Z)`       | *type of X*
+| `(s/either X Y Z)`     | *type of X*
 | `(s/named X name)`     | *type of X*
 | `(s/recursive Var)`    | *Ref to (model) Var*
 | `(s/eq X)`    | *type of class of X*
@@ -93,7 +94,6 @@ Be warned that Swagger-UI might not display these correctly and the code generat
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
-| `(s/either X Y Z)`| oneOf: *type of X*, *type of Y*, *type of Z*
 | `(s/conditional pred X pred Y pred Z)` | oneOf: *type of X*, *type of X*, *type of Z*
 | `(s/if pred X Y)` | oneOf: *type of X*, *type of Y*
 
