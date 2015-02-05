@@ -101,10 +101,10 @@
 (defmethod json-type schema.core.AnythingSchema [_] nil)
 
 (defmethod json-type :default [e]
-  (if (s/schema-name e)
+  (if-let [schema-name (s/schema-name e)]
     (case *swagger-spec-version*
-      "1.2" {:$ref (s/schema-name e)}
-      "2.0" {:$ref (str "#/definitions/" (s/schema-name e))})
+      "1.2" {:$ref schema-name}
+      "2.0" {:$ref (str "#/definitions/" schema-name)})
     (and (not *ignore-missing-mappings*)
          (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
 
