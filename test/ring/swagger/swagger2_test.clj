@@ -3,8 +3,7 @@
             [ring.swagger.swagger2 :refer :all]
             [ring.swagger.validator :as validator]
             [cheshire.core :as json]
-            [midje.sweet :refer :all]
-            [ring.swagger.json-schema :as jsons])
+            [midje.sweet :refer :all])
   (:import  [java.util Date UUID]
             [java.util.regex Pattern]
             [org.joda.time DateTime LocalDate]))
@@ -144,3 +143,24 @@
 
       (fact "with :ignore-missing-mappings errors (and mappings) are ignored"
         (validate swagger {:ignore-missing-mappings? true}) => nil))))
+
+(facts "empty-responses-messages?"
+  (let [swagger {:paths {"/hello" {:post {:responses {200 {}
+                                                      425 {}}}}}}]
+    (validate swagger) => nil
+
+    (swagger-json swagger)
+    => (contains {:paths
+                  {"/hello"
+                   {:post
+                    {:responses
+                     {200 {:description ""}
+                      425 {:description ""}}}}}})
+
+    (swagger-json swagger {:http-response-messages? true})
+    => (contains {:paths
+                  {"/hello"
+                   {:post
+                    {:responses
+                     {200 {:description "OK"}
+                      425 {:description "The collection is unordered."}}}}}})))

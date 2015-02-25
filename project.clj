@@ -7,8 +7,8 @@
             :comments "same as Clojure"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [cheshire "5.4.0"]
-                 [slingshot "0.12.1"]
-                 [metosin/ring-http-response "0.5.2"]
+                 [slingshot "0.12.2"]
+                 [metosin/ring-http-response "0.6.0-SNAPSHOT"]
                  [prismatic/schema "0.3.7"]
                  [prismatic/plumbing "0.3.7"]
                  [clj-time "0.9.0"]
