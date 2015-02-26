@@ -88,7 +88,7 @@
 
   (fact "with default parameters"
     (conf-js nil {})
-    => "window.API_CONF = {\"url\":\"/api/docs\"};")
+    => "window.API_CONF = {\"url\":\"/api/api-docs\"};")
 
   (fact "with swagger-docs & oauth2 set"
     (conf-js nil {:swagger-docs "/lost"
