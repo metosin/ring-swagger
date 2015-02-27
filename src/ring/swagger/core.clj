@@ -35,18 +35,20 @@
     this))
 
 (extend-protocol WalkableSchema
-  clojure.lang.APersistentMap
+  clojure.lang.IPersistentMap
   (-walk [this f names]
-    (f (into (empty this)
-             (for [[k v] this
-                   ; FIXME: ?
-                   :when (jsons/not-predicate? k)]
-               [k (walk v f (conj names (s/explicit-schema-key k)))]))
-       names))
-  clojure.lang.APersistentVector
+    (if-not (record? this)
+      (f (into (empty this)
+               (for [[k v] this
+                     ; FIXME: ?
+                     :when (jsons/not-predicate? k)]
+                 [k (walk v f (conj names (s/explicit-schema-key k)))]))
+         names)
+      this))
+  clojure.lang.IPersistentVector
   (-walk [this f names]
     (f (walk (first this) f names) names))
-  clojure.lang.APersistentSet
+  clojure.lang.IPersistentSet
   (-walk [this f names]
     (f (walk (first this) f names) names))
   schema.core.Maybe
@@ -54,7 +56,8 @@
     (f (walk (:schema this) f names) names))
   schema.core.Both
   (-walk [this f names]
-    (f (walk (first (:schemas this)) f names) names))
+    (f (walk (first (:schemas this)) f names) names)
+    this)
   schema.core.Either
   (-walk [this f names]
     (f (walk (first (:schemas this)) f names) names))
