@@ -347,178 +347,176 @@
 ;; Final json
 ;;
 
-(defn has-body [expected] (chatty-checker [x] (= (-> x :body) expected)))
-(defn has-apis [expected] (chatty-checker [x] (= (-> x :body :apis) expected)))
-
 (facts "api-listing"
   (fact "without parameters"
-    (api-listing {} {}) => (has-body
-                             {:swaggerVersion "1.2"
-                              :apiVersion "0.0.1"
-                              :apis []
-                              :info {}
-                              :authorizations {}}))
+    (:body (api-listing {} {})) => {:swaggerVersion "1.2"
+                                    :apiVersion "0.0.1"
+                                    :apis []
+                                    :info {}
+                                    :authorizations {}})
 
   (fact "with parameters"
-    (api-listing {:apiVersion ...version...
-                  :title ..title..
-                  :description ..description..
-                  :termsOfServiceUrl ..terms..
-                  :contact ..contact..
-                  :license ..license..
-                  :licenseUrl ..licenseUrl..
-                  :authorizations {:not :validated}} {})
+    (:body (api-listing {:apiVersion ...version...
+                         :title ..title..
+                         :description ..description..
+                         :termsOfServiceUrl ..terms..
+                         :contact ..contact..
+                         :license ..license..
+                         :licenseUrl ..licenseUrl..
+                         :authorizations {:not :validated}} {}))
 
-    => (has-body
-         {:swaggerVersion "1.2"
-          :apiVersion ...version...
-          :info {:title ..title..
-                 :description ..description..
-                 :termsOfServiceUrl ..terms..
-                 :contact ..contact..
-                 :license ..license..
-                 :licenseUrl ..licenseUrl..}
-          :apis []
-          :authorizations {:not :validated}}))
+    => {:swaggerVersion "1.2"
+        :apiVersion ...version...
+        :info {:title ..title..
+               :description ..description..
+               :termsOfServiceUrl ..terms..
+               :contact ..contact..
+               :license ..license..
+               :licenseUrl ..licenseUrl..}
+        :apis []
+        :authorizations {:not :validated}})
 
   (fact "apis"
     (fact "none"
-      (api-listing ..map.. {}) => (has-apis []))
+      (-> (api-listing ..map.. {}) :body :apis) => [])
     (fact "some"
-      (api-listing ..map.. {"api1" {}
-                            "api2" {:description ..desc..}}) => (has-apis [{:path "/api1"
-                                                                            :description ""}
-                                                                           {:path "/api2"
-                                                                            :description ..desc..}]))))
+      (-> (api-listing ..map.. {"api1" {}
+                                "api2" {:description ..desc..}})
+          :body :apis)
+      => [{:path "/api1"
+           :description ""}
+          {:path "/api2"
+           :description ..desc..}])))
 (fact "api-declaration"
   (fact "empty api"
-    (api-declaration
-      {}
-      {..api.. {}}
-      ..api..
-      ..basepath..) => (has-body {:swaggerVersion "1.2"
-                                  :apiVersion "0.0.1"
-                                  :basePath ..basepath..
-                                  :resourcePath "/"
-                                  :produces ["application/json"]
-                                  :consumes ["application/json"]
-                                  :models {}
-                                  :apis []}))
+    (:body (api-declaration
+             {}
+             {..api.. {}}
+             ..api..
+             ..basepath..))
+    => {:swaggerVersion "1.2"
+        :apiVersion "0.0.1"
+        :basePath ..basepath..
+        :resourcePath "/"
+        :produces ["application/json"]
+        :consumes ["application/json"]
+        :models {}
+        :apis []})
   (fact "more full api"
     (s/defschema Q {:q String})
-    (api-declaration
-      {:apiVersion ..version..
-       :produces ["application/json"
-                  "application/xml"]
-       :consumes ["application/json"
-                  "application/xml"]}
-      {..api.. {:routes [{:method :get
-                          :uri "/pets/:id"
-                          :metadata {:return Pet
-                                     :summary ..summary..
-                                     :notes ..notes..
-                                     :responseMessages [{:code 200
-                                                         :message "the Pet"
-                                                         :responseModel Pet}
-                                                        {:code 404
-                                                         :message "pet not found"
-                                                         :responseModel PetError}]
-                                     :parameters [(string-path-parameters "/pets/:id")]}}
-                         {:method :get
-                          :uri "/pets"
-                          :metadata {:return [Pet]
-                                     :summary ..summary2..
-                                     :notes ..notes2..
-                                     :parameters [{:model Q
-                                                   :type :query}]}}]}}
+    (:body
+      (api-declaration
+        {:apiVersion ..version..
+         :produces ["application/json"
+                    "application/xml"]
+         :consumes ["application/json"
+                    "application/xml"]}
+        {..api.. {:routes [{:method :get
+                            :uri "/pets/:id"
+                            :metadata {:return Pet
+                                       :summary ..summary..
+                                       :notes ..notes..
+                                       :responseMessages [{:code 200
+                                                           :message "the Pet"
+                                                           :responseModel Pet}
+                                                          {:code 404
+                                                           :message "pet not found"
+                                                           :responseModel PetError}]
+                                       :parameters [(string-path-parameters "/pets/:id")]}}
+                           {:method :get
+                            :uri "/pets"
+                            :metadata {:return [Pet]
+                                       :summary ..summary2..
+                                       :notes ..notes2..
+                                       :parameters [{:model Q
+                                                     :type :query}]}}]}}
         ..api..
-        ..basepath..)
+        ..basepath..))
 
-    => (has-body
-         {:swaggerVersion "1.2"
-          :apiVersion ..version..
-          :basePath ..basepath..
-          :resourcePath "/"
-          :produces ["application/json"
-                     "application/xml"]
-          :consumes ["application/json"
-                     "application/xml"]
-          :models {'Pet Pet'
-                   'Tag Tag'
-                   'Category Category'
-                   'PetError PetError'}
-          :apis [{:operations [{:method "GET"
-                                :nickname "getPetsById"
-                                :notes ..notes..
-                                :responseMessages [{:code 200
-                                                    :message "the Pet"
-                                                    :responseModel 'Pet}
-                                                   {:code 404
-                                                    :message "pet not found"
-                                                    :responseModel 'PetError}]
-                                :parameters [{:description ""
-                                              :name "id"
-                                              :paramType :path
-                                              :required true
-                                              :type "string"}]
-                                :authorizations {}
-                                :summary ..summary..
-                                :type 'Pet}]
-                  :path "/pets/{id}"}
-                 {:operations [{:method "GET"
-                                :nickname "getPets"
-                                :notes ..notes2..
-                                :responseMessages []
-                                :parameters [{:description ""
-                                              :name "q"
-                                              :paramType :query
-                                              :required true
-                                              :type "string"}]
-                                :authorizations {}
-                                :summary ..summary2..
-                                :type "array"
-                                :items {:$ref 'Pet}}]
-                  :path "/pets"}]}))
+    => {:swaggerVersion "1.2"
+        :apiVersion ..version..
+        :basePath ..basepath..
+        :resourcePath "/"
+        :produces ["application/json"
+                   "application/xml"]
+        :consumes ["application/json"
+                   "application/xml"]
+        :models {'Pet Pet'
+                 'Tag Tag'
+                 'Category Category'
+                 'PetError PetError'}
+        :apis [{:operations [{:method "GET"
+                              :nickname "getPetsById"
+                              :notes ..notes..
+                              :responseMessages [{:code 200
+                                                  :message "the Pet"
+                                                  :responseModel 'Pet}
+                                                 {:code 404
+                                                  :message "pet not found"
+                                                  :responseModel 'PetError}]
+                              :parameters [{:description ""
+                                            :name "id"
+                                            :paramType :path
+                                            :required true
+                                            :type "string"}]
+                              :authorizations {}
+                              :summary ..summary..
+                              :type 'Pet}]
+                :path "/pets/{id}"}
+               {:operations [{:method "GET"
+                              :nickname "getPets"
+                              :notes ..notes2..
+                              :responseMessages []
+                              :parameters [{:description ""
+                                            :name "q"
+                                            :paramType :query
+                                            :required true
+                                            :type "string"}]
+                              :authorizations {}
+                              :summary ..summary2..
+                              :type "array"
+                              :items {:$ref 'Pet}}]
+                :path "/pets"}]})
 
   (fact "primitive responses"
-    (api-declaration
-      {}
-      {..api.. {:routes [{:method :get
+    (:body
+      (api-declaration
+        {}
+        {..api.. {:routes [{:method :get
                             :uri "/primitive"
                             :metadata {:return String}}
                            {:method :get
                             :uri "/primitiveArray"
                             :metadata {:return [String]}}]}}
         ..api..
-        ..basepath..)
+        ..basepath..))
 
-      => (has-body
-           {:swaggerVersion "1.2"
-            :apiVersion "0.0.1"
-            :basePath ..basepath..
-            :resourcePath "/"
-            :produces ["application/json"]
-            :consumes ["application/json"]
-            :models {}
-            :apis [{:operations [{:method "GET"
-                                  :nickname "getPrimitive"
-                                  :notes ""
-                                  :parameters []
-                                  :responseMessages []
-                                  :authorizations {}
-                                  :summary ""
-                                  :type "string"}]
-                    :path "/primitive"}
-                   {:operations [{:method "GET"
-                                  :nickname "getPrimitiveArray"
-                                  :notes ""
-                                  :parameters []
-                                  :responseMessages []
-                                  :authorizations {}
-                                  :summary ""
-                                  :type "array"
-                                  :items {:type "string"}}]
-                    :path "/primitiveArray"}]})))
+    => {:swaggerVersion "1.2"
+        :apiVersion "0.0.1"
+        :basePath ..basepath..
+        :resourcePath "/"
+        :produces ["application/json"]
+        :consumes ["application/json"]
+        :models {}
+        :apis [{:operations [{:method "GET"
+                              :nickname "getPrimitive"
+                              :notes ""
+                              :parameters []
+                              :responseMessages []
+                              :authorizations {}
+                              :summary ""
+                              :type "string"}]
+                :path "/primitive"}
+               {:operations [{:method "GET"
+                              :nickname "getPrimitiveArray"
+                              :notes ""
+                              :parameters []
+                              :responseMessages []
+                              :authorizations {}
+                              :summary ""
+                              :type "array"
+                              :items {:type "string"}}]
+                :path "/primitiveArray"}]}))
 
 ;;
 ;; Web stuff
