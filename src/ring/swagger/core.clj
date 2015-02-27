@@ -38,35 +38,35 @@
   clojure.lang.IPersistentMap
   (-walk [this f names]
     (if-not (record? this)
-      (f (into (empty this)
-               (for [[k v] this
-                     ; FIXME: ?
-                     :when (jsons/not-predicate? k)]
-                 [k (walk v f (conj names (s/explicit-schema-key k)))]))
+      (f (with-meta
+           (into (empty this)
+                 (for [[k v] this
+                       :when (jsons/not-predicate? k)]
+                   [k (walk v f (conj names (s/explicit-schema-key k)))]))
+           (meta this))
          names)
       this))
   clojure.lang.IPersistentVector
   (-walk [this f names]
-    (f (walk (first this) f names) names))
+    (f (with-meta (mapv #(walk % f names) this) (meta this)) names))
   clojure.lang.IPersistentSet
   (-walk [this f names]
-    (f (walk (first this) f names) names))
+    (f (with-meta (into (empty this) (map #(walk % f names) this)) (meta this)) names))
   schema.core.Maybe
   (-walk [this f names]
-    (f (walk (:schema this) f names) names))
+    (f (with-meta (s/maybe (walk (:schema this) f names)) (meta this)) names))
   schema.core.Both
   (-walk [this f names]
-    (f (walk (first (:schemas this)) f names) names)
-    this)
+    (f (with-meta (apply s/both (map #(walk % f names) (:schemas this))) (meta this)) names))
   schema.core.Either
   (-walk [this f names]
-    (f (walk (first (:schemas this)) f names) names))
+    (f (with-meta (apply s/either (walk (first (:schemas this)) f names)) (meta this)) names))
   schema.core.Recursive
   (-walk [this f names]
-    (f (walk (:derefable this) f names) names))
+    (f (with-meta (s/recursive (walk (:derefable this) f names)) (meta this)) names))
   schema.core.NamedSchema
   (-walk [this f names]
-    (f (walk (:derefable this) f names) names)))
+    (f (with-meta (s/named (walk (:schema this) f names) (:name this)) (meta this)) names)))
 
 
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
