@@ -337,7 +337,7 @@
                                         :b #{{:c String}}})) => truthy)
 
   ;; FIXME: should work
-  #_(fact "nested value behind a record"
+  (fact "nested value behind a record"
     (transform
       (with-named-sub-schemas
         {:a String

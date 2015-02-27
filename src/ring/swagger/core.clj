@@ -26,24 +26,57 @@
 ;; Schema transformations
 ;;
 
+(defprotocol WalkableSchema
+  (-walk [this f names]))
+
+(defn walk [this f names]
+  (if (satisfies? WalkableSchema this)
+    (-walk this f names)
+    this))
+
+(extend-protocol WalkableSchema
+  clojure.lang.APersistentMap
+  (-walk [this f names]
+    (f (into (empty this)
+             (for [[k v] this
+                   ; FIXME: ?
+                   :when (jsons/not-predicate? k)]
+               [k (walk v f (conj names (s/explicit-schema-key k)))]))
+       names))
+  clojure.lang.APersistentVector
+  (-walk [this f names]
+    (f (walk (first this) f names) names))
+  clojure.lang.APersistentSet
+  (-walk [this f names]
+    (f (walk (first this) f names) names))
+  schema.core.Maybe
+  (-walk [this f names]
+    (f (walk (:schema this) f names) names))
+  schema.core.Both
+  (-walk [this f names]
+    (f (walk (first (:schemas this)) f names) names))
+  schema.core.Either
+  (-walk [this f names]
+    (f (walk (first (:schemas this)) f names) names))
+  schema.core.Recursive
+  (-walk [this f names]
+    (f (walk (:derefable this) f names) names))
+  schema.core.NamedSchema
+  (-walk [this f names]
+    (f (walk (:derefable this) f names) names)))
+
+
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
-(defn- collect-schemas [keys schema]
-  (cond
-    (plain-map? schema)
-    (if (and (seq (pop keys)) (s/schema-name schema))
-      schema
-      (with-meta
-        (into (empty schema)
-              (for [[k v] schema
-                    :when (jsons/not-predicate? k)
-                    :let [keys (conj keys (s/explicit-schema-key k))]]
-                [k (collect-schemas keys v)]))
-        {:name (full-name keys)}))
+(defn- collect-schemas [names schema]
+  (walk schema (fn [x names]
+                 (cond
+                   (plain-map? x)
+                   (if-not (s/schema-name x)
+                     (with-meta x {:name (full-name names)})
+                     x)
 
-    (valid-container? schema)
-    (contain schema (collect-schemas keys (first schema)))
-
-    :else schema))
+                   :else x))
+        names))
 
 (defn with-named-sub-schemas
   "Traverses a schema tree of Maps, Sets and Sequences and add Schema-name to all
