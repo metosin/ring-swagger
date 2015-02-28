@@ -4,11 +4,11 @@
 
 - Supports both 1.2 and 2.0 Swagger Specs
 - For web developers
-  - Extendable Schema->JSON Mappings with out-of-the-box support for most common types
+  - Extendable Schema-&gt;JSON Mappings with out-of-the-box support for most common types
   - Utilities for input & output Schema validation & coercion
 - For web library developers:
   - A Schema-based contract for collecting route documentation from the web apps
-  - Extendable Schema->JSON Schema conversion with out-of-the-box support for most Schema predicates
+  - Extendable Schema-&gt;JSON Schema conversion with out-of-the-box support for most Schema predicates
   - Common middleware for handling Schemas and Validation Errors.
   - Ring-handlers for exposing the swaggers artifacts
     - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
@@ -30,7 +30,7 @@ For creating you own adapter, see [Collecting API Documentation](https://github.
 
 ## Web Schemas
 
-[Prismatic Schema](https://github.com/Prismatic/schema) is used for modelling both the input & output schemas for routes. 
+[Prismatic Schema](https://github.com/Prismatic/schema) is used for modeling both the input & output schemas for routes.
 
 As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schema, so not all Clojure Schema elements can be used.
 
@@ -64,12 +64,12 @@ As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schem
 - Vectors, Sets and Maps can be used as containers
   - Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references
-    - Nested maps can be within valid containers (as only element - heregenous schema sequences not supported by the spec)
+    - Nested maps can be within valid containers (as only element - heterogeneous schema sequences not supported by the spec)
 
 ### Missing Schema elements
 
 If ring-swagger can't transform the Schemas into JSON Schemas, by default a `IllegalArgumentException` will be thrown. Binding `ring.swagger.json-schema/*ignore-missing-mappings*` to true, one
-can ingore the errors (missing schema elements will be ignored from
+can ignore the errors (missing schema elements will be ignored from
 the generated JSON Schema).
 
 ### Adding support for custom Schema elements
@@ -82,7 +82,7 @@ JSON Schema generation is supported by the `ring.swagger.json-schema/json-type` 
 (defmethod jsons/json-type s/Maybe [e] (swagger/->json (:schema e)))
 ```
 
-One might also need to write both JSON Serialization for the Schema values and Coersion function to de-serialize the value back from JSON.
+One might also need to write both JSON Serialization for the Schema values and coercion function to de-serialize the value back from JSON.
 
 ### Extra Schema elements supported by `ring.swagger.json-schema-dirty`
 
@@ -99,7 +99,7 @@ Be warned that Swagger-UI might not display these correctly and the code generat
 
 ### Currently Non-supported Schema elements
 
-these should work, just need the mappings (feel free to contribute!):
+These schemas should work, just need the mappings (feel free to contribute!):
 
 - `s/Symbol`
 - `s/Inst`
@@ -133,7 +133,7 @@ Currently there are two modes for coercions: `:json` and `:query`. Both `coerce`
 
 #### Query-coercion:
 
-extends the json-coercion with the following transformations:
+Query-coercion extends the json-coercion with the following transformations:
 
 - string -> Long
 - string -> Double
