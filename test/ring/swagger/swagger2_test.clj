@@ -147,7 +147,8 @@
 
 (facts "empty-responses-messages?"
   (let [swagger {:paths {"/hello" {:post {:responses {200 {}
-                                                      425 {}}}}}}]
+                                                      425 {}
+                                                      500 {:description "FAIL"}}}}}}]
 
     (fact "with defaults"
       (validate swagger) => nil
@@ -158,7 +159,8 @@
                      {:post
                       {:responses
                        {200 {:description ""}
-                        425 {:description ""}}}}}}))
+                        425 {:description ""}
+                        500 {:description "FAIL"}}}}}}))
 
     (fact ":default-response-description-fn option overriden"
       (let [options {:default-response-description-fn #(get-in status/status [% :description])}]
@@ -170,4 +172,5 @@
                        {:post
                         {:responses
                          {200 {:description "OK"}
-                          425 {:description "The collection is unordered."}}}}}})))))
+                          425 {:description "The collection is unordered."}
+                          500 {:description "FAIL"}}}}}})))))
