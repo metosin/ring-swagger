@@ -11,6 +11,7 @@
 [metosin/ring-http-status "0.6.0"] is available but we use "0.5.2"
 [prismatic/schema "0.3.7"] is available but we use "0.3.3"
 [prismatic/plumbing "0.3.7"] is available but we use "0.3.5"
+[lein-ring "0.9.2"] is available but we use "0.9.1"
 ```
 
 ## 0.17.0 (15.1.2015)
