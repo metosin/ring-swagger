@@ -10,7 +10,7 @@
             [ring.swagger.json-schema :as jsons]
             [org.tobereplaced.lettercase :as lc]
             [ring.swagger.swagger2-schema :as schema]
-            [ring.util.http-status :as https-status]
+            [ring.util.http-status :as http-status]
             [instar.core :as instar])
   (:import (clojure.lang Sequential IPersistentSet)))
 
@@ -179,12 +179,13 @@
                           :required (s/required-key? k)}
                          json-schema))))
 
-(defn- ->description
-  "if option :http-response-messages? is set to true,
-   use real http-status messages"
+(defn- default-response-description
+  "uses option :default-response-description-fn to generate
+   a default response description for status code"
   [status]
-  (if (true? (:http-response-messages? *options*))
-    (https-status/description status)))
+  (if-let [generator (:default-response-description-fn *options*)]
+    (generator status)
+    ""))
 
 (defn convert-parameters [parameters]
   (into [] (mapcat extract-parameter parameters)))
@@ -199,7 +200,8 @@
                     k (-> v
                           (cond-> schema (update-in [:schema] convert))
                           (cond-> headers (update-in [:headers] ->properties))
-                          (assoc :description (or description (->description k) ""))
+                          (assoc :description (or description
+                                                  (default-response-description k)))
                           remove-empty-keys))]
     (if-not (empty? responses)
       responses
@@ -274,7 +276,11 @@
 (def Swagger schema/Swagger)
 
 (def Options {(s/optional-key :ignore-missing-mappings?) s/Bool
-              (s/optional-key :http-response-messages?) s/Bool})
+              (s/optional-key :default-response-description-fn) (s/=> s/Str s/Int)})
+
+(def option-defaults
+  (s/validate Options {:ignore-missing-mappings? false
+                       :default-response-description-fn (constantly "")}))
 
 (s/defn swagger-json
   "Produces swagger-json output from ring-swagger spec.
@@ -284,17 +290,18 @@
    :ignore-missing-mappings? (false) - whether to silently ignore
    missing schema to json-schema mappings.
 
-   :http-response-messages? (false) whether to use default
-   http-status messages."
+   :default-response-description-fn ((constantly \"\")) - a fn to generate
+   default response descriptions from http status code"
   ([swagger :- Swagger] (swagger-json swagger nil))
   ([swagger :- Swagger, options :- Options]
-    (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
-              *options* options]
-      (let [[paths definitions] (-> swagger
-                                    ensure-named-top-level-models
-                                    extract-paths-and-definitions)]
-        (merge
+   (let [options (merge option-defaults options)]
+     (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
+               *options* options]
+       (let [[paths definitions] (-> swagger
+                                     ensure-named-top-level-models
+                                     extract-paths-and-definitions)]
+         (merge
           swagger-defaults
           (-> swagger
               (assoc :paths paths)
-              (assoc :definitions definitions)))))))
+              (assoc :definitions definitions))))))))

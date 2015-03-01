@@ -3,6 +3,7 @@
             [ring.swagger.swagger2 :refer :all]
             [ring.swagger.validator :as validator]
             [cheshire.core :as json]
+            [ring.util.http-status :as status]
             [midje.sweet :refer :all])
   (:import  [java.util Date UUID]
             [java.util.regex Pattern]
@@ -147,20 +148,26 @@
 (facts "empty-responses-messages?"
   (let [swagger {:paths {"/hello" {:post {:responses {200 {}
                                                       425 {}}}}}}]
-    (validate swagger) => nil
 
-    (swagger-json swagger)
-    => (contains {:paths
-                  {"/hello"
-                   {:post
-                    {:responses
-                     {200 {:description ""}
-                      425 {:description ""}}}}}})
+    (fact "with defaults"
+      (validate swagger) => nil
 
-    (swagger-json swagger {:http-response-messages? true})
-    => (contains {:paths
-                  {"/hello"
-                   {:post
-                    {:responses
-                     {200 {:description "OK"}
-                      425 {:description "The collection is unordered."}}}}}})))
+      (swagger-json swagger)
+      => (contains {:paths
+                    {"/hello"
+                     {:post
+                      {:responses
+                       {200 {:description ""}
+                        425 {:description ""}}}}}}))
+
+    (fact ":default-response-description-fn option overriden"
+      (let [options {:default-response-description-fn #(get-in status/status [% :description])}]
+        (validate swagger options) => nil
+
+        (swagger-json swagger options)
+        => (contains {:paths
+                      {"/hello"
+                       {:post
+                        {:responses
+                         {200 {:description "OK"}
+                          425 {:description "The collection is unordered."}}}}}})))))
