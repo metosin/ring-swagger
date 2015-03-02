@@ -23,7 +23,7 @@
                            :b {:c "(not (#{:kikka :kakka} nil))"}}}))
 
   (fact "using custom :error-handler"
-    ((wrap-validation-errors bad :error-handler (constantly "FAIL")) ..request..) =>
+    ((wrap-validation-errors bad {:error-handler (constantly "FAIL")}) ..request..) =>
     "FAIL")
 
   (fact "only response-exceptions are caught"
@@ -33,9 +33,9 @@
     (fact "by default, schema.core validation errors are not caught"
       ((wrap-validation-errors failing-handler)) => (throws Exception))
     (fact "with :catch-core-errors? false, schema.core validation errors are not caught"
-      ((wrap-validation-errors failing-handler :catch-core-errors? false)) => (throws Exception))
+      ((wrap-validation-errors failing-handler {:catch-core-errors? false})) => (throws Exception))
     (fact "with :catch-core-errors? truem, schema.core validation errors are caught"
-      ((wrap-validation-errors failing-handler :catch-core-errors? true) ..request..) =>
+      ((wrap-validation-errors failing-handler {:catch-core-errors? true}) ..request..) =>
       (bad-request {:errors {:a "missing-required-key"}}))))
 
 (fact "stringify-error"

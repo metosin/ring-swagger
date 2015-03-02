@@ -54,7 +54,7 @@
 (s/defschema Responses (merge
                          ;; TODO: More than one non-optional/required key schemata
                          ;vendor-extension s/Any
-                         {(s/pred valid-response-key?) Response}))
+                         {(s/pred valid-response-key?) (s/maybe Response)}))
 
 (s/defschema Parameters {(s/optional-key :body) s/Any
                          (s/optional-key :query) s/Any
@@ -87,7 +87,7 @@
                       ;(s/optional-key :schemes) [Scheme]
                       (s/optional-key :consumes) [s/Str]
                       (s/optional-key :produces) [s/Str]
-                      (s/optional-key :paths) {s/Str {s/Keyword Operation}}
+                      (s/optional-key :paths) {s/Str {s/Keyword (s/maybe Operation)}}
                       ;(s/optional-key :parameters) Parameters
                       ;(s/optional-key :responses) Responses
                       ;(s/optional-key :security) Security

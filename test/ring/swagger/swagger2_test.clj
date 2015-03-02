@@ -40,7 +40,7 @@
     (validate swagger) => nil))
 
 (fact "minimalistic spec"
-  (let [swagger {:paths {"/ping" {:get {}}}}]
+  (let [swagger {:paths {"/ping" {:get nil}}}]
     (validate swagger) => nil))
 
 (fact "more complete spec"
@@ -146,8 +146,8 @@
         (validate swagger {:ignore-missing-mappings? true}) => nil))))
 
 (facts "empty-responses-messages?"
-  (let [swagger {:paths {"/hello" {:post {:responses {200 {}
-                                                      425 {}
+  (let [swagger {:paths {"/hello" {:post {:responses {200 nil
+                                                      425 nil
                                                       500 {:description "FAIL"}}}}}}]
 
     (fact "with defaults"

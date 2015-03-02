@@ -31,9 +31,9 @@
 
    :error-handler - a function of schema.utils.ErrorContainer -> response
    :catch-core-errors? - consume also :schema.core/errors (defaults to false)"
-  [handler & {:keys [error-handler catch-core-errors?]
-              :or   {error-handler default-error-handler
-                     catch-core-errors? false}}]
+  [handler & [{:keys [error-handler catch-core-errors?]
+               :or   {error-handler default-error-handler
+                      catch-core-errors? false}}]]
   (fn [request]
     (try+
       (handler request)

@@ -1,10 +1,12 @@
-## 0.18.0 (1.3.2015)
+## 0.18.0 (2.3.2015)
 - fixed Swagger 2.0 response bug #29
 - `ring.swagger.swagger2/swagger-json` now takes an optional extra argument, the Options-map
   with options `:ignore-missing-mappings?` & `:default-response-description-fn`
 - ensured that ignoring missing mappings works for both body- & non-body parameters
-- **BREAKING**: moved binding of `s/either` from `ring.swagger.json-schema-dirty` to
- `ring.swagger.json-schema`. Uses the first schema element as the source for the mappings
+- **BREAKING**:
+  - moved binding of `s/either` from `ring.swagger.json-schema-dirty` to `ring.swagger.json-schema`.
+  Uses the first schema element as the source for the mappings
+  - `ring.swagger.middleware/wrap-validation-error` takes now options as a single map
 - updated deps:
 
 ```clojure
