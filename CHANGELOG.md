@@ -1,5 +1,5 @@
 ## 0.18.0 (2.3.2015)
-- fixed Swagger 2.0 response bug #29
+- fixed Swagger 2.0 response bug [#29](https://github.com/metosin/ring-swagger/issues/29)
 - `ring.swagger.swagger2/swagger-json` now takes an optional extra argument, the Options-map
   with options `:ignore-missing-mappings?` & `:default-response-description-fn`
 - ensured that ignoring missing mappings works for both body- & non-body parameters

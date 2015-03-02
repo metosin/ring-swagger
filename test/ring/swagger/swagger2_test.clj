@@ -145,7 +145,7 @@
       (fact "with :ignore-missing-mappings errors (and mappings) are ignored"
         (validate swagger {:ignore-missing-mappings? true}) => nil))))
 
-(facts "empty-responses-messages?"
+(facts "handling empty responses"
   (let [swagger {:paths {"/hello" {:post {:responses {200 nil
                                                       425 nil
                                                       500 {:description "FAIL"}}}}}}]
