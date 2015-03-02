@@ -31,10 +31,9 @@
 
    :error-handler - a function of schema.utils.ErrorContainer -> response
    :catch-core-errors? - consume also :schema.core/errors (defaults to false)"
-  [handler & [{:keys [error-handler catch-core-errors?]
-               :or   {error-handler default-error-handler
-                      catch-core-errors? false}}]]
-  (fn [request]
+  [handler & [{:keys [error-handler catch-core-errors?]}]]
+  (let [error-handler (or error-handler default-error-handler)]
+    (fn [request]
     (try+
       (handler request)
       (catch [:type :schema.core/error] validation-error
@@ -42,4 +41,4 @@
           (error-handler validation-error)
           (throw+ validation-error)))
       (catch [:type :ring.swagger.schema/validation] error-container
-        (error-handler error-container)))))
+        (error-handler error-container))))))

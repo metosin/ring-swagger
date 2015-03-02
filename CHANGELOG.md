@@ -1,3 +1,7 @@
+## 0.18.1 (2.3.2015)
+
+- Fixed wrap-validation-errors defaults
+
 ## 0.18.0 (2.3.2015)
 - fixed Swagger 2.0 response bug [#29](https://github.com/metosin/ring-swagger/issues/29)
 - `ring.swagger.swagger2/swagger-json` now takes an optional extra argument, the Options-map
