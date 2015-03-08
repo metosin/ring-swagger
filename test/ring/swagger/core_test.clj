@@ -96,6 +96,20 @@
 (s/defschema RootModel
   {:sub {:foo Long}})
 
+(fact "name-schemas"
+  (fact "Adds name to basic sub-schema"
+    (meta (:sub (name-schemas ['Root] RootModel)))
+    => {:name 'RootSub})
+  (fact "Works with deep schemas"
+    (meta (:sub2 (:sub1 (name-schemas ['Root] {:sub1 {:sub2 {:foo Long}}}))))
+    => {:name 'RootSub1Sub2})
+  (fact "Adds names to maps inside Schemas"
+    (meta (:schema (:sub (name-schemas ['Root] {:sub (s/maybe {:a s/Str})}))))
+    => {:name 'RootSub})
+  (fact "Uses name of optional-key"
+    (meta (get (name-schemas ['Root] {(s/optional-key :sub) {:a s/Str}}) (s/optional-key :sub)))
+    => {:name 'RootSub}))
+
 (fact "with-named-sub-schemas"
   (fact "add :name meta-data to sub-schemas"
     (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
@@ -337,7 +351,7 @@
                                         :b #{{:c String}}})) => truthy)
 
   ;; FIXME: should work
-  #_(fact "nested value behind a record"
+  (fact "nested value behind a record"
     (transform
       (with-named-sub-schemas
         {:a String
