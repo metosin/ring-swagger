@@ -2,6 +2,13 @@
 
 - `with-named-sub-schemas` has learned how to add names to schemas inside `s/maybe` and others
   - This means that you can now use inline schemas inside `s/maybe`
+- updated deps:
+
+```clojure
+[prismatic/schema "0.4.0"] is available but we use "0.3.7"
+[prismatic/plumbing "0.4.0"] is available but we use "0.3.7"
+[potemkin "0.3.12"] is available but we use "0.3.11"
+```
 
 ## 0.18.1 (2.3.2015)
 

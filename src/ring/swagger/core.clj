@@ -4,7 +4,6 @@
             [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
-            [schema.macros :as sm]
             [plumbing.core :refer :all :exclude [update]]
             [schema.utils :as su]
             ring.swagger.json ;; needed for the json-encoders
@@ -188,7 +187,7 @@
 (defn convert-parameters [parameters]
   (mapcat extract-parameter parameters))
 
-(sm/defn ^:always-validate convert-response-messages [messages :- [ResponseMessage]]
+(s/defn ^:always-validate convert-response-messages [messages :- [ResponseMessage]]
   (for [{:keys [responseModel] :as message} messages]
     (if (and responseModel (schema/named-schema? responseModel))
       (update-in message [:responseModel] (fn [x] (:type (jsons/->json x :top true))))
