@@ -41,7 +41,7 @@
 
   schema.core.Either
   (-walk [this inner outer]
-    (outer (with-meta (apply s/either (inner (first (:schemas this)))) (meta this))))
+    (outer (with-meta (apply s/either (map inner (:schemas this))) (meta this))))
 
   schema.core.Recursive
   (-walk [this inner outer]
