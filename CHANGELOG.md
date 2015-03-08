@@ -1,3 +1,8 @@
+## 0.19.0-SNAPSHOT (x.x.2015)
+
+- `with-named-sub-schemas` has learned how to add names to schemas inside `s/maybe` and others
+  - This means that you can now use inline schemas inside `s/maybe`
+
 ## 0.18.1 (2.3.2015)
 
 - Fixed wrap-validation-errors defaults
