@@ -12,6 +12,7 @@
             [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
+            [ring.swagger.impl.walk :as swalk]
             [org.tobereplaced.lettercase :as lc]))
 
 ;;
@@ -26,60 +27,25 @@
 ;; Schema transformations
 ;;
 
-(defprotocol WalkableSchema
-  (-walk [this f names]))
-
-(defn walk [this f names]
-  (if (satisfies? WalkableSchema this)
-    (-walk this f names)
-    this))
-
-(extend-protocol WalkableSchema
-  clojure.lang.IPersistentMap
-  (-walk [this f names]
-    (if-not (record? this)
-      (f (with-meta
-           (into (empty this)
-                 (for [[k v] this
-                       :when (jsons/not-predicate? k)]
-                   [k (walk v f (conj names (s/explicit-schema-key k)))]))
-           (meta this))
-         names)
-      this))
-  clojure.lang.IPersistentVector
-  (-walk [this f names]
-    (f (with-meta (mapv #(walk % f names) this) (meta this)) names))
-  clojure.lang.IPersistentSet
-  (-walk [this f names]
-    (f (with-meta (into (empty this) (map #(walk % f names) this)) (meta this)) names))
-  schema.core.Maybe
-  (-walk [this f names]
-    (f (with-meta (s/maybe (walk (:schema this) f names)) (meta this)) names))
-  schema.core.Both
-  (-walk [this f names]
-    (f (with-meta (apply s/both (map #(walk % f names) (:schemas this))) (meta this)) names))
-  schema.core.Either
-  (-walk [this f names]
-    (f (with-meta (apply s/either (walk (first (:schemas this)) f names)) (meta this)) names))
-  schema.core.Recursive
-  (-walk [this f names]
-    (f (with-meta (s/recursive (walk (:derefable this) f names)) (meta this)) names))
-  schema.core.NamedSchema
-  (-walk [this f names]
-    (f (with-meta (s/named (walk (:schema this) f names) (:name this)) (meta this)) names)))
-
-
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
-(defn- collect-schemas [names schema]
-  (walk schema (fn [x names]
-                 (cond
-                   (plain-map? x)
-                   (if-not (s/schema-name x)
-                     (with-meta x {:name (full-name names)})
-                     x)
 
-                   :else x))
-        names))
+(defn map-entry? [x]
+  (instance? clojure.lang.IMapEntry x))
+
+(defn- collect-schemas [names schema]
+  (swalk/walk schema
+              (fn [x]
+                (if (map-entry? x)
+                  ; Filter away s/Keyword, s/Any keys
+                  (if (jsons/not-predicate? (key x))
+                    [(key x) (collect-schemas (conj names (first x)) (val x))])
+                  (collect-schemas names x)))
+              (fn [x]
+                (if (plain-map? x)
+                  (if-not (s/schema-name x)
+                    (with-meta x {:name (full-name names)})
+                    x)
+                  x))))
 
 (defn with-named-sub-schemas
   "Traverses a schema tree of Maps, Sets and Sequences and add Schema-name to all
