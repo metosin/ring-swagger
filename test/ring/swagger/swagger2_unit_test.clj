@@ -4,6 +4,7 @@
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
+            [ring.swagger.core :refer [with-named-sub-schemas]]
             [ring.swagger.swagger2 :refer :all]
             [flatland.ordered.map :refer :all]))
 
@@ -93,32 +94,6 @@
 
 (s/defschema RootModel
   {:sub {:foo Long}})
-
-(fact "with-named-sub-schemas"
-  (fact "add :name meta-data to sub-schemas"
-    (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
-
-  (fact "Keeps the order"
-    (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
-
-(fact "collect-models"
-  (fact "Sub-schemas are collected"
-    (collect-models Pet)
-    => {'Pet Pet
-        'Tag Tag
-        'Category Category})
-
-  (fact "No schemas are collected if all are unnamed"
-    (collect-models String) => {})
-
-  (fact "Inline-sub-schemas as collected after they are named"
-    (collect-models (with-named-sub-schemas RootModel))
-    => {'RootModel RootModel
-        'RootModelSub (:sub RootModel)})
-
-  (fact "Described anonymous models are collected"
-    (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
-      (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
 
 (fact "transform-models"
   (transform-models [Pet]) => {:Pet Pet'
@@ -323,10 +298,6 @@
 (s/defschema Bar {:foo (s/maybe #'Foo)})
 
 (fact "recursive"
-  (collect-models [Foo Bar])
-  => {'Bar {:foo (s/maybe #'Foo)}
-      'Foo {:bar (s/recursive #'Bar)}}
-
   (transform-models [Foo Bar])
   => {:Bar {:properties {:foo {:$ref "#/definitions/Foo"}}
             :required [:foo]}
