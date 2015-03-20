@@ -19,6 +19,13 @@
     (fact "LocalDate"
       ((c LocalDate) "2014-02-19") => (partial instance? LocalDate))
 
+    (fact "java.time.LocalDateTime with and without millis"
+      ((c java.time.LocalDateTime) "2014-02-18T18:25:37.456Z") => (partial instance? java.time.LocalDateTime)
+      ((c java.time.LocalDateTime) "2014-02-18T18:25:37Z") => (partial instance? java.time.LocalDateTime))
+
+    (fact "java.time.LocalDate"
+      ((c java.time.LocalDate) "2014-02-19") => (partial instance? java.time.LocalDate))
+
     (fact "UUID"
       ((c UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))))
 

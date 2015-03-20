@@ -7,7 +7,7 @@
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date UUID]
            [java.util.regex Pattern]
-           (clojure.lang APersistentSet Keyword)))
+           [clojure.lang APersistentSet Keyword]))
 
 (defn date-time? [x] (#{Date DateTime} x))
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
@@ -66,12 +66,23 @@
 (defn string->uuid [^String x]
   (try (UUID/fromString x) (catch Exception e x)))
 
-(def json-coersions {s/Keyword sc/string->keyword
-                     Keyword sc/string->keyword
-                     s/Int sc/safe-long-cast
-                     Long sc/safe-long-cast
-                     Double double
-                     s/Uuid string->uuid})
+(defn string->local-date-time [iso-8601-string]
+  (-> iso-8601-string
+      (java.time.ZonedDateTime/parse java.time.format.DateTimeFormatter/ISO_DATE_TIME)
+      (.withZoneSameInstant java.time.ZoneOffset/UTC)
+      .toLocalDateTime))
+
+(defn string->local-date [date-string]
+  (java.time.LocalDate/parse date-string java.time.format.DateTimeFormatter/ISO_DATE))
+
+(def json-coersions {s/Keyword     sc/string->keyword
+                     Keyword       sc/string->keyword
+                     s/Int         sc/safe-long-cast
+                     Long          sc/safe-long-cast
+                     Double        double
+                     s/Uuid        string->uuid
+                     java.time.LocalDate     string->local-date
+                     java.time.LocalDateTime string->local-date-time})
 
 (def query-coercions {s/Int string->long
                       Long string->long

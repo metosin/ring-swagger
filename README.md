@@ -49,6 +49,8 @@ As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schem
 | `#"[a-z0-9]+"`              | string, pattern | `"a6"`
 | `s/uuid`, `java.util.UUID`  | string, uuid | `"77e70512-1337-dead-beef-0123456789ab"`
 | `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
+| `java.time.LocalDate`   | string, date | `"2014-02-19"`
+| `java.time.LocalDateTime`   | string, date-time | `"2014-02-18T18:25:37.456Z"`, consumes also without millis: `"2014-02-18T18:25:37Z"`
 | `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
 | `(s/maybe X)`          | *type of X*
 | `(s/both X Y Z)`       | *type of X*
