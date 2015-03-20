@@ -6,8 +6,9 @@
 
 ```clojure
 [prismatic/schema "0.4.0"] is available but we use "0.3.7"
-[prismatic/plumbing "0.4.0"] is available but we use "0.3.7"
+[prismatic/plumbing "0.4.1"] is available but we use "0.3.7"
 [potemkin "0.3.12"] is available but we use "0.3.11"
+[metosin/ring-http-response "0.6.1"] is available but we use "0.6.0"
 ```
 - Fixed compatibility with Schema 0.4.0
 
