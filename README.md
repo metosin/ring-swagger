@@ -129,7 +129,7 @@ Currently there are two modes for coercions: `:json` and `:query`. Both `coerce`
 
 - numbers -> `Long` or `Double`
 - string -> Keyword
-- string -> `java.util.Date`, `org.joda.time.DateTime` or `org.joda.time.LocalDate`
+- string -> `java.util.Date`, `org.joda.time.DateTime`, `org.joda.time.LocalDate`, `java.time.LocalDate`, or `java.time.LocalDateTime`
 - string -> `java.util.regex.Pattern`
 - vectors -> Sets
 
