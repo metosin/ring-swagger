@@ -1,4 +1,4 @@
-## 0.19.0-SNAPSHOT (x.x.2015)
+## 0.19.0 (20.3.2015)
 
 - `with-named-sub-schemas` has learned how to add names to schemas inside `s/maybe` and others
   - This means that you can now use inline schemas inside `s/maybe`
@@ -9,6 +9,7 @@
 [prismatic/plumbing "0.4.0"] is available but we use "0.3.7"
 [potemkin "0.3.12"] is available but we use "0.3.11"
 ```
+- Fixed compatibility with Schema 0.4.0
 
 ## 0.18.1 (2.3.2015)
 
