@@ -96,6 +96,9 @@
 (s/defschema RootModel
   {:sub {:foo Long}})
 
+(def AnonymousRootModel
+  {:sub {:foo Long}})
+
 (fact "name-schemas"
   (fact "Adds name to basic sub-schema"
     (meta (:sub (name-schemas ['Root] RootModel)))
@@ -113,6 +116,12 @@
 (fact "with-named-sub-schemas"
   (fact "add :name meta-data to sub-schemas"
     (meta (:sub (with-named-sub-schemas RootModel))) => {:name 'RootModelSub})
+
+  (fact "add :name meta-data to anonymous sub-schemas"
+    (meta (:sub (with-named-sub-schemas AnonymousRootModel))) => (contains {:name #(.startsWith (str %) "Schema")}))
+
+  (fact "add prefixed :name meta-data to anonymous sub-schemas"
+    (meta (:sub (with-named-sub-schemas AnonymousRootModel "Body"))) => (contains {:name #(.startsWith (str %) "Body")}))
 
   (fact "Keeps the order"
     (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))

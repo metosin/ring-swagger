@@ -1,3 +1,7 @@
+## 0.19.1 (xx.x.2015)
+
+- `with-named-sub-schemas` takes an optional parameter - prefix for schema names
+
 ## 0.19.0 (20.3.2015)
 
 - `with-named-sub-schemas` has learned how to add names to schemas inside `s/maybe` and others
