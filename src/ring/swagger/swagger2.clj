@@ -1,6 +1,5 @@
 (ns ring.swagger.swagger2
   (:require [clojure.string :as str]
-            [clojure.walk :as walk]
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [plumbing.core :refer [for-map fn->]]
@@ -9,9 +8,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.core :refer [with-named-sub-schemas collect-models]]
-            [org.tobereplaced.lettercase :as lc]
             [ring.swagger.swagger2-schema :as schema]
-            [ring.util.http-status :as http-status]
             [instar.core :as instar])
   (:import (clojure.lang Sequential IPersistentSet)))
 
