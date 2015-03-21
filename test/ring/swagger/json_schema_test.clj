@@ -23,7 +23,10 @@
     (->json LocalDate) => {:type "string" :format "date"}
     (->json Pattern)   => {:type "string" :format "regex"}
     (->json #"[6-9]")  => {:type "string" :pattern "[6-9]"}
-    (->json UUID)      => {:type "string" :format "uuid"})
+    (->json UUID)      => {:type "string" :format "uuid"}
+
+    (->json java.time.LocalDate)     => {:type "string" :format "date"}
+    (->json java.time.LocalDateTime) => {:type "string" :format "date-time"})
 
   (fact "schema types"
     (->json s/Int)     => {:type "integer" :format "int64"}
@@ -94,6 +97,8 @@
     Date
     DateTime
     LocalDate
+    java.time.LocalDate
+    java.time.LocalDateTime
     Pattern
     UUID
     clojure.lang.Keyword)

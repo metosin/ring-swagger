@@ -25,6 +25,6 @@
                                   [com.github.fge/json-schema-validator "2.2.6"]
                                   [metosin/ring-swagger-ui "2.0.24"]
                                   [javax.servlet/servlet-api "2.5"]]}
-             :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha4"]]}}
+             :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha5"]]}}
   :aliases {"all" ["with-profile" "dev:dev,1.7"]
             "test-ancient" ["midje"]})

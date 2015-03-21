@@ -80,6 +80,8 @@
 (defmethod json-type java.util.Date          [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.DateTime  [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
+(defmethod json-type java.time.LocalDate     [_] {:type "string" :format "date"})
+(defmethod json-type java.time.LocalDateTime [_] {:type "string" :format "date-time"})
 (defmethod json-type java.util.regex.Pattern [e]
   (if (instance? java.util.regex.Pattern e)
     {:type "string" :pattern (str e)}
