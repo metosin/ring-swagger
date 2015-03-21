@@ -104,6 +104,7 @@
                         flatten
                         (map with-named-sub-schemas))]
     (->> all-models
+         ;; FIXME: should walk over predicates here too
          (map (juxt s/schema-name identity))
          (filter (fn-> first))
          (into {}))))
