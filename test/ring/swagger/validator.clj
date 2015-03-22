@@ -4,7 +4,7 @@
            [com.github.fge.jackson JsonLoader]
            [com.github.fge.jsonschema.core.report ListProcessingReport]))
 
-(def schema-string (delay (slurp "http://swagger.io/v2/schema.json")))
+(defonce schema-string (delay (slurp "http://swagger.io/v2/schema.json")))
 
 (defn validate [input-doc]
   (let [mapper        (ObjectMapper.)
