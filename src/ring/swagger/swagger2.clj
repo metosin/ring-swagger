@@ -54,6 +54,7 @@
                              (mapcat vals)
                              (keep :schema))]
     (->> (concat body-models response-models)
+         ;; FIXME: flatten does not do sets, we should walk over predicates
          flatten
          (map (juxt s/schema-name identity))
          (into {})
@@ -194,7 +195,7 @@
    with a generated names for all anonymous nested schemas
    that come as body parameters or response models."
   [swagger]
-  (-> swagger
+   (-> swagger
       (instar/transform [:paths * * :parameters :body] #(with-named-sub-schemas % "Body"))
       (instar/transform [:paths * * :responses * :schema] #(with-named-sub-schemas % "Response"))))
 
