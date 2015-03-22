@@ -190,28 +190,15 @@
 ;; Named top level schemas in body parameters and responses
 ;;
 
-(defn direct-or-contained [f x]
-  (if (valid-container? x) (f (first x)) (f x)))
-
-(defn ensure-model-schema-name [model prefix]
-  (if-not (or (direct-or-contained s/schema-name model)
-              (direct-or-contained (comp not map?) model))
-    (update-schema model (fn-> (s/schema-with-name (gensym (or prefix "Model")))))
-    model))
-
 (defn ensure-named-top-level-models
   "Takes a ring-swagger spec and returns a new version
    with a generated name added for all the top level maps
    that come as body parameters or response models and are
    not named schemas already"
   [swagger]
-  (let [swagger (instar/transform swagger
-                                  [:paths * * :parameters :body]
-                                  (fn-> (ensure-model-schema-name "Body")))
-        swagger (instar/transform swagger
-                                  [:paths * * :responses * :schema]
-                                  (fn-> (ensure-model-schema-name "Response")))]
-    swagger))
+  (-> swagger
+      (instar/transform [:paths * * :parameters :body] #(with-named-sub-schemas % "Body"))
+      (instar/transform [:paths * * :responses * :schema] #(with-named-sub-schemas % "Response"))))
 
 ;;
 ;; Schema

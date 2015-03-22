@@ -174,3 +174,69 @@
                          {200 {:description "OK"}
                           425 {:description "The collection is unordered."}
                           500 {:description "FAIL"}}}}}})))))
+
+(s/defschema Response200 {:id s/Str})
+
+(defn schema-name [m]
+  (-> m first val (subs (.length "#/definitions/"))))
+
+(def valid-reference (just {:$ref anything}))
+(defn contains-model-definition [model-name] (contains {model-name anything}))
+
+(facts "transforming subschemas"
+  (let [model {:id s/Str}
+        swagger {:paths {"/hello" {:post {:parameters {:body model}
+                                          :responses  {200 {:schema Response200}
+                                                       201 {:schema [model]}
+                                                       202 {:schema #{model}}
+                                                       203 {:schema (s/maybe model)}
+                                                       204 {:schema [(s/maybe model)]}
+                                                       205 {:schema #{(s/maybe model)}}}}}}}
+        swagger-spec (swagger-json swagger)
+        operation (get-in swagger-spec [:paths "/hello" :post])
+        definitions (:definitions swagger-spec)]
+
+    (validate swagger) => nil
+
+    (fact "anonymous body models"
+      (let [schema (get-in operation [:parameters 0 :schema])
+            model-name (schema-name schema)]
+        schema => (just {:$ref anything})
+        model-name => #"Body.*"
+        definitions => (contains-model-definition model-name)))
+
+    (fact "named response models"
+      (let [schema (get-in operation [:responses 200 :schema])
+            model-name (schema-name schema)]
+        schema => valid-reference
+        model-name => #"Response.*"
+        definitions => (contains-model-definition model-name)))
+
+    (fact "response models in vectors"
+      (let [schema (get-in operation [:responses 201 :schema])
+            model-name (schema-name (:items schema))]
+        schema => (just {:items valid-reference
+                         :type "array"})
+        model-name => #"Response.*"
+        definitions => (contains-model-definition model-name)))
+
+    (fact "response models in vectors"
+      (let [schema (get-in operation [:responses 201 :schema])
+            model-name (schema-name (:items schema))]
+        schema => (just {:items valid-reference
+                         :type "array"})
+        model-name => #"Response.*"
+        definitions => (contains-model-definition model-name)))
+
+    #_(fact "response models in sets"
+      (let [schema (get-in operation [:responses 202 :schema])
+            model-name (schema-name (:items schema))]
+        schema => (just {:items valid-reference
+                         :uniqueItems true
+                         :type "array"})
+        model-name => #"Response.*"
+        definitions => (contains-model-definition model-name)))
+
+    (fact "response models in predicates")
+    (fact "response models in predicates in vectors")
+    (fact "response models in predicates in sets")))
