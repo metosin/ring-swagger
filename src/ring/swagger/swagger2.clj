@@ -73,7 +73,7 @@
   (->> schemas
        (map collect-models)
        (apply merge)
-       (map (juxt (comp keyword key) (comp transform val)))
+       (map (juxt (comp str key) (comp transform val)))
        (into {})))
 
 ;;
