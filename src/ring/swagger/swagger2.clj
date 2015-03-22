@@ -55,7 +55,6 @@
                              (keep :schema))]
     (->> (concat body-models response-models)
          flatten
-         (map with-named-sub-schemas)
          (map (juxt s/schema-name identity))
          (into {})
          vals)))
