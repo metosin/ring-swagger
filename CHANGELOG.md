@@ -1,6 +1,8 @@
 ## 0.19.1 (xx.x.2015)
 
 - `with-named-sub-schemas` takes an optional parameter - prefix for schema names
+- Schema-names are now generated as String instead of Keywords in the swagger-json 2.0
+- Fixes how the schema names are collected from under vectors, sets or predicates (2.0)
 
 ## 0.19.0 (20.3.2015)
 
