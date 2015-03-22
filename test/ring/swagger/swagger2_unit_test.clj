@@ -252,7 +252,7 @@
 (fact "ensure-named-top-level-models"
 
   (let [[paths definitions] (extract-paths-and-definitions
-                             (ensure-named-top-level-models
+                             (ensure-body-and-response-schema-names
                               {:paths {"/api" {:post {:parameters {:body {:foo s/Str}}
                                                       :responses  {200 {:description "ok"
                                                                         :schema [{:bar Long}]}}}}}}))]

@@ -189,11 +189,10 @@
 ;; Named top level schemas in body parameters and responses
 ;;
 
-(defn ensure-named-top-level-models
+(defn ensure-body-and-response-schema-names
   "Takes a ring-swagger spec and returns a new version
-   with a generated name added for all the top level maps
-   that come as body parameters or response models and are
-   not named schemas already"
+   with a generated names for all anonymous nested schemas
+   that come as body parameters or response models."
   [swagger]
   (-> swagger
       (instar/transform [:paths * * :parameters :body] #(with-named-sub-schemas % "Body"))
@@ -238,7 +237,7 @@
      (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
                *options* options]
        (let [[paths definitions] (-> swagger
-                                     ensure-named-top-level-models
+                                     ensure-body-and-response-schema-names
                                      extract-paths-and-definitions)]
          (merge
           swagger-defaults
