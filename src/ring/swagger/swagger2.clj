@@ -90,6 +90,7 @@
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
+             ;; FIXME: doesn't read wrapped models
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
              :required    true
@@ -100,6 +101,7 @@
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
+             ;; FIXME: doesn't read wrapped models
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
              :required    true
@@ -111,10 +113,13 @@
   (if-let [schema-name (s/schema-name model)]
     (let [schema-json (->json model)]
       (vector {:in          :body
+               ;; FIXME: doesn't read wrapped models
                :name        (name schema-name)
                :description (or (:description schema-json) "")
                :required    true
                :schema      (dissoc schema-json :description)}))))
+
+;; FIXME: doesn't read predicate wrapped models
 
 (defmulti ^:private extract-parameter first)
 
