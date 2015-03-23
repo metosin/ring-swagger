@@ -4,15 +4,16 @@
             [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
             [schema.core :as s]
-            [plumbing.core :refer :all :exclude [update]]
-            [schema.utils :as su]
-            ring.swagger.json ;; needed for the json-encoders
+            [plumbing.core :refer :all]
+            ;; needed for the json-encoders
+            ring.swagger.json
             [ring.swagger.schema :as schema]
-            [ring.swagger.coerce :as coerce]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.impl.walk :as swalk]
-            [org.tobereplaced.lettercase :as lc]))
+            [org.tobereplaced.lettercase :as lc])
+  (:import (clojure.lang IMapEntry)
+           (javax.servlet ServletContext)))
 
 ;;
 ;; Models
@@ -29,22 +30,24 @@
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 
 (defn map-entry? [x]
-  (instance? clojure.lang.IMapEntry x))
+  (instance? IMapEntry x))
 
 (defn name-schemas [names schema]
-  (swalk/walk schema
-              (fn [x]
-                (if (map-entry? x)
-                  ; Filter away s/Keyword, s/Any keys
-                  (if (jsons/not-predicate? (key x))
-                    [(key x) (name-schemas (conj names (s/explicit-schema-key (key x))) (val x))])
-                  (name-schemas names x)))
-              (fn [x]
-                (if (plain-map? x)
-                  (if-not (s/schema-name x)
-                    (with-meta x {:name (full-name names)})
-                    x)
-                  x))))
+  (swalk/walk
+    schema
+    (fn [x]
+      (if (map-entry? x)
+        ;; TODO: why filter?
+        ; Filter away s/Keyword, s/Any keys
+        (if (jsons/not-predicate? (key x))
+          [(key x) (name-schemas (conj names (s/explicit-schema-key (key x))) (val x))])
+        (name-schemas names x)))
+    (fn [x]
+      (if (plain-map? x)
+        (if-not (s/schema-name x)
+          (with-meta x {:name (full-name names)})
+          x)
+        x))))
 
 (defn with-named-sub-schemas
   "Traverses a schema tree of Maps, Sets and Sequences and add Schema-name to all
@@ -146,7 +149,7 @@
 (defn context
   "Context of a request. Defaults to \"\", but has the
    servlet-context in the legacy app-server environments."
-  [{:keys [servlet-context]}]
+  [{:keys [^ServletContext servlet-context]}]
   (if servlet-context (.getContextPath servlet-context) ""))
 
 (defn basepath
@@ -166,8 +169,7 @@
 ;;
 
 (defmulti ^:private extract-parameter
-  (fn [{:keys [type]}]
-    type))
+  (fn [{:keys [type]}] type))
 
 (defmethod extract-parameter :body [{:keys [model type]}]
   (if model
@@ -233,5 +235,3 @@
                                   :nickname (or nickname (generate-nick route))
                                   :responseMessages (convert-response-messages responseMessages)
                                   :parameters (convert-parameters parameters)})]})}))))
-
-
