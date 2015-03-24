@@ -13,7 +13,7 @@
 (extend-protocol WalkableSchema
   clojure.lang.IMapEntry
   (-walk [this inner outer]
-    (outer (vec (inner (key this)) (inner (val this)))))
+    (outer (vector (inner (key this)) (inner (val this)))))
 
   clojure.lang.IPersistentMap
   (-walk [this inner outer]
