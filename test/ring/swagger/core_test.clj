@@ -111,7 +111,10 @@
     => {:name 'RootSub})
   (fact "Uses name of optional-key"
     (meta (get (name-schemas ['Root] {(s/optional-key :sub) {:a s/Str}}) (s/optional-key :sub)))
-    => {:name 'RootSub}))
+    => {:name 'RootSub})
+  (fact "generated names for non-spesific keys"
+    (str (:name (meta (get (name-schemas ["Root"] {s/Keyword {:a s/Str}}) s/Keyword))))
+    => #"^RootKeyword\d+"))
 
 (fact "with-named-sub-schemas"
   (fact "add :name meta-data to sub-schemas"

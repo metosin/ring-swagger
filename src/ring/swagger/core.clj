@@ -37,10 +37,12 @@
     schema
     (fn [x]
       (if (map-entry? x)
-        ;; TODO: why filter?
-        ; Filter away s/Keyword, s/Any keys
-        (if (jsons/not-predicate? (key x))
-          [(key x) (name-schemas (conj names (s/explicit-schema-key (key x))) (val x))])
+        [(key x)
+         (name-schemas
+           (conj names
+                 (if (s/specific-key? (key x))
+                   (s/explicit-schema-key (key x))
+                   (gensym (pr-str (key x))))) (val x))]
         (name-schemas names x)))
     (fn [x]
       (if (plain-map? x)
