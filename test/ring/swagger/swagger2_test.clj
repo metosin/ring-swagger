@@ -175,7 +175,7 @@
                           425 {:description "The collection is unordered."}
                           500 {:description "FAIL"}}}}}})))))
 
-(s/defschema Response200 {:id s/Str})
+(s/defschema ResponseModel {:id s/Str})
 
 (defn schema-name [m]
   (-> m first val (subs (.length "#/definitions/"))))
@@ -186,7 +186,7 @@
 (facts "transforming subschemas"
   (let [model {:id s/Str}
         swagger {:paths {"/hello" {:post {:parameters {:body model}
-                                          :responses  {200 {:schema Response200}
+                                          :responses  {200 {:schema ResponseModel}
                                                        201 {:schema [model]}
                                                        202 {:schema #{model}}
                                                        203 {:schema (s/maybe model)}
@@ -209,7 +209,7 @@
       (let [schema (get-in operation [:responses 200 :schema])
             model-name (schema-name schema)]
         schema => valid-reference
-        model-name => #"Response.*"
+        model-name => "ResponseModel"
         definitions => (contains-model-definition model-name)))
 
     (fact "response models in vectors"
