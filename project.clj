@@ -19,7 +19,7 @@
                  [org.flatland/ordered "1.5.2"]
                  [instar "1.0.10" :exclusions [org.clojure/clojure]]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
-                             [lein-ring "0.9.2"]
+                             [lein-ring "0.9.3"]
                              [lein-midje "3.1.3"]]
                    :dependencies [[midje "1.7.0-SNAPSHOT"]
                                   [ring-mock "0.1.5"]
