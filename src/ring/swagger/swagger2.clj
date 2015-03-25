@@ -89,8 +89,7 @@
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
-             ;; TODO: doesn't read wrapped models
-             :name        (name (s/schema-name model))
+             :name        (name (peek-schema-name model))
              :description (or (:description schema-json) "")
              :required    true
              :schema      {:type  "array"
@@ -100,8 +99,7 @@
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
-             ;; TODO: doesn't read wrapped models
-             :name        (name (s/schema-name model))
+             :name        (name (peek-schema-name model))
              :description (or (:description schema-json) "")
              :required    true
              :schema      {:type        "array"
