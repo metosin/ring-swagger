@@ -5,6 +5,10 @@
 - uses `[metosin/schema-tools "0.3.0]` to walk over Schema records both to fetch schema names and give names to subschemas (Swagger 2.0 only)
   - see [tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/swagger2_test.clj) - in the end of the file
 
+```clojure
+[lein-ring "0.9.3"] is available but we use "0.9.2"
+```
+
 ## 0.19.0 (20.3.2015)
 
 - `with-named-sub-schemas` has learned how to add names to schemas inside `s/maybe` and others
