@@ -183,21 +183,34 @@
 (def valid-reference (just {:$ref anything}))
 (defn contains-model-definition [model-name] (contains {model-name anything}))
 
-(defn extract-body-param [swagger-spec path f]
+(defn extract-body-schema [swagger-spec path f]
   (let [operation (get-in swagger-spec [:paths path :post])
         definitions (:definitions swagger-spec)
         schema (get-in operation [:parameters 0 :schema])
         name (schema-name (f schema))]
-    {:name name, :schema schema, :definitions definitions}))
+    {:name name
+     :schema schema
+     :definitions definitions
+     :defined? (boolean (definitions name))}))
+
+(defn extract-response-schema [swagger-spec code f]
+  (let [operation (get-in swagger-spec [:paths "/responses" :post])
+        definitions (:definitions swagger-spec)
+        schema (get-in operation [:responses code :schema])
+        name (schema-name (f schema))]
+    {:name name
+     :schema schema
+     :definitions definitions
+     :defined? (boolean (definitions name))}))
 
 (facts "transforming subschemas"
   (let [model {:id s/Str}
-        swagger {:paths {"/kikka" {:post {:responses {200 {:schema ResponseModel}
-                                                      201 {:schema [model]}
-                                                      202 {:schema #{model}}
-                                                      203 {:schema (s/maybe model)}
-                                                      204 {:schema [(s/maybe model)]}
-                                                      205 {:schema #{(s/maybe model)}}}}}
+        swagger {:paths {"/responses" {:post {:responses {200 {:schema ResponseModel}
+                                                          201 {:schema [model]}
+                                                          202 {:schema #{model}}
+                                                          203 {:schema (s/maybe model)}
+                                                          204 {:schema [(s/maybe model)]}
+                                                          205 {:schema #{(s/maybe model)}}}}}
                          "/body1" {:post {:parameters {:body model}}}
                          "/body2" {:post {:parameters {:body [model]}}}
                          "/body3" {:post {:parameters {:body #{model}}}}
@@ -211,95 +224,89 @@
     (facts "body schemas"
 
       (fact "anonymous body schema"
-        (let [{:keys [name schema definitions]} (extract-body-param spec "/body1" identity)]
+        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body1" identity)]
           schema => (just {:$ref anything})
           name => #"Body.*"
-          definitions => (contains-model-definition name)))
+          defined? => true))
 
       (fact "body schema in vector"
-        (let [{:keys [name schema definitions]} (extract-body-param spec "/body2" :items)]
+        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body2" :items)]
           schema => (just {:items valid-reference
                            :type  "array"})
           name => #"Body.*"
-          definitions => (contains-model-definition name)))
+          defined? => true))
 
       (fact "body schema in set"
-        (let [{:keys [name schema definitions]} (extract-body-param spec "/body3" :items)]
+        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body3" :items)]
           schema => (just {:items       valid-reference
                            :uniqueItems true
                            :type        "array"})
           name => #"Body.*"
-          definitions => (contains-model-definition name)))
+          defined? => true))
 
       (fact "body schema in predicate"
-        (let [{:keys [name schema definitions]} (extract-body-param spec "/body4" identity)]
+        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body4" identity)]
           schema => valid-reference
           name => #"Body.*"
-          definitions => (contains-model-definition name)))
+          defined? => true))
 
       (fact "body schema in predicate in vectors"
-        (let [{:keys [name schema definitions]} (extract-body-param spec "/body5" :items)]
+        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body5" :items)]
           schema => (just {:items       valid-reference
                            :type        "array"})
           name => #"Body.*"
-          definitions => (contains-model-definition name)))
+          defined? => true))
 
       (fact "body schema in predicate in sets"
-        (let [{:keys [name schema definitions]} (extract-body-param spec "/body6" :items)]
+        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body6" :items)]
           schema => (just {:items       valid-reference
                            :uniqueItems true
                            :type        "array"})
           name => #"Body.*"
-          definitions => (contains-model-definition name))))
+          defined? => true)))
 
     (facts "response schemas"
-      (let [operation (get-in spec [:paths "/kikka" :post])
+      (let [operation (get-in spec [:paths "/responses" :post])
             definitions (:definitions spec)]
 
         (fact "named response models"
-          (let [schema (get-in operation [:responses 200 :schema])
-                name (schema-name schema)]
+          (let [{:keys [name schema defined?]} (extract-response-schema spec 200 identity)]
             schema => valid-reference
             name => "ResponseModel"
-            definitions => (contains-model-definition name)))
+            defined? => true))
 
         (fact "response models in vectors"
-          (let [schema (get-in operation [:responses 201 :schema])
-                name (schema-name (:items schema))]
+          (let [{:keys [name schema defined?]} (extract-response-schema spec 201 :items)]
             schema => (just {:items valid-reference
                              :type  "array"})
             name => #"Response.*"
-            definitions => (contains-model-definition name)))
+            defined? => true))
 
         (fact "response models in sets"
-          (let [schema (get-in operation [:responses 202 :schema])
-                name (schema-name (:items schema))]
+          (let [{:keys [name schema defined?]} (extract-response-schema spec 202 :items)]
             schema => (just {:items       valid-reference
                              :uniqueItems true
                              :type        "array"})
             name => #"Response.*"
-            definitions => (contains-model-definition name)))
+            defined? => true))
 
         (fact "response models in predicates"
-          (let [schema (get-in operation [:responses 203 :schema])
-                name (schema-name schema)]
+          (let [{:keys [name schema defined?]} (extract-response-schema spec 203 identity)]
             schema => valid-reference
             name => #"Response.*"
-            definitions => (contains-model-definition name)))
+            defined? => true))
 
         (fact "response models in predicates in vectors"
-          (let [schema (get-in operation [:responses 204 :schema])
-                name (schema-name (:items schema))]
+          (let [{:keys [name schema defined?]} (extract-response-schema spec 204 :items)]
             schema => (just {:items valid-reference
                              :type  "array"})
             name => #"Response.*"
-            definitions => (contains-model-definition name)))
+            defined? => true))
 
         (fact "response models in predicates in sets"
-          (let [schema (get-in operation [:responses 205 :schema])
-                name (schema-name (:items schema))]
+          (let [{:keys [name schema defined?]} (extract-response-schema spec 205 :items)]
             schema => (just {:items       valid-reference
                              :uniqueItems true
                              :type        "array"})
             name => #"Response.*"
-            definitions => (contains-model-definition name)))))))
+            defined? => true))))))
