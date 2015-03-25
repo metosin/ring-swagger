@@ -203,6 +203,7 @@
      :definitions definitions
      :defined? (boolean (definitions name))}))
 
+;; TODO: tabular facts
 (facts "transforming subschemas"
   (let [model {:id s/Str}
         swagger {:paths {"/responses" {:post {:responses {200 {:schema ResponseModel}
@@ -266,47 +267,45 @@
           defined? => true)))
 
     (facts "response schemas"
-      (let [operation (get-in spec [:paths "/responses" :post])
-            definitions (:definitions spec)]
 
-        (fact "named response models"
-          (let [{:keys [name schema defined?]} (extract-response-schema spec 200 identity)]
-            schema => valid-reference
-            name => "ResponseModel"
-            defined? => true))
+      (fact "named response models"
+        (let [{:keys [name schema defined?]} (extract-response-schema spec 200 identity)]
+          schema => valid-reference
+          name => "ResponseModel"
+          defined? => true))
 
-        (fact "response models in vectors"
-          (let [{:keys [name schema defined?]} (extract-response-schema spec 201 :items)]
-            schema => (just {:items valid-reference
-                             :type  "array"})
-            name => #"Response.*"
-            defined? => true))
+      (fact "response models in vectors"
+        (let [{:keys [name schema defined?]} (extract-response-schema spec 201 :items)]
+          schema => (just {:items valid-reference
+                           :type  "array"})
+          name => #"Response.*"
+          defined? => true))
 
-        (fact "response models in sets"
-          (let [{:keys [name schema defined?]} (extract-response-schema spec 202 :items)]
-            schema => (just {:items       valid-reference
-                             :uniqueItems true
-                             :type        "array"})
-            name => #"Response.*"
-            defined? => true))
+      (fact "response models in sets"
+        (let [{:keys [name schema defined?]} (extract-response-schema spec 202 :items)]
+          schema => (just {:items       valid-reference
+                           :uniqueItems true
+                           :type        "array"})
+          name => #"Response.*"
+          defined? => true))
 
-        (fact "response models in predicates"
-          (let [{:keys [name schema defined?]} (extract-response-schema spec 203 identity)]
-            schema => valid-reference
-            name => #"Response.*"
-            defined? => true))
+      (fact "response models in predicates"
+        (let [{:keys [name schema defined?]} (extract-response-schema spec 203 identity)]
+          schema => valid-reference
+          name => #"Response.*"
+          defined? => true))
 
-        (fact "response models in predicates in vectors"
-          (let [{:keys [name schema defined?]} (extract-response-schema spec 204 :items)]
-            schema => (just {:items valid-reference
-                             :type  "array"})
-            name => #"Response.*"
-            defined? => true))
+      (fact "response models in predicates in vectors"
+        (let [{:keys [name schema defined?]} (extract-response-schema spec 204 :items)]
+          schema => (just {:items valid-reference
+                           :type  "array"})
+          name => #"Response.*"
+          defined? => true))
 
-        (fact "response models in predicates in sets"
-          (let [{:keys [name schema defined?]} (extract-response-schema spec 205 :items)]
-            schema => (just {:items       valid-reference
-                             :uniqueItems true
-                             :type        "array"})
-            name => #"Response.*"
-            defined? => true))))))
+      (fact "response models in predicates in sets"
+        (let [{:keys [name schema defined?]} (extract-response-schema spec 205 :items)]
+          schema => (just {:items       valid-reference
+                           :uniqueItems true
+                           :type        "array"})
+          name => #"Response.*"
+          defined? => true)))))
