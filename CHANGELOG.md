@@ -1,9 +1,9 @@
-## 0.19.1 (xx.x.2015)
+## 0.19.1 (25.3.2015)
 
 - `with-named-sub-schemas` takes an optional parameter - prefix for schema names
 - Schema-names are now generated as String instead of Keywords in the swagger-json 2.0
-- uses `[metosin/schema-tools "0.3.0]` to walk over Schema records both to fetch schema names
-and give names to subschemas.
+- uses `[metosin/schema-tools "0.3.0]` to walk over Schema records both to fetch schema names and give names to subschemas (Swagger 2.0 only)
+  - see [tests](https://github.com/metosin/ring-swagger/blob/master/test/ring/swagger/swagger2_test.clj) - in the end of the file
 
 ## 0.19.0 (20.3.2015)
 
