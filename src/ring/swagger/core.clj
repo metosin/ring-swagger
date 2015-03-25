@@ -10,7 +10,7 @@
             [ring.swagger.schema :as schema]
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [ring.swagger.impl.walk :as swalk]
+            [schema-tools.walk :as stw]
             [org.tobereplaced.lettercase :as lc])
   (:import (clojure.lang IMapEntry)
            (javax.servlet ServletContext)))
@@ -38,7 +38,7 @@
   [schema]
   (let [name (atom nil)]
     ((fn walk [x]
-       (swalk/walk
+       (stw/walk
          x
          (fn [x]
            (if (plain-map? x)
@@ -48,7 +48,7 @@
     @name))
 
 (defn name-schemas [names schema]
-  (swalk/walk
+  (stw/walk
     schema
     (fn [x]
       (if (map-entry? x)
