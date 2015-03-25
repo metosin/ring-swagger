@@ -107,16 +107,13 @@
                            :items       (dissoc schema-json :description)}})))
 
 (defmethod extract-body-parameter :default [model]
-  (if-let [schema-name (s/schema-name model)]
+  (if-let [schema-name (peek-schema-name model)]
     (let [schema-json (->json model)]
       (vector {:in          :body
-               ;; TODO: doesn't read wrapped models
                :name        (name schema-name)
                :description (or (:description schema-json) "")
                :required    true
                :schema      (dissoc schema-json :description)}))))
-
-;; FIXME: doesn't read predicate wrapped models
 
 (defmulti ^:private extract-parameter first)
 

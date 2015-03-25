@@ -190,7 +190,6 @@
         name (schema-name (f schema))]
     {:name name, :schema schema, :definitions definitions}))
 
-(println "-----")
 (facts "transforming subschemas"
   (let [model {:id s/Str}
         swagger {:paths {"/kikka" {:post {:responses {200 {:schema ResponseModel}
@@ -232,20 +231,20 @@
           name => #"Body.*"
           definitions => (contains-model-definition name)))
 
-      #_(fact "body schema in predicate"
-        (let [{:keys [name schema definitions]} (extract-body-param spec "/body4" :items)]
+      (fact "body schema in predicate"
+        (let [{:keys [name schema definitions]} (extract-body-param spec "/body4" identity)]
           schema => valid-reference
           name => #"Body.*"
           definitions => (contains-model-definition name)))
 
-      #_(fact "body schema in predicate in vectors"
+      (fact "body schema in predicate in vectors"
         (let [{:keys [name schema definitions]} (extract-body-param spec "/body5" :items)]
           schema => (just {:items       valid-reference
                            :type        "array"})
           name => #"Body.*"
           definitions => (contains-model-definition name)))
 
-      #_(fact "body schema in predicate in sets"
+      (fact "body schema in predicate in sets"
         (let [{:keys [name schema definitions]} (extract-body-param spec "/body6" :items)]
           schema => (just {:items       valid-reference
                            :uniqueItems true
