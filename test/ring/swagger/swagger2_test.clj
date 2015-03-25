@@ -183,80 +183,124 @@
 (def valid-reference (just {:$ref anything}))
 (defn contains-model-definition [model-name] (contains {model-name anything}))
 
+(defn extract-body-param [swagger-spec path f]
+  (let [operation (get-in swagger-spec [:paths path :post])
+        definitions (:definitions swagger-spec)
+        schema (get-in operation [:parameters 0 :schema])
+        name (schema-name (f schema))]
+    {:name name, :schema schema, :definitions definitions}))
+
+(println "-----")
 (facts "transforming subschemas"
   (let [model {:id s/Str}
-        swagger {:paths {"/hello" {:post {:parameters {:body model}
-                                          :responses  {200 {:schema ResponseModel}
-                                                       201 {:schema [model]}
-                                                       202 {:schema #{model}}
-                                                       203 {:schema (s/maybe model)}
-                                                       204 {:schema [(s/maybe model)]}
-                                                       205 {:schema #{(s/maybe model)}}}}}}}
-        swagger-spec (swagger-json swagger)
-        operation (get-in swagger-spec [:paths "/hello" :post])
-        definitions (:definitions swagger-spec)]
+        swagger {:paths {"/kikka" {:post {:responses {200 {:schema ResponseModel}
+                                                      201 {:schema [model]}
+                                                      202 {:schema #{model}}
+                                                      203 {:schema (s/maybe model)}
+                                                      204 {:schema [(s/maybe model)]}
+                                                      205 {:schema #{(s/maybe model)}}}}}
+                         "/body1" {:post {:parameters {:body model}}}
+                         "/body2" {:post {:parameters {:body [model]}}}
+                         "/body3" {:post {:parameters {:body #{model}}}}
+                         "/body4" {:post {:parameters {:body (s/maybe model)}}}
+                         "/body5" {:post {:parameters {:body [(s/maybe model)]}}}
+                         "/body6" {:post {:parameters {:body #{(s/maybe model)}}}}}}
+        spec (swagger-json swagger)]
 
     (validate swagger) => nil
 
-    (fact "anonymous body models"
-      (let [schema (get-in operation [:parameters 0 :schema])
-            model-name (schema-name schema)]
-        schema => (just {:$ref anything})
-        model-name => #"Body.*"
-        definitions => (contains-model-definition model-name)))
+    (facts "body schemas"
 
-    (fact "named response models"
-      (let [schema (get-in operation [:responses 200 :schema])
-            model-name (schema-name schema)]
-        schema => valid-reference
-        model-name => "ResponseModel"
-        definitions => (contains-model-definition model-name)))
+      (fact "anonymous body schema"
+        (let [{:keys [name schema definitions]} (extract-body-param spec "/body1" identity)]
+          schema => (just {:$ref anything})
+          name => #"Body.*"
+          definitions => (contains-model-definition name)))
 
-    (fact "response models in vectors"
-      (let [schema (get-in operation [:responses 201 :schema])
-            model-name (schema-name (:items schema))]
-        schema => (just {:items valid-reference
-                         :type "array"})
-        model-name => #"Response.*"
-        definitions => (contains-model-definition model-name)))
+      (fact "body schema in vector"
+        (let [{:keys [name schema definitions]} (extract-body-param spec "/body2" :items)]
+          schema => (just {:items valid-reference
+                           :type  "array"})
+          name => #"Body.*"
+          definitions => (contains-model-definition name)))
 
-    (fact "response models in vectors"
-      (let [schema (get-in operation [:responses 201 :schema])
-            model-name (schema-name (:items schema))]
-        schema => (just {:items valid-reference
-                         :type "array"})
-        model-name => #"Response.*"
-        definitions => (contains-model-definition model-name)))
+      (fact "body schema in set"
+        (let [{:keys [name schema definitions]} (extract-body-param spec "/body3" :items)]
+          schema => (just {:items       valid-reference
+                           :uniqueItems true
+                           :type        "array"})
+          name => #"Body.*"
+          definitions => (contains-model-definition name)))
 
-    (fact "response models in sets"
-      (let [schema (get-in operation [:responses 202 :schema])
-            model-name (schema-name (:items schema))]
-        schema => (just {:items valid-reference
-                         :uniqueItems true
-                         :type "array"})
-        model-name => #"Response.*"
-        definitions => (contains-model-definition model-name)))
+      #_(fact "body schema in predicate"
+        (let [{:keys [name schema definitions]} (extract-body-param spec "/body4" :items)]
+          schema => valid-reference
+          name => #"Body.*"
+          definitions => (contains-model-definition name)))
 
-    (fact "response models in predicates"
-      (let [schema (get-in operation [:responses 203 :schema])
-            model-name (schema-name schema)]
-        schema => valid-reference
-        model-name => #"Response.*"
-        definitions => (contains-model-definition model-name)))
+      #_(fact "body schema in predicate in vectors"
+        (let [{:keys [name schema definitions]} (extract-body-param spec "/body5" :items)]
+          schema => (just {:items       valid-reference
+                           :type        "array"})
+          name => #"Body.*"
+          definitions => (contains-model-definition name)))
 
-    (fact "response models in predicates in vectors"
-      (let [schema (get-in operation [:responses 204 :schema])
-            model-name (schema-name (:items schema))]
-        schema => (just {:items valid-reference
-                         :type "array"})
-        model-name => #"Response.*"
-        definitions => (contains-model-definition model-name)))
+      #_(fact "body schema in predicate in sets"
+        (let [{:keys [name schema definitions]} (extract-body-param spec "/body6" :items)]
+          schema => (just {:items       valid-reference
+                           :uniqueItems true
+                           :type        "array"})
+          name => #"Body.*"
+          definitions => (contains-model-definition name))))
 
-    (fact "response models in predicates in sets"
-      (let [schema (get-in operation [:responses 205 :schema])
-            model-name (schema-name (:items schema))]
-        schema => (just {:items valid-reference
-                         :uniqueItems true
-                         :type "array"})
-        model-name => #"Response.*"
-        definitions => (contains-model-definition model-name)))))
+    (facts "response schemas"
+      (let [operation (get-in spec [:paths "/kikka" :post])
+            definitions (:definitions spec)]
+
+        (fact "named response models"
+          (let [schema (get-in operation [:responses 200 :schema])
+                name (schema-name schema)]
+            schema => valid-reference
+            name => "ResponseModel"
+            definitions => (contains-model-definition name)))
+
+        (fact "response models in vectors"
+          (let [schema (get-in operation [:responses 201 :schema])
+                name (schema-name (:items schema))]
+            schema => (just {:items valid-reference
+                             :type  "array"})
+            name => #"Response.*"
+            definitions => (contains-model-definition name)))
+
+        (fact "response models in sets"
+          (let [schema (get-in operation [:responses 202 :schema])
+                name (schema-name (:items schema))]
+            schema => (just {:items       valid-reference
+                             :uniqueItems true
+                             :type        "array"})
+            name => #"Response.*"
+            definitions => (contains-model-definition name)))
+
+        (fact "response models in predicates"
+          (let [schema (get-in operation [:responses 203 :schema])
+                name (schema-name schema)]
+            schema => valid-reference
+            name => #"Response.*"
+            definitions => (contains-model-definition name)))
+
+        (fact "response models in predicates in vectors"
+          (let [schema (get-in operation [:responses 204 :schema])
+                name (schema-name (:items schema))]
+            schema => (just {:items valid-reference
+                             :type  "array"})
+            name => #"Response.*"
+            definitions => (contains-model-definition name)))
+
+        (fact "response models in predicates in sets"
+          (let [schema (get-in operation [:responses 205 :schema])
+                name (schema-name (:items schema))]
+            schema => (just {:items       valid-reference
+                             :uniqueItems true
+                             :type        "array"})
+            name => #"Response.*"
+            definitions => (contains-model-definition name)))))))
