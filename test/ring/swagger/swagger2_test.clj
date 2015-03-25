@@ -210,7 +210,7 @@
     (validate swagger) => nil
 
     (tabular
-      (fact "anonymous body schema"
+      (fact "body and response schemas in all flavours"
         (let [{:keys [name schema defined?]} (extract-schema spec ?uri ?path ?fn)]
           schema => ?schema
           name => ?name
