@@ -54,7 +54,6 @@
                              (mapcat vals)
                              (keep :schema))]
     (->> (concat body-models response-models)
-         ;; FIXME: flatten does not do sets, we should walk over predicates
          flatten
          (map (juxt s/schema-name identity))
          (into {})
@@ -90,7 +89,7 @@
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
-             ;; FIXME: doesn't read wrapped models
+             ;; TODO: doesn't read wrapped models
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
              :required    true
@@ -101,7 +100,7 @@
   (let [model (first e)
         schema-json (->json model)]
     (vector {:in          :body
-             ;; FIXME: doesn't read wrapped models
+             ;; TODO: doesn't read wrapped models
              :name        (name (s/schema-name model))
              :description (or (:description schema-json) "")
              :required    true
@@ -113,7 +112,7 @@
   (if-let [schema-name (s/schema-name model)]
     (let [schema-json (->json model)]
       (vector {:in          :body
-               ;; FIXME: doesn't read wrapped models
+               ;; TODO: doesn't read wrapped models
                :name        (name schema-name)
                :description (or (:description schema-json) "")
                :required    true
@@ -169,7 +168,7 @@
 (defn transform-operation
     "Returns a map with methods as keys and the Operation
      maps with parameters and responses transformed to comply
-     with Swagger JSON spec as values"
+     with Swagger spec as values"
     [operation]
     (for-map [[k v] operation]
       k (-> v
@@ -201,8 +200,10 @@
    that come as body parameters or response models."
   [swagger]
    (-> swagger
-      (instar/transform [:paths * * :parameters :body] #(with-named-sub-schemas % "Body"))
-      (instar/transform [:paths * * :responses * :schema] #(with-named-sub-schemas % "Response"))))
+      (instar/transform
+        [:paths * * :parameters :body] #(with-named-sub-schemas % "Body"))
+      (instar/transform
+        [:paths * * :responses * :schema] #(with-named-sub-schemas % "Response"))))
 
 ;;
 ;; Schema

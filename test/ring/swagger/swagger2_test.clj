@@ -228,7 +228,7 @@
         model-name => #"Response.*"
         definitions => (contains-model-definition model-name)))
 
-    #_(fact "response models in sets"
+    (fact "response models in sets"
       (let [schema (get-in operation [:responses 202 :schema])
             model-name (schema-name (:items schema))]
         schema => (just {:items valid-reference

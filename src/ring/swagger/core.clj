@@ -32,6 +32,21 @@
 (defn map-entry? [x]
   (instance? IMapEntry x))
 
+(defn peek-schema-name
+  "Recurisively seeks the schema-name withing a schema.
+   Walks over sets, vectors and Schema predicates."
+  [schema]
+  (let [name (atom nil)]
+    ((fn walk [x]
+       (swalk/walk
+         x
+         (fn [x]
+           (if (plain-map? x)
+             (do (reset! name (s/schema-name x)) x)
+             (walk x)))
+         identity)) [schema])
+    @name))
+
 (defn name-schemas [names schema]
   (swalk/walk
     schema
@@ -109,8 +124,7 @@
                         flatten
                         (map with-named-sub-schemas))]
     (->> all-models
-         ;; FIXME: should walk over predicates here too
-         (map (juxt s/schema-name identity))
+         (map (juxt peek-schema-name identity))
          (filter (fn-> first))
          (into {}))))
 
