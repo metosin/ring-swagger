@@ -7,7 +7,7 @@
             ;; needed for the json-encoders
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [ring.swagger.core :refer [with-named-sub-schemas collect-models]]
+            [ring.swagger.core :refer [with-named-sub-schemas collect-models peek-schema-name]]
             [ring.swagger.swagger2-schema :as schema]
             [instar.core :as instar])
   (:import (clojure.lang Sequential IPersistentSet)))
@@ -55,7 +55,7 @@
                              (keep :schema))]
     (->> (concat body-models response-models)
          flatten
-         (map (juxt s/schema-name identity))
+         (map (juxt peek-schema-name identity))
          (into {})
          vals)))
 
