@@ -181,26 +181,14 @@
   (-> m first val (subs (.length "#/definitions/"))))
 
 (def valid-reference (just {:$ref anything}))
-(defn contains-model-definition [model-name] (contains {model-name anything}))
 
-(defn extract-body-schema [swagger-spec path f]
-  (let [operation (get-in swagger-spec [:paths path :post])
+(defn extract-schema [swagger-spec uri path f]
+  (let [operation (get-in swagger-spec [:paths uri :post])
         definitions (:definitions swagger-spec)
-        schema (get-in operation [:parameters 0 :schema])
+        schema (get-in operation (conj path :schema))
         name (schema-name (f schema))]
     {:name name
      :schema schema
-     :definitions definitions
-     :defined? (boolean (definitions name))}))
-
-(defn extract-response-schema [swagger-spec code f]
-  (let [operation (get-in swagger-spec [:paths "/responses" :post])
-        definitions (:definitions swagger-spec)
-        schema (get-in operation [:responses code :schema])
-        name (schema-name (f schema))]
-    {:name name
-     :schema schema
-     :definitions definitions
      :defined? (boolean (definitions name))}))
 
 ;; TODO: tabular facts
@@ -225,20 +213,20 @@
     (facts "body schemas"
 
       (fact "anonymous body schema"
-        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body1" identity)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/body1" [:parameters 0] identity)]
           schema => (just {:$ref anything})
           name => #"Body.*"
           defined? => true))
 
       (fact "body schema in vector"
-        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body2" :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/body2" [:parameters 0] :items)]
           schema => (just {:items valid-reference
                            :type  "array"})
           name => #"Body.*"
           defined? => true))
 
       (fact "body schema in set"
-        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body3" :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/body3" [:parameters 0] :items)]
           schema => (just {:items       valid-reference
                            :uniqueItems true
                            :type        "array"})
@@ -246,20 +234,20 @@
           defined? => true))
 
       (fact "body schema in predicate"
-        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body4" identity)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/body4" [:parameters 0] identity)]
           schema => valid-reference
           name => #"Body.*"
           defined? => true))
 
       (fact "body schema in predicate in vectors"
-        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body5" :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/body5" [:parameters 0] :items)]
           schema => (just {:items       valid-reference
                            :type        "array"})
           name => #"Body.*"
           defined? => true))
 
       (fact "body schema in predicate in sets"
-        (let [{:keys [name schema defined?]} (extract-body-schema spec "/body6" :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/body6" [:parameters 0] :items)]
           schema => (just {:items       valid-reference
                            :uniqueItems true
                            :type        "array"})
@@ -269,20 +257,20 @@
     (facts "response schemas"
 
       (fact "named response models"
-        (let [{:keys [name schema defined?]} (extract-response-schema spec 200 identity)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/responses" [:responses 200] identity)]
           schema => valid-reference
           name => "ResponseModel"
           defined? => true))
 
       (fact "response models in vectors"
-        (let [{:keys [name schema defined?]} (extract-response-schema spec 201 :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/responses" [:responses 201] :items)]
           schema => (just {:items valid-reference
                            :type  "array"})
           name => #"Response.*"
           defined? => true))
 
       (fact "response models in sets"
-        (let [{:keys [name schema defined?]} (extract-response-schema spec 202 :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/responses" [:responses 202] :items)]
           schema => (just {:items       valid-reference
                            :uniqueItems true
                            :type        "array"})
@@ -290,20 +278,20 @@
           defined? => true))
 
       (fact "response models in predicates"
-        (let [{:keys [name schema defined?]} (extract-response-schema spec 203 identity)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/responses" [:responses 203] identity)]
           schema => valid-reference
           name => #"Response.*"
           defined? => true))
 
       (fact "response models in predicates in vectors"
-        (let [{:keys [name schema defined?]} (extract-response-schema spec 204 :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/responses" [:responses 204] :items)]
           schema => (just {:items valid-reference
                            :type  "array"})
           name => #"Response.*"
           defined? => true))
 
       (fact "response models in predicates in sets"
-        (let [{:keys [name schema defined?]} (extract-response-schema spec 205 :items)]
+        (let [{:keys [name schema defined?]} (extract-schema spec "/responses" [:responses 205] :items)]
           schema => (just {:items       valid-reference
                            :uniqueItems true
                            :type        "array"})
