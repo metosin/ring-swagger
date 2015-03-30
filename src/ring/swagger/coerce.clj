@@ -19,7 +19,7 @@
 (defn unparse-date ^String [date] (tf/unparse-local-date (tf/formatters :date) (->DateTime date)))
 
 (defn parse-pattern ^Pattern [pattern] (re-pattern pattern))
-(defn unparse-pattern ^String [pattern] (.toString pattern))
+(defn unparse-pattern ^String [pattern] (str pattern))
 
 (defn date-time-matcher
   [schema]
