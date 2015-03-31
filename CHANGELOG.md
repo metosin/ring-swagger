@@ -1,3 +1,7 @@
+## 0.19.3 (31.3.2015)
+
+- `:resourcePath` is now set correctly with Swagger 1.2 endpoints (fixes [#36](https://github.com/metosin/ring-swagger/issues/36).
+
 ## 0.19.2 (31.3.2015)
 
 - avoid reflection with regexps, thanks to [Michael Blume](https://github.com/MichaelBlume)

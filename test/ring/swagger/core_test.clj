@@ -423,7 +423,7 @@
     => {:swaggerVersion "1.2"
         :apiVersion "0.0.1"
         :basePath ..basepath..
-        :resourcePath "/"
+        :resourcePath (str "/" ..api..)
         :produces ["application/json"]
         :consumes ["application/json"]
         :models {}
@@ -462,7 +462,7 @@
     => {:swaggerVersion "1.2"
         :apiVersion ..version..
         :basePath ..basepath..
-        :resourcePath "/"
+        :resourcePath (str "/" ..api..)
         :produces ["application/json"
                    "application/xml"]
         :consumes ["application/json"
@@ -520,7 +520,7 @@
     => {:swaggerVersion "1.2"
         :apiVersion "0.0.1"
         :basePath ..basepath..
-        :resourcePath "/"
+        :resourcePath (str "/" ..api..)
         :produces ["application/json"]
         :consumes ["application/json"]
         :models {}
