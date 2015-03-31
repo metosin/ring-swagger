@@ -66,13 +66,13 @@
                                                   :operationId  "operationId"
                                                   :consumes     ["application/xyz"]
                                                   :produces     ["application/xyz"]
-                                                  :parameters   {:body     Nothing
+                                                  :parameters   {:body     nil
                                                                  :query    (merge Anything {:x Long :y Long})
                                                                  :path     {:id String}
                                                                  :header   Anything
                                                                  :formData Anything}
                                                   :responses    {200      {:description "ok"
-                                                                           :schema      {:sum Long}}
+                                                                           :schema      nil}
                                                                  400      {:description "not found"
                                                                            :schema      NotFound}
                                                                  :default {:description "error"

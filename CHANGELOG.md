@@ -1,3 +1,9 @@
+## 0.19.2 (31.3.2015)
+
+- avoid reflection with regexps, thanks to [Michael Blume](https://github.com/MichaelBlume)
+- default 2.0 responses don't have schemas
+- support for walking over Schema predicates support for 1.2 too
+
 ## 0.19.1 (25.3.2015)
 
 - `with-named-sub-schemas` takes an optional parameter - prefix for schema names
