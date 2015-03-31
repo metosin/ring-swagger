@@ -3,6 +3,8 @@
             [ring.swagger.common :refer [plain-map?]]
             [flatland.ordered.map :refer :all]))
 
+; TODO: clean all 1.2 hacks after Compojure-api goes 2.0
+
 (def ^:dynamic *ignore-missing-mappings* false)
 (def ^:dynamic *swagger-spec-version* "1.2")
 
@@ -42,12 +44,21 @@
 
 (declare json-type)
 
+(defn ensure-swagger12-top [schema]
+  (if (or false (= *swagger-spec-version* "1.2"))
+    (if-let [ref (:$ref schema)]
+      (-> schema
+          (dissoc :$ref)
+          (assoc :type ref))
+      schema)
+    schema))
+
 (defn ->json
   [x & {:keys [top] :or {top false}}]
   (if-let [json (if top
                   (if-let [schema-name (s/schema-name x)]
                     {:type schema-name}
-                    (or (json-type x) {:type "void"}))
+                    (or (ensure-swagger12-top (json-type x)) {:type "void"}))
                   (json-type x))]
     (merge json (json-schema-meta x))))
 

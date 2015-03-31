@@ -150,3 +150,7 @@
 
     (fact "nested properties work ok"
       (keys (properties Bar)) => [:key])))
+
+(fact "ensuring swagger12 top-level type-parameters"
+  (ensure-swagger12-top {:$ref ..schema..}) => {:type ..schema..}
+  (ensure-swagger12-top ..schema..) => ..schema..)
