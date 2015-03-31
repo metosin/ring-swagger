@@ -158,7 +158,7 @@
                           remove-empty-keys))]
     (if-not (empty? responses)
       responses
-      {:default {:description "" :schema s/Any}})))
+      {:default {:description ""}})))
 
 (defn transform-operation
     "Returns a map with methods as keys and the Operation
