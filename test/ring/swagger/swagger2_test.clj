@@ -9,7 +9,6 @@
             [java.util.regex Pattern]
             [org.joda.time DateTime LocalDate]))
 
-
 (s/defschema LegOfPet {:length Long})
 
 (s/defschema Pet {:id Long

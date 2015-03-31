@@ -53,11 +53,7 @@
                              (map :responses)
                              (mapcat vals)
                              (keep :schema))]
-    (->> (concat body-models response-models)
-         flatten
-         (map (juxt peek-schema-name identity))
-         (into {})
-         vals)))
+    (concat body-models response-models)))
 
 (defn transform [schema]
   (let [properties (->properties schema)
