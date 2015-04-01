@@ -101,7 +101,7 @@
   (->> schemas
        (map collect-models)
        (apply merge)
-       (map (juxt key #_(comp keyword key) (comp transform val)))
+       (map (juxt key (comp transform val)))
        (into {})))
 
 (defn extract-models [details]
