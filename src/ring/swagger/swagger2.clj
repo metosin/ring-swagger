@@ -7,10 +7,9 @@
             ;; needed for the json-encoders
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [ring.swagger.core :refer [with-named-sub-schemas collect-models peek-schema-name]]
+            [ring.swagger.core :refer [with-named-sub-schemas collect-models peek-schema]]
             [ring.swagger.swagger2-schema :as schema]
-            [instar.core :as instar])
-  (:import (clojure.lang Sequential IPersistentSet)))
+            [instar.core :as instar]))
 
 ;;
 ;; Support Schemas
@@ -42,13 +41,13 @@
 ;;
 
 (defn extract-models [swagger]
-  (let [route-meta      (->> swagger
-                             :paths
-                             vals
-                             (map vals)
-                             flatten)
-        body-models     (->> route-meta
-                             (map (comp :body :parameters)))
+  (let [route-meta (->> swagger
+                        :paths
+                        vals
+                        (map vals)
+                        flatten)
+        body-models (->> route-meta
+                         (map (comp :body :parameters)))
         response-models (->> route-meta
                              (map :responses)
                              (mapcat vals)
@@ -62,7 +61,7 @@
                       seq)]
     (remove-empty-keys
       {:properties properties
-       :required required})))
+       :required   required})))
 
 (defn transform-models [schemas]
   (->> schemas
@@ -75,46 +74,16 @@
 ;; Paths, parameters, responses
 ;;
 
-(defmulti ^:private extract-body-parameter
-  (fn [e]
-    (if (instance? Class e)
-      e
-      (class e))))
-
-(defmethod extract-body-parameter Sequential [e]
-  (let [model (first e)
-        schema-json (->json model)]
-    (vector {:in          :body
-             :name        (name (peek-schema-name model))
-             :description (or (:description schema-json) "")
-             :required    true
-             :schema      {:type  "array"
-                           :items (dissoc schema-json :description)}})))
-
-(defmethod extract-body-parameter IPersistentSet [e]
-  (let [model (first e)
-        schema-json (->json model)]
-    (vector {:in          :body
-             :name        (name (peek-schema-name model))
-             :description (or (:description schema-json) "")
-             :required    true
-             :schema      {:type        "array"
-                           :uniqueItems true
-                           :items       (dissoc schema-json :description)}})))
-
-(defmethod extract-body-parameter :default [model]
-  (if-let [schema-name (peek-schema-name model)]
-    (let [schema-json (->json model)]
-      (vector {:in          :body
-               :name        (name schema-name)
-               :description (or (:description schema-json) "")
-               :required    true
-               :schema      (dissoc schema-json :description)}))))
-
 (defmulti ^:private extract-parameter first)
 
 (defmethod extract-parameter :body [[_ model]]
-  (extract-body-parameter model))
+  (if-let [schema (peek-schema model)]
+    (let [schema-json (->json model)]
+      (vector {:in          :body
+               :name        (name (s/schema-name schema))
+               :description (or (:description (->json schema)) "")
+               :required    true
+               :schema      (dissoc schema-json :description)}))))
 
 (defmethod extract-parameter :default [[type model]]
   (if model
@@ -125,10 +94,10 @@
           :when json-schema]
       (merge
         {:in          type
-                          :name (name rk)
+         :name        (name rk)
          :description ""
-                          :required (s/required-key? k)}
-                         json-schema))))
+         :required    (s/required-key? k)}
+        json-schema))))
 
 (defn- default-response-description
   "uses option :default-response-description-fn to generate
@@ -154,14 +123,14 @@
       {:default {:description ""}})))
 
 (defn transform-operation
-    "Returns a map with methods as keys and the Operation
-     maps with parameters and responses transformed to comply
-     with Swagger spec as values"
-    [operation]
-    (for-map [[k v] operation]
-      k (-> v
-            (update-in-or-remove-key [:parameters] convert-parameters empty?)
-            (update-in [:responses] convert-responses))))
+  "Returns a map with methods as keys and the Operation
+   maps with parameters and responses transformed to comply
+   with Swagger spec as values"
+  [operation]
+  (for-map [[k v] operation]
+    k (-> v
+          (update-in-or-remove-key [:parameters] convert-parameters empty?)
+          (update-in [:responses] convert-responses))))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
@@ -187,7 +156,7 @@
    with a generated names for all anonymous nested schemas
    that come as body parameters or response models."
   [swagger]
-   (-> swagger
+  (-> swagger
       (instar/transform
         [:paths * * :parameters :body] #(with-named-sub-schemas % "Body"))
       (instar/transform
@@ -198,7 +167,7 @@
 ;;
 
 (def swagger-defaults {:swagger  "2.0"
-                       :info     {:title "Swagger API"
+                       :info     {:title   "Swagger API"
                                   :version "0.0.1"}
                        :produces ["application/json"]
                        :consumes ["application/json"]})
@@ -209,11 +178,11 @@
 
 (def Swagger schema/Swagger)
 
-(def Options {(s/optional-key :ignore-missing-mappings?) s/Bool
+(def Options {(s/optional-key :ignore-missing-mappings?)        s/Bool
               (s/optional-key :default-response-description-fn) (s/=> s/Str s/Int)})
 
 (def option-defaults
-  (s/validate Options {:ignore-missing-mappings? false
+  (s/validate Options {:ignore-missing-mappings?        false
                        :default-response-description-fn (constantly "")}))
 
 (s/defn swagger-json
@@ -228,14 +197,14 @@
    default response descriptions from http status code"
   ([swagger :- Swagger] (swagger-json swagger nil))
   ([swagger :- Swagger, options :- Options]
-   (let [options (merge option-defaults options)]
-     (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
-               *options* options]
-       (let [[paths definitions] (-> swagger
-                                     ensure-body-and-response-schema-names
-                                     extract-paths-and-definitions)]
-         (merge
-          swagger-defaults
-          (-> swagger
-              (assoc :paths paths)
-              (assoc :definitions definitions))))))))
+    (let [options (merge option-defaults options)]
+      (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
+                *options* options]
+        (let [[paths definitions] (-> swagger
+                                      ensure-body-and-response-schema-names
+                                      extract-paths-and-definitions)]
+          (merge
+            swagger-defaults
+            (-> swagger
+                (assoc :paths paths)
+                (assoc :definitions definitions))))))))
