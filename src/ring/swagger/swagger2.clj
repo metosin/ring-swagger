@@ -142,17 +142,12 @@
   (into [] (mapcat extract-parameter parameters)))
 
 (defn convert-responses [responses]
-  (let [convert (fn [schema]
-                  (if-let [json-schema (->json schema)]
-                    json-schema
-                    (transform schema)))
-        responses (for-map [[k v] responses
-                            :let [{:keys [schema headers description]} v]]
+  (let [responses (for-map [[k v] responses
+                            :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] convert))
+                          (cond-> schema (update-in [:schema] ->json))
                           (cond-> headers (update-in [:headers] ->properties))
-                          (assoc :description (or description
-                                                  (default-response-description k)))
+                          (update-in [:description] #(or % (default-response-description k)))
                           remove-empty-keys))]
     (if-not (empty? responses)
       responses
