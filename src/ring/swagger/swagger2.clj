@@ -123,8 +123,10 @@
           :let [rk (s/explicit-schema-key k)
                 json-schema (->json v)]
           :when json-schema]
-      (jsons/->parameter {:in type
+      (merge
+        {:in          type
                           :name (name rk)
+         :description ""
                           :required (s/required-key? k)}
                          json-schema))))
 

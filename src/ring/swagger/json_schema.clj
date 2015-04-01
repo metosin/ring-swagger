@@ -13,12 +13,6 @@
   [schema]
   (:json-schema (meta schema)))
 
-(defn ->parameter [base json]
-  (merge {:description ""
-          :required true}
-         base
-         json))
-
 ;;
 ;; Schema implementation which is used wrap stuff which doesn't support meta-data
 ;;

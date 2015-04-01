@@ -190,8 +190,10 @@
 (defmethod extract-parameter :body [{:keys [model type]}]
   (if model
     (vector
-      (jsons/->parameter {:paramType type
-                          :name (some-> model schema/extract-schema-name str/lower-case)}
+      (merge {:paramType type
+              :name (some-> model schema/extract-schema-name str/lower-case)
+              :description ""
+              :required true}
                          (jsons/->json model :top true)))))
 
 (defmethod extract-parameter :default [{:keys [model type] :as it}]
@@ -199,8 +201,9 @@
     (for [[k v] (-> model value-of strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key (eval k))]]
-      (jsons/->parameter {:paramType type
+      (merge {:paramType type
                           :name (name rk)
+              :description ""
                           :required (s/required-key? k)}
                          (jsons/->json v)))))
 
