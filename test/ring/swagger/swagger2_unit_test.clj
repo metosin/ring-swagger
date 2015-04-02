@@ -239,15 +239,22 @@
                   :uniqueItems true
                   :items       {:$ref "#/definitions/Body"}}}])
 
-
   (fact "Body param with desc"
     (convert-parameters {:body (describe Body "foo")})
-    => [{:description "foo" :name "Body" :in :body :required true :schema {:$ref "#/definitions/Body"}}])
+    => [{:description "foo"
+         :name "Body"
+         :in :body
+         :required true
+         :schema {:$ref "#/definitions/Body"}}])
 
   (fact "Array body param with desc"
     (convert-parameters {:body [(describe Body "foo")]})
-    => [{:description "foo" :name "Body" :in :body :required true :schema {:type "array"
-                                                                           :items {:$ref "#/definitions/Body"}}}]))
+    => [{:description "foo"
+         :name "Body"
+         :in :body
+         :required true
+         :schema {:type "array"
+                  :items {:$ref "#/definitions/Body"}}}]))
 
 (fact "ensure-named-top-level-models"
 

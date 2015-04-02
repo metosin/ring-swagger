@@ -32,20 +32,26 @@
 (defn map-entry? [x]
   (instance? IMapEntry x))
 
-(defn peek-schema-name
-  "Recurisively seeks the schema-name withing a schema.
+(defn peek-schema
+  "Recurisively seeks the form with schema-name.
    Walks over sets, vectors and Schema predicates."
   [schema]
-  (let [name (atom nil)]
+  (let [it (atom nil)]
     ((fn walk [x]
        (stw/walk
          x
          (fn [x]
-           (if (plain-map? x)
-             (do (reset! name (s/schema-name x)) x)
+           (if (and (plain-map? x) (s/schema-name x))
+             (do (reset! it x) x)
              (walk x)))
          identity)) [schema])
-    @name))
+    @it))
+
+(defn peek-schema-name
+  "Recurisively seeks the schema-name withing a schema.
+   Walks over sets, vectors and Schema predicates."
+  [schema]
+  (s/schema-name (peek-schema schema)))
 
 (defn name-schemas [names schema]
   (stw/walk
@@ -190,19 +196,22 @@
 (defmethod extract-parameter :body [{:keys [model type]}]
   (if model
     (vector
-      (jsons/->parameter {:paramType type
-                          :name (some-> model schema/extract-schema-name str/lower-case)}
-                         (jsons/->json model :top true)))))
+      (merge {:paramType type
+              :name (some-> model schema/extract-schema-name str/lower-case)
+              :description ""
+              :required true}
+             (jsons/->json model :top true)))))
 
 (defmethod extract-parameter :default [{:keys [model type] :as it}]
   (if model
     (for [[k v] (-> model value-of strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key (eval k))]]
-      (jsons/->parameter {:paramType type
-                          :name (name rk)
-                          :required (s/required-key? k)}
-                         (jsons/->json v)))))
+      (merge {:paramType type
+              :name (name rk)
+              :description ""
+              :required (s/required-key? k)}
+             (jsons/->json v)))))
 
 (defn convert-parameters [parameters]
   (mapcat extract-parameter parameters))
