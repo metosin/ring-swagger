@@ -4,10 +4,8 @@
 
 (defn opt [x] (s/optional-key x))
 
-(s/defschema Responses
-  s/Any
-  #_{(s/either (s/eq :default) s/Int) (s/maybe {:s s/Str})
-   #"x-" {:t s/Str}})
+; https://groups.google.com/forum/#!topic/prismatic-plumbing/TVkIAJVEmpg
+(s/defschema Responses s/Any)
 
 (s/defschema Parameters
   {(opt :body) s/Any
