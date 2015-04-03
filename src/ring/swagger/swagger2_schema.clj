@@ -1,95 +1,80 @@
 (ns ring.swagger.swagger2-schema
   "Schemas that Ring-Swagger expects from it's clients"
-  (require [schema.core :as s]
-           [plumbing.core :refer [fn->>]]))
+  (require [schema.core :as s]))
 
-;;
-;; helpers
-;;
+(defn opt [x] (s/optional-key x))
+(def X- (s/pred #(re-find #"x-" (name %)) ":x-.*"))
 
-(defn regexp [r n] (s/pred (fn->> name (re-find r)) n))
-(defn valid-response-key? [x] (or (= :default x) (integer? x)))
+(s/defschema ExternalDocs
+  {:url s/Str
+   (opt :description) s/Str})
 
-;;
-;; schemas
-;;
-
-(def vendor-extension (regexp #"x-" 'vendor-extension))
-
-(s/defschema ExternalDocs {:url s/Str
-                           (s/optional-key :description) s/Str})
-
-(s/defschema Info (merge
-                    {vendor-extension s/Any
-                     :version s/Str
-                     :title   s/Str
-                     (s/optional-key :description) s/Str
-                     (s/optional-key :termsOfService) s/Str
-                     (s/optional-key :contact) {(s/optional-key :name) s/Str
-                                                (s/optional-key :url) s/Str
-                                                (s/optional-key :email) s/Str}
-                     (s/optional-key :license) {:name s/Str
-                                                (s/optional-key :url) s/Str}}))
+(s/defschema Info
+  {X- s/Any
+   :version s/Str
+   :title s/Str
+   (opt :description) s/Str
+   (opt :termsOfService) s/Str
+   (opt :contact) {(opt :name) s/Str
+                   (opt :url) s/Str
+                   (opt :email) s/Str}
+   (opt :license) {:name s/Str
+                   (opt :url) s/Str}})
 
 (s/defschema Tag (s/either s/Str s/Keyword))
 
-; TODO
-(s/defschema Schema s/Any)
-
 (s/defschema Scheme (s/enum :http :https :ws :wss))
 
-(s/defschema SerializableType {(s/optional-key :type) (s/enum :string :number :boolean :integer :array :file)
-                               (s/optional-key :format) s/Str
-                               (s/optional-key :items) s/Any
-                               (s/optional-key :collectionFormat) s/Str})
+#_(s/defschema SerializableType {(opt :type) (s/enum :string :number :boolean :integer :array :file)
+                               (opt :format) s/Str
+                               (opt :items) s/Any
+                               (opt :collectionFormat) s/Str})
 
-; TODO
-(s/defschema Example s/Any)
+#_(s/defschema Response
+  {(opt :description) s/Str
+   (opt :schema) s/Any                                      ; anything
+   (opt :headers) s/Any                                     ; anything
+   (opt :examples) s/Any})                                  ; anything
 
-(s/defschema Response {(s/optional-key :description) s/Str
-                       (s/optional-key :schema) Schema
-                       (s/optional-key :headers) Schema
-                       (s/optional-key :examples) Example})
+(s/defschema Responses
+  s/Any                                                     ; anything
+  #_{(s/either (s/eq :default) s/Int) (s/maybe {:s s/Str})
+   #"x-" {:t s/Str}})
 
-(s/defschema Responses (merge
-                         ;; TODO: More than one non-optional/required key schemata
-                         ;vendor-extension s/Any
-                         {(s/pred valid-response-key?) (s/maybe Response)}))
+(s/defschema Parameters
+  {(opt :body) s/Any
+   (opt :query) s/Any
+   (opt :path) s/Any
+   (opt :header) s/Any
+   (opt :formData) s/Any})
 
-(s/defschema Parameters {(s/optional-key :body) s/Any
-                         (s/optional-key :query) s/Any
-                         (s/optional-key :path) s/Any
-                         (s/optional-key :header) s/Any
-                         (s/optional-key :formData) s/Any})
+(s/defschema Operation
+  {(opt :tags) [Tag]
+   (opt :summary) s/Str
+   (opt :description) s/Str
+   (opt :externalDocs) ExternalDocs
+   (opt :operationId) s/Str
+   (opt :consumes) [s/Str]
+   (opt :produces) [s/Str]
+   (opt :parameters) Parameters
+   (opt :responses) Responses
+   ;(opt :schemes) [Scheme]
+   ;(opt :security) s/Any
+   s/Keyword s/Any})
 
-(s/defschema Operation {(s/optional-key :tags) [Tag]
-                        (s/optional-key :summary) s/Str
-                        (s/optional-key :description) s/Str
-                        (s/optional-key :externalDocs) ExternalDocs
-                        (s/optional-key :operationId) s/Str
-                        (s/optional-key :consumes) [s/Str]
-                        (s/optional-key :produces) [s/Str]
-                        (s/optional-key :parameters) Parameters
-                        (s/optional-key :responses) Responses
-                        ;(s/optional-key :schemes) [Scheme]
-                        ;(s/optional-key :security) s/Any
-                        })
-
-#_(s/defschema Parameters s/Any)
-#_(s/defschema Security s/Any)
-
-; TODO: Authorizations: https://github.com/metosin/ring-swagger/commit/0525294dc87c0f179244c61504ed990460041349
-(s/defschema Swagger {(s/optional-key :swagger) (s/enum "2.0")
-                      (s/optional-key :info) Info
-                      ;(s/optional-key :externalDocs) ExternalDocs
-                      ;(s/optional-key :host) s/Str
-                      (s/optional-key :basePath) s/Str
-                      ;(s/optional-key :schemes) [Scheme]
-                      (s/optional-key :consumes) [s/Str]
-                      (s/optional-key :produces) [s/Str]
-                      (s/optional-key :paths) {s/Str {s/Keyword (s/maybe Operation)}}
-                      ;(s/optional-key :parameters) Parameters
-                      ;(s/optional-key :responses) Responses
-                      ;(s/optional-key :security) Security
-                      ;(s/optional-key :tags) [Tag]
-                      })
+(s/defschema Swagger
+  {(opt :swagger) (s/eq "2.0")                              ; has defaults
+   (opt :info) Info                                         ; has defaults
+   (opt :externalDocs) ExternalDocs
+   (opt :basePath) s/Str
+   (opt :consumes) [s/Str]
+   (opt :produces) [s/Str]
+   (opt :paths) {s/Str {s/Keyword (s/maybe Operation)}}     ; has defaults
+   (opt :schemes) [Scheme]
+   ;(opt :externalDocs) ExternalDocs
+   ;(opt :host) s/Str
+   ;(opt :parameters) s/Any
+   ;(opt :responses) Responses
+   ;(opt :security) s/Any
+   ;(opt :tags) [Tag]
+   s/Keyword s/Any})
