@@ -1,8 +1,7 @@
 (ns ring.swagger.swagger2-test
   (:require [schema.core :as s]
             [ring.swagger.swagger2 :refer :all]
-            [ring.swagger.validator :as validator]
-            [cheshire.core :as json]
+            [ring.swagger.validator :as v]
             [ring.util.http-status :as status]
             [midje.sweet :refer :all])
   (:import  [java.util Date UUID]
@@ -22,7 +21,7 @@
 (s/defschema NotFound {:message s/Str})
 
 (defn validate-swagger-json [swagger & [options]]
-  (validator/validate (json/generate-string (swagger-json swagger options))))
+  (v/validate (swagger-json swagger options)))
 
 (defn validate [swagger & [options]]
   (if-let [input-errors (s/check Swagger swagger)]
