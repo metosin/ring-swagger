@@ -1,8 +1,8 @@
 (ns ring.swagger.core
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
-            [ring.util.response :refer :all]
             [ring.swagger.impl :refer :all]
+            [ring.util.http-response :as r]
             [schema.core :as s]
             [plumbing.core :refer :all]
             ;; needed for the json-encoders
@@ -227,7 +227,7 @@
 ;;
 
 (defn api-listing [parameters swagger]
-  (response
+  (r/ok
     (merge
       swagger-defaults
       (select-keys parameters [:apiVersion])
@@ -239,7 +239,7 @@
 
 (defn api-declaration [parameters swagger api basepath]
   (if-let [details (and swagger (swagger api))]
-    (response
+    (r/ok
       (merge
         swagger-defaults
         resource-defaults

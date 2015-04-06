@@ -1,6 +1,6 @@
 (ns ring.swagger.ui
   (:require [cheshire.core :as json]
-            [ring.util.response :as response]
+            [ring.util.http-response :as r]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.not-modified :refer [wrap-not-modified]]
             [ring.middleware.head :refer [wrap-head]]
@@ -40,9 +40,9 @@
             ;; Check if requested uri is under swagger-ui path and what file is requested
             (when-let [req-path (get-path path uri)]
               (condp = req-path
-                "" (response/redirect (swagger/join-paths uri "index.html"))
-                "conf.js" (response/content-type (response/response (conf-js req options)) "application/javascript")
-                (response/resource-response (str root "/" req-path))))))
+                "" (r/found (swagger/join-paths uri "index.html"))
+                "conf.js" (r/content-type (r/ok (conf-js req options)) "application/javascript")
+                (r/resource-response (str root "/" req-path))))))
         (wrap-content-type options)
         (wrap-not-modified)
         (wrap-head))))
