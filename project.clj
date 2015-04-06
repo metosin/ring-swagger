@@ -16,7 +16,7 @@
                  [org.tobereplaced/lettercase "1.0.0"]
                  [potemkin "0.3.13"]
                  [org.flatland/ordered "1.5.2"]
-                 [instar "1.0.10" :exclusions [org.clojure/clojure]]]
+                 [instar "1.0.10" :exclusions [org.clojure/clojure com.keminglabs/cljx org.clojure/clojurescript]]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-ring "0.9.3"]
                              [lein-midje "3.1.3"]]
