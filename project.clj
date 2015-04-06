@@ -14,7 +14,6 @@
                  [prismatic/plumbing "0.4.1"]
                  [clj-time "0.9.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
-                 [ring/ring-core "1.3.2"]
                  [potemkin "0.3.12"]
                  [org.flatland/ordered "1.5.2"]
                  [instar "1.0.10" :exclusions [org.clojure/clojure]]]
