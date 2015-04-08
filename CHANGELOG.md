@@ -1,3 +1,14 @@
+## 0.19.4 (8.4.2015)
+
+- minify Ring-Swagger 2.0 Schema - just the [essentials](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj)
+- Swagger2.0 JSON Schema is now in classpath `ring/swagger/v2.0_schema.json`
+- exclude ill transitive dependencies from Instar (cljx, cljs)
+- use ~1000x faster JSON Schema validator in tests:
+
+```clojure
+[metosin/scjsv "0.2.0"] is available
+```
+
 ## 0.19.3 (31.3.2015)
 
 - `:resourcePath` is now set correctly with Swagger 1.2 endpoints (fixes [#36](https://github.com/metosin/ring-swagger/issues/36).
