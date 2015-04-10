@@ -1,3 +1,7 @@
+## x.x.x
+
+- drop import of `javax.servlet ServletContext`, causing reflection on Servlet Apps.
+
 ## 0.19.4 (8.4.2015)
 
 - minify Ring-Swagger 2.0 Schema - just the [essentials](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj)

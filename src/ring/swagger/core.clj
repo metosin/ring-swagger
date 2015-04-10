@@ -12,8 +12,7 @@
             [ring.swagger.json-schema :as jsons]
             [schema-tools.walk :as stw]
             [org.tobereplaced.lettercase :as lc])
-  (:import (clojure.lang IMapEntry)
-           (javax.servlet ServletContext)))
+  (:import (clojure.lang IMapEntry)))
 
 ;;
 ;; Models
@@ -171,7 +170,7 @@
 (defn context
   "Context of a request. Defaults to \"\", but has the
    servlet-context in the legacy app-server environments."
-  [{:keys [^ServletContext servlet-context]}]
+  [{:keys [servlet-context]}]
   (if servlet-context (.getContextPath servlet-context) ""))
 
 (defn basepath
