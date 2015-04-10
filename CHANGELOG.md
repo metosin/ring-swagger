@@ -1,6 +1,11 @@
 ## x.x.x
 
 - drop import of `javax.servlet ServletContext`, causing reflection on Servlet Apps.
+- updated dependencies:
+
+```clojure
+[prismatic/plumbing "0.4.2"] is available but we use "0.4.1"
+```
 
 ## 0.19.4 (8.4.2015)
 

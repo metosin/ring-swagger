@@ -11,7 +11,7 @@
                  [metosin/ring-http-response "0.6.1"]
                  [metosin/schema-tools "0.3.0"]
                  [prismatic/schema "0.4.0"]
-                 [prismatic/plumbing "0.4.1"]
+                 [prismatic/plumbing "0.4.2"]
                  [clj-time "0.9.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
                  [potemkin "0.3.13"]
