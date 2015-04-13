@@ -231,3 +231,10 @@
       "/resp"    [:responses 203] identity  #"Response.*"  valid-reference
       "/resp"    [:responses 204] :items    #"Response.*"  (just {:items valid-reference , :type  "array"})
       "/resp"    [:responses 205] :items    #"Response.*"  (just {:items valid-reference , :type  "array", :uniqueItems true}))))
+
+(fact "multipla different schemas with same name"
+  (let [model1 (s/schema-with-name {:id s/Str} 'Kikka)
+        model2 (s/schema-with-name {:id s/Int} 'Kikka)
+        swagger {:paths {"/body" {:post {:parameters {:body {:1 model1, :2 model2}}}}}}]
+    (fact "with defaults"
+      (validate swagger) => (throws IllegalArgumentException))))
