@@ -72,6 +72,25 @@ If ring-swagger can't transform the Schemas into JSON Schemas, by default a `Ill
 can ignore the errors (missing schema elements will be ignored from
 the generated JSON Schema).
 
+### Model names
+
+Prismatic Schema names are used to name the Swagger Body & Response models. Nested schemas are traversed and all found sub-schemas are generated automatically a name (so that they can be referenced in the JSON Schema). 
+
+If multiple such schemas have same name but have different value, an describive `IllegalArgumentException` is raised. This can happen if one transforms schemas via normal `clojure.core` functions:
+
+```clojure
+(s/defschema User {:id s/Str, :name s/Str})
+(def NewUser (dissoc User :id))
+
+(meta User)
+; {:name Kikka}
+
+(meta NewUser)
+; {:name Kikka} <- fail!
+```
+
+There are better schema transformers functions available at [schema-tools](https://github.com/metosin/schema-tools).
+
 ### Adding support for custom Schema elements
 
 JSON Schema generation is supported by the `ring.swagger.json-schema/json-type` multimethod. One can register own schema types by installing new methods for it's dispatch:
