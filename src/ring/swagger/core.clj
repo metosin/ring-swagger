@@ -93,10 +93,21 @@
   (let [schemas (atom {})]
     (walk/prewalk
       (fn [x]
-        (when-let [schema (and
-                            (plain-map? x)
-                            (s/schema-name x))]
-          (swap! schemas assoc schema (if (var? x) @x x)))
+        (when-let [schema-name (and
+                                 (plain-map? x)
+                                 (s/schema-name x))]
+          (let [old-schema (@schemas schema-name)
+                schema (if (var? x) @x x)]
+            (when (and old-schema
+                       (not= old-schema schema))
+              (throw
+                (IllegalArgumentException.
+                  (str
+                    "Looks like you're trying to define two models with the same name ("
+                    schema-name "), but different properties: " old-schema " & " schema " "
+                    "This might happen if you anonymously manipulate a named schema (see #39). "
+                    "Extract to another named schema or use schema-tools.core -transformers."))))
+            (swap! schemas assoc schema-name schema)))
         x)
       x)
     @schemas))
