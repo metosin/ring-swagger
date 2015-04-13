@@ -101,11 +101,9 @@
       x)
     @schemas))
 
-;; TODO: use keywords instead of symbols
 (defn transform-models [schemas]
   (->> schemas
-       (map collect-models)
-       (apply merge)
+       collect-models
        (map (juxt key (comp transform val)))
        (into {})))
 

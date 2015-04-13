@@ -65,8 +65,7 @@
 
 (defn transform-models [schemas]
   (->> schemas
-       (map collect-models)
-       (apply merge)
+       collect-models
        (map (juxt (comp str key) (comp transform val)))
        (into {})))
 
