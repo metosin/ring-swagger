@@ -1,10 +1,12 @@
-## x.x.x
+## 0.19.5 (13.4.2015)
 
+- throw `IllegalArgumentException` if multiple different schemas have a same name. Fixes [#39](https://github.com/metosin/ring-swagger/issues/39)
 - drop import of `javax.servlet ServletContext`, causing reflection on Servlet Apps.
 - updated dependencies:
 
 ```clojure
 [prismatic/plumbing "0.4.2"] is available but we use "0.4.1"
+[metosin/schema-tools "0.4.0"] is available but we use "0.3.0"
 ```
 
 ## 0.19.4 (8.4.2015)
