@@ -4,9 +4,9 @@
             [ring.swagger.validator :as v]
             [ring.util.http-status :as status]
             [midje.sweet :refer :all])
-  (:import  [java.util Date UUID]
-            [java.util.regex Pattern]
-            [org.joda.time DateTime LocalDate]))
+  (:import [java.util Date UUID]
+           [java.util.regex Pattern]
+           [org.joda.time DateTime LocalDate]))
 
 (s/defschema LegOfPet {:length Long})
 
@@ -42,82 +42,82 @@
     (validate swagger) => nil))
 
 (fact "more complete spec"
-  (let [swagger {:swagger  "2.0"
-                 :info     {:version        "version"
-                            :title          "title"
-                            :description    "description"
-                            :termsOfService "jeah"
-                            :contact        {:name  "name"
-                                             :url   "url"
-                                             :email "tommi@example.com"}
-                            :license        {:name "name"
-                                             :url  "url"}
-                            :x-kikka        "jeah"}
+  (let [swagger {:swagger "2.0"
+                 :info {:version "version"
+                        :title "title"
+                        :description "description"
+                        :termsOfService "jeah"
+                        :contact {:name "name"
+                                  :url "url"
+                                  :email "tommi@example.com"}
+                        :license {:name "name"
+                                  :url "url"}
+                        :x-kikka "jeah"}
                  :basePath "/"
                  :consumes ["application/json" "application/edn"]
                  :produces ["application/json" "application/edn"]
-                 :paths    {"/api/:id"     {:get {:tags         [:tag1 :tag2 :tag3]
-                                                  :summary      "summary"
-                                                  :description  "description"
-                                                  :externalDocs {:url         "url"
-                                                                 :description "more info"}
-                                                  :operationId  "operationId"
-                                                  :consumes     ["application/xyz"]
-                                                  :produces     ["application/xyz"]
-                                                  :parameters   {:body     nil
-                                                                 :query    (merge Anything {:x Long :y Long})
-                                                                 :path     {:id String}
-                                                                 :header   Anything
-                                                                 :formData Anything}
-                                                  :responses    {200      {:description "ok"
-                                                                           :schema      nil}
-                                                                 400      {:description "not found"
-                                                                           :schema      NotFound}
-                                                                 :default {:description "error"
-                                                                           :schema      {:code Long}}}}}
-                            "/api/parrots" {:get {:responses {200 {:schema      Parrot
-                                                                   :description ""}}}}
-                            "/api/all-types" {:get {:parameters {:body {:a Boolean
-                                                                        :b Double
-                                                                        :c Long
-                                                                        :d String
-                                                                        :e {:f [s/Keyword]
-                                                                            :g #{String}
-                                                                            :h #{(s/enum :kikka :kakka :kukka)}
-                                                                            :i Date
-                                                                            :j DateTime
-                                                                            :k LocalDate
-                                                                            :l (s/maybe String)
-                                                                            :m (s/both Long (s/pred odd? 'odd?))
-                                                                            :o [{:p #{{:q String}}}]
-                                                                            :u UUID
-                                                                            :v Pattern
-                                                                            :w #"a[6-9]"}}}}}
-                            "/api/pets"    {:get  {:parameters {:body     Pet
-                                                                :query    (merge Anything {:x Long :y Long})
-                                                                :path     Nothing
-                                                                :header   Anything
-                                                                :formData Anything}
-                                                   :responses  {200      {:description "ok"
-                                                                          :schema      {:sum Long}}
-                                                                :default {:description "error"
-                                                                          :schema      {:code Long}}}}
-                                            :post {:parameters {:body     #{Pet}
-                                                                :query    (merge Anything {:x Long :y Long})
-                                                                :path     Nothing
-                                                                :header   Anything
-                                                                :formData Anything}
-                                                   :responses  {200      {:schema      {:sum Long}}
-                                                                :default {:schema      {:code Long}
-                                                                          :headers     {:location String}}}}
-                                            :put  {:parameters {:body     [Pet]
-                                                                :query    (merge Anything {:x Long :y Long})
-                                                                :path     Nothing
-                                                                :header   Anything
-                                                                :formData Anything}
-                                                   :responses  {200      {:description "ok"
-                                                                          :schema      {:sum Long}}
-                                                                :default {:description "error"}}}}}}]
+                 :paths {"/api/:id" {:get {:tags [:tag1 :tag2 :tag3]
+                                           :summary "summary"
+                                           :description "description"
+                                           :externalDocs {:url "url"
+                                                          :description "more info"}
+                                           :operationId "operationId"
+                                           :consumes ["application/xyz"]
+                                           :produces ["application/xyz"]
+                                           :parameters {:body nil
+                                                        :query (merge Anything {:x Long :y Long})
+                                                        :path {:id String}
+                                                        :header Anything
+                                                        :formData Anything}
+                                           :responses {200 {:description "ok"
+                                                            :schema nil}
+                                                       400 {:description "not found"
+                                                            :schema NotFound}
+                                                       :default {:description "error"
+                                                                 :schema {:code Long}}}}}
+                         "/api/parrots" {:get {:responses {200 {:schema Parrot
+                                                                :description ""}}}}
+                         "/api/all-types" {:get {:parameters {:body {:a Boolean
+                                                                     :b Double
+                                                                     :c Long
+                                                                     :d String
+                                                                     :e {:f [s/Keyword]
+                                                                         :g #{String}
+                                                                         :h #{(s/enum :kikka :kakka :kukka)}
+                                                                         :i Date
+                                                                         :j DateTime
+                                                                         :k LocalDate
+                                                                         :l (s/maybe String)
+                                                                         :m (s/both Long (s/pred odd? 'odd?))
+                                                                         :o [{:p #{{:q String}}}]
+                                                                         :u UUID
+                                                                         :v Pattern
+                                                                         :w #"a[6-9]"}}}}}
+                         "/api/pets" {:get {:parameters {:body Pet
+                                                         :query (merge Anything {:x Long :y Long})
+                                                         :path Nothing
+                                                         :header Anything
+                                                         :formData Anything}
+                                            :responses {200 {:description "ok"
+                                                             :schema {:sum Long}}
+                                                        :default {:description "error"
+                                                                  :schema {:code Long}}}}
+                                      :post {:parameters {:body #{Pet}
+                                                          :query (merge Anything {:x Long :y Long})
+                                                          :path Nothing
+                                                          :header Anything
+                                                          :formData Anything}
+                                             :responses {200 {:schema {:sum Long}}
+                                                         :default {:schema {:code Long}
+                                                                   :headers {:location String}}}}
+                                      :put {:parameters {:body [Pet]
+                                                         :query (merge Anything {:x Long :y Long})
+                                                         :path Nothing
+                                                         :header Anything
+                                                         :formData Anything}
+                                            :responses {200 {:description "ok"
+                                                             :schema {:sum Long}}
+                                                        :default {:description "error"}}}}}}]
 
     (validate swagger) => nil))
 
@@ -136,7 +136,7 @@
 
   (fact "body-parameters"
     (let [swagger {:paths {"/hello" {:post {:parameters {:body {:name (->InvalidElement)
-                                                                :age  s/Num}}}}}}]
+                                                                :age s/Num}}}}}}]
       (fact "dy default, exception is throws when generating json schema"
         (validate swagger) => (throws IllegalArgumentException))
 
@@ -214,25 +214,25 @@
           name => ?name
           defined? => true))
 
-      ?uri        ?path           ?fn       ?name          ?schema
+      ?uri ?path ?fn ?name ?schema
 
       ;; body models
-      "/body1"   [:parameters 0]  identity  #"Body.*"      valid-reference
-      "/body2"   [:parameters 0]  :items    #"Body.*"      (just {:items valid-reference, :type  "array"})
-      "/body3"   [:parameters 0]  :items    #"Body.*"      (just {:items valid-reference, :type  "array", :uniqueItems true})
-      "/body4"   [:parameters 0]  identity  #"Body.*"      valid-reference
-      "/body5"   [:parameters 0]  :items    #"Body.*"      (just {:items valid-reference, :type  "array"})
-      "/body6"   [:parameters 0]  :items    #"Body.*"      (just {:items valid-reference, :type  "array", :uniqueItems true})
+      "/body1" [:parameters 0] identity #"Body.*" valid-reference
+      "/body2" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
+      "/body3" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/body4" [:parameters 0] identity #"Body.*" valid-reference
+      "/body5" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
+      "/body6" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
 
       ;; response models
-      "/resp"    [:responses 200] identity  "Response"     valid-reference
-      "/resp"    [:responses 201] :items    #"Response.*"  (just {:items valid-reference , :type  "array"})
-      "/resp"    [:responses 202] :items    #"Response.*"  (just {:items valid-reference , :type  "array", :uniqueItems true})
-      "/resp"    [:responses 203] identity  #"Response.*"  valid-reference
-      "/resp"    [:responses 204] :items    #"Response.*"  (just {:items valid-reference , :type  "array"})
-      "/resp"    [:responses 205] :items    #"Response.*"  (just {:items valid-reference , :type  "array", :uniqueItems true}))))
+      "/resp" [:responses 200] identity "Response" valid-reference
+      "/resp" [:responses 201] :items #"Response.*" (just {:items valid-reference, :type "array"})
+      "/resp" [:responses 202] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/resp" [:responses 203] identity #"Response.*" valid-reference
+      "/resp" [:responses 204] :items #"Response.*" (just {:items valid-reference, :type "array"})
+      "/resp" [:responses 205] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true}))))
 
-(fact "multipla different schemas with same name"
+(fact "multiple different schemas with same name"
   (let [model1 (s/schema-with-name {:id s/Str} 'Kikka)
         model2 (s/schema-with-name {:id s/Int} 'Kikka)
         swagger {:paths {"/body" {:post {:parameters {:body {:1 model1, :2 model2}}}}}}]
