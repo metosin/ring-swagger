@@ -4,7 +4,6 @@
             [schema.core :as s]
             [plumbing.core :refer [for-map fn->]]
             ring.swagger.json
-            ;; needed for the json-encoders
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.core :refer [with-named-sub-schemas collect-models peek-schema]]
@@ -61,7 +60,7 @@
                       seq)]
     (remove-empty-keys
       {:properties properties
-       :required   required})))
+       :required required})))
 
 (defn transform-models [schemas]
   (->> schemas
@@ -78,11 +77,11 @@
 (defmethod extract-parameter :body [[_ model]]
   (if-let [schema (peek-schema model)]
     (let [schema-json (->json model)]
-      (vector {:in          :body
-               :name        (name (s/schema-name schema))
+      (vector {:in :body
+               :name (name (s/schema-name schema))
                :description (or (:description (->json schema)) "")
-               :required    true
-               :schema      (dissoc schema-json :description)}))))
+               :required true
+               :schema (dissoc schema-json :description)}))))
 
 (defmethod extract-parameter :default [[type model]]
   (if model
@@ -92,10 +91,10 @@
                 json-schema (->json v)]
           :when json-schema]
       (merge
-        {:in          type
-         :name        (name rk)
+        {:in type
+         :name (name rk)
          :description ""
-         :required    (s/required-key? k)}
+         :required (s/required-key? k)}
         json-schema))))
 
 (defn- default-response-description
@@ -165,9 +164,9 @@
 ;; Schema
 ;;
 
-(def swagger-defaults {:swagger  "2.0"
-                       :info     {:title   "Swagger API"
-                                  :version "0.0.1"}
+(def swagger-defaults {:swagger "2.0"
+                       :info {:title "Swagger API"
+                              :version "0.0.1"}
                        :produces ["application/json"]
                        :consumes ["application/json"]})
 
@@ -177,11 +176,11 @@
 
 (def Swagger schema/Swagger)
 
-(def Options {(s/optional-key :ignore-missing-mappings?)        s/Bool
+(def Options {(s/optional-key :ignore-missing-mappings?) s/Bool
               (s/optional-key :default-response-description-fn) (s/=> s/Str s/Int)})
 
 (def option-defaults
-  (s/validate Options {:ignore-missing-mappings?        false
+  (s/validate Options {:ignore-missing-mappings? false
                        :default-response-description-fn (constantly "")}))
 
 (s/defn swagger-json
