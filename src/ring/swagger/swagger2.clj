@@ -35,6 +35,10 @@
   (binding [jsons/*swagger-spec-version* "2.0"]
     (jsons/properties schema)))
 
+(defn ->additional-properties [schema]
+    (binding [jsons/*swagger-spec-version* "2.0"]
+      (jsons/additional-properties schema)))
+
 ;;
 ;; Schema transformations
 ;;
@@ -55,11 +59,13 @@
 
 (defn transform [schema]
   (let [properties (->properties schema)
+        additional-properties (->additional-properties schema)
         required (->> (required-keys schema)
                       (filter (partial contains? properties))
                       seq)]
     (remove-empty-keys
       {:properties properties
+       :additionalProperties additional-properties
        :required required})))
 
 (defn transform-models [schemas]

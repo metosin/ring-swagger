@@ -118,8 +118,10 @@
 ;; Schema -> Json Schema
 ;;
 
-(defn not-predicate? [x]
-  (not= (class x) schema.core.Predicate))
+(defn predicate? [x]
+  (= (class x) schema.core.Predicate))
+
+(def not-predicate? (complement predicate?))
 
 (defn try->json [v k]
   (try (->json v)
@@ -140,3 +142,10 @@
               :let [k (s/explicit-schema-key k)
                     v (try->json v k)]]
           (and v [k v]))))
+
+
+;; TODO: https://github.com/runningskull/ring-swagger/commit/4f113100923414d9d8f22a862c466abdca4b788d
+(defn additional-properties
+  [schema]
+  {:pre [(plain-map? schema)]}
+  nil)
