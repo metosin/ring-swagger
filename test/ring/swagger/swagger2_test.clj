@@ -236,5 +236,4 @@
   (let [model1 (s/schema-with-name {:id s/Str} 'Kikka)
         model2 (s/schema-with-name {:id s/Int} 'Kikka)
         swagger {:paths {"/body" {:post {:parameters {:body {:1 model1, :2 model2}}}}}}]
-    (fact "with defaults"
-      (validate swagger) => (throws IllegalArgumentException))))
+    (validate swagger) => (throws IllegalArgumentException)))
