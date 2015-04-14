@@ -143,9 +143,10 @@
                     v (try->json v k)]]
           (and v [k v]))))
 
-
-;; TODO: https://github.com/runningskull/ring-swagger/commit/4f113100923414d9d8f22a862c466abdca4b788d
 (defn additional-properties
+  "Generates json-schema additional properties from a plain map
+  schema from under key s/Keyword."
   [schema]
   {:pre [(plain-map? schema)]}
-  nil)
+  (if-let [v (schema s/Keyword)]
+    (try->json v s/Keyword)))

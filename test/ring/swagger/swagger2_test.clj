@@ -218,22 +218,46 @@
 
       ;; body models
       "/body1" [:parameters 0] identity #"Body.*" valid-reference
-      "/body2" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
-      "/body3" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/body2" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array"})
+      "/body3" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
       "/body4" [:parameters 0] identity #"Body.*" valid-reference
-      "/body5" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
-      "/body6" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/body5" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array"})
+      "/body6" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
 
       ;; response models
-      "/resp" [:responses 200] identity "Response" valid-reference
-      "/resp" [:responses 201] :items #"Response.*" (just {:items valid-reference, :type "array"})
-      "/resp" [:responses 202] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/resp" [:responses 200] identity "Response"    valid-reference
+      "/resp" [:responses 201] :items   #"Response.*" (just {:items valid-reference, :type "array"})
+      "/resp" [:responses 202] :items   #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true})
       "/resp" [:responses 203] identity #"Response.*" valid-reference
-      "/resp" [:responses 204] :items #"Response.*" (just {:items valid-reference, :type "array"})
-      "/resp" [:responses 205] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true}))))
+      "/resp" [:responses 204] :items   #"Response.*" (just {:items valid-reference, :type "array"})
+      "/resp" [:responses 205] :items   #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true}))))
 
 (fact "multiple different schemas with same name"
   (let [model1 (s/schema-with-name {:id s/Str} 'Kikka)
         model2 (s/schema-with-name {:id s/Int} 'Kikka)
         swagger {:paths {"/body" {:post {:parameters {:body {:1 model1, :2 model2}}}}}}]
     (validate swagger) => (throws IllegalArgumentException)))
+
+(defn has-definition [schema-name value]
+  (chatty-checker [actual]
+    (= (get-in actual [:definitions (name schema-name)]) value)))
+
+(fact "additionalProperties"
+  (let [Kikka  (s/schema-with-name {:a s/Str s/Keyword s/Str} 'Kikka)
+        Kukka  (s/schema-with-name {:a s/Str s/Keyword Kikka} 'Kukka)
+        swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}
+                         "/kukka" {:post {:parameters {:body Kukka}}}}}
+        spec (swagger-json swagger)]
+    (validate swagger) => nil
+
+    (fact "keyword to primitive mapping"
+      spec => (has-definition 'Kikka
+                              {:properties {:a {:type "string"}}
+                               :additionalProperties {:type "string"}
+                               :required [:a]}))
+
+    (fact "keyword to model mapping"
+      spec => (has-definition 'Kukka
+                              {:properties {:a {:type "string"}}
+                               :additionalProperties {:$ref "#/definitions/Kikka"}
+                               :required [:a]}))))
