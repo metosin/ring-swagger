@@ -1,3 +1,7 @@
+## 0.19.6 (xx.4.2015)
+
+- initial support for `additionalProperties` via `s/Keyword` -key in the schemas. Thanks for [Juan Patten](https://github.com/runningskull/ring-swagger/commit/4f113100923414d9d8f22a862c466abdca4b788d) for the initial code.
+
 ## 0.19.5 (13.4.2015)
 
 - throw `IllegalArgumentException` if multiple different schemas have a same name. Fixes [#39](https://github.com/metosin/ring-swagger/issues/39)
