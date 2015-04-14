@@ -3,7 +3,7 @@
 
 (defn remove-empty-keys
   "removes empty keys from a map"
-  [m] (into {} (filter (fn-> second nil? not) m)))
+  [m] (into (empty m) (filter (fn-> second nil? not) m)))
 
 (defn name-of
   "Returns name of a Var, String, Named object or nil"
