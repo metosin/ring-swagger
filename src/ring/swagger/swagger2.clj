@@ -33,7 +33,9 @@
 
 (defn ->properties [schema]
   (binding [jsons/*swagger-spec-version* "2.0"]
-    (jsons/properties schema)))
+    (let [properties (jsons/properties schema)]
+      (if-not (empty? properties)
+        properties))))
 
 (defn ->additional-properties [schema]
     (binding [jsons/*swagger-spec-version* "2.0"]

@@ -245,19 +245,28 @@
 (fact "additionalProperties"
   (let [Kikka  (s/schema-with-name {:a s/Str s/Keyword s/Str} 'Kikka)
         Kukka  (s/schema-with-name {:a s/Str s/Keyword Kikka} 'Kukka)
+        Kakka  (s/schema-with-name {s/Keyword Kukka} 'Kakka)
         swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}
-                         "/kukka" {:post {:parameters {:body Kukka}}}}}
+                         "/kukka" {:post {:parameters {:body Kukka}}}
+                         "/kakka" {:post {:parameters {:body Kakka}}}}}
         spec (swagger-json swagger)]
     (validate swagger) => nil
 
     (fact "keyword to primitive mapping"
-      spec => (has-definition 'Kikka
-                              {:properties {:a {:type "string"}}
-                               :additionalProperties {:type "string"}
-                               :required [:a]}))
+      spec => (has-definition
+                'Kikka
+                {:properties {:a {:type "string"}}
+                 :additionalProperties {:type "string"}
+                 :required [:a]}))
 
     (fact "keyword to model mapping"
-      spec => (has-definition 'Kukka
-                              {:properties {:a {:type "string"}}
-                               :additionalProperties {:$ref "#/definitions/Kikka"}
-                               :required [:a]}))))
+      spec => (has-definition
+                'Kukka
+                {:properties {:a {:type "string"}}
+                 :additionalProperties {:$ref "#/definitions/Kikka"}
+                 :required [:a]}))
+
+    (fact "just additional properties"
+      spec => (has-definition
+                'Kakka
+                {:additionalProperties {:$ref "#/definitions/Kukka"}}))))
