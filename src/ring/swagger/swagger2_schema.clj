@@ -3,9 +3,22 @@
   (require [schema.core :as s]))
 
 (defn opt [x] (s/optional-key x))
+(def X- (s/pred #(re-find #"x-" (name %)) ":x-.*"))
 
 ; https://groups.google.com/forum/#!topic/prismatic-plumbing/TVkIAJVEmpg
 (s/defschema Responses s/Any)
+
+(s/defschema Info
+  {X- s/Any
+   :version s/Str
+   :title s/Str
+   (opt :description) s/Str
+   (opt :termsOfService) s/Str
+   (opt :contact) {(opt :name) s/Str
+                   (opt :url) s/Str
+                   (opt :email) s/Str}
+   (opt :license) {:name s/Str
+                   (opt :url) s/Str}})
 
 (s/defschema Parameters
   {(opt :body) s/Any
@@ -20,5 +33,6 @@
    s/Keyword s/Any})
 
 (s/defschema Swagger
-  {(opt :paths) {s/Str {s/Keyword (s/maybe Operation)}}
+  {(opt :info) Info
+   (opt :paths) {s/Str {s/Keyword (s/maybe Operation)}}
    s/Keyword s/Any})

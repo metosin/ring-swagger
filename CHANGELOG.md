@@ -1,3 +1,7 @@
+## 0.19.7-SNAPSHOT (xx.4.2015)
+
+- welcome back the `Info` schema in `ring.swagger.swagger2-schema`!
+
 ## 0.19.6 (19.4.2015)
 
 - initial support for `additionalProperties` via `s/Keyword` -key in the schemas. Thanks for [Juan Patten](https://github.com/runningskull/ring-swagger/commit/4f113100923414d9d8f22a862c466abdca4b788d) for the initial code.
