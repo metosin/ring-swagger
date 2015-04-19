@@ -203,7 +203,7 @@
    default response descriptions from http status code"
   ([swagger :- Swagger] (swagger-json swagger nil))
   ([swagger :- Swagger, options :- Options]
-    (let [options (merge option-defaults options)]
+    (let [options (deep-merge option-defaults options)]
       (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
                 *options* options]
         (let [[paths definitions] (-> swagger

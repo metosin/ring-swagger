@@ -1,6 +1,7 @@
 ## 0.19.7-SNAPSHOT (xx.4.2015)
 
 - welcome back the `Info` schema in `ring.swagger.swagger2-schema`!
+- ring-swagger defaults in `swagger-json` are deep-merged in instead of plain merge.
 
 ## 0.19.6 (19.4.2015)
 
