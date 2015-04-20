@@ -1,6 +1,6 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.png?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Dependencies Status](http://jarkeeper.com/metosin/ring-swagger/status.png)](http://jarkeeper.com/metosin/ring-swagger)
 
-[Swagger](http://swagger.io/) implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema) for data modeling.
+[Swagger](http://swagger.io/) implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema) for data modeling. 
 
 - Supports both 1.2 and 2.0 Swagger Specs
 - For web developers
@@ -26,7 +26,84 @@
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [rook](https://github.com/AvisoNovate/rook)
 
-For creating you own adapter, see [Collecting API Documentation](https://github.com/metosin/ring-swagger/wiki/Collecting-API-Documentation).
+Route definitions as expected as a clojure Map defined by the [Schema](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). 
+The Schema is open as ring-swagger tries not to be on your way - one can always pass any extra data in the Swagger Spec format. The generated specs can be validated against
+the [Swagger Schema](https://github.com/metosin/ring-swagger/blob/master/resources/ring/swagger/v2.0_schema.json) via tools like
+[scjsv](https://github.com/metosin/scjsv).
+
+### Simlest possible example
+
+```clojure
+(require '[ring.swagger.swagger2 :as rs])
+
+(rs/swagger-json nil)
+; {:swagger "2.0"
+;  :info {:title "Swagger API"
+;          :version "0.0.1"}
+;  :produces ["application/json"]
+;  :consumes ["application/json"]
+;  :definitions {}
+;  :paths {}}
+```
+
+### A more complete example
+
+with info, tags, routes and anonymous nested schemas.
+
+```clojure
+(require '[schema.core :as s])
+
+(s/defschema User {:id s/Str, 
+                   :name s/Str
+                   :address {:street s/Str
+                             :city (s/enum :tre :hki)}})
+
+(rs/swagger-json {:info {:title "Cool API"
+                         :contact {:email "my@example.com"}}
+                  :tags [{:name "user"
+                         :description "User stuff"}]
+                  :paths {"/api/ping" {:get nil}
+                          "/user/:id" {:post {:summary "User Api"
+                                              :description "User Api description"
+                                              :tags ["user"]
+                                              :parameters {:path {:id s/Str}
+                                                           :body User}
+                                              :responses {200 {:schema User
+                                                               :description "Found it!"}
+                                                          404 {:description "Ohnoes."}}}}}})
+; {:swagger "2.0"
+;  :info {:title "Cool API"
+;         :version "0.0.1"
+;         :contact {:email "my@example.com"}}
+;  :produces ["application/json"]
+;  :consumes ["application/json"]
+;  :paths {"/api/ping" {:get {:responses {:default {:description ""}}}}
+;          "/user/{id}" {:post {:parameters [{:type "string"
+;                                             :in :path
+;                                             :name "id"
+;                                             :description ""
+;                                             :required true}
+;                                            {:in :body
+;                                             :name "User"
+;                                             :description ""
+;                                             :required true
+;                                             :schema {:$ref "#/definitions/User"}}]
+;                               :summary "User Api"
+;                               :description "User Api description"
+;                               :responses {200 {:schema {:$ref "#/definitions/User"}
+;                                                :description "User or not."}
+;                                           404 {:description "Ohnoes."}}}}}
+;  :definitions {"User" {:properties {:id {:type "string"}
+;                                     :name {:type "string"}
+;                                     :address {:$ref "#/definitions/UserAddress"}}
+;                        :required [:id :name :address]}
+;                "UserAddress" {:properties {:street {:type "string"}
+;                                            :city {:enum (:tre :hki)
+;                                                   :type "string"}}
+;                               :required [:street :city]}}}
+```
+
+For more information about creating your own adapter, see [Collecting API Documentation](https://github.com/metosin/ring-swagger/wiki/Collecting-API-Documentation).
 
 ## Web Schemas
 
@@ -40,7 +117,7 @@ As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schem
 | --------|-------|:------------:|
 | `Integer` | integer, int32 | `1` |
 | `Long`, `s/Int` | integer, int64 | `1` |
-| `Double`, `Number, `s/Num`  | number, double | `1.2`
+| `Double`, `Number`, `s/Num`  | number, double | `1.2`
 | `String`, `s/Str`, Keyword, `s/Keyword`      | string | `"kikka"`
 | `Boolean`                   | boolean | `true`
 | `nil`, `s/Any`              | void |
