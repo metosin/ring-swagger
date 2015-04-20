@@ -270,3 +270,14 @@
       spec => (has-definition
                 'Kakka
                 {:additionalProperties {:$ref "#/definitions/Kukka"}}))))
+
+(fact "tags"
+  (let [swagger {:tags [{:name "pet"
+                         :description "Everything about your Pets"
+                         :externalDocs {:description "Find out more"
+                                        :url "http://swagger.io"}}
+                        {:name "store"
+                         :description "Operations about user"}]
+                 :paths {"/pet"   {:post {:tags ["pet"]}}
+                         "/store" {:post {:tags ["store"]}}}}]
+    (validate swagger) => nil))
