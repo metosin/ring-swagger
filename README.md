@@ -28,7 +28,7 @@
 
 Route definitions as expected as a clojure Map defined by the [Schema](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). 
 The Schema is open as ring-swagger tries not to be on your way - one can always pass any extra data in the Swagger Spec format. The generated specs can be validated against
-the [Swagger Schema](https://github.com/metosin/ring-swagger/blob/master/resources/ring/swagger/v2.0_schema.json) via tools like
+the [Swagger Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json) via tools like
 [scjsv](https://github.com/metosin/scjsv).
 
 ### Simplest possible example
@@ -101,6 +101,25 @@ the [Swagger Schema](https://github.com/metosin/ring-swagger/blob/master/resourc
 ;                                            :city {:enum (:tre :hki)
 ;                                                   :type "string"}}
 ;                               :required [:street :city]}}}
+```
+
+### validating the results
+
+```clojure
+(require '[scjsv.core :as scjsv])
+
+(def validator (scjsv/validator (slurp "https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json")))
+
+(validator (rs/swagger-json {:paths {"/api/ping" {:get nil}}}))
+; nil
+
+validator (rs/swagger-json {:pathz {"/api/ping" {:get nil}}}))
+; ({:level "error"
+;   :schema {:loadingURI "#", :pointer ""}
+;   :instance {:pointer ""}
+;   :domain "validation"
+;   :keyword "additionalProperties"
+;   :message "object instance has properties which are not allowed by the schema: [\"pathz\"]", :unwanted ["pathz"]})
 ```
 
 For more information about creating your own adapter, see [Collecting API Documentation](https://github.com/metosin/ring-swagger/wiki/Collecting-API-Documentation).
