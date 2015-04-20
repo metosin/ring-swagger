@@ -31,7 +31,7 @@ The Schema is open as ring-swagger tries not to be on your way - one can always 
 the [Swagger Schema](https://github.com/metosin/ring-swagger/blob/master/resources/ring/swagger/v2.0_schema.json) via tools like
 [scjsv](https://github.com/metosin/scjsv).
 
-### Simlest possible example
+### Simplest possible example
 
 ```clojure
 (require '[ring.swagger.swagger2 :as rs])
@@ -46,9 +46,9 @@ the [Swagger Schema](https://github.com/metosin/ring-swagger/blob/master/resourc
 ;  :paths {}}
 ```
 
-### A more complete example
+### More complete example
 
-with info, tags, routes and anonymous nested schemas.
+... with info, tags, routes and anonymous nested schemas.
 
 ```clojure
 (require '[schema.core :as s])
