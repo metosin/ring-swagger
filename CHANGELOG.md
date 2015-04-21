@@ -1,8 +1,8 @@
-## 0.20.0-SNAPSHOT (xx.4.2015)
+## 0.20.0 (21.4.2015)
 
 - welcome back the `Info` schema in `ring.swagger.swagger2-schema`!
 - ring-swagger defaults in `swagger-json` are deep-merged in instead of plain merge.
-- **breaking**: default spec-location has changed from `/api/api-docs` to `/swagger.json` in `ring.swagger.ui`
+- **breaking**: default spec-location has changed from `/api/api-docs` to `/swagger.json` in `ring.swagger.ui
 
 ## 0.19.6 (19.4.2015)
 
