@@ -10,7 +10,7 @@
   (second (re-find (re-pattern (str "^" root "[/]?(.*)")) uri)))
 
 (defn conf-js [req {:keys [swagger-docs oauth2]
-                    :or {swagger-docs "/api/api-docs" #_"/swagger.json"
+                    :or {swagger-docs "/swagger.json"
                          oauth2 nil}}]
   (let [swagger-docs (swagger/join-paths (swagger/context req) swagger-docs)
         conf (cond-> {:url swagger-docs}
