@@ -90,6 +90,24 @@
     {:type "string" :pattern (str e)}
     {:type "string" :format "regex"}))
 
+(defrecord File [m]
+  schema.core.Schema
+  (walker [this]
+    (let [sub-walker (schema.core/subschema-walker m)]
+      (clojure.core/fn [x]
+       (if (schema.utils/error? x)
+         x
+         (sub-walker x)))))
+  (explain [this] (cons 'file m)))
+
+(def file
+  (File. {:filename s/Str
+          :size s/Int
+          (s/optional-key :tempfile) java.io.File
+          :content-type s/Str}))
+
+(defmethod json-type File            [_] {:type "file"})
+
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class
 (def predicate-to-class {integer? java.lang.Long
