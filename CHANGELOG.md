@@ -1,3 +1,10 @@
+## x.xx.x
+
+- updated dependencies:
+```clojure
+[prismatic/schema "0.4.1"] is available but we use "0.4.0"
+```
+
 ## 0.20.0 (21.4.2015)
 
 - welcome back the `Info` schema in `ring.swagger.swagger2-schema`!
