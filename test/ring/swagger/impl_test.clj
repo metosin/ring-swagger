@@ -5,7 +5,3 @@
 
 (fact "scrict-schema strips open keys"
   (strict-schema {s/Keyword s/Any :s String}) => {:s String})
-
-(fact "loose-schema adds open keys to top-level"
-  (loose-schema {:s String}) => {s/Keyword s/Any :s String})
-
