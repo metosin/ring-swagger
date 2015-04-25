@@ -93,12 +93,6 @@
   (or (query-coercions schema)
       (json-schema-coercion-matcher schema)))
 
-(defn all-matchers
-  "A matcher that applies all matchers"
-  [matchers]
-  (fn [schema] (reduce (fn [schema matcher]
-                         (or (matcher schema) schema)) schema matchers)))
-
 ;;
 ;; Public Api
 ;;
@@ -108,3 +102,4 @@
 (defmethod coercer :json    [_] json-schema-coercion-matcher)
 (defmethod coercer :query   [_] query-schema-coercion-matcher)
 (defmethod coercer :default [c] c)
+
