@@ -21,7 +21,8 @@
 (s/defschema NotFound {:message s/Str})
 
 (defn validate-swagger-json [swagger & [options]]
-  (v/validate (swagger-json swagger options)))
+  (s/with-fn-validation
+    (v/validate (swagger-json swagger options))))
 
 (defn validate [swagger & [options]]
   (if-let [input-errors (s/check Swagger swagger)]
