@@ -24,7 +24,6 @@
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 - [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
-- [rook](https://github.com/AvisoNovate/rook)
 
 Route definitions as expected as a clojure Map defined by the [Schema](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema is open as ring-swagger tries not to be on your way - one can always pass any extra data in the Swagger Spec format.
 
