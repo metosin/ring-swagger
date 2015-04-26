@@ -201,8 +201,8 @@
 
    :default-response-description-fn ((constantly \"\")) - a fn to generate
    default response descriptions from http status code"
-  ([swagger :- Swagger] (swagger-json swagger nil))
-  ([swagger :- Swagger, options :- (s/maybe Options)]
+  ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
+  ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
     (let [options (merge option-defaults options)]
       (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
                 *options* options]
