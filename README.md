@@ -26,10 +26,7 @@
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [rook](https://github.com/AvisoNovate/rook)
 
-Route definitions as expected as a clojure Map defined by the [Schema](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). 
-The Schema is open as ring-swagger tries not to be on your way - one can always pass any extra data in the Swagger Spec format. The generated specs can be validated against
-the [Swagger Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json) via tools like
-[scjsv](https://github.com/metosin/scjsv).
+Route definitions as expected as a clojure Map defined by the [Schema](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema is open as ring-swagger tries not to be on your way - one can always pass any extra data in the Swagger Spec format.
 
 ### Simplest possible example
 
@@ -58,23 +55,38 @@ the [Swagger Schema](https://raw.githubusercontent.com/reverb/swagger-spec/maste
                    :address {:street s/Str
                              :city (s/enum :tre :hki)}})
 
-(rs/swagger-json {:info {:title "Cool API"
-                         :contact {:email "my@example.com"}}
-                  :tags [{:name "user"
-                         :description "User stuff"}]
-                  :paths {"/api/ping" {:get nil}
-                          "/user/:id" {:post {:summary "User Api"
-                                              :description "User Api description"
-                                              :tags ["user"]
-                                              :parameters {:path {:id s/Str}
-                                                           :body User}
-                                              :responses {200 {:schema User
-                                                               :description "Found it!"}
-                                                          404 {:description "Ohnoes."}}}}}})
+(s/with-fn-validation 
+  (rs/swagger-json 
+    {:info {:version "1.0.0"
+            :title "Sausages"
+            :description "Sausage description"
+            :termsOfService "http://helloreverb.com/terms/"
+            :contact {:name "My API Team"
+                      :email "foo@example.com"
+                      :url "http://www.metosin.fi"}
+            :license {:name "Eclipse Public License"
+                      :url "http://www.eclipse.org/legal/epl-v10.html"}}
+            :tags [{:name "user"
+                   :description "User stuff"}]
+            :paths {"/api/ping" {:get nil}
+                    "/user/:id" {:post {:summary "User Api"
+                                        :description "User Api description"
+                                        :tags ["user"]
+                                        :parameters {:path {:id s/Str}
+                                                     :body User}
+                                        :responses {200 {:schema User
+                                                         :description "Found it!"}
+                                                    404 {:description "Ohnoes."}}}}}}))
 ; {:swagger "2.0"
-;  :info {:title "Cool API"
-;         :version "0.0.1"
-;         :contact {:email "my@example.com"}}
+;  :info {:version "1.0.0"
+;         :title "Sausages"
+;         :description "Sausage description"
+;         :termsOfService "http://helloreverb.com/terms/"
+;         :contact {:email "foo@example.com"
+;                   :name "My API Team"
+;                   :url "http://www.metosin.fi"}
+;         :license {:name "Eclipse Public License"
+;                   :url "http://www.eclipse.org/legal/epl-v10.html"}}
 ;  :produces ["application/json"]
 ;  :consumes ["application/json"]
 ;  :paths {"/api/ping" {:get {:responses {:default {:description ""}}}}
@@ -104,6 +116,8 @@ the [Swagger Schema](https://raw.githubusercontent.com/reverb/swagger-spec/maste
 ```
 
 ### validating the results
+
+The generated full spec can be validated against the [Swagger JSON Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json) via tools like [scjsv](https://github.com/metosin/scjsv).
 
 ```clojure
 (require '[scjsv.core :as scjsv])

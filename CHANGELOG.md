@@ -1,5 +1,6 @@
-## x.xx.x
+## 0.20.1 (26.4.2015)
 
+- `swagger-json` now handles `nil` options, thanks to [Frankie Sardo](https://github.com/frankiesardo).
 - updated dependencies:
 ```clojure
 [prismatic/schema "0.4.1"] is available but we use "0.4.0"
