@@ -1,3 +1,7 @@
+## x.xx.x
+
+- add `:type "object"` to Swagger 2.0 Definitions, requested by [Ron](https://github.com/webron).
+
 ## 0.20.1 (26.4.2015)
 
 - `swagger-json` now handles `nil` options, thanks to [Frankie Sardo](https://github.com/frankiesardo).

@@ -256,21 +256,24 @@
     (fact "keyword to primitive mapping"
       spec => (has-definition
                 'Kikka
-                {:properties {:a {:type "string"}}
+                {:type "object"
+                 :properties {:a {:type "string"}}
                  :additionalProperties {:type "string"}
                  :required [:a]}))
 
     (fact "keyword to model mapping"
       spec => (has-definition
                 'Kukka
-                {:properties {:a {:type "string"}}
+                {:type "object"
+                 :properties {:a {:type "string"}}
                  :additionalProperties {:$ref "#/definitions/Kikka"}
                  :required [:a]}))
 
     (fact "just additional properties"
       spec => (has-definition
                 'Kakka
-                {:additionalProperties {:$ref "#/definitions/Kukka"}}))))
+                {:type "object"
+                 :additionalProperties {:$ref "#/definitions/Kukka"}}))))
 
 (fact "tags"
   (let [swagger {:tags [{:name "pet"

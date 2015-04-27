@@ -47,14 +47,16 @@
 ;;
 
 (def Tag'
-  {:properties {:id {:type "integer"
+  {:type "object"
+   :properties {:id {:type "integer"
                      :format "int64"
                      :description "Unique identifier for the tag"}
                 :name {:type "string"
                        :description "Friendly name for the tag"}}})
 
 (def Category'
-  {:properties {:id {:type "integer"
+  {:type "object"
+   :properties {:id {:type "integer"
                      :format "int64"
                      :description "Category unique identifier"
                      :minimum "0.0"
@@ -63,7 +65,8 @@
                        :description "Name of the category"}}})
 
 (def Pet'
-  {:required [:id :name]
+  {:type "object"
+   :required [:id :name]
    :properties {:id {:type "integer"
                      :format "int64"
                      :description "Unique identifier for the Pet"
@@ -111,7 +114,8 @@
     (transform-models [Baz]) => {})
 
   (fact "nested record-schemas are inlined"
-    (transform-models [Bar]) => {"Bar" {:properties {:key {:enum [:b :a]
+    (transform-models [Bar]) => {"Bar" {:type "object"
+                                        :properties {:key {:enum [:b :a]
                                                            :type "string"}}
                                         :required [:key]}})
 
@@ -125,14 +129,17 @@
 
       =>
 
-      {"Nested" {:properties {:address {:$ref "#/definitions/NestedAddress"}
+      {"Nested" {:type "object"
+                 :properties {:address {:$ref "#/definitions/NestedAddress"}
                               :id {:type "string"}}
                  :required [:id :address]}
-       "NestedAddress" {:properties {:country {:enum [:fi :pl]
+       "NestedAddress" {:type "object"
+                        :properties {:country {:enum [:fi :pl]
                                                :type "string"}
                                      :street {:$ref "#/definitions/NestedAddressStreet"}}
                         :required [:country :street]}
-       "NestedAddressStreet" {:properties {:name {:type "string"}}
+       "NestedAddressStreet" {:type "object"
+                              :properties {:name {:type "string"}}
                               :required [:name]}})
 
     (fact "nested named sub-schemas"
@@ -270,16 +277,22 @@
                                  first
                                  (get-in [:schema :$ref]))
             body-schema-name (last (re-find #"\#\/definitions\/(.+)$" body-schema-ref))]
-        (get definitions body-schema-name)) => {:properties {:foo {:type "string"}}
-                                                             :required   [:foo]})
+        (get definitions body-schema-name))
+
+      => {:type "object"
+          :properties {:foo {:type "string"}}
+          :required   [:foo]})
 
     (fact "array of anonymous map as response model is named and refers to correct definition"
       (let [response-schema-ref  (-> paths
                                      (get-in ["/api" :post :responses 200 :schema :items :$ref]))
             response-schema-name (last (re-find #"\#\/definitions\/(.+)$" response-schema-ref))]
-        (get definitions response-schema-name)) => {:properties {:bar {:type "integer"
-                                                                             :format "int64"}}
-                                                          :required   [:bar]})))
+        (get definitions response-schema-name))
+
+      => {:type "object"
+          :properties {:bar {:type "integer"
+                             :format "int64"}}
+          :required   [:bar]})))
 
 ;; ;;
 ;; ;; Helpers
@@ -306,9 +319,11 @@
 
 (fact "recursive"
   (transform-models [Foo Bar])
-  => {"Bar" {:properties {:foo {:$ref "#/definitions/Foo"}}
+  => {"Bar" {:type "object"
+             :properties {:foo {:$ref "#/definitions/Foo"}}
              :required [:foo]}
-      "Foo" {:properties {:bar {:$ref "#/definitions/Bar"}}
+      "Foo" {:type "object"
+             :properties {:bar {:$ref "#/definitions/Bar"}}
              :required [:bar]}})
 
 ;;
@@ -386,7 +401,8 @@
                                                                   :schema {:$ref "#/definitions/Pet"}}
                                                              404 {:description "fail"
                                                                   :schema {:$ref "#/definitions/PetError"}}}}}}
-        :definitions {"Pet"      {:required   [:id :name]
+        :definitions {"Pet"      {:type "object"
+                                  :required   [:id :name]
                                   :properties {:id        {:type        "integer"
                                                            :format      "int64"
                                                            :description "Unique identifier for the Pet"
@@ -405,19 +421,22 @@
                                                :status    {:enum        [:pending :sold :available]
                                                            :type        "string"
                                                            :description "pet status in the store"}}}
-                      "Category" {:properties {:id   {:type        "integer"
+                      "Category" {:type "object"
+                                  :properties {:id   {:type        "integer"
                                                       :format      "int64"
                                                       :description "Category unique identifier"
                                                       :minimum     "0.0"
                                                       :maximum     "100.0"}
                                                :name {:type        "string"
                                                       :description "Name of the category"}}}
-                      "Tag"      {:properties {:id   {:type        "integer"
+                      "Tag"      {:type "object"
+                                  :properties {:id   {:type        "integer"
                                                       :format      "int64"
                                                       :description "Unique identifier for the tag"}
                                                :name {:type        "string"
                                                       :description "Friendly name for the tag"}}}
-                      "PetError" {:properties {:message {:type "string"}}
+                      "PetError" {:type "object"
+                                  :properties {:message {:type "string"}}
                                   :required [:message]}}}))
 
 (defrecord InvalidElement [])
@@ -434,7 +453,9 @@
       (binding [jsons/*ignore-missing-mappings* true]
         (transform schema)
 
-        => {:properties {:a {:type "string"}}, :required [:a]}))))
+        => {:type "object"
+            :properties {:a {:type "string"}}
+            :required [:a]}))))
 
 
 

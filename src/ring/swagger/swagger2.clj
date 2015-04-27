@@ -66,7 +66,8 @@
                       (filter (partial contains? properties))
                       seq)]
     (remove-empty-keys
-      {:properties properties
+      {:type "object"
+       :properties properties
        :additionalProperties additional-properties
        :required required})))
 
