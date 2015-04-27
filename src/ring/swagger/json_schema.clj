@@ -104,6 +104,7 @@
 (defmethod json-type schema.core.Recursive      [e] (->json (:derefable e)))
 (defmethod json-type schema.core.EqSchema       [e] (->json (class (:v e))))
 (defmethod json-type schema.core.NamedSchema    [e] (->json (:schema e)))
+(defmethod json-type schema.core.One            [e] (->json (:schema e)))
 (defmethod json-type schema.core.AnythingSchema [_] nil)
 
 (defmethod json-type :default [e]
