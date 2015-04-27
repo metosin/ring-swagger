@@ -150,7 +150,7 @@ As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schem
 | `Integer` | integer, int32 | `1` |
 | `Long`, `s/Int` | integer, int64 | `1` |
 | `Double`, `Number`, `s/Num`  | number, double | `1.2`
-| `String`, `s/Str`, Keyword, `s/Keyword`      | string | `"kikka"`
+| `String`, `s/Str`, `Keyword`, `s/Keyword`      | string | `"kikka"`
 | `Boolean`                   | boolean | `true`
 | `nil`, `s/Any`              | void |
 | `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`, consumes also without millis: `"2014-02-18T18:25:37Z"`
