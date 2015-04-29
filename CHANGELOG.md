@@ -1,4 +1,4 @@
-## x.xx.x
+## 0.20.2
 
 - add `:type "object"` to Swagger 2.0 Definitions, requested by [Ron](https://github.com/webron).
 - in `ring.swagger.middleware`: middlewares can publish swagger-data to request via `assoc-meta-to-request` & 
