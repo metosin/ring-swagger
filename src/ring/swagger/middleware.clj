@@ -11,11 +11,17 @@
 ;; middleware-based swagger parameters
 ;;
 
-(defn assoc-meta-to-request [request data]
-  (update-in request [::meta] deep-merge data))
+(defn deep-merge-swagger-data-to-request
+  "Deep-merges top-level swagger-data into a request.
+  Can be read with get-meta-from-request."
+  [request data]
+  (update-in request [::data] deep-merge data))
 
-(defn get-meta-from-request [request]
-  (::meta request))
+(defn get-swagger-data-from-request
+  "Reads top-level swagger-data from request, pushed in by
+  deep-merge-meta-to-request."
+  [request]
+  (::data request))
 
 ;;
 ;; common utilities

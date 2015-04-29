@@ -53,24 +53,23 @@
     ((mw3 identity) ..request..) => {:abba 3 :jabba 3}
     ((mw3 identity :abba 4 :jabba 4 :doo 4) ..request..) => {:abba 4 :jabba 4 :doo 4}))
 
-(fact "swagger-data by middlewares"
+(fact "publishing and reading swagger-data by middlewares"
   (let [request {:uri ..uri.., :request-method ..method..}]
 
     (fact "by default, no meta-data is attached"
-      (get-meta-from-request request) => nil)
+      (get-swagger-data-from-request request) => nil)
 
     (fact "middlwares can publish swagger-data to it"
       (let [enchanced
             (-> request
-                (assoc-meta-to-request
-                  {:formats {:produces [:json :edn]}})
-                (assoc-meta-to-request
-                  {:formats {:consumes [:json :edn]}}))]
+                (deep-merge-swagger-data-to-request
+                  {:produces [:json :edn]})
+                (deep-merge-swagger-data-to-request
+                  {:consumes [:json :edn]}))]
 
         enchanced => (contains request)
 
         (fact "meta-data can be extracted from request"
-          (get-meta-from-request enchanced)
-          => {:formats {:produces [:json :edn]
-                        :consumes [:json :edn]}})))))
-
+          (get-swagger-data-from-request enchanced)
+          => {:produces [:json :edn]
+              :consumes [:json :edn]})))))
