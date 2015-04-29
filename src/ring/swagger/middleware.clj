@@ -1,10 +1,25 @@
 (ns ring.swagger.middleware
   (:require [slingshot.slingshot :refer [try+ throw+]]
             [schema.utils :as su]
+            [ring.swagger.common :refer [deep-merge]]
             [plumbing.core :refer [for-map]]
             [clojure.walk :refer :all]
             [ring.util.http-response :refer [bad-request]])
   (:import (schema.utils ValidationError)))
+
+;;
+;; middleware-based swagger parameters
+;;
+
+(defn assoc-meta-to-request [request data]
+  (update-in request [::meta] deep-merge data))
+
+(defn get-meta-from-request [request]
+  (::meta request))
+
+;;
+;; common utilities
+;;
 
 (defn comp-mw [mw & base-params]
   (fn [handler & params]
