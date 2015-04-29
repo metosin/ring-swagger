@@ -56,20 +56,34 @@
 (fact "publishing and reading swagger-data by middlewares"
   (let [request {:uri ..uri.., :request-method ..method..}]
 
-    (fact "by default, no meta-data is attached"
-      (get-swagger-data-from-request request) => nil)
+    (fact "by default, no swagger-data is attached"
+      (get-swagger-data request) => nil)
 
-    (fact "middlwares can publish swagger-data to it"
+    (fact "middlwares can attach swagger-data to request"
       (let [enchanced
             (-> request
-                (deep-merge-swagger-data-to-request
+                (deep-merge-swagger-data
                   {:produces [:json :edn]})
-                (deep-merge-swagger-data-to-request
+                (deep-merge-swagger-data
                   {:consumes [:json :edn]}))]
 
-        enchanced => (contains request)
+        (fact "original request is preserved"
+          enchanced => (contains request))
 
-        (fact "meta-data can be extracted from request"
-          (get-swagger-data-from-request enchanced)
+        (fact "swagger-data can be extracted from request"
+          (get-swagger-data enchanced)
+          => {:produces [:json :edn]
+              :consumes [:json :edn]})))
+
+    (fact "wrap-swagger-data"
+      (let [enchanced
+            ((wrap-swagger-data identity {:produces [:json :edn]
+                                          :consumes [:json :edn]}) request)]
+
+        (fact "original request is preserved"
+          enchanced => (contains request))
+
+        (fact "swagger-data can be extracted from request"
+          (get-swagger-data enchanced)
           => {:produces [:json :edn]
               :consumes [:json :edn]})))))
