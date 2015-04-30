@@ -5,6 +5,11 @@
   - middlewares can publish swagger-data to request via `deep-merge-swagger-data`.
   - clients can extract data with `get-swagger-data`.
   - `wrap-swagger-data` middleware to easy swagger-data publishing.
+- updated dependencies:
+
+```clojure
+[prismatic/schema "0.4.2"] is available but we use "0.4.1"
+```
 
 ## 0.20.1 (26.4.2015)
 
