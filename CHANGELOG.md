@@ -1,4 +1,4 @@
-## 0.20.2
+## 0.20.2 (2.5.2014)
 
 - add `:type "object"` to Swagger 2.0 Definitions, requested by [Ron](https://github.com/webron).
 - Middlewares can define extra swagger data, set into a request, read out by swagger-docs
