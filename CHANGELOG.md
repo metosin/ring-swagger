@@ -1,10 +1,9 @@
 ## 0.20.2
 
 - add `:type "object"` to Swagger 2.0 Definitions, requested by [Ron](https://github.com/webron).
-- in `ring.swagger.middleware`:
-  - middlewares can publish swagger-data to request via `deep-merge-swagger-data`.
-  - clients can extract data with `get-swagger-data`.
-  - `wrap-swagger-data` middleware to easy swagger-data publishing.
+- Middlewares can define extra swagger data, set into a request, read out by swagger-docs
+  - setting data via `set-swagger-data`, reading data via `get-swagger-data`.
+  - `wrap-swagger-data` middleware for easy publishing of swagger-data.
 - updated dependencies:
 
 ```clojure

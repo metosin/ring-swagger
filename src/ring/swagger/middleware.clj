@@ -11,15 +11,18 @@
 ;; middleware-based swagger parameters
 ;;
 
-(defn deep-merge-swagger-data
-  "Deep-merges top-level swagger-data into a request.
-  Can be read with get-swagger-data."
-  [request data]
-  (update-in request [::data] deep-merge data))
+(defn set-swagger-data
+  "Sets extra top-level swagger-data into a request.
+  By default, deep-merges gives data in. Data
+  can be read with get-swagger-data."
+  ([request data]
+   (set-swagger-data request deep-merge data))
+  ([request f & data]
+   (update-in request [::data] (partial apply f) data)))
 
 (defn get-swagger-data
   "Reads top-level swagger-data from request, pushed in by
-  deep-merge-swagger-data."
+  set-swagger-data."
   [request]
   (::data request))
 
@@ -27,7 +30,7 @@
   "Middleware that adds top level swagger-data into request."
   [handler data]
   (fn [request]
-    (handler (deep-merge-swagger-data request data))))
+    (handler (set-swagger-data request data))))
 
 ;;
 ;; common utilities
