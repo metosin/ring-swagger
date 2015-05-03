@@ -64,11 +64,11 @@
   [handler & [{:keys [error-handler catch-core-errors?]}]]
   (let [error-handler (or error-handler default-error-handler)]
     (fn [request]
-    (try+
-      (handler request)
-      (catch [:type :schema.core/error] validation-error
-        (if catch-core-errors?
-          (error-handler validation-error)
-          (throw+ validation-error)))
-      (catch [:type :ring.swagger.schema/validation] error-container
-        (error-handler error-container))))))
+      (try+
+        (handler request)
+        (catch [:type :schema.core/error] validation-error
+          (if catch-core-errors?
+            (error-handler validation-error)
+            (throw+ validation-error)))
+        (catch [:type :ring.swagger.schema/validation] error-container
+          (error-handler error-container))))))
