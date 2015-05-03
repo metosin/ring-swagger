@@ -4,9 +4,7 @@
             [schema.utils :as su]
             [potemkin :refer [import-vars]]
             [slingshot.slingshot :refer [throw+]]
-            [org.tobereplaced.lettercase :as lc]
             [ring.swagger.common :refer :all]
-            [ring.swagger.impl :refer :all]
             [ring.swagger.coerce :as coerce]
             ring.swagger.json-schema))
 

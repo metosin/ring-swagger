@@ -1,7 +1,6 @@
 (ns ring.swagger.core
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
-            [ring.swagger.impl :refer :all]
             [ring.util.http-response :as r]
             [schema.core :as s]
             [plumbing.core :refer :all]
@@ -13,6 +12,19 @@
             [schema-tools.walk :as stw]
             [org.tobereplaced.lettercase :as lc])
   (:import (clojure.lang IMapEntry)))
+
+;;
+;; Helpers
+;;
+
+(defn required-keys [schema]
+  (filterv s/required-key? (keys schema)))
+
+(defn strict-schema
+  "removes open keys from schema"
+  [schema]
+  {:pre [(map? schema)]}
+  (dissoc schema s/Keyword))
 
 ;;
 ;; Models

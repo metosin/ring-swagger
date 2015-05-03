@@ -1,12 +1,11 @@
 (ns ring.swagger.swagger2
   (:require [clojure.string :as str]
-            [ring.swagger.impl :refer :all]
             [schema.core :as s]
             [plumbing.core :refer [for-map fn->]]
             ring.swagger.json
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
-            [ring.swagger.core :refer [with-named-sub-schemas collect-models peek-schema]]
+            [ring.swagger.core :as rsc]
             [ring.swagger.swagger2-schema :as schema]
             [instar.core :as instar]))
 
@@ -62,7 +61,7 @@
 (defn transform [schema]
   (let [properties (->properties schema)
         additional-properties (->additional-properties schema)
-        required (->> (required-keys schema)
+        required (->> (rsc/required-keys schema)
                       (filter (partial contains? properties))
                       seq)]
     (remove-empty-keys
@@ -73,7 +72,7 @@
 
 (defn transform-models [schemas]
   (->> schemas
-       collect-models
+       rsc/collect-models
        (map (juxt (comp str key) (comp transform val)))
        (into {})))
 
@@ -84,7 +83,7 @@
 (defmulti ^:private extract-parameter first)
 
 (defmethod extract-parameter :body [[_ model]]
-  (if-let [schema (peek-schema model)]
+  (if-let [schema (rsc/peek-schema model)]
     (let [schema-json (->json model)]
       (vector {:in :body
                :name (name (s/schema-name schema))
@@ -94,7 +93,7 @@
 
 (defmethod extract-parameter :default [[type model]]
   (if model
-    (for [[k v] (-> model value-of strict-schema)
+    (for [[k v] (-> model value-of rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
                 json-schema (->json v)]
@@ -165,9 +164,9 @@
   [swagger]
   (-> swagger
       (instar/transform
-        [:paths * * :parameters :body] #(with-named-sub-schemas % "Body"))
+        [:paths * * :parameters :body] #(rsc/with-named-sub-schemas % "Body"))
       (instar/transform
-        [:paths * * :responses * :schema] #(with-named-sub-schemas % "Response"))))
+        [:paths * * :responses * :schema] #(rsc/with-named-sub-schemas % "Response"))))
 
 ;;
 ;; Schema

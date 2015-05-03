@@ -7,6 +7,13 @@
             [flatland.ordered.map :refer :all]))
 
 ;;
+;; Helpers
+;;
+
+(fact "scrict-schema strips open keys"
+  (strict-schema {s/Keyword s/Any :s String}) => {:s String})
+
+;;
 ;; Schemas
 ;;
 
