@@ -1,3 +1,11 @@
+## 0.20.3
+
+- updated deps:
+
+```clojure
+[prismatic/plumbing "0.4.3"] is available but we use "0.4.2"
+```
+
 ## 0.20.2 (2.5.2014)
 
 - add `:type "object"` to Swagger 2.0 Definitions, requested by [Ron](https://github.com/webron).
