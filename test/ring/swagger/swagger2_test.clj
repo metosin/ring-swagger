@@ -237,7 +237,14 @@
   (let [model1 (s/schema-with-name {:id s/Str} 'Kikka)
         model2 (s/schema-with-name {:id s/Int} 'Kikka)
         swagger {:paths {"/body" {:post {:parameters {:body {:1 model1, :2 model2}}}}}}]
-    (validate swagger) => (throws IllegalArgumentException)))
+
+    (fact "with default options"
+      (validate swagger)
+      => (throws IllegalArgumentException))
+
+    (fact "with overriden options"
+      (validate swagger {:duplicate-schema-fn (constantly nil)})
+      => nil)))
 
 (defn has-definition [schema-name value]
   (chatty-checker [actual]
