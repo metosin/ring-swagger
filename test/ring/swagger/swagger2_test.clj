@@ -240,11 +240,11 @@
 
     (fact "with default options"
       (validate swagger)
-      => (throws IllegalArgumentException))
+      => nil)
 
     (fact "with overriden options"
-      (validate swagger {:duplicate-schema-fn (constantly nil)})
-      => nil)))
+      (validate swagger {:maybe-duplicate-schema-fn ring.swagger.core/fail-on-duplicate-schema!})
+      => (throws IllegalArgumentException))))
 
 (defn has-definition [schema-name value]
   (chatty-checker [actual]

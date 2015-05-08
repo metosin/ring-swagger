@@ -1,6 +1,7 @@
 ## 0.20.3
 
 - new option `:duplicate-schema-fn` to handle duplicates schemas.
+  - **breaking**: default behaviour is "do nothing".
 - updated deps:
 
 ```clojure

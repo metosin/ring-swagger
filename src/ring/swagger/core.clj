@@ -100,33 +100,35 @@
        :properties (jsons/properties schema)
        :required required})))
 
-
-(defn fail-on-duplicate-schema! [existing-schema schema]
-  (let [schema-name (s/schema-name existing-schema)]
-    (throw
-      (IllegalArgumentException.
-        (str
-          "Looks like you're trying to define two models with the same name ("
-          schema-name "), but different properties: " existing-schema " & " schema ". "
-          "There is no way to create valid api docs with this setup. Root cause "
-          " may be that you have defined multiple schemas with same name or you "
-          "have created copies of the scehmas with clojure.core fn's like "
-          "\"select-keys\". Please check out schema-tools.core -transformers.")))))
+; FIXME: custom predicates & regexps don't work
+(defn fail-on-duplicate-schema!
+  [existing-schema schema]
+  (when-not (= schema existing-schema)
+    (let [schema-name (s/schema-name existing-schema)]
+      (throw
+        (IllegalArgumentException.
+          (str
+            "Looks like you're trying to define two models with the same name ("
+            schema-name "), but different properties: " existing-schema " & " schema ". "
+            "There is no way to create valid api docs with this setup. Root cause "
+            " may be that you have defined multiple schemas with same name or you "
+            "have created copies of the scehmas with clojure.core fn's like "
+            "\"select-keys\". Please check out schema-tools.core -transformers."))))))
 
 ;; NOTE: silently ignores non-map schemas
 (defn collect-models
   "Walks through the data structure and collects all Schema names. Handles
   duplicate entries with side-effecting duplicate-schema-fn"
   ([x] (collect-models x fail-on-duplicate-schema!))
-  ([x duplicate-schema-fn]
+  ([x maybe-duplicate-schema-fn]
    (let [schemas (atom {})]
      (walk/prewalk
        (fn [x]
          (when-let [schema-name (and (plain-map? x) (s/schema-name x))]
            (let [existing-schema (@schemas schema-name)
                  schema (if (var? x) @x x)]
-             (when (and existing-schema (not= existing-schema schema))
-               (duplicate-schema-fn existing-schema schema))
+             (when existing-schema
+               (maybe-duplicate-schema-fn existing-schema schema))
              (swap! schemas assoc schema-name schema)))
          x)
        x)

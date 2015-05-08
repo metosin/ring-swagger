@@ -72,7 +72,7 @@
 
 (defn transform-models
   [schemas]
-  (->> (rsc/collect-models schemas (:duplicate-schema-fn *options*))
+  (->> (rsc/collect-models schemas (:maybe-duplicate-schema-fn *options*))
        (map (juxt (comp str key) (comp transform val)))
        (into {})))
 
@@ -186,12 +186,12 @@
 
 (def Options {(s/optional-key :ignore-missing-mappings?) s/Bool
               (s/optional-key :default-response-description-fn) (s/=> s/Str s/Int)
-              (s/optional-key :duplicate-schema-fn) s/Any})
+              (s/optional-key :maybe-duplicate-schema-fn) s/Any})
 
 (def option-defaults
   (s/validate Options {:ignore-missing-mappings? false
                        :default-response-description-fn (constantly "")
-                       :duplicate-schema-fn rsc/fail-on-duplicate-schema!}))
+                       :maybe-duplicate-schema-fn (constantly nil)}))
 
 (s/defn swagger-json
   "Produces swagger-json output from ring-swagger spec.
@@ -204,7 +204,7 @@
    :default-response-description-fn ((constantly \"\")) - a fn to generate
    default response descriptions from http status code
 
-   :duplicate-schema-fn (ring.swagger.core/fail-on-duplicate-schema!) -
+   :maybe-duplicate-schema-fn (constantly nil) -
    a function to handle possible duplicate schema definitions."
   ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
   ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
