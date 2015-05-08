@@ -1,5 +1,6 @@
 ## 0.20.3
 
+- new option `:duplicate-schema-fn` to handle duplicates schemas.
 - updated deps:
 
 ```clojure
