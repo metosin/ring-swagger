@@ -6,6 +6,7 @@
 
 ```clojure
 [prismatic/plumbing "0.4.3"] is available but we use "0.4.2"
+[lein-ring "0.9.4"] is available but we use "0.9.3"
 ```
 
 ## 0.20.2 (2.5.2014)
