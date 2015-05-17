@@ -143,8 +143,7 @@
           "have created copies of the scehmas with clojure.core fn's like "
           "\"select-keys\". Please check out schema-tools.core -transformers.")))))
 
-(defn handle-duplicate-schemas
-  [f schemas]
+(defn handle-duplicate-schemas [f schemas]
   (into
     (empty schemas)
     (for [[k v] schemas]
