@@ -4,9 +4,8 @@
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
-            [ring.swagger.core :refer [with-named-sub-schemas]]
-            [ring.swagger.swagger2 :refer :all]
-            [flatland.ordered.map :refer :all]))
+            [ring.swagger.core :as rsc]
+            [ring.swagger.swagger2 :refer :all]))
 
 ;;
 ;; Schemas
@@ -112,7 +111,7 @@
       (s/defschema Nested {:id s/Str
                            :address {:country (s/enum :fi :pl)
                                      :street {:name s/Str}}})
-      (transform-models [(with-named-sub-schemas Nested)] +options+)
+      (transform-models [(rsc/with-named-sub-schemas Nested)] +options+)
 
       =>
 
@@ -140,7 +139,7 @@
 
       (keys
         (transform-models
-          [(with-named-sub-schemas ReturnValue)]
+          [(rsc/with-named-sub-schemas ReturnValue)]
           +options+)) => ["Boundary" "ReturnValue"])))
 
 (s/defschema Query {:id Long (s/optional-key :q) String})
