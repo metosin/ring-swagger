@@ -1,7 +1,8 @@
 ## 0.20.3
 
-- new option `:duplicate-schema-fn` to handle duplicates schemas.
-  - **breaking**: default behaviour is "do nothing".
+- new option `:handle-duplicate-schemas-fn` to handle duplicates schemas.
+  - **breaking**: default behaviour is "take the first definition" instead of `IllegalArgumentException` 
+  (the code was broken, did not work with anonymous predicate schemas & regexps.
 - updated deps:
 
 ```clojure
