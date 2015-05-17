@@ -11,6 +11,7 @@
             [ring.swagger.json-schema :as jsons]
             [schema-tools.walk :as stw]
             [flatland.ordered.set :as os]
+            [clojure.string :as string]
             [org.tobereplaced.lettercase :as lc])
   (:import (clojure.lang IMapEntry)))
 
@@ -134,12 +135,11 @@
       (IllegalArgumentException.
         (str
           "Looks like you're trying to define two models with the same name ("
-          schema-name "), but different values:\n\n"
-          (map (fn [[i v]] (str i ": " v "\n\n")) (zipmap (range) values)) "."
-          "There is no way to create valid api docs with this setup. Root cause "
-          " may be that you have defined multiple schemas with same name or you "
-          "have created copies of the scehmas with clojure.core fn's like "
-          "\"select-keys\". Please check out schema-tools.core -transformers.")))))
+          schema-name "), but different values:\n\n" (string/join "\n\n" values) "\n\n"
+          "There is no way to create valid api docs with this setup. You may have
+          multiple namespaces defining same Schema names or you have created copies"
+          "of the scehmas with clojure.core fn's like \"select-keys\". Please check"
+          "out schema-tools.core -transformers.")))))
 
 (defn handle-duplicate-schemas [f schemas]
   (into
