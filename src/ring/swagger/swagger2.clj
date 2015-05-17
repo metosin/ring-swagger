@@ -17,12 +17,6 @@
 (def Nothing {})
 
 ;;
-;; Rendering options
-;;
-
-(def ^{:private true :dynamic true} *options* {})
-
-;;
 ;; 2.0 Json Schema changes
 ;;
 
@@ -109,21 +103,21 @@
 (defn- default-response-description
   "uses option :default-response-description-fn to generate
    a default response description for status code"
-  [status]
-  (if-let [generator (:default-response-description-fn *options*)]
+  [status options]
+  (if-let [generator (:default-response-description-fn options)]
     (generator status)
     ""))
 
 (defn convert-parameters [parameters]
   (into [] (mapcat extract-parameter parameters)))
 
-(defn convert-responses [responses]
+(defn convert-responses [responses options]
   (let [responses (for-map [[k v] responses
                             :let [{:keys [schema headers]} v]]
                     k (-> v
                           (cond-> schema (update-in [:schema] ->json))
                           (cond-> headers (update-in [:headers] ->properties))
-                          (update-in [:description] #(or % (default-response-description k)))
+                          (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]
     (if-not (empty? responses)
       responses
@@ -133,11 +127,11 @@
   "Returns a map with methods as keys and the Operation
    maps with parameters and responses transformed to comply
    with Swagger spec as values"
-  [operation]
+  [operation options]
   (for-map [[k v] operation]
     k (-> v
           (update-in-or-remove-key [:parameters] convert-parameters empty?)
-          (update-in [:responses] convert-responses))))
+          (update-in [:responses] convert-responses options))))
 
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
@@ -148,7 +142,7 @@
                    (reduce-kv (fn [acc k v]
                                 (assoc acc
                                   (swagger-path k)
-                                  (transform-operation v))) {}))
+                                  (transform-operation v options))) {}))
         definitions (-> swagger
                         extract-models
                         (transform-models options))]
@@ -213,8 +207,7 @@
   ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
   ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
     (let [options (merge option-defaults options)]
-      (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))
-                *options* options]
+      (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
         (let [[paths definitions] (-> swagger
                                       ensure-body-and-response-schema-names
                                       (extract-paths-and-definitions options))]
