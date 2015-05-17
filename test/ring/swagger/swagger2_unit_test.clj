@@ -12,18 +12,18 @@
 ;; Schemas
 ;;
 
-(s/defschema Tag {(s/optional-key :id)   (field s/Int {:description "Unique identifier for the tag"})
+(s/defschema Tag {(s/optional-key :id) (field s/Int {:description "Unique identifier for the tag"})
                   (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
 
-(s/defschema Category {(s/optional-key :id)   (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
+(s/defschema Category {(s/optional-key :id) (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
                        (s/optional-key :name) (field s/Str {:description "Name of the category"})})
 
-(s/defschema Pet {:id                         (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
-                  :name                       (field s/Str {:description "Friendly name of the pet"})
-                  (s/optional-key :category)  (field Category {:description "Category the pet is in"})
+(s/defschema Pet {:id (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
+                  :name (field s/Str {:description "Friendly name of the pet"})
+                  (s/optional-key :category) (field Category {:description "Category the pet is in"})
                   (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
-                  (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
-                  (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
+                  (s/optional-key :tags) (field [Tag] {:description "Tags assigned to this pet"})
+                  (s/optional-key :status) (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
 
 (s/defschema PetError {:message String s/Keyword s/Any})
 
@@ -166,43 +166,43 @@
 
   (fact "all parameter types can be converted"
     (convert-parameters
-      {:body     Pet
-       :query    Query
-       :path     Path
-       :header   {:h String}
-       :formData {:f Integer}}) => [{:name       "Pet"
-                                     :in          :body
+      {:body Pet
+       :query Query
+       :path Path
+       :header {:h String}
+       :formData {:f Integer}}) => [{:name "Pet"
+                                     :in :body
                                      :description ""
-                                     :required    true
-                                     :schema      {:$ref "#/definitions/Pet"}}
-                                    {:name        "id"
-                                     :in          :query
+                                     :required true
+                                     :schema {:$ref "#/definitions/Pet"}}
+                                    {:name "id"
+                                     :in :query
                                      :description ""
-                                     :required    true
-                                     :type        "integer"
-                                     :format      "int64"}
-                                    {:name        "q"
-                                     :in          :query
+                                     :required true
+                                     :type "integer"
+                                     :format "int64"}
+                                    {:name "q"
+                                     :in :query
                                      :description ""
-                                     :required    false
-                                     :type        "string"}
-                                    {:name        "p"
-                                     :in          :path
+                                     :required false
+                                     :type "string"}
+                                    {:name "p"
+                                     :in :path
                                      :description ""
-                                     :required    true
-                                     :type        "integer"
-                                     :format      "int64"}
-                                    {:name        "h"
-                                     :in          :header
+                                     :required true
+                                     :type "integer"
+                                     :format "int64"}
+                                    {:name "h"
+                                     :in :header
                                      :description ""
-                                     :required    true
-                                     :type        "string"}
-                                    {:name        "f"
-                                     :in          :formData
+                                     :required true
+                                     :type "string"}
+                                    {:name "f"
+                                     :in :formData
                                      :description ""
-                                     :required    true
-                                     :type        "integer"
-                                     :format      "int32"}])
+                                     :required true
+                                     :type "integer"
+                                     :format "int32"}])
 
   (fact "anonymous schemas can be used with ..."
 
@@ -234,7 +234,7 @@
          :description ""
          :in :body
          :required true
-         :schema {:type  "array"
+         :schema {:type "array"
                   :items {:$ref "#/definitions/Body"}}}])
 
   (fact "Set body parameters"
@@ -245,9 +245,9 @@
          :description ""
          :in :body
          :required true
-         :schema {:type        "array"
+         :schema {:type "array"
                   :uniqueItems true
-                  :items       {:$ref "#/definitions/Body"}}}])
+                  :items {:$ref "#/definitions/Body"}}}])
 
   (fact "Body param with desc"
     (convert-parameters {:body (describe Body "foo")})
@@ -269,34 +269,34 @@
 (fact "ensure-named-top-level-models"
 
   (let [[paths definitions] (extract-paths-and-definitions
-                             (ensure-body-and-response-schema-names
-                              {:paths {"/api" {:post {:parameters {:body {:foo s/Str}}
-                                                      :responses  {200 {:description "ok"
-                                                                        :schema [{:bar Long}]}}}}}})
-                             +options+)]
+                              (ensure-body-and-response-schema-names
+                                {:paths {"/api" {:post {:parameters {:body {:foo s/Str}}
+                                                        :responses {200 {:description "ok"
+                                                                         :schema [{:bar Long}]}}}}}})
+                              +options+)]
 
     (fact "anonymous map as body parameter is named and refers to correct definition"
-      (let [body-schema-ref  (-> paths
-                                 (get-in ["/api" :post :parameters])
-                                 first
-                                 (get-in [:schema :$ref]))
+      (let [body-schema-ref (-> paths
+                                (get-in ["/api" :post :parameters])
+                                first
+                                (get-in [:schema :$ref]))
             body-schema-name (last (re-find #"\#\/definitions\/(.+)$" body-schema-ref))]
         (get definitions body-schema-name))
 
       => {:type "object"
           :properties {:foo {:type "string"}}
-          :required   [:foo]})
+          :required [:foo]})
 
     (fact "array of anonymous map as response model is named and refers to correct definition"
-      (let [response-schema-ref  (-> paths
-                                     (get-in ["/api" :post :responses 200 :schema :items :$ref]))
+      (let [response-schema-ref (-> paths
+                                    (get-in ["/api" :post :responses 200 :schema :items :$ref]))
             response-schema-name (last (re-find #"\#\/definitions\/(.+)$" response-schema-ref))]
         (get definitions response-schema-name))
 
       => {:type "object"
           :properties {:bar {:type "integer"
                              :format "int64"}}
-          :required   [:bar]})))
+          :required [:bar]})))
 
 ;; ;;
 ;; ;; Helpers
@@ -336,109 +336,109 @@
 
 (facts "swagger json"
   (fact "without parameters"
-    (swagger-json {}) => {:swagger     "2.0"
-                          :info        {:title "Swagger API"
-                                        :version "0.0.1"}
-                          :produces    ["application/json"]
-                          :consumes    ["application/json"]
-                          :paths       {}
+    (swagger-json {}) => {:swagger "2.0"
+                          :info {:title "Swagger API"
+                                 :version "0.0.1"}
+                          :produces ["application/json"]
+                          :consumes ["application/json"]
+                          :paths {}
                           :definitions {}})
 
   (fact "full api"
     (swagger-json
-      {:swagger  "2.0"
-       :info     {:version ..version..
-                  :title ..title..
-                  :description ..description1..
-                  :termsOfService ..terms..
-                  :contact {:name ..name1..
-                            :url ..url1..
-                            :email ..email1..}
-                  :license {:name ..name2..
-                            :url  ..url2..}
-                  :x-kikka ..kikka..}
+      {:swagger "2.0"
+       :info {:version ..version..
+              :title ..title..
+              :description ..description1..
+              :termsOfService ..terms..
+              :contact {:name ..name1..
+                        :url ..url1..
+                        :email ..email1..}
+              :license {:name ..name2..
+                        :url ..url2..}
+              :x-kikka ..kikka..}
        :basePath ..basepath..
        :consumes ["application/json" "application/edn"]
        :produces ["application/json" "application/edn"]
-       :paths    {"/api/path/:id" {:get {:tags         [:tag1 :tag2 :tag3]
-                                         :summary      ..summary1..
-                                         :description  ..description2..
-                                         :externalDocs {:url ..url3..
-                                                        :description ..description3..}
-                                         :operationId  ..operationid..
-                                         :consumes     ["application/xyz"]
-                                         :produces     ["application/xyz"]
-                                         :parameters   {:path {:id Integer}}
-                                         :responses    {200 {:description "ok"
-                                                             :schema Pet}
-                                                        404 {:description "fail"
-                                                             :schema PetError}}}}}})
-    => {:swagger     "2.0"
-        :info        {:version        ..version..
-                      :title          ..title..
-                      :description    ..description1..
-                      :termsOfService ..terms..
-                      :contact        {:name ..name1..
-                                       :url  ..url1..
-                                       :email ..email1..}
-                      :license        {:name ..name2..
-                                       :url ..url2..}
-                      :x-kikka        ..kikka..}
-        :basePath    ..basepath..
-        :consumes    ["application/json" "application/edn"]
-        :produces    ["application/json" "application/edn"]
-        :paths       {"/api/path/{id}" {:get {:tags [:tag1 :tag2 :tag3]
-                                              :summary ..summary1..
-                                              :description ..description2..
-                                              :externalDocs {:url ..url3..
-                                                             :description ..description3..}
-                                              :operationId  ..operationid..
-                                              :consumes     ["application/xyz"]
-                                              :produces     ["application/xyz"]
-                                              :parameters   [{:in          :path
-                                                              :name        "id"
-                                                              :description ""
-                                                              :required    true
-                                                              :type        "integer"
-                                                              :format      "int32"}]
-                                              :responses    {200 {:description "ok"
-                                                                  :schema {:$ref "#/definitions/Pet"}}
-                                                             404 {:description "fail"
-                                                                  :schema {:$ref "#/definitions/PetError"}}}}}}
-        :definitions {"Pet"      {:type "object"
-                                  :required   [:id :name]
-                                  :properties {:id        {:type        "integer"
-                                                           :format      "int64"
-                                                           :description "Unique identifier for the Pet"
-                                                           :minimum     "0.0"
-                                                           :maximum     "100.0"}
-                                               :name      {:type        "string"
-                                                           :description "Friendly name of the pet"}
-                                               :category  {:$ref        "#/definitions/Category"
-                                                           :description "Category the pet is in"}
-                                               :photoUrls {:type        "array"
-                                                           :items       {:type "string"}
-                                                           :description "Image URLs"}
-                                               :tags      {:type        "array"
-                                                           :items       {:$ref "#/definitions/Tag"}
-                                                           :description "Tags assigned to this pet"}
-                                               :status    {:enum        [:pending :sold :available]
-                                                           :type        "string"
-                                                           :description "pet status in the store"}}}
+       :paths {"/api/path/:id" {:get {:tags [:tag1 :tag2 :tag3]
+                                      :summary ..summary1..
+                                      :description ..description2..
+                                      :externalDocs {:url ..url3..
+                                                     :description ..description3..}
+                                      :operationId ..operationid..
+                                      :consumes ["application/xyz"]
+                                      :produces ["application/xyz"]
+                                      :parameters {:path {:id Integer}}
+                                      :responses {200 {:description "ok"
+                                                       :schema Pet}
+                                                  404 {:description "fail"
+                                                       :schema PetError}}}}}})
+    => {:swagger "2.0"
+        :info {:version ..version..
+               :title ..title..
+               :description ..description1..
+               :termsOfService ..terms..
+               :contact {:name ..name1..
+                         :url ..url1..
+                         :email ..email1..}
+               :license {:name ..name2..
+                         :url ..url2..}
+               :x-kikka ..kikka..}
+        :basePath ..basepath..
+        :consumes ["application/json" "application/edn"]
+        :produces ["application/json" "application/edn"]
+        :paths {"/api/path/{id}" {:get {:tags [:tag1 :tag2 :tag3]
+                                        :summary ..summary1..
+                                        :description ..description2..
+                                        :externalDocs {:url ..url3..
+                                                       :description ..description3..}
+                                        :operationId ..operationid..
+                                        :consumes ["application/xyz"]
+                                        :produces ["application/xyz"]
+                                        :parameters [{:in :path
+                                                      :name "id"
+                                                      :description ""
+                                                      :required true
+                                                      :type "integer"
+                                                      :format "int32"}]
+                                        :responses {200 {:description "ok"
+                                                         :schema {:$ref "#/definitions/Pet"}}
+                                                    404 {:description "fail"
+                                                         :schema {:$ref "#/definitions/PetError"}}}}}}
+        :definitions {"Pet" {:type "object"
+                             :required [:id :name]
+                             :properties {:id {:type "integer"
+                                               :format "int64"
+                                               :description "Unique identifier for the Pet"
+                                               :minimum "0.0"
+                                               :maximum "100.0"}
+                                          :name {:type "string"
+                                                 :description "Friendly name of the pet"}
+                                          :category {:$ref "#/definitions/Category"
+                                                     :description "Category the pet is in"}
+                                          :photoUrls {:type "array"
+                                                      :items {:type "string"}
+                                                      :description "Image URLs"}
+                                          :tags {:type "array"
+                                                 :items {:$ref "#/definitions/Tag"}
+                                                 :description "Tags assigned to this pet"}
+                                          :status {:enum [:pending :sold :available]
+                                                   :type "string"
+                                                   :description "pet status in the store"}}}
                       "Category" {:type "object"
-                                  :properties {:id   {:type        "integer"
-                                                      :format      "int64"
-                                                      :description "Category unique identifier"
-                                                      :minimum     "0.0"
-                                                      :maximum     "100.0"}
-                                               :name {:type        "string"
+                                  :properties {:id {:type "integer"
+                                                    :format "int64"
+                                                    :description "Category unique identifier"
+                                                    :minimum "0.0"
+                                                    :maximum "100.0"}
+                                               :name {:type "string"
                                                       :description "Name of the category"}}}
-                      "Tag"      {:type "object"
-                                  :properties {:id   {:type        "integer"
-                                                      :format      "int64"
-                                                      :description "Unique identifier for the tag"}
-                                               :name {:type        "string"
-                                                      :description "Friendly name for the tag"}}}
+                      "Tag" {:type "object"
+                             :properties {:id {:type "integer"
+                                               :format "int64"
+                                               :description "Unique identifier for the tag"}
+                                          :name {:type "string"
+                                                 :description "Friendly name for the tag"}}}
                       "PetError" {:type "object"
                                   :properties {:message {:type "string"}}
                                   :required [:message]}}}))
