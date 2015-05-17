@@ -70,11 +70,10 @@
        :additionalProperties additional-properties
        :required required})))
 
-(defn transform-models
-  [schemas]
+(defn transform-models [schemas options]
   (->> schemas
        rsc/collect-models
-       (rsc/handle-duplicate-schemas (:handle-duplicate-schemas-fn *options*))
+       (rsc/handle-duplicate-schemas (:handle-duplicate-schemas-fn options))
        (map (juxt (comp str key) (comp transform val)))
        (into {})))
 
@@ -143,16 +142,16 @@
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
 
-(defn extract-paths-and-definitions [swagger]
+(defn extract-paths-and-definitions [swagger options]
   (let [paths (->> swagger
                    :paths
                    (reduce-kv (fn [acc k v]
                                 (assoc acc
                                   (swagger-path k)
                                   (transform-operation v))) {}))
-        definitions (->> swagger
-                         extract-models
-                         transform-models)]
+        definitions (-> swagger
+                        extract-models
+                        (transform-models options))]
     [paths definitions]))
 
 ;;
@@ -215,7 +214,7 @@
                 *options* options]
         (let [[paths definitions] (-> swagger
                                       ensure-body-and-response-schema-names
-                                      extract-paths-and-definitions)]
+                                      (extract-paths-and-definitions options))]
           (deep-merge
             swagger-defaults
             (-> swagger

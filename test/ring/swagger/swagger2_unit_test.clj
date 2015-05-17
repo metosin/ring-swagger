@@ -42,6 +42,8 @@
 
 (def ordered-schema-order (keys OrderedSchema))
 
+(def +options+ option-defaults)
+
 ;;
 ;; Excepcted JSON Schemas
 ;;
@@ -99,25 +101,25 @@
   {:sub {:foo Long}})
 
 (fact "transform-models"
-  (transform-models [Pet]) => {"Pet" Pet'
-                               "Tag" Tag'
-                               "Category" Category'}
+  (transform-models [Pet] +options+) => {"Pet" Pet'
+                                         "Tag" Tag'
+                                         "Category" Category'}
 
   (s/defschema Foo (s/enum :a :b))
   (s/defschema Bar {:key Foo})
   (s/defschema Baz s/Keyword)
 
   (fact "record-schemas are not transformed"
-    (transform-models [Foo]) => {})
+    (transform-models [Foo] +options+) => {})
 
   (fact "non-map schemas are not transformed"
-    (transform-models [Baz]) => {})
+    (transform-models [Baz] +options+) => {})
 
   (fact "nested record-schemas are inlined"
-    (transform-models [Bar]) => {"Bar" {:type "object"
-                                        :properties {:key {:enum [:b :a]
-                                                           :type "string"}}
-                                        :required [:key]}})
+    (transform-models [Bar] +options+) => {"Bar" {:type "object"
+                                                  :properties {:key {:enum [:b :a]
+                                                                     :type "string"}}
+                                                  :required [:key]}})
 
   (fact "nested schemas"
 
@@ -125,7 +127,7 @@
       (s/defschema Nested {:id s/Str
                            :address {:country (s/enum :fi :pl)
                                      :street {:name s/Str}}})
-      (transform-models [(with-named-sub-schemas Nested)])
+      (transform-models [(with-named-sub-schemas Nested)] +options+)
 
       =>
 
@@ -153,7 +155,8 @@
 
       (keys
         (transform-models
-          [(with-named-sub-schemas ReturnValue)])) => ["Boundary" "ReturnValue"])))
+          [(with-named-sub-schemas ReturnValue)]
+          +options+)) => ["Boundary" "ReturnValue"])))
 
 (s/defschema Query {:id Long (s/optional-key :q) String})
 (s/defschema Path {:p Long})
@@ -269,7 +272,8 @@
                              (ensure-body-and-response-schema-names
                               {:paths {"/api" {:post {:parameters {:body {:foo s/Str}}
                                                       :responses  {200 {:description "ok"
-                                                                        :schema [{:bar Long}]}}}}}}))]
+                                                                        :schema [{:bar Long}]}}}}}})
+                             +options+)]
 
     (fact "anonymous map as body parameter is named and refers to correct definition"
       (let [body-schema-ref  (-> paths
@@ -318,7 +322,7 @@
 (s/defschema Bar {:foo (s/maybe #'Foo)})
 
 (fact "recursive"
-  (transform-models [Foo Bar])
+  (transform-models [Foo Bar] +options+)
   => {"Bar" {:type "object"
              :properties {:foo {:$ref "#/definitions/Foo"}}
              :required [:foo]}

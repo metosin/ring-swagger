@@ -148,7 +148,7 @@
   (into
     (empty schemas)
     (for [[k v] schemas]
-      ((or f ignore-duplicate-schemas) k v))))
+      (f k v))))
 
 ;;
 ;; transformers
