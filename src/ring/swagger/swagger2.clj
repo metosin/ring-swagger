@@ -1,7 +1,7 @@
 (ns ring.swagger.swagger2
   (:require [clojure.string :as str]
             [schema.core :as s]
-            [plumbing.core :refer [for-map fn->]]
+            [plumbing.core :refer [for-map]]
             ring.swagger.json
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
@@ -75,7 +75,7 @@
        rsc/collect-models
        (rsc/handle-duplicate-schemas (:handle-duplicate-schemas-fn options))
        (map (juxt (comp str key) (comp transform val)))
-       (into {})))
+       (into (sorted-map))))
 
 ;;
 ;; Paths, parameters, responses

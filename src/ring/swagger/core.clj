@@ -123,13 +123,11 @@
 ;; duplicates
 ;;
 
-(defn ignore-duplicate-schemas
-  [schema-name values]
+(defn ignore-duplicate-schemas [schema-name values]
   [schema-name (first values)])
 
 ; FIXME: custom predicates & regexps don't work
-(defn fail-on-duplicate-schema!
-  [schema-name values]
+(defn fail-on-duplicate-schema! [schema-name values]
   (if-not (seq (rest values))
     [schema-name (first values)]
     (throw
