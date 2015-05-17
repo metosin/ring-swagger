@@ -242,7 +242,7 @@
       => nil)
 
     (fact "with overriden options"
-      (validate swagger {:maybe-duplicate-schema-fn ring.swagger.core/fail-on-duplicate-schema!})
+      (validate swagger {:handle-duplicate-schemas-fn ring.swagger.core/fail-on-duplicate-schema!})
       => (throws IllegalArgumentException))))
 
 (defn has-definition [schema-name value]

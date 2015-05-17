@@ -10,6 +10,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [schema-tools.walk :as stw]
+            [flatland.ordered.set :as os]
             [org.tobereplaced.lettercase :as lc])
   (:import (clojure.lang IMapEntry)))
 
@@ -100,43 +101,63 @@
        :properties (jsons/properties schema)
        :required required})))
 
-; FIXME: custom predicates & regexps don't work
-(defn fail-on-duplicate-schema!
-  [existing-schema schema]
-  (when-not (= schema existing-schema)
-    (let [schema-name (s/schema-name existing-schema)]
-      (throw
-        (IllegalArgumentException.
-          (str
-            "Looks like you're trying to define two models with the same name ("
-            schema-name "), but different properties: " existing-schema " & " schema ". "
-            "There is no way to create valid api docs with this setup. Root cause "
-            " may be that you have defined multiple schemas with same name or you "
-            "have created copies of the scehmas with clojure.core fn's like "
-            "\"select-keys\". Please check out schema-tools.core -transformers."))))))
-
 ;; NOTE: silently ignores non-map schemas
 (defn collect-models
-  "Walks through the data structure and collects all Schema names. Handles
-  duplicate entries with side-effecting duplicate-schema-fn"
-  ([x] (collect-models x fail-on-duplicate-schema!))
-  ([x maybe-duplicate-schema-fn]
-   (let [schemas (atom {})]
-     (walk/prewalk
-       (fn [x]
-         (when-let [schema-name (and (plain-map? x) (s/schema-name x))]
-           (let [existing-schema (@schemas schema-name)
-                 schema (if (var? x) @x x)]
-             (when existing-schema
-               (maybe-duplicate-schema-fn existing-schema schema))
-             (swap! schemas assoc schema-name schema)))
-         x)
-       x)
-     @schemas)))
+  "Walks through the data structure and collects all Schemas
+  into a map schema-name->#{values}. Note: schame-name can link
+  to sevetal implementations."
+  [x]
+  (let [schemas (atom {})]
+    (walk/prewalk
+      (fn [x]
+        (when-let [schema-name (and (plain-map? x) (s/schema-name x))]
+          (let [schema (if (var? x) @x x)]
+            (swap!
+              schemas update-in [schema-name]
+              (fn [x] (conj (or x (os/ordered-set)) schema)))))
+        x)
+      x)
+    @schemas))
+
+;;
+;; duplicates
+;;
+
+(defn ignore-duplicate-schemas
+  [schema-name values]
+  [schema-name (first values)])
+
+; FIXME: custom predicates & regexps don't work
+(defn fail-on-duplicate-schema!
+  [schema-name values]
+  (if-not (seq (rest values))
+    [schema-name (first values)]
+    (throw
+      (IllegalArgumentException.
+        (str
+          "Looks like you're trying to define two models with the same name ("
+          schema-name "), but different values:\n\n"
+          (map (fn [[i v]] (str i ": " v "\n\n")) (zipmap (range) values)) "."
+          "There is no way to create valid api docs with this setup. Root cause "
+          " may be that you have defined multiple schemas with same name or you "
+          "have created copies of the scehmas with clojure.core fn's like "
+          "\"select-keys\". Please check out schema-tools.core -transformers.")))))
+
+(defn handle-duplicate-schemas
+  [f schemas]
+  (into
+    (empty schemas)
+    (for [[k v] schemas]
+      ((or f ignore-duplicate-schemas) k v))))
+
+;;
+;; transformers
+;;
 
 (defn transform-models [schemas]
   (->> schemas
        collect-models
+       (handle-duplicate-schemas ignore-duplicate-schemas)
        (map (juxt key (comp transform val)))
        (into {})))
 
