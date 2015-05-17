@@ -27,21 +27,6 @@
 
 (s/defschema PetError {:message String s/Keyword s/Any})
 
-(s/defschema OrderedSchema (ordered-map
-                             :id Long
-                             :hot Boolean
-                             :tag (s/enum :kikka :kukka)
-                             :chief [{:name String
-                                      :type #{{:id String}}}]
-                             :a String
-                             :b String
-                             :c String
-                             :d String
-                             :e String
-                             :f String))
-
-(def ordered-schema-order (keys OrderedSchema))
-
 (def +options+ option-defaults)
 
 ;;
