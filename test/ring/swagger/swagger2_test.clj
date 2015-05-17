@@ -119,7 +119,6 @@
                                             :responses {200 {:description "ok"
                                                              :schema {:sum Long}}
                                                         :default {:description "error"}}}}}}]
-
     (validate swagger) => nil))
 
 (defrecord InvalidElement [])

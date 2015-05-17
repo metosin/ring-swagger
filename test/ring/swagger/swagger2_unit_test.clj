@@ -456,6 +456,3 @@
         => {:type "object"
             :properties {:a {:type "string"}}
             :required [:a]}))))
-
-
-
