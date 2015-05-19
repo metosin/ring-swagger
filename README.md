@@ -65,17 +65,17 @@ Route definitions as expected as a clojure Map defined by the [Schema](https://g
                       :url "http://www.metosin.fi"}
             :license {:name "Eclipse Public License"
                       :url "http://www.eclipse.org/legal/epl-v10.html"}}
-            :tags [{:name "user"
-                   :description "User stuff"}]
-            :paths {"/api/ping" {:get nil}
-                    "/user/:id" {:post {:summary "User Api"
-                                        :description "User Api description"
-                                        :tags ["user"]
-                                        :parameters {:path {:id s/Str}
-                                                     :body User}
-                                        :responses {200 {:schema User
-                                                         :description "Found it!"}
-                                                    404 {:description "Ohnoes."}}}}}}))
+     :tags [{:name "user"
+             :description "User stuff"}]
+     :paths {"/api/ping" {:get nil}
+             "/user/:id" {:post {:summary "User Api"
+                                  :description "User Api description"
+                                  :tags ["user"]
+                                  :parameters {:path {:id s/Str}
+                                               :body User}
+                                  :responses {200 {:schema User
+                                                   :description "Found it!"}
+                                              404 {:description "Ohnoes."}}}}}}))
 ; {:swagger "2.0"
 ;  :info {:version "1.0.0"
 ;         :title "Sausages"
@@ -86,33 +86,37 @@ Route definitions as expected as a clojure Map defined by the [Schema](https://g
 ;                   :url "http://www.metosin.fi"}
 ;         :license {:name "Eclipse Public License"
 ;                   :url "http://www.eclipse.org/legal/epl-v10.html"}}
-;  :produces ["application/json"]
+;  :tags [{:description "User stuff" :name "user"}]
 ;  :consumes ["application/json"]
-;  :paths {"/api/ping" {:get {:responses {:default {:description ""}}}}
-;          "/user/{id}" {:post {:parameters [{:type "string"
+;  :produces ["application/json"]
+;  :definitions {"User" {:type "object"
+;                        :properties {:address {:$ref "#/definitions/UserAddress"}
+;                                     :id {:type "string"}
+;                                     :name {:type "string"}}
+;                        :required (:id :name :address)}
+;                "UserAddress" {:type "object"
+;                               :properties {:city {:enum (:tre :hki)
+;                                                   :type "string"}
+;                                            :street {:type "string"}}
+;                               :required (:street :city)}}
+;   :paths {"/api/ping" {:get {:responses {:default {:description ""}}}}
+;          "/user/{id}" {:post {:description "User Api description"
+;                               :summary "User Api"
+;                               :tags ["user"]
+;                               :parameters [{:description ""
 ;                                             :in :path
 ;                                             :name "id"
-;                                             :description ""
-;                                             :required true}
-;                                            {:in :body
+;                                             :required true
+;                                             :type "string"}
+;                                            {:description ""
+;                                             :in :body
 ;                                             :name "User"
-;                                             :description ""
 ;                                             :required true
 ;                                             :schema {:$ref "#/definitions/User"}}]
-;                               :summary "User Api"
-;                               :description "User Api description"
-;                               :responses {200 {:schema {:$ref "#/definitions/User"}
-;                                                :description "User or not."}
-;                                           404 {:description "Ohnoes."}}}}}
-;  :definitions {"User" {:properties {:id {:type "string"}
-;                                     :name {:type "string"}
-;                                     :address {:$ref "#/definitions/UserAddress"}}
-;                        :required [:id :name :address]}
-;                "UserAddress" {:properties {:street {:type "string"}
-;                                            :city {:enum (:tre :hki)
-;                                                   :type "string"}}
-;                               :required [:street :city]}}}
-```
+;                               :responses {200 {:description "Found it!"
+;                                                :schema {:$ref "#/definitions/User"}}
+;                                           404 {:description "Ohnoes."}}}}}}
+ ```
 
 ### validating the results
 
