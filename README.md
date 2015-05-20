@@ -172,7 +172,7 @@ The generated full spec can be validated against the [Swagger JSON Schema](https
 (validator (rs/swagger-json {:paths {"/api/ping" {:get nil}}}))
 ; nil
 
-validator (rs/swagger-json {:pathz {"/api/ping" {:get nil}}}))
+(validator (rs/swagger-json {:pathz {"/api/ping" {:get nil}}}))
 ; ({:level "error"
 ;   :schema {:loadingURI "#", :pointer ""}
 ;   :instance {:pointer ""}
