@@ -118,6 +118,45 @@ Route definitions as expected as a clojure Map defined by the [Schema](https://g
 ;                                           404 {:description "Ohnoes."}}}}}}
  ```
 
+### Customizing Swagger Spec output
+
+One can pass extra options-map as a third parameter to `swagger-json`. The following options are available:
+
+```clojure
+ :ignore-missing-mappings?        - (false) boolean whether to silently ignore
+                                    missing schema to json-schema mappings.
+
+ :default-response-description-fn - ((constantly \"\")) - a fn to generate default
+                                    response descriptions from http status code.
+                                    Takes a status code (Int) and returns a String.
+
+ :handle-duplicate-schemas-fn     - (ring.swagger.core/ignore-duplicate-schemas),
+                                    a function to handle possible duplicate schema
+                                    definitions. Takes schema-name and set of found
+                                    attached schema values as parameters. Returns
+                                    sequence of schema-name and selected schema value.
+```
+
+For example, to get default response descriptions from the [HTTP Spec](http://en.wikipedia.org/wiki/List_of_HTTP_status_codes), you can do the following:
+
+```clojure
+(require '[ring.util.http-status :as status])
+
+(rs/swagger-json
+  {:paths {"/hello" {:post {:responses {200 nil
+                                        425 nil
+                                        500 {:description "FAIL"}}}}}}
+  {:default-response-description-fn #(get-in status/status [% :description])})
+; {:swagger "2.0"
+;  :info {:title "Swagger API" :version "0.0.1"}
+;  :consumes ["application/json"]
+;  :produces ["application/json"]
+;  :definitions {}
+;  :paths {"/hello" {:post {:responses {200 {:description "OK"}
+;                                       425 {:description "The collection is unordered."}
+;                                       500 {:description "FAIL"}}}}}}
+```
+
 ### validating the results
 
 The generated full spec can be validated against the [Swagger JSON Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json) via tools like [scjsv](https://github.com/metosin/scjsv).
