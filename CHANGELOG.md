@@ -4,6 +4,7 @@
 
 ```clojure
 [metosin/schema-tools "0.4.1"] is available but we use "0.4.0"
+[metosin/ring-http-response "0.6.2"] is available but we use "0.6.1"
 ```
 
 ## 0.20.3

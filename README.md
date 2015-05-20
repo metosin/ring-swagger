@@ -148,7 +148,7 @@ For example, to get default response descriptions from the [HTTP Spec](http://en
   {:paths {"/hello" {:post {:responses {200 nil
                                         425 nil
                                         500 {:description "FAIL"}}}}}}
-  {:default-response-description-fn #(get-in status/status [% :description])})
+  {:default-response-description-fn status/get-description})
 
 ; {:swagger "2.0"
 ;  :info {:title "Swagger API" :version "0.0.1"}

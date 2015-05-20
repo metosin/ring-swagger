@@ -161,7 +161,7 @@
                         500 {:description "FAIL"}}}}}}))
 
     (fact ":default-response-description-fn option overriden"
-      (let [options {:default-response-description-fn #(get-in status/status [% :description])}]
+      (let [options {:default-response-description-fn status/get-description}]
         (validate swagger options) => nil
 
         (swagger-json swagger options)
