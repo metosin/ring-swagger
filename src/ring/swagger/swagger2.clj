@@ -194,7 +194,10 @@
    the following options with defaults:
 
    :ignore-missing-mappings?        - (false) boolean whether to silently ignore
-                                      missing schema to json-schema mappings.
+                                      missing schema to JSON Schema mappings. if
+                                      set to true, IllegalArgumentException is
+                                      thrown if a Schema can't be presented as
+                                      JSON Schema.
 
    :default-response-description-fn - ((constantly \"\")) - a fn to generate default
                                       response descriptions from http status code.
