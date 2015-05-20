@@ -160,7 +160,7 @@ For example, to get default response descriptions from the [HTTP Spec](http://en
 ;                                       500 {:description "FAIL"}}}}}}
 ```
 
-### validating the results
+### Validating the Swagger Spec
 
 The generated full spec can be validated against the [Swagger JSON Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json) via tools like [scjsv](https://github.com/metosin/scjsv).
 
