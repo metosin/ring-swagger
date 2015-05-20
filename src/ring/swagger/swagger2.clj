@@ -193,17 +193,18 @@
    Optional second argument is a options map, supporting
    the following options with defaults:
 
-   :ignore-missing-mappings? (false) - boolean whether to silently ignore
-   missing schema to json-schema mappings.
+   :ignore-missing-mappings?        - (false) boolean whether to silently ignore
+                                      missing schema to json-schema mappings.
 
-   :default-response-description-fn ((constantly \"\")) - a fn to generate
-   default response descriptions from http status code. Takes a status code (Int)
-   and returns a String.
+   :default-response-description-fn - ((constantly \"\")) - a fn to generate default
+                                      response descriptions from http status code.
+                                      Takes a status code (Int) and returns a String.
 
-   :handle-duplicate-schemas-fn (ring.swagger.core/ignore-duplicate-schemas) -
-   a function to handle possible duplicate schema definitions. Takes schema-name
-   and set of found attached schema values as parameters. Returns sequence of
-   schema-name and selected schema value."
+   :handle-duplicate-schemas-fn     - (ring.swagger.core/ignore-duplicate-schemas),
+                                      a function to handle possible duplicate schema
+                                      definitions. Takes schema-name and set of found
+                                      attached schema values as parameters. Returns
+                                      sequence of schema-name and selected schema value."
   ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
   ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
     (let [options (merge option-defaults options)]
