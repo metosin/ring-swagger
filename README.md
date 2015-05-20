@@ -33,6 +33,7 @@ Route definitions as expected as a clojure Map defined by the [Schema](https://g
 (require '[ring.swagger.swagger2 :as rs])
 
 (rs/swagger-json nil)
+
 ; {:swagger "2.0"
 ;  :info {:title "Swagger API"
 ;          :version "0.0.1"}
@@ -76,6 +77,7 @@ Route definitions as expected as a clojure Map defined by the [Schema](https://g
                                   :responses {200 {:schema User
                                                    :description "Found it!"}
                                               404 {:description "Ohnoes."}}}}}}))
+
 ; {:swagger "2.0"
 ;  :info {:version "1.0.0"
 ;         :title "Sausages"
@@ -147,6 +149,7 @@ For example, to get default response descriptions from the [HTTP Spec](http://en
                                         425 nil
                                         500 {:description "FAIL"}}}}}}
   {:default-response-description-fn #(get-in status/status [% :description])})
+
 ; {:swagger "2.0"
 ;  :info {:title "Swagger API" :version "0.0.1"}
 ;  :consumes ["application/json"]
