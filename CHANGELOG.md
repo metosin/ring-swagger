@@ -1,3 +1,11 @@
+## 
+
+- updated dependencies:
+
+```clojure
+[metosin/schema-tools "0.4.1"] is available but we use "0.4.0"
+```
+
 ## 0.20.3
 
 - new option `:handle-duplicate-schemas-fn` to handle duplicates schemas.
