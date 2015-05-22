@@ -2,6 +2,7 @@
 
 [Swagger](http://swagger.io/) implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema) for data modeling. 
 
+- [API Docs](http://metosin.github.io/ring-swagger/doc/)
 - Supports both 1.2 and 2.0 Swagger Specs
 - For web developers
   - Extendable Schema-&gt;JSON Mappings with out-of-the-box support for most common types

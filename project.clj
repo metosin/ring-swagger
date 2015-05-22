@@ -19,12 +19,17 @@
                  [instar "1.0.10" :exclusions [org.clojure/clojure com.keminglabs/cljx org.clojure/clojurescript]]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-ring "0.9.4"]
-                             [lein-midje "3.1.3"]]
+                             [lein-midje "3.1.3"]
+                             [funcool/codeina "0.1.0"]]
                    :dependencies [[midje "1.7.0-SNAPSHOT"]
                                   [ring-mock "0.1.5"]
                                   [metosin/scjsv "0.2.0"]
                                   [metosin/ring-swagger-ui "2.0.24"]
                                   [javax.servlet/servlet-api "2.5"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha4"]]}}
+  :codeina {:sources ["src"]
+            :output-dir "gh-pages/doc"
+            :src-dir-uri "http://github.com/metosin/ring-swagger/blob/master/"
+            :src-linenum-anchor-prefix "L" }
   :aliases {"all" ["with-profile" "dev:dev,1.7"]
             "test-ancient" ["midje"]})

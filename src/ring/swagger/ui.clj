@@ -25,9 +25,10 @@
    default is to serve swagger-ui at \"/\".
 
    Other options can be given using keyword-value pairs.
-   :root - the root prefix to get resources from. Default 'swagger-ui'
-   :swagger-docs - the endpoint to get swagger data from. Default '/swagger.json'
-   :oauth2 - map with oauth2 params, namely :client-id, :realm and :app-name"
+
+   - **:root** the root prefix to get resources from. Default 'swagger-ui'
+   - **:swagger-docs** the endpoint to get swagger data from. Default '/swagger.json'
+   - **:oauth2** map with oauth2 params, namely `:client-id`, `:realm` and `:app-name`"
   [& params]
   (let [[path kvs] (if (string? (first params))
                      [(first params) (rest params)]
