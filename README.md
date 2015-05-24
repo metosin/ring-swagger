@@ -2,6 +2,7 @@
 
 [Swagger](http://swagger.io/) implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema) for data modeling. 
 
+- [API Docs](http://metosin.github.io/ring-swagger/doc/)
 - Supports both 1.2 and 2.0 Swagger Specs
 - For web developers
   - Extendable Schema-&gt;JSON Mappings with out-of-the-box support for most common types
@@ -24,6 +25,7 @@
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 - [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
+- [yada](https://github.com/juxt/yada)
 
 Route definitions as expected as a clojure Map defined by the [Schema](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema is open as ring-swagger tries not to be on your way - one can always pass any extra data in the Swagger Spec format.
 
