@@ -164,7 +164,7 @@
     route))
 
 ;;
-;; Named top level schemas in body parameters and responses
+;; Transforming the spec
 ;;
 
 (defn transform-paths
