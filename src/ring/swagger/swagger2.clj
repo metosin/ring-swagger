@@ -195,7 +195,7 @@
 
    :ignore-missing-mappings?        - (false) boolean whether to silently ignore
                                       missing schema to JSON Schema mappings. if
-                                      set to true, IllegalArgumentException is
+                                      set to false, IllegalArgumentException is
                                       thrown if a Schema can't be presented as
                                       JSON Schema.
 
