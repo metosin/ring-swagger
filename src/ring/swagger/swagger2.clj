@@ -6,8 +6,7 @@
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.core :as rsc]
-            [ring.swagger.swagger2-schema :as schema]
-            [instar.core :as instar]))
+            [ring.swagger.swagger2-schema :as schema]))
 
 ;;
 ;; Support Schemas
@@ -148,20 +147,50 @@
                         (transform-models options))]
     [paths definitions]))
 
+(defn ensure-body-sub-schemas [route]
+  (if (get-in route [:parameters :body])
+    (update-in route [:parameters :body] #(rsc/with-named-sub-schemas % "Body"))
+    route))
+
+(defn ensure-response-sub-schemas [route]
+  (if-let [responses (get-in route [:responses])]
+    (let [schema-codes (reduce (fn [acc [k {:keys [schema]}]]
+                                 (if schema (conj acc k) acc))
+                               [] responses)
+          transformed (reduce (fn [acc code]
+                                (update-in acc [:responses code :schema] #(rsc/with-named-sub-schemas % "Response")))
+                              route schema-codes)]
+      transformed)
+    route))
+
 ;;
 ;; Named top level schemas in body parameters and responses
 ;;
+
+(defn transform-paths
+  "Transforms the :paths of a Ring Swagger spec by applying (f endpoint)
+  to all endpoints. If the function returns nil, the given route is removed,
+  otherwise return value of the function call is used as a new value for the
+  route."
+  [f swagger]
+  (let [transformed (for [[path endpoints] (:paths swagger)
+                          [method endpoint] endpoints
+                          :let [endpoint (f endpoint)]]
+                      [[path method] endpoint])
+        paths (reduce (fn [acc [kv endpoint]]
+                        (if endpoint
+                          (assoc-in acc kv endpoint)
+                          acc)) {} transformed)]
+    (assoc-in swagger [:paths] paths)))
 
 (defn ensure-body-and-response-schema-names
   "Takes a ring-swagger spec and returns a new version
    with a generated names for all anonymous nested schemas
    that come as body parameters or response models."
   [swagger]
-  (-> swagger
-      (instar/transform
-        [:paths * * :parameters :body] #(rsc/with-named-sub-schemas % "Body"))
-      (instar/transform
-        [:paths * * :responses * :schema] #(rsc/with-named-sub-schemas % "Response"))))
+  (->> swagger
+       (transform-paths ensure-body-sub-schemas)
+       (transform-paths ensure-response-sub-schemas)))
 
 ;;
 ;; Schema

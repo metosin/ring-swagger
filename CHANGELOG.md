@@ -9,6 +9,12 @@
 [prismatic/plumbing "0.4.4"] is available but we use "0.4.3"
 ```
 
+- removed dependency:
+
+```
+[instar "1.0.10" :exclusions [org.clojure/clojure com.keminglabs/cljx org.clojure/clojurescript]]]
+```
+
 ## 0.20.3
 
 - new option `:handle-duplicate-schemas-fn` to handle duplicates schemas.
