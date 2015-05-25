@@ -15,7 +15,7 @@
 [instar "1.0.10" :exclusions [org.clojure/clojure com.keminglabs/cljx org.clojure/clojurescript]]]
 ```
 
-## 0.20.3
+## 0.20.3 (17.5.2015)
 
 - new option `:handle-duplicate-schemas-fn` to handle duplicates schemas.
   - **breaking**: default behaviour is "take the first definition" instead of `IllegalArgumentException` 
@@ -27,7 +27,7 @@
 [lein-ring "0.9.4"] is available but we use "0.9.3"
 ```
 
-## 0.20.2 (2.5.2014)
+## 0.20.2 (2.5.2015)
 
 - add `:type "object"` to Swagger 2.0 Definitions, requested by [Ron](https://github.com/webron).
 - Middlewares can define extra swagger data, set into a request, read out by swagger-docs
