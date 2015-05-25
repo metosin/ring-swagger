@@ -1,5 +1,6 @@
-## 0.20.4
+## 0.20.4 (25.5.2015)
 
+- `ring.swagger.swagger2/transform-paths` for generic endpoint tranformations.
 - updated dependencies:
 
 ```clojure
