@@ -61,6 +61,9 @@
     (fact "s/named -> type of schema"
       (->json (s/named Long "long"))  => (->json Long))
 
+    (fact "s/one -> type of schema"
+      (->json [(s/one Long "s")])  => (->json [Long]))
+
     (fact "s/recursive -> type of internal schema"
       (->json (s/recursive #'Model))  => (->json #'Model))
 

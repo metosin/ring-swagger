@@ -214,6 +214,7 @@ As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schem
 | `(s/both X Y Z)`       | *type of X*
 | `(s/either X Y Z)`     | *type of X*
 | `(s/named X name)`     | *type of X*
+| `(s/one X name)`       | *type of X*
 | `(s/recursive Var)`    | *Ref to (model) Var*
 | `(s/eq X)`    | *type of class of X*
 | `(s/optional-key X)`    | *optional key*

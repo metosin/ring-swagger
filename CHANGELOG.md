@@ -1,3 +1,7 @@
+## 0.20.5
+
+- support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).
+
 ## 0.20.4 (25.5.2015)
 
 - `ring.swagger.swagger2/transform-paths` for generic endpoint tranformations.
