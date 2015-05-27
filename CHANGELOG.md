@@ -1,6 +1,11 @@
 ## 0.20.5
 
 - support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).
+- updated dependencies:
+
+```clojure
+[metosin/schema-tools "0.4.2"] is available but we use "0.4.1"
+```
 
 ## 0.20.4 (25.5.2015)
 
