@@ -67,11 +67,13 @@
 ;; Collections
 (defmethod json-type clojure.lang.Sequential [e]
   {:type "array"
-   :items (json-type (first e))})
+   :items (json-type (first e))
+   :collectionFormat "multi"})
 (defmethod json-type clojure.lang.IPersistentSet [e]
   {:type "array"
    :uniqueItems true
-   :items (json-type (first e))})
+   :items (json-type (first e))
+   :collectionFormat "multi"})
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
