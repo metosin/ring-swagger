@@ -1,6 +1,8 @@
 (ns ring.swagger.coerce
   (:require [schema.core :as s]
             [schema.coerce :as sc]
+            [clojure.string :as string]
+            [ring.swagger.json-schema :as js]
             [clj-time.format :as tf]
             [clj-time.coerce :as tc]
             [ring.swagger.common :refer :all])
@@ -79,6 +81,62 @@
                       Boolean string->boolean
                       s/Uuid string->uuid})
 
+;;
+;; Query params
+;;
+
+(defrecord SplitParams [type split coll]
+  schema.core.Schema
+  (walker [this]
+    (let [sub-walker (s/subschema-walker coll)]
+      (fn [x]
+        (if (schema.utils/error? x)
+          x
+          (sub-walker x)))))
+  (explain [this] (cons 'params coll)))
+
+(defmethod js/json-type SplitParams [x]
+  (merge {:collectionFormat (:type x)}
+         (js/json-type (:coll x))))
+
+(defn split-params-matcher [schema]
+  (if (instance? SplitParams schema)
+    (fn [x]
+      (if (string? x)
+        (string/split x (:split schema))
+        x))))
+
+(defrecord MultiParams [coll]
+  schema.core.Schema
+  (walker [this]
+    (let [sub-walker (s/subschema-walker coll)]
+      (fn [x]
+        (if (schema.utils/error? x)
+          x
+          (sub-walker x)))))
+  (explain [this] (cons 'params coll)))
+
+(defmethod js/json-type MultiParams [x]
+  (merge {:collectionFormat "multi"}
+         (js/json-type (:coll x))))
+
+(defn multi-params-matcher
+  "If only one parameter is provided to multi param, ring
+   doesn't wrap the param is collection."
+  [schema]
+  ; Default
+  (if (or (and (coll? schema) (not (record? schema))) (instance? MultiParams schema))
+    (fn [x]
+      (if-not (coll? x)
+        [x]
+        x))))
+
+(defn csv-params [coll] (->SplitParams "csv" #"," coll))
+(defn ssv-params [coll] (->SplitParams "ssv" #" " coll))
+(defn tsv-params [coll] (->SplitParams "tsv" #"\\t" coll))
+(defn pipe-params [coll] (->SplitParams "pipes" #"\|" coll))
+(defn multi-params [coll] (->MultiParams coll))
+
 (defn json-schema-coercion-matcher
   [schema]
   (or (json-coersions schema)
@@ -91,6 +149,8 @@
 (defn query-schema-coercion-matcher
   [schema]
   (or (query-coercions schema)
+      (multi-params-matcher schema)
+      (split-params-matcher schema)
       (json-schema-coercion-matcher schema)))
 
 ;;
