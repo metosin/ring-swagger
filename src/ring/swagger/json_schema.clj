@@ -79,6 +79,10 @@
 (defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
 (defmethod json-type java.util.regex.Pattern [e] {:type "string" :format "regex"})
 
+(defmethod json-type :default [e]
+  (if-not *ignore-missing-mappings*
+    (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
+
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class
 (def predicate-to-class {integer? java.lang.Long
@@ -142,20 +146,20 @@
   clojure.lang.Sequential
   (json-property [e]
     {:type "array"
-     :items (json-type (first e))})
+     :items (->json (first e))})
   (json-parameter [e]
     {:type "array"
-     :items (json-type (first e))})
+     :items (->json (first e))})
 
   clojure.lang.IPersistentSet
   (json-property [e]
     {:type "array"
      :uniqueItems true
-     :items (json-type (first e))})
+     :items (->json (first e))})
   (json-parameter [e]
     {:type "array"
      :uniqueItems true
-     :items (json-type (first e))})
+     :items (->json (first e))})
 
   clojure.lang.IPersistentMap
   (json-property [e]
