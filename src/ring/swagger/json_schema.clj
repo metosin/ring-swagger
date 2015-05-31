@@ -36,7 +36,11 @@
 ;; Describe Java and Clojure classes and Schemas as Json schema
 ;;
 
-(declare json-type)
+(defmulti json-type identity)
+
+(defprotocol JsonSchema
+  (json-property [this])
+  (json-parameter [this]))
 
 (defn ensure-swagger12-top [schema]
   (if (or false (= *swagger-spec-version* "1.2"))
@@ -52,26 +56,14 @@
   (if-let [json (if top
                   (if-let [schema-name (s/schema-name x)]
                     {:type schema-name}
-                    (or (ensure-swagger12-top (json-type x)) {:type "void"}))
-                  (json-type x))]
+                    (or (ensure-swagger12-top (if (instance? Class x)
+                                                (json-type x)
+                                                (json-property x)))
+                        {:type "void"}))
+                  (if (instance? Class x)
+                    (json-type x)
+                    (json-property x)))]
     (merge json (json-schema-meta x))))
-
-(defmulti json-type
-  (fn [e]
-    (if (instance? Class e)
-      e
-      (class e))))
-
-(defmethod json-type nil [_] {:type "void"})
-
-;; Collections
-(defmethod json-type clojure.lang.Sequential [e]
-  {:type "array"
-   :items (json-type (first e))})
-(defmethod json-type clojure.lang.IPersistentSet [e]
-  {:type "array"
-   :uniqueItems true
-   :items (json-type (first e))})
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
@@ -85,10 +77,7 @@
 (defmethod json-type java.util.Date          [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.DateTime  [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
-(defmethod json-type java.util.regex.Pattern [e]
-  (if (instance? java.util.regex.Pattern e)
-    {:type "string" :pattern (str e)}
-    {:type "string" :format "regex"}))
+(defmethod json-type java.util.regex.Pattern [e] {:type "string" :format "regex"})
 
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class
@@ -96,24 +85,109 @@
                          keyword? clojure.lang.Keyword
                          symbol?  clojure.lang.Symbol})
 
-(defmethod json-type schema.core.Predicate      [e] (if-let [c (predicate-to-class (:p? e))] (->json c)))
-(defmethod json-type schema.core.EnumSchema     [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
-(defmethod json-type schema.core.Maybe          [e] (->json (:schema e)))
-(defmethod json-type schema.core.Both           [e] (->json (first (:schemas e))))
-(defmethod json-type schema.core.Either         [e] (->json (first (:schemas e))))
-(defmethod json-type schema.core.Recursive      [e] (->json (:derefable e)))
-(defmethod json-type schema.core.EqSchema       [e] (->json (class (:v e))))
-(defmethod json-type schema.core.NamedSchema    [e] (->json (:schema e)))
-(defmethod json-type schema.core.One            [e] (->json (:schema e)))
-(defmethod json-type schema.core.AnythingSchema [_] nil)
+(extend-protocol JsonSchema
+  Object
+  (json-property [e] (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
+  (json-parameter [e] (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
 
-(defmethod json-type :default [e]
-  (if-let [schema-name (s/schema-name e)]
-    (case *swagger-spec-version*
-      "1.2" {:$ref schema-name}
-      "2.0" {:$ref (str "#/definitions/" schema-name)})
-    (and (not *ignore-missing-mappings*)
-         (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+  nil
+  (json-property [_] {:type "void"})
+  (json-parameter [_] {:type "void"})
+
+  schema.core.Predicate
+  (json-property [e] (some-> e :p? predicate-to-class ->json))
+  (json-parameter [e] (some-> e :p? predicate-to-class ->json))
+
+  schema.core.EnumSchema
+  (json-property [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+  (json-parameter [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+
+  schema.core.Maybe
+  (json-property [e] (->json (:schema e)))
+  (json-parameter [e] (->json (:schema e)))
+
+  schema.core.Both
+  (json-property [e] (->json (first (:schemas e))))
+  (json-parameter [e] (->json (first (:schemas e))))
+
+  schema.core.Either
+  (json-property [e] (->json (first (:schemas e))))
+  (json-parameter [e] (->json (first (:schemas e))))
+
+  schema.core.Recursive
+  (json-property [e] (->json (:derefable e)))
+  (json-parameter [e] (->json (:derefable e)))
+
+  schema.core.EqSchema
+  (json-property [e] (->json (class (:v e))))
+  (json-parameter [e] (->json (class (:v e))))
+
+  schema.core.NamedSchema
+  (json-property [e] (->json (:schema e)))
+  (json-parameter [e] (->json (:schema e)))
+
+  schema.core.One
+  (json-property [e] (->json (:schema e)))
+  (json-parameter [e] (->json (:schema e)))
+
+  schema.core.AnythingSchema
+  (json-property [_] nil)
+  (json-parameter [_] nil)
+
+  java.util.regex.Pattern
+  (json-property [e] {:type "string" :pattern (str e)})
+  (json-parameter [e] {:type "string" :pattern (str e)})
+
+  ;; Collections
+  clojure.lang.Sequential
+  (json-property [e]
+    {:type "array"
+     :items (json-type (first e))})
+  (json-parameter [e]
+    {:type "array"
+     :items (json-type (first e))})
+
+  clojure.lang.IPersistentSet
+  (json-property [e]
+    {:type "array"
+     :uniqueItems true
+     :items (json-type (first e))})
+  (json-parameter [e]
+    {:type "array"
+     :uniqueItems true
+     :items (json-type (first e))})
+
+  clojure.lang.IPersistentMap
+  (json-property [e]
+    (if-let [schema-name (s/schema-name e)]
+      (case *swagger-spec-version*
+        "1.2" {:$ref schema-name}
+        "2.0" {:$ref (str "#/definitions/" schema-name)})
+      (and (not *ignore-missing-mappings*)
+           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+  (json-parameter [e]
+    (if-let [schema-name (s/schema-name e)]
+      (case *swagger-spec-version*
+        "1.2" {:$ref schema-name}
+        "2.0" {:$ref (str "#/definitions/" schema-name)})
+      (and (not *ignore-missing-mappings*)
+           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+
+  clojure.lang.Var
+  (json-property [e]
+    (if-let [schema-name (s/schema-name e)]
+      (case *swagger-spec-version*
+        "1.2" {:$ref schema-name}
+        "2.0" {:$ref (str "#/definitions/" schema-name)})
+      (and (not *ignore-missing-mappings*)
+           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+  (json-parameter [e]
+    (if-let [schema-name (s/schema-name e)]
+      (case *swagger-spec-version*
+        "1.2" {:$ref schema-name}
+        "2.0" {:$ref (str "#/definitions/" schema-name)})
+      (and (not *ignore-missing-mappings*)
+           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))))
 
 ;;
 ;; Schema -> Json Schema
