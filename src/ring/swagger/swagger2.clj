@@ -74,23 +74,23 @@
 ;; Paths, parameters, responses
 ;;
 
-(defmulti ^:private extract-parameter first)
+(defmulti ^:private extract-parameter (fn [[x] _] x))
 
-(defmethod extract-parameter :body [[_ model]]
+(defmethod extract-parameter :body [[_ model] options]
   (if-let [schema (rsc/peek-schema model)]
-    (let [schema-json (->json model)]
+    (let [schema-json (->json model options)]
       (vector {:in :body
                :name (name (s/schema-name schema))
-               :description (or (:description (->json schema)) "")
+               :description (or (:description (->json schema options)) "")
                :required true
                :schema (dissoc schema-json :description)}))))
 
-(defmethod extract-parameter :default [[type model]]
+(defmethod extract-parameter :default [[type model] options]
   (if model
     (for [[k v] (-> model value-of rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
-                json-schema (->json v)]
+                json-schema (->json v (assoc options ::jsons/type type))]
           :when json-schema]
       (merge
         {:in type
@@ -107,14 +107,16 @@
     (generator status)
     ""))
 
-(defn convert-parameters [parameters]
-  (into [] (mapcat extract-parameter parameters)))
+(defn convert-parameters
+  ([parameters] (convert-parameters parameters {}))
+  ([parameters options]
+   (into [] (mapcat #(extract-parameter % options) parameters))))
 
 (defn convert-responses [responses options]
   (let [responses (for-map [[k v] responses
                             :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] ->json))
+                          (cond-> schema (update-in [:schema] ->json options))
                           (cond-> headers (update-in [:headers] ->properties))
                           (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]
@@ -129,7 +131,7 @@
   [operation options]
   (for-map [[k v] operation]
     k (-> v
-          (update-in-or-remove-key [:parameters] convert-parameters empty?)
+          (update-in-or-remove-key [:parameters] #(convert-parameters % options) empty?)
           (update-in [:responses] convert-responses options))))
 
 (defn swagger-path [uri]
@@ -236,7 +238,9 @@
                                       a function to handle possible duplicate schema
                                       definitions. Takes schema-name and set of found
                                       attached schema values as parameters. Returns
-                                      sequence of schema-name and selected schema value."
+                                      sequence of schema-name and selected schema value.
+   :collection-format               - Sets the collectionFormat for query and formData
+                                      parameters."
   ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
   ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
     (let [options (merge option-defaults options)]
