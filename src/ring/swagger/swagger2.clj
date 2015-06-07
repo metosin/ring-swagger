@@ -85,6 +85,34 @@
                :required true
                :schema (dissoc schema-json :description)}))))
 
+(defmethod extract-parameter :query [[type model]]
+  (if model
+    (for [[k v] (-> model value-of rsc/strict-schema)
+          :when (s/specific-key? k)
+          :let [rk (s/explicit-schema-key k)
+                json-schema (->json v :type :parameter)]
+          :when json-schema]
+      (merge
+        {:in type
+         :name (name rk)
+         :description ""
+         :required (s/required-key? k)}
+        json-schema))))
+
+(defmethod extract-parameter :formData [[type model]]
+  (if model
+    (for [[k v] (-> model value-of rsc/strict-schema)
+          :when (s/specific-key? k)
+          :let [rk (s/explicit-schema-key k)
+                json-schema (->json v :type :parameter)]
+          :when json-schema]
+      (merge
+        {:in type
+         :name (name rk)
+         :description ""
+         :required (s/required-key? k)}
+        json-schema))))
+
 (defmethod extract-parameter :default [[type model]]
   (if model
     (for [[k v] (-> model value-of rsc/strict-schema)

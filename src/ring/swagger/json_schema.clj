@@ -51,19 +51,26 @@
       schema)
     schema))
 
+(defn ->json-schema [x & {:keys [type]
+                          :or {type :property}}]
+  (if (instance? Class x)
+    (json-type x)
+    (case type
+      :parameter (json-parameter x)
+      :property  (json-property x))))
+
 (defn ->json
-  [x & {:keys [top] :or {top false}}]
+  [x & {:keys [top type no-meta]
+        :or {top false
+             type :property}}]
   (if-let [json (if top
                   (if-let [schema-name (s/schema-name x)]
                     {:type schema-name}
-                    (or (ensure-swagger12-top (if (instance? Class x)
-                                                (json-type x)
-                                                (json-property x)))
+                    (or (ensure-swagger12-top (->json-schema x :type type))
                         {:type "void"}))
-                  (if (instance? Class x)
-                    (json-type x)
-                    (json-property x)))]
-    (merge json (json-schema-meta x))))
+                  (->json-schema x :type type))]
+    (cond->> json
+      (not no-meta) (merge (json-schema-meta x)))))
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
@@ -146,20 +153,22 @@
   clojure.lang.Sequential
   (json-property [e]
     {:type "array"
-     :items (->json (first e))})
+     :items (->json (first e) :no-meta true)})
   (json-parameter [e]
     {:type "array"
-     :items (->json (first e))})
+     :items (->json (first e) :no-meta true)
+     :collectionFormat "multi"})
 
   clojure.lang.IPersistentSet
   (json-property [e]
     {:type "array"
      :uniqueItems true
-     :items (->json (first e))})
+     :items (->json (first e) :no-meta true)})
   (json-parameter [e]
     {:type "array"
      :uniqueItems true
-     :items (->json (first e))})
+     :items (->json (first e) :no-meta true)
+     :collectionFormat "multi"})
 
   clojure.lang.IPersistentMap
   (json-property [e]
