@@ -116,7 +116,7 @@
   (let [responses (for-map [[k v] responses
                             :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] #(->json % options)))
+                          (cond-> schema (update-in [:schema] ->json options))
                           (cond-> headers (update-in [:headers] ->properties))
                           (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]
