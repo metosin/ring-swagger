@@ -189,6 +189,7 @@
      :schema schema
      :defined? (boolean (definitions name))}))
 
+#_
 (facts "transforming subschemas"
   (let [model {:id s/Str}
         swagger {:paths {"/resp" {:post {:responses {200 {:schema Response}

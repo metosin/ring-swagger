@@ -78,47 +78,19 @@
 
 (defmethod extract-parameter :body [[_ model] options]
   (if-let [schema (rsc/peek-schema model)]
-    (let [schema-json (->json model :options options)]
+    (let [schema-json (->json model options)]
       (vector {:in :body
                :name (name (s/schema-name schema))
-               :description (or (:description (->json schema :options options)) "")
+               :description (or (:description (->json schema options)) "")
                :required true
                :schema (dissoc schema-json :description)}))))
-
-(defmethod extract-parameter :query [[type model] options]
-  (if model
-    (for [[k v] (-> model value-of rsc/strict-schema)
-          :when (s/specific-key? k)
-          :let [rk (s/explicit-schema-key k)
-                json-schema (->json v :type :parameter :options options)]
-          :when json-schema]
-      (merge
-        {:in type
-         :name (name rk)
-         :description ""
-         :required (s/required-key? k)}
-        json-schema))))
-
-(defmethod extract-parameter :formData [[type model] options]
-  (if model
-    (for [[k v] (-> model value-of rsc/strict-schema)
-          :when (s/specific-key? k)
-          :let [rk (s/explicit-schema-key k)
-                json-schema (->json v :type :parameter :options options)]
-          :when json-schema]
-      (merge
-        {:in type
-         :name (name rk)
-         :description ""
-         :required (s/required-key? k)}
-        json-schema))))
 
 (defmethod extract-parameter :default [[type model] options]
   (if model
     (for [[k v] (-> model value-of rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
-                json-schema (->json v :options options)]
+                json-schema (->json v (assoc options ::jsons/type type))]
           :when json-schema]
       (merge
         {:in type
@@ -144,7 +116,7 @@
   (let [responses (for-map [[k v] responses
                             :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] #(->json % :options options)))
+                          (cond-> schema (update-in [:schema] #(->json % options)))
                           (cond-> headers (update-in [:headers] ->properties))
                           (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]

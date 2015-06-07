@@ -39,8 +39,7 @@
 (defmulti json-type identity)
 
 (defprotocol JsonSchema
-  (json-property [this options])
-  (json-parameter [this options]))
+  (json-property [this options]))
 
 (defn ensure-swagger12-top [schema]
   (if (or false (= *swagger-spec-version* "1.2"))
@@ -51,29 +50,30 @@
       schema)
     schema))
 
-(defn ->json-schema [x options & {:keys [type]
-                                  :or {type :property}}]
+(defn ->json-schema [x options]
   (if (instance? Class x)
     (json-type x)
-    (case type
-      :parameter (json-parameter x options)
-      :property  (json-property x options))))
+    (json-property x options)))
 
 (defn ->json
-  [x & {:keys [top type no-meta options]
-        :or {top false
-             type :property}}]
-  (if-let [json (if top
-                  (if-let [schema-name (s/schema-name x)]
-                    {:type schema-name}
-                    (or (ensure-swagger12-top (->json-schema x options :type type))
-                        {:type "void"}))
-                  (->json-schema x options :type type))]
-    (cond->> json
-      (not no-meta) (merge (json-schema-meta x)))))
+  ([x] (->json x {}))
+  ([x {no-meta ::no-meta
+       :keys [top]
+       :or {top false}
+       :as options}]
+   (if-let [json (if top
+                   (if-let [schema-name (s/schema-name x)]
+                     {:type schema-name}
+                     (or (ensure-swagger12-top (->json-schema x (dissoc options :top)))
+                         {:type "void"}))
+                   (->json-schema x options))]
+     (cond->> json
+       (not no-meta) (merge (json-schema-meta x))))))
 
 (defn assoc-collection-format [m options]
-  (assoc m :collectionFormat (:collection-format options "multi")))
+  (if (#{:query :formData} (::type options))
+    (assoc m :collectionFormat (:collection-format options "multi"))
+    m))
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
@@ -102,75 +102,55 @@
 (extend-protocol JsonSchema
   Object
   (json-property [e options] (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
-  (json-parameter [e options] (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
 
   nil
   (json-property [_ _] {:type "void"})
-  (json-parameter [_ _] {:type "void"})
 
   schema.core.Predicate
   (json-property [e options] (some-> e :p? predicate-to-class ->json))
-  (json-parameter [e options] (some-> e :p? predicate-to-class ->json))
 
   schema.core.EnumSchema
   (json-property [e options] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
-  (json-parameter [e options] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
   (json-property [e options] (->json (:schema e)))
-  (json-parameter [e options] (->json (:schema e)))
 
   schema.core.Both
   (json-property [e options] (->json (first (:schemas e))))
-  (json-parameter [e options] (->json (first (:schemas e))))
 
   schema.core.Either
   (json-property [e options] (->json (first (:schemas e))))
-  (json-parameter [e options] (->json (first (:schemas e))))
 
   schema.core.Recursive
   (json-property [e options] (->json (:derefable e)))
-  (json-parameter [e options] (->json (:derefable e)))
 
   schema.core.EqSchema
   (json-property [e options] (->json (class (:v e))))
-  (json-parameter [e options] (->json (class (:v e))))
 
   schema.core.NamedSchema
   (json-property [e options] (->json (:schema e)))
-  (json-parameter [e options] (->json (:schema e)))
 
   schema.core.One
   (json-property [e options] (->json (:schema e)))
-  (json-parameter [e options] (->json (:schema e)))
 
   schema.core.AnythingSchema
   (json-property [_ _] nil)
-  (json-parameter [_ _] nil)
 
   java.util.regex.Pattern
   (json-property [e options] {:type "string" :pattern (str e)})
-  (json-parameter [e options] {:type "string" :pattern (str e)})
 
   ;; Collections
   clojure.lang.Sequential
   (json-property [e options]
-    {:type "array"
-     :items (->json (first e) :no-meta true :options options)})
-  (json-parameter [e options]
     (-> {:type "array"
-         :items (->json (first e) :no-meta true :options options)}
+         :items (->json (first e) (assoc options ::no-meta true))}
         (assoc-collection-format options)))
 
   clojure.lang.IPersistentSet
   (json-property [e options]
-    {:type "array"
-     :uniqueItems true
-     :items (->json (first e) :no-meta true :options options)})
-  (json-parameter [e options]
     (-> {:type "array"
          :uniqueItems true
-         :items (->json (first e) :no-meta true :options options)}
+         :items (->json (first e) (assoc options ::no-meta true))}
         (assoc-collection-format options)))
 
   clojure.lang.IPersistentMap
@@ -181,23 +161,9 @@
         "2.0" {:$ref (str "#/definitions/" schema-name)})
       (and (not *ignore-missing-mappings*)
            (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
-  (json-parameter [e options]
-    (if-let [schema-name (s/schema-name e)]
-      (case *swagger-spec-version*
-        "1.2" {:$ref schema-name}
-        "2.0" {:$ref (str "#/definitions/" schema-name)})
-      (and (not *ignore-missing-mappings*)
-           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
 
   clojure.lang.Var
   (json-property [e options]
-    (if-let [schema-name (s/schema-name e)]
-      (case *swagger-spec-version*
-        "1.2" {:$ref schema-name}
-        "2.0" {:$ref (str "#/definitions/" schema-name)})
-      (and (not *ignore-missing-mappings*)
-           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
-  (json-parameter [e options]
     (if-let [schema-name (s/schema-name e)]
       (case *swagger-spec-version*
         "1.2" {:$ref schema-name}
