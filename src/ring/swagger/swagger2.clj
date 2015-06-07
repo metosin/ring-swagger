@@ -266,7 +266,9 @@
                                       a function to handle possible duplicate schema
                                       definitions. Takes schema-name and set of found
                                       attached schema values as parameters. Returns
-                                      sequence of schema-name and selected schema value."
+                                      sequence of schema-name and selected schema value.
+   :collection-format               - Sets the collectionFormat for query and formData
+                                      parameters."
   ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
   ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
     (let [options (merge option-defaults options)]

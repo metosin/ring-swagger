@@ -73,7 +73,7 @@
       (not no-meta) (merge (json-schema-meta x)))))
 
 (defn assoc-collection-format [m options]
-  (assoc m :collectionFormat (:collectionFormat options "multi")))
+  (assoc m :collectionFormat (:collection-format options "multi")))
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})

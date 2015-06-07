@@ -299,5 +299,5 @@
   (:collectionFormat (first (convert-parameters {:formData {:q [String]}} {})))
   => "multi"
 
-  (:collectionFormat (first (convert-parameters {:query {:q [String]}} {:collectionFormat "csv"})))
+  (:collectionFormat (first (convert-parameters {:query {:q [String]}} {:collection-format "csv"})))
   => "csv")
