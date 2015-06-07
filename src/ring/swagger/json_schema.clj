@@ -55,25 +55,33 @@
     (json-type x)
     (json-property x options)))
 
-(defn ->json
-  ([x] (->json x {}))
-  ([x {no-meta ::no-meta
-       :keys [top]
-       :or {top false}
-       :as options}]
-   (if-let [json (if top
-                   (if-let [schema-name (s/schema-name x)]
-                     {:type schema-name}
-                     (or (ensure-swagger12-top (->json-schema x (dissoc options :top)))
-                         {:type "void"}))
-                   (->json-schema x options))]
-     (cond->> json
-       (not no-meta) (merge (json-schema-meta x))))))
-
-(defn assoc-collection-format [m options]
+(defn assoc-collection-format
+  "Add collectionFormat to the JSON Schema if the parameter type
+   is query or formData."
+  [m options]
   (if (#{:query :formData} (::type options))
     (assoc m :collectionFormat (:collection-format options "multi"))
     m))
+
+(defn merge-meta
+  [m x {no-meta ::no-meta}]
+  (if-not no-meta
+    (merge (json-schema-meta x) m)
+    m))
+
+(defn not-supported! [e]
+  (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
+
+(defn ->json
+  ([x] (->json x {}))
+  ([x {:keys [top] :as options}]
+   (if-let [json (if top
+                   (if-let [schema-name (s/schema-name x)]
+                     {:type schema-name}
+                     (or (ensure-swagger12-top (->json-schema x (dissoc options :top ::no-meta)))
+                         {:type "void"}))
+                   (->json-schema x (dissoc options ::no-meta)))]
+     (merge-meta json x options))))
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
@@ -91,7 +99,7 @@
 
 (defmethod json-type :default [e]
   (if-not *ignore-missing-mappings*
-    (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))
+    (not-supported! e)))
 
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class
@@ -99,77 +107,71 @@
                          keyword? clojure.lang.Keyword
                          symbol?  clojure.lang.Symbol})
 
+(defn- named-schema [e]
+  (if-let [schema-name (s/schema-name e)]
+    (case *swagger-spec-version*
+      "1.2" {:$ref schema-name}
+      "2.0" {:$ref (str "#/definitions/" schema-name)})
+    (and (not *ignore-missing-mappings*)
+         (not-supported! e))))
+
+(defn- coll-schema [e options]
+  (-> {:type "array"
+       :items (->json (first e) (assoc options ::no-meta true))}
+      (assoc-collection-format options)))
+
 (extend-protocol JsonSchema
   Object
-  (json-property [e options] (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
+  (json-property [e _] (not-supported! e))
 
   nil
   (json-property [_ _] {:type "void"})
 
   schema.core.Predicate
-  (json-property [e options] (some-> e :p? predicate-to-class ->json))
+  (json-property [e _] (some-> e :p? predicate-to-class ->json))
 
   schema.core.EnumSchema
-  (json-property [e options] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+  (json-property [e _] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
-  (json-property [e options] (->json (:schema e)))
+  (json-property [e _] (->json (:schema e)))
 
   schema.core.Both
-  (json-property [e options] (->json (first (:schemas e))))
+  (json-property [e _] (->json (first (:schemas e))))
 
   schema.core.Either
-  (json-property [e options] (->json (first (:schemas e))))
+  (json-property [e _] (->json (first (:schemas e))))
 
   schema.core.Recursive
-  (json-property [e options] (->json (:derefable e)))
+  (json-property [e _] (->json (:derefable e)))
 
   schema.core.EqSchema
-  (json-property [e options] (->json (class (:v e))))
+  (json-property [e _] (->json (class (:v e))))
 
   schema.core.NamedSchema
-  (json-property [e options] (->json (:schema e)))
+  (json-property [e _] (->json (:schema e)))
 
   schema.core.One
-  (json-property [e options] (->json (:schema e)))
+  (json-property [e _] (->json (:schema e)))
 
   schema.core.AnythingSchema
   (json-property [_ _] nil)
 
   java.util.regex.Pattern
-  (json-property [e options] {:type "string" :pattern (str e)})
+  (json-property [e _] {:type "string" :pattern (str e)})
 
   ;; Collections
   clojure.lang.Sequential
-  (json-property [e options]
-    (-> {:type "array"
-         :items (->json (first e) (assoc options ::no-meta true))}
-        (assoc-collection-format options)))
+  (json-property [e options] (coll-schema e options))
 
   clojure.lang.IPersistentSet
-  (json-property [e options]
-    (-> {:type "array"
-         :uniqueItems true
-         :items (->json (first e) (assoc options ::no-meta true))}
-        (assoc-collection-format options)))
+  (json-property [e options] (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (json-property [e options]
-    (if-let [schema-name (s/schema-name e)]
-      (case *swagger-spec-version*
-        "1.2" {:$ref schema-name}
-        "2.0" {:$ref (str "#/definitions/" schema-name)})
-      (and (not *ignore-missing-mappings*)
-           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+  (json-property [e _] (named-schema e))
 
   clojure.lang.Var
-  (json-property [e options]
-    (if-let [schema-name (s/schema-name e)]
-      (case *swagger-spec-version*
-        "1.2" {:$ref schema-name}
-        "2.0" {:$ref (str "#/definitions/" schema-name)})
-      (and (not *ignore-missing-mappings*)
-           (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e)))))))
+  (json-property [e _] (named-schema e)))
 
 ;;
 ;; Schema -> Json Schema

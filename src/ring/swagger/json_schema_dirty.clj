@@ -5,5 +5,4 @@
 
 (extend-protocol JsonSchema
   schema.core.ConditionalSchema
-  (json-property [e options] {:type "void" :oneOf (mapv (comp ->json second) (:preds-and-schemas e))})
-  (json-parameter [e options] {:type "void" :oneOf (mapv (comp ->json second) (:preds-and-schemas e))}))
+  (json-property [e _]  {:type "void" :oneOf (mapv (comp ->json second) (:preds-and-schemas e))}))
