@@ -75,13 +75,13 @@
 
 (facts "generating return types from models, list & set of models"
   (fact "non-named schema"
-    (->json s/Any {:top true})    => {:type "void"})
+    (->json s/Any {:parameter? true})    => {:type "void"})
   (fact "returning Model"
-    (->json Model {:top true})    => {:type 'Model})
+    (->json Model {:parameter? true})    => {:type 'Model})
   (fact "returning [Model]"
-    (->json [Model] {:top true})  => {:items {:$ref 'Model}, :type "array"})
+    (->json [Model] {:parameter? true})  => {:items {:$ref 'Model}, :type "array"})
   (fact "returning #{Model}"
-    (->json #{Model} {:top true}) => {:items {:$ref 'Model}, :type "array" :uniqueItems true}))
+    (->json #{Model} {:parameter? true}) => {:items {:$ref 'Model}, :type "array" :uniqueItems true}))
 
 (fact "Describe"
   (tabular
@@ -154,6 +154,6 @@
     (fact "nested properties work ok"
       (keys (properties Bar)) => [:key])))
 
-(fact "ensuring swagger12 top-level type-parameters"
-  (ensure-swagger12-top {:$ref ..schema..}) => {:type ..schema..}
-  (ensure-swagger12-top ..schema..) => ..schema..)
+(fact "ensuring swagger12 model references"
+  (ensure-swagger12-model-references {:$ref ..schema..}) => {:type ..schema..}
+  (ensure-swagger12-model-references ..schema..) => ..schema..)

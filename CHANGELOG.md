@@ -7,6 +7,7 @@ implementation. If you have existing JSON Schema custom implementations
 you'll need to convert those.
 * **BREAKING**: `ring.swagger.json-schema/->json` signature has changed,
 instead of kwargs it now takes a options map.
+  - `:top` option is renamed to `:parameter?` to denote it's a swagger parameter, not an schema property.
 * Support for collections in query and form parameters (even with single parameter):
   - Parameters `{:query {:x [Long]}}` with `ring.middleware.params/wrap-params` middleware and query-string of
   `x=1&x=2&x?3` with `ring.swagger.schema/coercer!` should result in `x` being `[1 2 3]`

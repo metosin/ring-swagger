@@ -41,7 +41,7 @@
 (defprotocol JsonSchema
   (json-property [this options]))
 
-(defn ensure-swagger12-top [schema]
+(defn ensure-swagger12-model-references [schema]
   (if (or false (= *swagger-spec-version* "1.2"))
     (if-let [ref (:$ref schema)]
       (-> schema
@@ -74,11 +74,11 @@
 
 (defn ->json
   ([x] (->json x {}))
-  ([x {:keys [top] :as options}]
-   (if-let [json (if top
+  ([x {:keys [parameter?] :as options}]
+   (if-let [json (if parameter?
                    (if-let [schema-name (s/schema-name x)]
                      {:type schema-name}
-                     (or (ensure-swagger12-top (->json-schema x (dissoc options :top)))
+                     (or (ensure-swagger12-model-references (->json-schema x (dissoc options :parameter?)))
                          {:type "void"}))
                    (->json-schema x options))]
      (merge-meta json x options))))

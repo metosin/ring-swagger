@@ -248,7 +248,7 @@
               :name (some-> model schema/extract-schema-name str/lower-case)
               :description ""
               :required true}
-             (jsons/->json model {:top true})))))
+             (jsons/->json model {:parameter? true})))))
 
 (defmethod extract-parameter :default [{:keys [model type] :as it}]
   (if model
@@ -267,7 +267,7 @@
 (s/defn ^:always-validate convert-response-messages [messages :- [ResponseMessage]]
   (for [{:keys [responseModel] :as message} messages]
     (if (and responseModel (schema/named-schema? responseModel))
-      (update-in message [:responseModel] (fn [x] (:type (jsons/->json x {:top true}))))
+      (update-in message [:responseModel] (fn [x] (:type (jsons/->json x {:parameter? true}))))
       (dissoc message :responseModel))))
 
 ;;
@@ -300,7 +300,7 @@
                                    responseMessages authorizations]} metadata]]
                  {:path (swagger-path uri)
                   :operations [(merge
-                                 (jsons/->json return {:top true})
+                                 (jsons/->json return {:parameter? true})
                                  {:method (-> method name .toUpperCase)
                                   :authorizations (or authorizations {})
                                   :summary (or summary "")
