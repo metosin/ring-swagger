@@ -11,6 +11,9 @@ instead of kwargs it now takes a options map.
   - In Compojure-api `:query-params [x :- [Long]]` & url `?x=1&x=2&x?3` should result in `x` being `[1 2 3]`
   - For now, only supports [collectionFormat](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#fixed-fields-7)
   `multi`.
+* (From compojure-api) Support for file uploads.
+  - `ring.swagger.upload/TempFileUpload` and `ByteArrayUpload` Schemas to be used
+  with `ring.middleware.multipart-params` default stores.
 
 ## 0.20.5
 
