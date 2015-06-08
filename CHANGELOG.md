@@ -7,8 +7,10 @@ implementation. If you have existing JSON Schema custom implementations
 you'll need to convert those.
 * **BREAKING**: `ring.swagger.json-schema/->json` signature has changed,
 instead of kwargs it now takes a options map.
-* Support for collections in query and form parameters.
-  - In Compojure-api `:query-params [x :- [Long]]` & url `?x=1&x=2&x?3` should result in `x` being `[1 2 3]`
+* Support for collections in query and form parameters (even with single parameter):
+  - Parameters `{:query {:x [Long]}}` with `ring.middleware.params/wrap-params` middleware and query-string of
+  `x=1&x=2&x?3` with `ring.swagger.schema/coercer!` should result in `x` being `[1 2 3]`
+    - Same with Compojure-api: `:query-params [x :- [Long]]`
   - For now, only supports [collectionFormat](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#fixed-fields-7)
   `multi`.
 * (From compojure-api) Support for file uploads.
