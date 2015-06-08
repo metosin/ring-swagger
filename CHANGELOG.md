@@ -14,14 +14,13 @@ instead of kwargs it now takes a options map.
 * (From compojure-api) Support for file uploads.
   - `ring.swagger.upload/TempFileUpload` and `ByteArrayUpload` Schemas to be used
   with `ring.middleware.multipart-params` default stores.
-
-## 0.20.5
-
 - support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).
 - updated dependencies:
 
 ```clojure
 [metosin/schema-tools "0.4.2"] is available but we use "0.4.1"
+[cheshire "5.5.0"] is available but we use "5.4.0"
+[org.flatland/ordered "1.5.3"] is available but we use "1.5.2"
 ```
 
 ## 0.20.4 (25.5.2015)
