@@ -1,6 +1,7 @@
 (ns ring.swagger.coerce
   (:require [schema.core :as s]
             [schema.coerce :as sc]
+            [clojure.string :as string]
             [clj-time.format :as tf]
             [clj-time.coerce :as tc]
             [ring.swagger.common :refer :all])
@@ -88,9 +89,29 @@
       (date-matcher schema)
       (pattern-matcher schema)))
 
+(defn split-params-matcher [schema]
+  (if (or (and (coll? schema) (not (record? schema))))
+    (fn [x]
+      (if (string? x)
+        (string/split x #",")
+        x))))
+
+(defn multi-params-matcher
+  "If only one parameter is provided to multi param, ring
+   doesn't wrap the param is collection."
+  [schema]
+  ; Default
+  (if (or (and (coll? schema) (not (record? schema))))
+    (fn [x]
+      (if-not (coll? x)
+        [x]
+        x))))
+
 (defn query-schema-coercion-matcher
   [schema]
   (or (query-coercions schema)
+      ; (split-params-matcher schema)
+      (multi-params-matcher schema)
       (json-schema-coercion-matcher schema)))
 
 ;;
