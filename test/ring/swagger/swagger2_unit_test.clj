@@ -444,3 +444,13 @@
         => {:type "object"
             :properties {:a {:type "string"}}
             :required [:a]}))))
+
+(fact "collectionFormat"
+  (:collectionFormat (first (convert-parameters {:query {:q [String]}} {})))
+  => "multi"
+
+  (:collectionFormat (first (convert-parameters {:formData {:q [String]}} {})))
+  => "multi"
+
+  (:collectionFormat (first (convert-parameters {:query {:q [String]}} {:collection-format "csv"})))
+  => "csv")

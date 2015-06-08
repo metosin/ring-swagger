@@ -3,5 +3,6 @@
    properly described using Json Schema."
   (:require [ring.swagger.json-schema :refer :all]))
 
-(defmethod json-type schema.core.ConditionalSchema [e]
-  {:type "void" :oneOf (mapv (comp ->json second) (:preds-and-schemas e))})
+(extend-protocol JsonSchema
+  schema.core.ConditionalSchema
+  (json-property [e _]  {:type "void" :oneOf (mapv (comp ->json second) (:preds-and-schemas e))}))

@@ -75,13 +75,13 @@
 
 (facts "generating return types from models, list & set of models"
   (fact "non-named schema"
-    (->json s/Any :top true)    => {:type "void"})
+    (->json s/Any {:top true})    => {:type "void"})
   (fact "returning Model"
-    (->json Model :top true)    => {:type 'Model})
+    (->json Model {:top true})    => {:type 'Model})
   (fact "returning [Model]"
-    (->json [Model] :top true)  => {:items {:$ref 'Model}, :type "array"})
+    (->json [Model] {:top true})  => {:items {:$ref 'Model}, :type "array"})
   (fact "returning #{Model}"
-    (->json #{Model} :top true) => {:items {:$ref 'Model}, :type "array" :uniqueItems true}))
+    (->json #{Model} {:top true}) => {:items {:$ref 'Model}, :type "array" :uniqueItems true}))
 
 (fact "Describe"
   (tabular
