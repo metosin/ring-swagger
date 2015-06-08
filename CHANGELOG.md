@@ -1,3 +1,17 @@
+## 0.21.0-SNAPSHOT
+
+* **BREAKING**: Json Schema conversion for objects (e.g. records) is now
+extendable using a protocol instead of a multimethod. Check
+[json-schema.clj](./src/ring/swagger/json_schema.clj) for the new
+implementation. If you have existing JSON Schema custom implementations
+you'll need to convert those.
+* **BREAKING**: `ring.swagger.json-schema/->json` signature has changed,
+instead of kwargs it now takes a options map.
+* Support for collections in query and form parameters.
+  - In Compojure-api `:query-params [x :- [Long]]` & url `?x=1&x=2&x?3` should result in `x` being `[1 2 3]`
+  - For now, only supports [collectionFormat](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#fixed-fields-7)
+  `multi`.
+
 ## 0.20.5
 
 - support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).

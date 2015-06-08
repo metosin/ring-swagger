@@ -36,7 +36,10 @@
 ;; Describe Java and Clojure classes and Schemas as Json schema
 ;;
 
-(declare json-type)
+(defmulti json-type identity)
+
+(defprotocol JsonSchema
+  (json-property [this options]))
 
 (defn ensure-swagger12-top [schema]
   (if (or false (= *swagger-spec-version* "1.2"))
@@ -47,31 +50,38 @@
       schema)
     schema))
 
+(defn ->json-schema [x options]
+  (if (instance? Class x)
+    (json-type x)
+    (json-property x options)))
+
+(defn assoc-collection-format
+  "Add collectionFormat to the JSON Schema if the parameter type
+   is query or formData."
+  [m options]
+  (if (#{:query :formData} (::type options))
+    (assoc m :collectionFormat (:collection-format options "multi"))
+    m))
+
+(defn merge-meta
+  [m x {no-meta ::no-meta}]
+  (if-not no-meta
+    (merge (json-schema-meta x) m)
+    m))
+
+(defn not-supported! [e]
+  (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
+
 (defn ->json
-  [x & {:keys [top] :or {top false}}]
-  (if-let [json (if top
-                  (if-let [schema-name (s/schema-name x)]
-                    {:type schema-name}
-                    (or (ensure-swagger12-top (json-type x)) {:type "void"}))
-                  (json-type x))]
-    (merge json (json-schema-meta x))))
-
-(defmulti json-type
-  (fn [e]
-    (if (instance? Class e)
-      e
-      (class e))))
-
-(defmethod json-type nil [_] {:type "void"})
-
-;; Collections
-(defmethod json-type clojure.lang.Sequential [e]
-  {:type "array"
-   :items (json-type (first e))})
-(defmethod json-type clojure.lang.IPersistentSet [e]
-  {:type "array"
-   :uniqueItems true
-   :items (json-type (first e))})
+  ([x] (->json x {}))
+  ([x {:keys [top] :as options}]
+   (if-let [json (if top
+                   (if-let [schema-name (s/schema-name x)]
+                     {:type schema-name}
+                     (or (ensure-swagger12-top (->json-schema x (dissoc options :top)))
+                         {:type "void"}))
+                   (->json-schema x options))]
+     (merge-meta json x options))))
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
@@ -85,10 +95,11 @@
 (defmethod json-type java.util.Date          [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.DateTime  [_] {:type "string" :format "date-time"})
 (defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
-(defmethod json-type java.util.regex.Pattern [e]
-  (if (instance? java.util.regex.Pattern e)
-    {:type "string" :pattern (str e)}
-    {:type "string" :format "regex"}))
+(defmethod json-type java.util.regex.Pattern [e] {:type "string" :format "regex"})
+
+(defmethod json-type :default [e]
+  (if-not *ignore-missing-mappings*
+    (not-supported! e)))
 
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class
@@ -96,24 +107,71 @@
                          keyword? clojure.lang.Keyword
                          symbol?  clojure.lang.Symbol})
 
-(defmethod json-type schema.core.Predicate      [e] (if-let [c (predicate-to-class (:p? e))] (->json c)))
-(defmethod json-type schema.core.EnumSchema     [e] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
-(defmethod json-type schema.core.Maybe          [e] (->json (:schema e)))
-(defmethod json-type schema.core.Both           [e] (->json (first (:schemas e))))
-(defmethod json-type schema.core.Either         [e] (->json (first (:schemas e))))
-(defmethod json-type schema.core.Recursive      [e] (->json (:derefable e)))
-(defmethod json-type schema.core.EqSchema       [e] (->json (class (:v e))))
-(defmethod json-type schema.core.NamedSchema    [e] (->json (:schema e)))
-(defmethod json-type schema.core.One            [e] (->json (:schema e)))
-(defmethod json-type schema.core.AnythingSchema [_] nil)
-
-(defmethod json-type :default [e]
+(defn- named-schema [e]
   (if-let [schema-name (s/schema-name e)]
     (case *swagger-spec-version*
       "1.2" {:$ref schema-name}
       "2.0" {:$ref (str "#/definitions/" schema-name)})
     (and (not *ignore-missing-mappings*)
-         (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))))
+         (not-supported! e))))
+
+(defn- coll-schema [e options]
+  (-> {:type "array"
+       :items (->json (first e) (assoc options ::no-meta true))}
+      (assoc-collection-format options)))
+
+(extend-protocol JsonSchema
+  Object
+  (json-property [e _] (not-supported! e))
+
+  nil
+  (json-property [_ _] {:type "void"})
+
+  schema.core.Predicate
+  (json-property [e _] (some-> e :p? predicate-to-class ->json))
+
+  schema.core.EnumSchema
+  (json-property [e _] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+
+  schema.core.Maybe
+  (json-property [e _] (->json (:schema e)))
+
+  schema.core.Both
+  (json-property [e _] (->json (first (:schemas e))))
+
+  schema.core.Either
+  (json-property [e _] (->json (first (:schemas e))))
+
+  schema.core.Recursive
+  (json-property [e _] (->json (:derefable e)))
+
+  schema.core.EqSchema
+  (json-property [e _] (->json (class (:v e))))
+
+  schema.core.NamedSchema
+  (json-property [e _] (->json (:schema e)))
+
+  schema.core.One
+  (json-property [e _] (->json (:schema e)))
+
+  schema.core.AnythingSchema
+  (json-property [_ _] nil)
+
+  java.util.regex.Pattern
+  (json-property [e _] {:type "string" :pattern (str e)})
+
+  ;; Collections
+  clojure.lang.Sequential
+  (json-property [e options] (coll-schema e options))
+
+  clojure.lang.IPersistentSet
+  (json-property [e options] (assoc (coll-schema e options) :uniqueItems true))
+
+  clojure.lang.IPersistentMap
+  (json-property [e _] (named-schema e))
+
+  clojure.lang.Var
+  (json-property [e _] (named-schema e)))
 
 ;;
 ;; Schema -> Json Schema
