@@ -9,7 +9,7 @@
                  [cheshire "5.5.0"]
                  [slingshot "0.12.2"]
                  [metosin/ring-http-response "0.6.2"]
-                 [metosin/schema-tools "0.4.2"]
+                 [metosin/schema-tools "0.4.3-SNAPSHOT"]
                  [prismatic/schema "0.4.3"]
                  [prismatic/plumbing "0.4.4"]
                  [clj-time "0.9.0"]
