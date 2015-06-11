@@ -4,14 +4,14 @@
 
 - [API Docs](http://metosin.github.io/ring-swagger/doc/)
 - Extendable trasformations from Prismatic Schemas to Swagger JSON Schemas
-- Extended JSON & String Serialization & coercion for Schema elements
+- Extended JSON & String Serialization & coercion
 - For web/routing library developers:
   - A [Schema-based contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj) for collecting route documentation from the web apps
   - Middlewares for handling Schemas Validation Errors
   - Handlers to generate the Swaggers artifacts
     - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
     - [Resource listing](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#51-resource-listing) and [Api declarations](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#52-api-declaration) for 1.2.
-    - [Swagger-UI](https://github.com/swagger-api/swagger-ui) bindings. (the UI itself is jar-packaged [separately](https://github.com/metosin/ring-swagger-ui) or you can get it from [NPM](https://www.npmjs.com/package/swagger-ui))
+    - [Swagger-UI](https://github.com/swagger-api/swagger-ui) bindings. (get the UI separately as [jar](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
 
 ## Latest version
 
