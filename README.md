@@ -122,7 +122,7 @@ Route definitions as expected as a clojure Map defined by the [Schema](https://g
 ;                                           404 {:description "Ohnoes."}}}}}}
  ```
 
-### Customizing Swagger Spec output
+## Customizing Swagger Spec output
 
 One can pass extra options-map as a third parameter to `swagger-json`. The following options are available:
 
@@ -165,7 +165,7 @@ For example, to get default response descriptions from the [HTTP Spec](http://en
 ;                                       500 {:description "FAIL"}}}}}}
 ```
 
-### Validating the Swagger Spec
+## Validating the Swagger Spec
 
 The generated full spec can be validated against the [Swagger JSON Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json) via tools like [scjsv](https://github.com/metosin/scjsv).
 
@@ -194,54 +194,81 @@ For more information about creating your own adapter, see [Collecting API Docume
 
 As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schema, so not all Clojure Schema elements can be used.
 
-### Supported Schema elements
+### Schema to Swagger JSON Schema transformation
 
-| Clojure Schema | JSON Schema | Sample JSON |
-| --------|-------|:------------:|
-| `Integer` | integer, int32 | `1` |
-| `Long`, `s/Int` | integer, int64 | `1` |
-| `Double`, `Number`, `s/Num`  | number, double | `1.2`
-| `String`, `s/Str`, `Keyword`, `s/Keyword`      | string | `"kikka"`
-| `Boolean`                   | boolean | `true`
-| `nil`, `s/Any`              | void |
-| `java.util.Date`, `org.joda.time.DateTime`  | string, date-time | `"2014-02-18T18:25:37.456Z"`, consumes also without millis: `"2014-02-18T18:25:37Z"`
-| `java.util.regex.Pattern`,  | string, regex | `[a-z0-9]`
-| `#"[a-z0-9]+"`              | string, pattern | `"a6"`
-| `s/Uuid`, `java.util.UUID`  | string, uuid | `"77e70512-1337-dead-beef-0123456789ab"`
-| `org.joda.time.LocalDate`   | string, date | `"2014-02-19"`
-| `(s/enum X Y Z)`       | *type of X*, enum(X,Y,Z)
-| `(s/maybe X)`          | *type of X*
-| `(s/both X Y Z)`       | *type of X*
-| `(s/either X Y Z)`     | *type of X*
-| `(s/named X name)`     | *type of X*
-| `(s/one X name)`       | *type of X*
-| `(s/recursive Var)`    | *Ref to (model) Var*
-| `(s/eq X)`    | *type of class of X*
-| `(s/optional-key X)`    | *optional key*
-| `(s/required-key X)`    | *required key*
-| `s/Keyword` (as a key)  | *ignored*
+There are two possible methods to do this:
+
+1. class-based dispatch via `ring.swagger.json-schema/json-type`.
+2. protocol-based dispatch via `ring.swagger.json-schema/JsonSchema`.
+
+To support truly symmetric web schemas, one needs also to ensure both JSON Serialization and deserialization/coercion from JSON.
+
+#### Class-based dispatch
+
+```clojure
+(require '[ring.swagger.json-schema :as json-schema])
+
+(defmethod json-schema/json-type java.sql.Date [_] {:type "string" :format "date"})
+```
+
+#### Protocol-based dispatch
+
+```clojure
+(require '[ring.swagger.json-schema :as json-schema])
+
+(extend-type java.util.regex.Pattern
+  json-schema/JsonSchema
+  (json-schema/json-property [e _] {:type "string" :pattern (str e)}))
+```
+
+### Out-of-the-box supported Schema elements
+
+| Clojure Schema                              | JSON Schema              | Sample JSON |
+| --------------------------------------------|--------------------------|:-----------:|
+| `Integer`                                   | integer, int32           | `1` 
+| `Long`, `s/Int`                             | integer, int64           | `1` 
+| `Double`, `Number`, `s/Num`                 | number, double           | `1.2`
+| `String`, `s/Str`, `Keyword`, `s/Keyword`   | string                   | `"kikka"`
+| `Boolean`                                   | boolean                  | `true`
+| `nil`, `s/Any`                              | void                     |
+| `java.util.Date`, `org.joda.time.DateTime`  | string, date-time        | `"2014-02-18T18:25:37.456Z"`, also without millis: `"2014-02-18T18:25:37Z"`
+| `java.util.regex.Pattern`,                  | string, regex            | `[a-z0-9]`
+| `#"[a-z0-9]+"`                              | string, pattern          | `"a6"`
+| `s/Uuid`, `java.util.UUID`                  | string, uuid             | `"77e70512-1337-dead-beef-0123456789ab"`
+| `org.joda.time.LocalDate`                   | string, date             | `"2014-02-19"`
+| `(s/enum X Y Z)`                            | *type of X*, enum(X,Y,Z)
+| `(s/maybe X)`                               | *type of X*
+| `(s/both X Y Z)`                            | *type of X*
+| `(s/either X Y Z)`                          | *type of X*
+| `(s/named X name)`                          | *type of X*
+| `(s/one X name)`                            | *type of X*
+| `(s/recursive Var)`                         | *Ref to (model) Var*
+| `(s/eq X)`                                  | *type of class of X*
+| `(s/optional-key X)`                        | *optional key*
+| `(s/required-key X)`                        | *required key*
+| `s/Keyword` (as a key)                      | *ignored*
 
 - All supported types have symmetric JSON serialization (Cheshire encoders) & deserialization (Schema coercions)
 - Vectors, Sets and Maps can be used as containers
-  - Maps are presented as Complex Types and References. Model references are resolved automatically.
+- Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references
     - Nested maps can be within valid containers (as only element - heterogeneous schema sequences not supported by the spec)
 
 ### Missing Schema elements
 
-If ring-swagger can't transform the Schemas into JSON Schemas, by default a `IllegalArgumentException` will be thrown. Binding `ring.swagger.json-schema/*ignore-missing-mappings*` to true, one
-can ignore the errors (missing schema elements will be ignored from
-the generated JSON Schema).
+If Ring-swagger can't transform the Schemas into JSON Schemas, by default a `IllegalArgumentException` will be thrown. Binding `ring.swagger.json-schema/*ignore-missing-mappings*` to true, one can ignore the errors (missing schema elements will be ignored from the generated JSON Schema).
 
-### Model names
+### Body and Response model names
 
-Prismatic Schema names are used to name the Swagger Body & Response models. Nested schemas are traversed and all found sub-schemas are generated automatically a name (so that they can be referenced in the JSON Schema). 
+Standard Prismatic Schema names are used. Nested schemas are traversed and all found sub-schemas are named automatically (so that they can be referenced in the JSON Schema).
 
-If multiple such schemas have same name but have different value, an describive `IllegalArgumentException` is raised. This can happen if one transforms schemas via normal `clojure.core` functions:
+As Swagger 2.0 squases all endpoint models into a single namespace, name collisions can happen. When this happens, the `:handle-duplicate-schemas-fn` function is called to resolve the collision. By default, the collisions are ignored.
+
+One common reason for the name collisions is to transform the schemas via normal `clojure.core` functions, which don't retain the original meta-data thus the schema name. 
 
 ```clojure
 (s/defschema User {:id s/Str, :name s/Str})
-(def NewUser (dissoc User :id))
+(def NewUser (dissoc User :id)) ; dissoc does not touch the schema meta-data
 
 (meta User)
 ; {:name Kikka}
@@ -252,23 +279,10 @@ If multiple such schemas have same name but have different value, an describive 
 
 There are better schema transformers functions available at [schema-tools](https://github.com/metosin/schema-tools).
 
-### Adding support for custom Schema elements
-
-JSON Schema generation is supported by the `ring.swagger.json-schema/json-type` multimethod. One can register own schema types by installing new methods for it's dispatch:
-
-```clojure
-(require '[ring.swagger.json-schema :as jsons])
-(require '[schema.core :as s])
-(defmethod jsons/json-type s/Maybe [e] (swagger/->json (:schema e)))
-```
-
-One might also need to write both JSON Serialization for the Schema values and coercion function to de-serialize the value back from JSON.
-
 ### Extra Schema elements supported by `ring.swagger.json-schema-dirty`
 
 Some Schema elements are impossible to accurately describe within boundaries of JSON-Schema or Swagger spec.
-You can require `ring.swagger.json-schema-dirty` namespace to get implementations for `json-type` multimethod which allow
-you to use some of these elements.
+You can require `ring.swagger.json-schema-dirty` namespace to get JSON Schema dispatching for the following:
 
 Be warned that Swagger-UI might not display these correctly and the code generated by swagger-codegen will be inaccurate.
 
@@ -286,7 +300,13 @@ These schemas should work, just need the mappings (feel free to contribute!):
 
 ### Schema coercion
 
-Ring-swagger utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back.
+Ring-swagger uses [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back.
+
+There are two coercers in `ring.swagger.coerce`, the `json-schema-coercion-matcher` and `query-schema-coercion-matcher`. These are enchanced versions of the orginal Schema coercers, adding support for all the supported Schema elements, including Dates & Regexps.
+
+#### Coerce!
+
+Ring-swagger provides a convenience function for coercion, `ring.swagger.schema/coerce!`. It returns either a valid coerced value of slingshots an Map with type `:ring.swagger.schema/validation`. One can catch these exceptions via `ring.swagger.middleware/wrap-validation-errors` and return a JSON-friendly map of the contents.
 
 ```clojure
 (require '[schema.core :as s])
@@ -295,29 +315,11 @@ Ring-swagger utilizes [Schema coercions](http://blog.getprismatic.com/blog/2014/
 (s/defschema Bone {:size Long, :animal (s/enum :cow :tyrannosaurus)})
 
 (coerce! Bone {:size 12, :animal "cow"})
-; => {:animal :cow, :size 12}
+; {:animal :cow, :size 12}
 
 (coerce! Bone {:animal :sheep})
 ; ExceptionInfo throw+: #schema.utils.ErrorContainer{:error {:animal (not (#{:tyrannosaurus :cow} :sheep)), :size missing-required-key}, :type :ring.swagger.schema/validation}  ring.swagger.schema/coerce! (schema.clj:57)
 ```
-
-Currently there are two modes for coercions: `:json` and `:query`. Both `coerce` and `coerce!` take an optional third parameter (default to `:json`) to denote which coercer to use. You can also use the two coercers directly from namespace `ring.swagger.coerce`.
-
-#### Json-coercion
-
-- numbers -> `Long` or `Double`
-- string -> Keyword
-- string -> `java.util.Date`, `org.joda.time.DateTime` or `org.joda.time.LocalDate`
-- string -> `java.util.regex.Pattern`
-- vectors -> Sets
-
-#### Query-coercion:
-
-Query-coercion extends the json-coercion with the following transformations:
-
-- string -> Long
-- string -> Double
-- string -> Boolean
 
 ## Adding description to Schemas
 
