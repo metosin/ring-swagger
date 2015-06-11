@@ -21,9 +21,10 @@ instead of kwargs it now takes a options map.
 - updated dependencies:
 
 ```clojure
-[metosin/schema-tools "0.4.2"] is available but we use "0.4.1"
+[metosin/schema-tools "0.4.3"] is available but we use "0.4.1"
 [cheshire "5.5.0"] is available but we use "5.4.0"
 [org.flatland/ordered "1.5.3"] is available but we use "1.5.2"
+[lein-ring "0.9.5"] is available but we use "0.9.4"
 ```
 
 ## 0.20.4 (25.5.2015)
