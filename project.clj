@@ -17,7 +17,7 @@
                  [potemkin "0.3.13"]
                  [org.flatland/ordered "1.5.3"]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
-                             [lein-ring "0.9.5"]
+                             [lein-ring "0.9.6"]
                              [lein-midje "3.1.3"]
                              [funcool/codeina "0.1.0"]]
                    :dependencies [[midje "1.7.0-SNAPSHOT"]

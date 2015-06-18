@@ -107,6 +107,7 @@
         [x]
         x))))
 
+;; TODO: string-schema-coercion-matcher
 (defn query-schema-coercion-matcher
   [schema]
   (or (query-coercions schema)

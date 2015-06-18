@@ -24,7 +24,7 @@
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [yada](https://github.com/juxt/yada)
 
-Route definitions as expected as a clojure Map defined by the [Schema](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema is open as ring-swagger tries not to be on your way - one can always pass any extra data in the Swagger Spec format.
+Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema allows extra keys as ring-swagger tries not to be on your way - one can pass any valid Swagger spec data in.
 
 ### Simplest possible example
 
@@ -44,7 +44,7 @@ Route definitions as expected as a clojure Map defined by the [Schema](https://g
 
 ### More complete example
 
-... with info, tags, routes and anonymous nested schemas.
+Info, tags, routes and anonymous nested schemas.
 
 ```clojure
 (require '[schema.core :as s])
@@ -187,7 +187,7 @@ For more information about creating your own adapter, see [Collecting API Docume
 
 ## Web Schemas
 
-[Prismatic Schema](https://github.com/Prismatic/schema) is used for modeling both the input & output schemas for routes.
+[Prismatic Schema](https://github.com/Prismatic/schema) is used for describing both the input & output schemas for routes.
 
 As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schema, so not all Clojure Schema elements can be used.
 
@@ -257,15 +257,15 @@ If Ring-swagger can't transform the Schemas into JSON Schemas, by default a `Ill
 
 ### Body and Response model names
 
-Standard Prismatic Schema names are used. Nested schemas are traversed and all found sub-schemas are named automatically (so that they can be referenced in the JSON Schema).
+Standard Prismatic Schema names are used. Nested schemas are traversed and all found sub-schemas are named automatically - so that they can be referenced in the generated Swagger spec.
 
-As Swagger 2.0 squases all endpoint models into a single namespace, name collisions can happen. When this happens, the `:handle-duplicate-schemas-fn` function is called to resolve the collision. By default, the collisions are ignored.
+Swagger 2.0 squashes all api models into a single global namespace, so schema name collisions can happen. When this happens, the function defined by `:handle-duplicate-schemas-fn` option is called to resolve the collision. By default, the collisions are ignored.
 
-One common reason for the name collisions is to transform the schemas via normal `clojure.core` functions, which don't retain the original meta-data thus the schema name. 
+One accidental reason for schema name collisions is the use of normal `clojure.core` functions to create transformed copies of the schemas. The normal core functions retain the original schema meta-data and by so the schema name.
 
 ```clojure
 (s/defschema User {:id s/Str, :name s/Str})
-(def NewUser (dissoc User :id)) ; dissoc does not touch the schema meta-data
+(def NewUser (dissoc User :id)) ; dissoc does not remove the schema meta-data
 
 (meta User)
 ; {:name Kikka}
