@@ -10,8 +10,8 @@
 
 (s/defschema Info
   {X- s/Any
-   :version s/Str
    :title s/Str
+   (opt :version) s/Str
    (opt :description) s/Str
    (opt :termsOfService) s/Str
    (opt :contact) {(opt :name) s/Str

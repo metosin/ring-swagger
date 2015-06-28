@@ -18,6 +18,7 @@ instead of kwargs it now takes a options map.
   - `ring.swagger.upload/TempFileUpload` and `ByteArrayUpload` Schemas to be used
   with `ring.middleware.multipart-params` default stores.
 - support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).
+- `:version` is not mandatory field in ring-swagger schema
 - updated dependencies:
 
 ```clojure
