@@ -13,7 +13,8 @@
             [flatland.ordered.set :as os]
             [clojure.string :as string]
             [org.tobereplaced.lettercase :as lc])
-  (:import (clojure.lang IMapEntry)))
+  (:import (clojure.lang IMapEntry)
+           (javax.servlet ServletContext)))
 
 ;;
 ;; Helpers
@@ -219,7 +220,7 @@
 (defn context
   "Context of a request. Defaults to \"\", but has the
    servlet-context in the legacy app-server environments."
-  [{:keys [servlet-context]}]
+  [{:keys [^ServletContext servlet-context]}]
   (if servlet-context (.getContextPath servlet-context) ""))
 
 (defn basepath
