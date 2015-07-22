@@ -293,9 +293,9 @@
                          "/store" {:post {:tags ["store"]}}}}]
     (validate swagger) => nil))
 
-(fact "route order"
+(fact "retain :paths order, #54"
   (let [->path (fn [x] (str "/" x))
         paths (reduce (fn [acc x] (assoc acc (->path x) {:get {}})) (om/ordered-map) (range 100))
         swagger {:paths paths}
         spec (swagger-json swagger)]
-    (-> spec :paths keys) => (map ->path(range 100))))
+    (-> spec :paths keys) => (map ->path (range 100))))
