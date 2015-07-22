@@ -19,6 +19,10 @@ instead of kwargs it now takes a options map.
   with `ring.middleware.multipart-params` default stores.
 - support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).
 - `:version` is not mandatory field in ring-swagger schema
+- new public api fns in `ring.swagger.swagger2`:
+   - `transform-paths` for generic path transformations on the clent side
+   - `ensure-body-and-response-schema-names` to fix the generated schema names on the client side (vs. the `swagger-json`
+   generating new names for all the requests.
 - Fixes [54](https://github.com/metosin/ring-swagger/issues/54): `:paths` order is now preserved
   - use `flatland.ordered.map/ordered-map` in the client side to keep the order.
 

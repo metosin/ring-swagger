@@ -141,8 +141,8 @@
   (let [original-paths (or (:paths swagger) {})
         paths (reduce-kv
                 (fn [acc k v]
-                                (assoc acc
-                                  (swagger-path k)
+                  (assoc acc
+                    (swagger-path k)
                     (transform-operation v options))) (empty original-paths) original-paths)
         definitions (-> swagger
                         extract-models
@@ -164,6 +164,10 @@
                               route schema-codes)]
       transformed)
     route))
+
+;;
+;; Public API
+;;
 
 ;;
 ;; Transforming the spec
@@ -206,7 +210,7 @@
                        :consumes ["application/json"]})
 
 ;;
-;; Public API
+;; Swagger Spec
 ;;
 
 (def Swagger schema/Swagger)
