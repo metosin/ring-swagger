@@ -23,9 +23,16 @@ instead of kwargs it now takes a options map.
 
 ```clojure
 [metosin/schema-tools "0.4.3"] is available but we use "0.4.1"
+[metosin/ring-http-response "0.6.3"] is available but we use "0.6.2"
+[metosin/ring-swagger-ui "2.1.0"] is available but we use "2.0.24"
 [cheshire "5.5.0"] is available but we use "5.4.0"
 [org.flatland/ordered "1.5.3"] is available but we use "1.5.2"
+[clj-time "0.10.0"] is available but we use "0.9.0"
+[potemkin "0.4.1"] is available but we use "0.3.13"
+
 [lein-ring "0.9.6"] is available but we use "0.9.4"
+[funcool/codeina "0.2.0"] is available but we use "0.1.0"
+[midje "1.7.0"] is available but we use "1.7.0-SNAPSHOT"
 ```
 
 ## 0.20.4 (25.5.2015)
