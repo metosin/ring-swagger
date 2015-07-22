@@ -138,12 +138,12 @@
   (str/replace uri #":([^/]+)" "{$1}"))
 
 (defn extract-paths-and-definitions [swagger options]
-  (let [paths (->> swagger
-                   :paths
-                   (reduce-kv (fn [acc k v]
+  (let [original-paths (or (:paths swagger) {})
+        paths (reduce-kv
+                (fn [acc k v]
                                 (assoc acc
                                   (swagger-path k)
-                                  (transform-operation v options))) {}))
+                    (transform-operation v options))) (empty original-paths) original-paths)
         definitions (-> swagger
                         extract-models
                         (transform-models options))]
@@ -175,14 +175,15 @@
   otherwise return value of the function call is used as a new value for the
   route."
   [f swagger]
-  (let [transformed (for [[path endpoints] (:paths swagger)
+  (let [initial-paths (:paths swagger)
+        transformed (for [[path endpoints] initial-paths
                           [method endpoint] endpoints
                           :let [endpoint (f endpoint)]]
                       [[path method] endpoint])
         paths (reduce (fn [acc [kv endpoint]]
                         (if endpoint
                           (assoc-in acc kv endpoint)
-                          acc)) {} transformed)]
+                          acc)) (empty initial-paths) transformed)]
     (assoc-in swagger [:paths] paths)))
 
 (defn ensure-body-and-response-schema-names

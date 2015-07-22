@@ -19,6 +19,9 @@ instead of kwargs it now takes a options map.
   with `ring.middleware.multipart-params` default stores.
 - support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).
 - `:version` is not mandatory field in ring-swagger schema
+- Fixes [54](https://github.com/metosin/ring-swagger/issues/54): `:paths` order is now preserved
+  - use `flatland.ordered.map/ordered-map` in the client side to keep the order.
+
 - updated dependencies:
 
 ```clojure
