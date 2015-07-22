@@ -1,28 +1,36 @@
 ## 0.21.0-SNAPSHOT
 
-* **BREAKING**: Json Schema conversion for objects (e.g. records) is now
-extendable using a protocol instead of a multimethod. Check
-[json-schema.clj](./src/ring/swagger/json_schema.clj) for the new
-implementation. If you have existing JSON Schema custom implementations
-you'll need to convert those.
-* **BREAKING**: `ring.swagger.json-schema/->json` signature has changed,
-instead of kwargs it now takes a options map.
+### Breaking changes
+
+- **BREAKING**: Json Schema conversion for objects (e.g. records) is now extendable using a protocol instead of a
+multimethod. Check [json-schema.clj](./src/ring/swagger/json_schema.clj) for the new implementation. If you have
+existing JSON Schema custom implementations you'll need to convert those.
+
+- **BREAKING**: `ring.swagger.json-schema/->json` signature has changed, instead of kwargs it now takes a options map.
   - `:top` option is renamed to `:parameter?` to denote it's a swagger parameter, not an schema property.
-* Support for collections in query and form parameters (even with single parameter):
+  
+### New features
+
+- Support for collections in query and form parameters (even with single parameter):
   - Parameters `{:query {:x [Long]}}` with `ring.middleware.params/wrap-params` middleware and query-string of
   `x=1&x=2&x?3` with `ring.swagger.schema/coercer!` should result in `x` being `[1 2 3]`
     - Same with Compojure-api: `:query-params [x :- [Long]]`
   - For now, only supports [collectionFormat](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#fixed-fields-7)
   `multi`.
-* (From compojure-api) Support for file uploads.
+
+- (From compojure-api) Support for file uploads.
   - `ring.swagger.upload/TempFileUpload` and `ByteArrayUpload` Schemas to be used
   with `ring.middleware.multipart-params` default stores.
+
 - support for `schema.core.One` by [Steffen Dienst](https://github.com/smee).
-- `:version` is not mandatory field in ring-swagger schema
+
+- `:version` is not mandatory field in ring-swagger schema (defaults to `0.0.1`)
+
 - new public api fns in `ring.swagger.swagger2`:
    - `transform-paths` for generic path transformations on the clent side
    - `ensure-body-and-response-schema-names` to fix the generated schema names on the client side (vs. the `swagger-json`
    generating new names for all the requests.
+   
 - Fixes [54](https://github.com/metosin/ring-swagger/issues/54): `:paths` order is now preserved
   - use `flatland.ordered.map/ordered-map` in the client side to keep the order.
 
