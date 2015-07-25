@@ -139,6 +139,10 @@ One can pass extra options-map as a third parameter to `swagger-json`. The follo
                                     definitions. Takes schema-name and set of found
                                     attached schema values as parameters. Returns
                                     sequence of schema-name and selected schema value.
+
+ :collection-format               - Sets the collectionFormat for query and formData
+                                    parameters.
+                                    Possible values: multi, ssv, csv, tsv, pipes."
 ```
 
 For example, to get default response descriptions from the [HTTP Spec](http://en.wikipedia.org/wiki/List_of_HTTP_status_codes), you can do the following:
