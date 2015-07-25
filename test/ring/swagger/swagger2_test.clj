@@ -299,3 +299,13 @@
         swagger {:paths paths}
         spec (swagger-json swagger)]
     (-> spec :paths keys) => (map ->path (range 100))))
+
+(fact "transform-operations"
+  (let [remove-x-no-doc (fn [endpoint] (if-not (some-> endpoint :x-no-doc true?) endpoint))
+        swagger {:paths {"/a" {:get {:x-no-doc true}, :post {}}
+                         "/b" {:put {:x-no-doc true}}}}]
+    (transform-operations remove-x-no-doc swagger) => {:paths {"/a" {:post {}}}}
+
+    (transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
+                                                   "/b" {:put {:x-no-doc true}}}})))
+; {:paths {"/a" {:post {}}}}))

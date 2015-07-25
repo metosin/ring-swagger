@@ -189,6 +189,27 @@ The generated full spec can be validated against the [Swagger JSON Schema](https
 
 For more information about creating your own adapter, see [Collecting API Documentation](https://github.com/metosin/ring-swagger/wiki/Collecting-API-Documentation).
 
+## Transforming the Swagger Spec
+
+There are the following utility functions for transforming the spec (on the client side):
+
+### `ring.swagger.swagger2/transform-operations`
+
+Transforms the operations under the :paths of a ring-swagger spec by applying `(f operation)` to all operations.
+If the function returns nil, the given operation is removed.
+
+As an example, one can filter away all operations with `:x-no-doc` set to `true`:
+
+```clojure
+(defn remove-x-no-doc [endpoint]
+  (if-not (some-> endpoint :x-no-doc true?)
+    endpoint))
+    
+(transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
+                                               "/b" {:put {:x-no-doc true}}}}))
+; {:paths {"/a" {:post {}}}}
+```
+
 ## Web Schemas
 
 [Prismatic Schema](https://github.com/Prismatic/schema) is used for describing both the input & output schemas for routes.

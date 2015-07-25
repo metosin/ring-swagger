@@ -27,7 +27,7 @@ existing JSON Schema custom implementations you'll need to convert those.
 - `:version` is not mandatory field in ring-swagger schema (defaults to `0.0.1`)
 
 - new public api fns in `ring.swagger.swagger2`:
-   - `transform-paths` for generic path transformations on the clent side
+   - `transform-operations` for generic operation transformations on the client side
    - `ensure-body-and-response-schema-names` to fix the generated schema names on the client side (vs. the `swagger-json`
    generating new names for all the requests.
    

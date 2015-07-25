@@ -124,7 +124,7 @@
       responses
       {:default {:description ""}})))
 
-(defn transform-operation
+(defn convert-operation
   "Returns a map with methods as keys and the Operation
    maps with parameters and responses transformed to comply
    with Swagger spec as values"
@@ -143,7 +143,7 @@
                 (fn [acc k v]
                   (assoc acc
                     (swagger-path k)
-                    (transform-operation v options))) (empty original-paths) original-paths)
+                    (convert-operation v options))) (empty original-paths) original-paths)
         definitions (-> swagger
                         extract-models
                         (transform-models options))]
@@ -173,11 +173,9 @@
 ;; Transforming the spec
 ;;
 
-(defn transform-paths
-  "Transforms the :paths of a Ring Swagger spec by applying (f endpoint)
-  to all endpoints. If the function returns nil, the given route is removed,
-  otherwise return value of the function call is used as a new value for the
-  route."
+(defn transform-operations
+  "Transforms the operations under the :paths of a ring-swagger spec by applying (f operation)
+  to all operations. If the function returns nil, the given operation is removed."
   [f swagger]
   (let [initial-paths (:paths swagger)
         transformed (for [[path endpoints] initial-paths
@@ -196,8 +194,8 @@
    that come as body parameters or response models."
   [swagger]
   (->> swagger
-       (transform-paths ensure-body-sub-schemas)
-       (transform-paths ensure-response-sub-schemas)))
+       (transform-operations ensure-body-sub-schemas)
+       (transform-operations ensure-response-sub-schemas)))
 
 ;;
 ;; Schema
@@ -244,6 +242,7 @@
                                       definitions. Takes schema-name and set of found
                                       attached schema values as parameters. Returns
                                       sequence of schema-name and selected schema value.
+
    :collection-format               - Sets the collectionFormat for query and formData
                                       parameters.
                                       Possible values: multi, ssv, csv, tsv, pipes."
