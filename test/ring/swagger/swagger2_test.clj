@@ -282,6 +282,44 @@
                 {:type "object"
                  :additionalProperties {:$ref "#/definitions/Kukka"}}))))
 
+(fact "body param is array of primitives"
+  (let [swagger {:paths {"/array" {:post {:parameters {:body [s/Str]}}}}}
+        spec (swagger-json swagger)]
+    (validate swagger) => nil
+
+    (let [param (first (get-in spec [:paths "/array" :post :parameters]))]
+      (some? param) => true
+      (get-in param [:schema :type]) => "array"
+      (get-in param [:schema :items :type]) => "string")))
+
+(fact :hmm "response is array of primitives"
+  (let [swagger {:paths {"/array" {:get {:responses {200 {:schema [Long]}}}}}}
+        spec (swagger-json swagger)]
+    (validate swagger) => nil
+
+    (let [param (get-in spec [:paths "/array" :get :responses 200])]
+      (some? param) => true
+      (get-in param [:schema :type]) => "array"
+      (get-in param [:schema :items :type]) => "integer")))
+
+(fact "body param is array of primitives with schema definition"
+  (let [MyArrayOfInt (s/schema-with-name [s/Str] 'MyArrayOfInt)
+        swagger {:paths {"/array" {:post {:parameters {:body MyArrayOfInt}}}}}
+        spec (swagger-json swagger)]
+    (validate swagger) => nil
+
+    (let [param (first (get-in spec [:paths "/array" :post :parameters]))]
+      (some? param) => true
+      (get-in param [:schema :type]) => "array"
+      (get-in param [:schema :items :type]) => "string")
+
+    ;; TODO: this should pass
+    ;spec => (has-definition
+    ;          'MyArrayOfInt
+    ;          {:type "array"
+    ;           :items {:type "string"}})
+    ))
+
 (fact "tags"
   (let [swagger {:tags [{:name "pet"
                          :description "Everything about your Pets"

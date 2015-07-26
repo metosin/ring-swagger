@@ -54,7 +54,7 @@
        (stw/walk
          x
          (fn [x]
-           (if (and (plain-map? x) (s/schema-name x))
+           (if (and (or (plain-map? x) (vector? x)) (s/schema-name x))
              (do (reset! it x) x)
              (walk x)))
          identity)) [schema])
@@ -85,6 +85,13 @@
           x)
         x))))
 
+(defn top-level-arrays
+  "Check for lists of primitives at the top level"
+  [name schema]
+  (if (vector? schema)
+    (with-meta schema {:name name})
+    schema))
+
 (defn with-named-sub-schemas
   "Traverses a schema tree of Maps, Sets and Sequences and add Schema-name to all
    anonymous maps between the root and any named schemas in thre tree. Names of the
@@ -92,7 +99,9 @@
    all keys in the path CamelCased"
   ([schema] (with-named-sub-schemas schema "schema"))
   ([schema prefix]
-   (name-schemas [(or (s/schema-name schema) (gensym prefix))] schema)))
+   (let [name      (or (s/schema-name schema) (gensym prefix))
+         top-level (top-level-arrays name schema)]
+     (name-schemas [name] top-level))))
 
 (defn transform [schema]
   (let [required (required-keys schema)
@@ -105,8 +114,8 @@
 ;; NOTE: silently ignores non-map schemas
 (defn collect-models
   "Walks through the data structure and collects all Schemas
-  into a map schema-name->#{values}. Note: schame-name can link
-  to sevetal implementations."
+  into a map schema-name->#{values}. Note: schema-name can link
+  to several implementations."
   [x]
   (let [schemas (atom {})]
     (walk/prewalk
