@@ -9,7 +9,7 @@
                  [cheshire "5.5.0"]
                  [slingshot "0.12.2"]
                  [metosin/ring-http-response "0.6.3"]
-                 [metosin/schema-tools "0.4.3"]
+                 [metosin/schema-tools "0.5.1"]
                  [prismatic/schema "0.4.3"]
                  [prismatic/plumbing "0.4.4"]
                  [clj-time "0.10.0"]
@@ -23,7 +23,7 @@
                    :dependencies [[midje "1.7.0"]
                                   [ring-mock "0.1.5"]
                                   [metosin/scjsv "0.2.0"]
-                                  [metosin/ring-swagger-ui "2.1.0"]
+                                  [metosin/ring-swagger-ui "2.1.1"]
                                   [javax.servlet/servlet-api "2.5"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha4"]]}}
   :codeina {:sources ["src"]

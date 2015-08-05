@@ -37,9 +37,10 @@ existing JSON Schema custom implementations you'll need to convert those.
 - updated dependencies:
 
 ```clojure
-[metosin/schema-tools "0.4.3"] is available but we use "0.4.1"
+[metosin/schema-tools "0.5.1"] is available but we use "0.4.1"
 [metosin/ring-http-response "0.6.3"] is available but we use "0.6.2"
-[metosin/ring-swagger-ui "2.1.0"] is available but we use "2.0.24"
+[metosin/ring-swagger-ui "2.1.1"] is available but we use "2.0.24"
+
 [cheshire "5.5.0"] is available but we use "5.4.0"
 [org.flatland/ordered "1.5.3"] is available but we use "1.5.2"
 [clj-time "0.10.0"] is available but we use "0.9.0"
