@@ -8,16 +8,22 @@
 (fact "json coercions"
   (let [c (coercer :json)]
 
-    (fact "Date with and without millis"
+    (fact "Date with / without millis and and from long / string-long"
       ((c Date) "2014-02-18T18:25:37.456Z") => (partial instance? Date)
-      ((c Date) "2014-02-18T18:25:37Z") => (partial instance? Date))
+      ((c Date) "2014-02-18T18:25:37Z") => (partial instance? Date)
+      ((c Date) "1432439999999") => (partial instance? Date)
+      ((c Date) 1432439999999) => (partial instance? Date))
 
-    (fact "DateTime with and without millis"
+    (fact "DateTime with / without millis and from long / string-long"
       ((c DateTime) "2014-02-18T18:25:37.456Z") => (partial instance? DateTime)
-      ((c DateTime) "2014-02-18T18:25:37Z") => (partial instance? DateTime))
+      ((c DateTime) "2014-02-18T18:25:37Z") => (partial instance? DateTime)
+      ((c DateTime) "1432439999999") => (partial instance? DateTime)
+      ((c DateTime) 1432439999999) => (partial instance? DateTime))
 
-    (fact "LocalDate"
-      ((c LocalDate) "2014-02-19") => (partial instance? LocalDate))
+    (fact "LocalDate from string, long / string-long"
+      ((c LocalDate) "2014-02-19") => (partial instance? LocalDate)
+      ((c LocalDate) "1432439999999") => (partial instance? LocalDate)
+      ((c LocalDate) 1432439999999) => (partial instance? LocalDate))
 
     (fact "UUID"
       ((c UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))))
