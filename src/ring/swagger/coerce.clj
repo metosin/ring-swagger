@@ -10,6 +10,16 @@
            [java.util.regex Pattern]
            (clojure.lang APersistentSet Keyword)))
 
+(defn string->long [^String x]
+  (try (Long/valueOf x) (catch Exception e x)))
+
+(defn string->double [^String x]
+  (try (Double/valueOf x) (catch Exception e x)))
+
+(defn string->uuid [^String x]
+  (try (UUID/fromString x) (catch Exception e x)))
+
+
 (defn date-time? [x] (#{Date DateTime} x))
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
 
@@ -26,18 +36,25 @@
   [schema]
   (if (date-time? schema)
     (fn [x]
-      (if (string? x)
-        (let [parsed (parse-date-time x)]
-          (if (= schema Date) (.toDate parsed) parsed))
-        x))))
+      (cond 
+        (string? x) (let [parsed (if-let [n (string->long x)]
+                                   (DateTime. n)
+                                   (parse-date-time x))]
+                      (if (= schema Date) (.toDate parsed) parsed))
+        (number? x) (let [d (DateTime. x)]
+                      (if (= schema Date) (.toDate d) d))
+        :else x))))
 
 (defn date-matcher
   [schema]
   (if (= LocalDate schema)
     (fn [x]
-      (if (string? x)
-        (parse-date x)
-        x))))
+      (cond
+        (string? x) (if-let [n (string->long x)]
+                      (LocalDate. n)
+                      (parse-date x))
+        (number? x) (LocalDate. x)
+        :else x))))
 
 (defn pattern-matcher
   [schema]
@@ -58,14 +75,6 @@
     "false" false
     x))
 
-(defn string->long [^String x]
-  (try (Long/valueOf x) (catch Exception e x)))
-
-(defn string->double [^String x]
-  (try (Double/valueOf x) (catch Exception e x)))
-
-(defn string->uuid [^String x]
-  (try (UUID/fromString x) (catch Exception e x)))
 
 (def json-coersions {s/Keyword sc/string->keyword
                      Keyword sc/string->keyword
