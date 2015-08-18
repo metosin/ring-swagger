@@ -49,8 +49,13 @@
       (->json (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
       (->json (s/enum 1 2 3))         => {:type "integer" :format "int64" :enum (seq #{1 2 3})})
 
-    (fact "s/maybe -> type of internal schema"
-      (->json (s/maybe Long))         => (->json Long))
+    (fact "s/maybe[type] -> core type + null"
+      (->json (s/maybe Long))         => (let [json (->json Long)
+                                               type (:type json)]
+                                           (assoc json :type [type "null"])))
+
+    (fact "s/maybe[model] -> type of internal schema"
+      (->json (s/maybe Model))         => (->json Model))
 
     (fact "s/both -> type of the first element"
       (->json (s/both Long String))   => (->json Long))
