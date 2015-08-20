@@ -134,11 +134,7 @@
   (json-property [e _] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
-  (json-property [e _] (let [schema (->json (:schema e))
-                             type   (:type schema)]
-                         (if type
-                           (assoc schema :type [type "null"])
-                           schema)))
+  (json-property [e _] (->json (:schema e)))
 
   schema.core.Both
   (json-property [e _] (->json (first (:schemas e))))
