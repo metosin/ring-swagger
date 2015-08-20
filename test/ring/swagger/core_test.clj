@@ -51,6 +51,9 @@
 ;; Excepcted JSON Schemas
 ;;
 
+(defn definition [sym]
+  (str "#/definitions/" sym))
+
 (def Tag' {:id 'Tag
            :properties {:id {:type "integer"
                              :format "int64"
@@ -74,7 +77,7 @@
                              :description "Unique identifier for the Pet"
                              :minimum "0.0"
                              :maximum "100.0"}
-                        :category {:$ref 'Category
+                        :category {:$ref (definition 'Category)
                                    :description "Category the pet is in"}
                         :name {:type "string"
                                :description "Friendly name of the pet"}
@@ -83,7 +86,7 @@
                                     :items {:type "string"}}
                         :tags {:type "array"
                                :description "Tags assigned to this pet"
-                               :items {:$ref 'Tag}}
+                               :items {:$ref (definition 'Tag)}}
                         :status {:type "string"
                                  :description "pet status in the store"
                                  :enum [:pending :sold :available]}}})
@@ -187,13 +190,13 @@
       =>
 
       {'Nested {:id 'Nested
-                :properties {:address {:$ref 'NestedAddress}
+                :properties {:address {:$ref (definition 'NestedAddress)}
                              :id {:type "string"}}
                 :required [:id :address]}
        'NestedAddress {:id 'NestedAddress
                        :properties {:country {:enum [:fi :pl]
                                               :type "string"}
-                                    :street {:$ref 'NestedAddressStreet}}
+                                    :street {:$ref (definition 'NestedAddressStreet)}}
                        :required [:country :street]}
        'NestedAddressStreet {:id 'NestedAddressStreet
                              :properties {:name {:type "string"}}
@@ -276,10 +279,10 @@
 
   (transform-models [Foo Bar])
   => {'Bar {:id 'Bar
-            :properties {:foo {:$ref 'Foo}}
+            :properties {:foo {:$ref (definition 'Foo)}}
             :required [:foo]}
       'Foo {:id 'Foo
-            :properties {:bar {:$ref 'Bar}}
+            :properties {:bar {:$ref (definition 'Bar)}}
             :required [:bar]}})
 
 (fact "with-named-sub-schemas"

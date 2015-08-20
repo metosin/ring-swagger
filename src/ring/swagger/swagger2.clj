@@ -20,18 +20,15 @@
 ;;
 
 (defn ->json [& args]
-  (binding [jsons/*swagger-spec-version* "2.0"]
-    (apply jsons/->json args)))
+  (apply jsons/->json args))
 
 (defn ->properties [schema]
-  (binding [jsons/*swagger-spec-version* "2.0"]
-    (let [properties (jsons/properties schema)]
-      (if-not (empty? properties)
-        properties))))
+  (let [properties (jsons/properties schema)]
+    (if-not (empty? properties)
+      properties)))
 
 (defn ->additional-properties [schema]
-    (binding [jsons/*swagger-spec-version* "2.0"]
-      (jsons/additional-properties schema)))
+  (jsons/additional-properties schema))
 
 ;;
 ;; Schema transformations

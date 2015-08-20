@@ -100,9 +100,7 @@
 
 (defn- named-schema [e]
   (if-let [schema-name (s/schema-name e)]
-    (case *swagger-spec-version*
-      "1.2" {:$ref schema-name}
-      "2.0" {:$ref (str "#/definitions/" schema-name)})
+    {:$ref (str "#/definitions/" schema-name)}
     (and (not *ignore-missing-mappings*)
          (not-supported! e))))
 
