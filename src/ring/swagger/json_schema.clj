@@ -74,11 +74,11 @@
 
 (defn ->json
   ([x] (->json x {}))
-  ([x {:keys [parameter?] :as options}]
-   (if-let [json (if parameter?
+  ([x {:keys [operation?] :as options}]
+   (if-let [json (if operation?
                    (if-let [schema-name (s/schema-name x)]
                      {:type schema-name}
-                     (or (ensure-swagger12-model-references (->json-schema x (dissoc options :parameter?)))
+                     (or (ensure-swagger12-model-references (->json-schema x (dissoc options :operation?)))
                          {:type "void"}))
                    (->json-schema x options))]
      (merge-meta json x options))))
