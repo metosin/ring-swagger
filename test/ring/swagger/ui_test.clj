@@ -2,7 +2,8 @@
   (:require [midje.sweet :refer :all]
             [ring.mock.request :as mock]
             [ring.swagger.test-utils :refer :all]
-            [ring.swagger.ui :refer :all]))
+            [ring.swagger.ui :refer :all]
+            [cheshire.core :as json]))
 
 (tabular
   (fact get-path
@@ -91,9 +92,18 @@
     => "window.API_CONF = {\"url\":\"/swagger.json\"};")
 
   (fact "with swagger-docs & oauth2 set"
-    (conf-js nil {:swagger-docs "/lost"
-                  :oauth2       {:client-id "1" :app-name "2" :realm "3"}})
-    => "window.API_CONF = {\"oauth2\":{\"clientId\":\"1\",\"appName\":\"2\",\"realm\":\"3\"},\"url\":\"/lost\"};")
+    (-> (conf-js nil {:swagger-docs "/lost"
+                      :oauth2 {:client-id "1"
+                               :app-name "2"
+                               :realm "3"}})
+        (->> (re-matches #"window.API_CONF = (\{.*\});"))
+        second
+        (json/decode true))
+
+    => {:url "/lost"
+        :oauth2 {:appName "2"
+                 :clientId "1"
+                 :realm "3"}})
 
   (fact "does not fail with crappy input"
     (conf-js nil {:kikka "kukka"

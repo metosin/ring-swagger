@@ -210,7 +210,7 @@
 
       (keys
         (transform-models
-          [(with-named-sub-schemas ReturnValue)])) => ['Boundary 'ReturnValue])))
+          [(with-named-sub-schemas ReturnValue)])) => (just ['Boundary 'ReturnValue] :in-any-order))))
 
 ;;
 ;; Route generation
