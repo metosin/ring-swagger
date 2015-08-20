@@ -153,7 +153,3 @@
 
     (fact "nested properties work ok"
       (keys (properties Bar)) => [:key])))
-
-(fact "ensuring swagger12 model references"
-  (ensure-swagger12-model-references {:$ref ..schema..}) => {:type ..schema..}
-  (ensure-swagger12-model-references ..schema..) => ..schema..)

@@ -2,6 +2,8 @@
 
 ### Breaking changes
 
+- **BREAKING**: Swagger 1.2 is no more supported.
+
 - **BREAKING**: Json Schema conversion for objects (e.g. records) is now extendable using a protocol instead of a
 multimethod. Check [json-schema.clj](./src/ring/swagger/json_schema.clj) for the new implementation. If you have
 existing JSON Schema custom implementations you'll need to convert those.

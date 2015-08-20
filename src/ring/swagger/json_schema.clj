@@ -41,15 +41,6 @@
 (defprotocol JsonSchema
   (json-property [this options]))
 
-(defn ensure-swagger12-model-references [schema]
-  (if (or false (= *swagger-spec-version* "1.2"))
-    (if-let [ref (:$ref schema)]
-      (-> schema
-          (dissoc :$ref)
-          (assoc :type ref))
-      schema)
-    schema))
-
 (defn ->json-schema [x options]
   (if (instance? Class x)
     (json-type x)
@@ -78,7 +69,7 @@
    (if-let [json (if operation?
                    (if-let [schema-name (s/schema-name x)]
                      {:type schema-name}
-                     (or (ensure-swagger12-model-references (->json-schema x (dissoc options :operation?)))
+                     (or (->json-schema x (dissoc options :operation?))
                          {:type "void"}))
                    (->json-schema x options))]
      (merge-meta json x options))))
