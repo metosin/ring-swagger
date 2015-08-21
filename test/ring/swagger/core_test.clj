@@ -117,27 +117,12 @@
   "/:foo-bar/:foo_bar"          [:foo-bar :foo_bar]
   "/api/ping"                   empty?)
 
-(fact "string-path-parameters"
-  (string-path-parameters "/api/:kikka/:kakka/:kukka") => {:type :path
-                                                           :model {:kukka java.lang.String
-                                                                   :kakka java.lang.String
-                                                                   :kikka java.lang.String}}
-  (string-path-parameters "/api/ping") => nil)
-
 ;;
 ;; Helpers
 ;;
 
 (fact "swagger-path"
   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
-
-(fact "generate-nick"
-  (generate-nick {:method :get
-                  :uri "/api/pizzas/:id"
-                  :metadata ..meta..}) => "getApiPizzasById"
-  (generate-nick {:method :delete
-                  :uri "/api/:version/pizzas/:id"
-                  :metadata ..meta..}) => "deleteApiByVersionPizzasById")
 
 ;;
 ;; Web stuff

@@ -3,10 +3,9 @@
             [clojure.walk :as walk]
             [schema.core :as s]
             [plumbing.core :refer :all]
-    ;; needed for the json-encoders
+            ;; needed for the json-encoders
             ring.swagger.json
             [ring.swagger.common :refer :all]
-            [ring.swagger.json-schema :as jsons]
             [schema-tools.walk :as stw]
             [flatland.ordered.set :as os]
             [clojure.string :as string]
@@ -130,21 +129,8 @@
 (defn path-params [s]
   (map (comp keyword second) (re-seq #":(.[^:|(/]*)[/]?" s)))
 
-(defn string-path-parameters [uri]
-  (let [params (path-params uri)]
-    (if (seq params)
-      {:type :path
-       :model (zipmap params (repeat String))})))
-
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
-
-(defn generate-nick [{:keys [method uri]}]
-  (-> (str (name method) " " uri)
-      (str/replace #"/" " ")
-      (str/replace #"-" "_")
-      (str/replace #":" " by ")
-      lc/mixed))
 
 (defn join-paths
   "Join several paths together with \"/\". If path ends with a slash,
