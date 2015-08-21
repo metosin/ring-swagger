@@ -50,12 +50,6 @@
          identity)) [schema])
     @it))
 
-(defn peek-schema-name
-  "Recurisively seeks the schema-name withing a schema.
-   Walks over sets, vectors and Schema predicates."
-  [schema]
-  (s/schema-name (peek-schema schema)))
-
 (defn name-schemas [names schema]
   (stw/walk
     schema
@@ -83,14 +77,6 @@
   ([schema] (with-named-sub-schemas schema "schema"))
   ([schema prefix]
    (name-schemas [(or (s/schema-name schema) (gensym prefix))] schema)))
-
-(defn transform [schema]
-  (let [required (required-keys schema)
-        required (if-not (empty? required) required)]
-    (remove-empty-keys
-      {:id (s/schema-name schema)
-       :properties (jsons/properties schema)
-       :required required})))
 
 ;; NOTE: silently ignores non-map schemas
 (defn collect-models
