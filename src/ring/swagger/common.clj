@@ -5,15 +5,6 @@
   "removes empty keys from a map"
   [m] (into (empty m) (filter (fn-> second nil? not) m)))
 
-(defn name-of
-  "Returns name of a Var, String, Named object or nil"
-  ^String [x]
-  (cond
-    (var? x) (-> x meta :name name)
-    (string? x) x
-    (instance? clojure.lang.Named x) (name x)
-    :else nil))
-
 (defn value-of
   "Extracts value of for var, symbol or returns itself"
   [x]
