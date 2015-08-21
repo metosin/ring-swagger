@@ -3,10 +3,7 @@
             [ring.swagger.common :refer [plain-map?]]
             [flatland.ordered.map :refer :all]))
 
-; TODO: clean all 1.2 hacks after Compojure-api goes 2.0
-
 (def ^:dynamic *ignore-missing-mappings* false)
-(def ^:dynamic *swagger-spec-version* "1.2")
 
 (defn json-schema-meta
   "Select interesting keys from meta-data of schema."
