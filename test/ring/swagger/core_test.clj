@@ -17,19 +17,6 @@
 ;; Schemas
 ;;
 
-(s/defschema Tag {(s/optional-key :id)   (field s/Int {:description "Unique identifier for the tag"})
-                  (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
-
-(s/defschema Category {(s/optional-key :id)   (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
-                       (s/optional-key :name) (field s/Str {:description "Name of the category"})})
-
-(s/defschema Pet {:id                         (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
-                  :name                       (field s/Str {:description "Friendly name of the pet"})
-                  (s/optional-key :category)  (field Category {:description "Category the pet is in"})
-                  (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
-                  (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
-                  (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
-
 (s/defschema OrderedSchema (ordered-map
                              :id Long
                              :hot Boolean
@@ -84,25 +71,6 @@
 
   (fact "Keeps the order"
     (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
-
-(fact "collect-models"
-  (fact "Sub-schemas are collected"
-    (collect-models Pet)
-    => {'Pet #{Pet}
-        'Tag #{Tag}
-        'Category #{Category}})
-
-  (fact "No schemas are collected if all are unnamed"
-    (collect-models String) => {})
-
-  (fact "Inline-sub-schemas as collected after they are nameed"
-    (collect-models (with-named-sub-schemas RootModel))
-    => {'RootModel #{RootModel}
-        'RootModelSub #{(:sub RootModel)}})
-
-  (fact "Described anonymous models are collected"
-    (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
-      (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
 
 ;;
 ;; Route generation
