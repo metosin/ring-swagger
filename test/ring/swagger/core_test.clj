@@ -6,17 +6,6 @@
             [ring.swagger.core :refer :all]
             [flatland.ordered.map :refer :all]))
 
-;;
-;; Helpers
-;;
-
-(fact "scrict-schema strips open keys"
-  (strict-schema {s/Keyword s/Any :s String}) => {:s String})
-
-;;
-;; Schemas
-;;
-
 (s/defschema OrderedSchema (ordered-map
                              :id Long
                              :hot Boolean
@@ -31,10 +20,6 @@
                              :f String))
 
 (def ordered-schema-order (keys OrderedSchema))
-
-;;
-;; Facts
-;;
 
 (s/defschema RootModel
   {:sub {:foo Long}})
@@ -86,15 +71,14 @@
   "/api/ping"                   empty?)
 
 ;;
-;; Helpers
+;; Common
 ;;
 
 (fact "swagger-path"
   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
 
-;;
-;; Web stuff
-;;
+(fact "scrict-schema strips open keys"
+  (strict-schema {s/Keyword s/Any :s String}) => {:s String})
 
 (fact join-paths
   (join-paths "/foo" nil "index.html") => "/foo/index.html"
