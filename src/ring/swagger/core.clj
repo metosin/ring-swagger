@@ -3,8 +3,6 @@
             [clojure.walk :as walk]
             [schema.core :as s]
             [plumbing.core :refer :all]
-            ;; needed for the json-encoders
-            ring.swagger.json
             [ring.swagger.common :refer :all]
             [schema-tools.walk :as stw]
             [flatland.ordered.set :as os]
