@@ -75,7 +75,7 @@
 ;;
 
 (fact "swagger-path"
-  (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
+  (swagger-path "/api/:kikka/:kakka/ko?/:kukka/kokka") => "/api/{kikka}/{kakka}/ko?/{kukka}/kokka")
 
 (fact "scrict-schema strips open keys"
   (strict-schema {s/Keyword s/Any :s String}) => {:s String})
