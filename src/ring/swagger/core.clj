@@ -138,41 +138,6 @@
       (f k v))))
 
 ;;
-;; transformers
-;;
-
-(defn transform-models [schemas]
-  (->> schemas
-       collect-models
-       (handle-duplicate-schemas ignore-duplicate-schemas)
-       (map (juxt key (comp transform val)))
-       (into {})))
-
-(defn extract-models [details]
-  (let [route-meta (->> details
-                        :routes
-                        (map :metadata))
-        return-models (->> route-meta
-                           (keep :return)
-                           flatten)
-        body-models (->> route-meta
-                         (mapcat :parameters)
-                         (filter (fn-> :type (= :body)))
-                         (keep :model)
-                         flatten)
-        response-models (->> route-meta
-                             (mapcat :responseMessages)
-                             (keep :responseModel)
-                             flatten)
-        all-models (->> (concat body-models return-models response-models)
-                        flatten
-                        (map with-named-sub-schemas))]
-    (->> all-models
-         (map (juxt peek-schema-name identity))
-         (filter (fn-> first))
-         (into {}))))
-
-;;
 ;; Route generation
 ;;
 

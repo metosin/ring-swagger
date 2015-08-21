@@ -30,8 +30,6 @@
                   (s/optional-key :tags)      (field [Tag] {:description "Tags assigned to this pet"})
                   (s/optional-key :status)    (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
 
-(s/defschema PetError {:message String s/Keyword s/Any})
-
 (s/defschema OrderedSchema (ordered-map
                              :id Long
                              :hot Boolean
@@ -48,60 +46,8 @@
 (def ordered-schema-order (keys OrderedSchema))
 
 ;;
-;; Excepcted JSON Schemas
-;;
-
-(defn definition [sym]
-  (str "#/definitions/" sym))
-
-(def Tag' {:id 'Tag
-           :properties {:id {:type "integer"
-                             :format "int64"
-                             :description "Unique identifier for the tag"}
-                        :name {:type "string"
-                               :description "Friendly name for the tag"}}})
-
-(def Category' {:id 'Category
-                :properties {:id {:type "integer"
-                                  :format "int64"
-                                  :description "Category unique identifier"
-                                  :minimum "0.0"
-                                  :maximum "100.0"}
-                             :name {:type "string"
-                                    :description "Name of the category"}}})
-
-(def Pet' {:id 'Pet
-           :required [:id :name]
-           :properties {:id {:type "integer"
-                             :format "int64"
-                             :description "Unique identifier for the Pet"
-                             :minimum "0.0"
-                             :maximum "100.0"}
-                        :category {:$ref (definition 'Category)
-                                   :description "Category the pet is in"}
-                        :name {:type "string"
-                               :description "Friendly name of the pet"}
-                        :photoUrls {:type "array"
-                                    :description "Image URLs"
-                                    :items {:type "string"}}
-                        :tags {:type "array"
-                               :description "Tags assigned to this pet"
-                               :items {:$ref (definition 'Tag)}}
-                        :status {:type "string"
-                                 :description "pet status in the store"
-                                 :enum [:pending :sold :available]}}})
-
-(def PetError' {:id 'PetError
-                :required [:message]
-                :properties {:message {:type "string"}}})
-;;
 ;; Facts
 ;;
-
-(facts "simple schemas"
-  (transform Tag) => Tag'
-  (transform Category) => Category'
-  (transform Pet) => Pet')
 
 (s/defschema RootModel
   {:sub {:foo Long}})
@@ -158,63 +104,6 @@
     (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
       (keys (collect-models (with-named-sub-schemas schema))) => (two-of symbol?))))
 
-(fact "transform-models"
-  (transform-models [Pet]) => {'Pet Pet'
-                               'Tag Tag'
-                               'Category Category'}
-
-  (s/defschema Foo (s/enum :a :b))
-  (s/defschema Bar {:key Foo})
-  (s/defschema Baz s/Keyword)
-
-  (fact "record-schemas are not transformed"
-    (transform-models [Foo]) => {})
-
-  (fact "non-map schemas are not transformed"
-    (transform-models [Baz]) => {})
-
-  (fact "nested record-schemas are inlined"
-    (transform-models [Bar]) => {'Bar {:id 'Bar,
-                                       :properties {:key {:enum [:b :a]
-                                                          :type "string"}}
-                                       :required [:key]}})
-
-  (fact "nested schemas"
-
-    (fact "with anonymous sub-schemas"
-      (s/defschema Nested {:id s/Str
-                           :address {:country (s/enum :fi :pl)
-                                     :street {:name s/Str}}})
-      (transform-models [(with-named-sub-schemas Nested)])
-
-      =>
-
-      {'Nested {:id 'Nested
-                :properties {:address {:$ref (definition 'NestedAddress)}
-                             :id {:type "string"}}
-                :required [:id :address]}
-       'NestedAddress {:id 'NestedAddress
-                       :properties {:country {:enum [:fi :pl]
-                                              :type "string"}
-                                    :street {:$ref (definition 'NestedAddressStreet)}}
-                       :required [:country :street]}
-       'NestedAddressStreet {:id 'NestedAddressStreet
-                             :properties {:name {:type "string"}}
-                             :required [:name]}})
-
-    (fact "nested named sub-schemas"
-
-      (s/defschema Boundary
-        {:type (s/enum "MultiPolygon" "Polygon" "MultiPoint" "Point")
-         :coordinates [s/Any]})
-
-      (s/defschema ReturnValue
-        {:boundary (s/maybe Boundary)})
-
-      (keys
-        (transform-models
-          [(with-named-sub-schemas ReturnValue)])) => (just ['Boundary 'ReturnValue] :in-any-order))))
-
 ;;
 ;; Route generation
 ;;
@@ -249,59 +138,6 @@
   (generate-nick {:method :delete
                   :uri "/api/:version/pizzas/:id"
                   :metadata ..meta..}) => "deleteApiByVersionPizzasById")
-
-(fact "extract-models"
-  (fact "returns both return and body-parameters but not query or path parameter types"
-    (extract-models {:routes [{:metadata {:return [Tag]
-                                          :parameters [{:model Tag
-                                                        :type :body}
-                                                       {:model [Category]
-                                                        :type :body}
-                                                       {:model Pet
-                                                        :type :path}
-                                                       {:model Pet
-                                                        :type :query}]}}
-                              {:metadata {:return Tag}}]})
-    => {'Category Category
-        'Tag Tag}))
-
-
-(declare Bar)
-
-(s/defschema Foo {:bar (s/recursive #'Bar)})
-
-(s/defschema Bar {:foo (s/maybe #'Foo)})
-
-(fact "recursive"
-  (collect-models [Foo Bar])
-  => {'Bar #{{:foo (s/maybe #'Foo)}}
-      'Foo #{{:bar (s/recursive #'Bar)}}}
-
-  (transform-models [Foo Bar])
-  => {'Bar {:id 'Bar
-            :properties {:foo {:$ref (definition 'Foo)}}
-            :required [:foo]}
-      'Foo {:id 'Foo
-            :properties {:bar {:$ref (definition 'Bar)}}
-            :required [:bar]}})
-
-(fact "with-named-sub-schemas"
-  (fact "nested maps"
-    (transform (with-named-sub-schemas  {:a String
-                                         :b {:c String}})) => truthy)
-  (fact "nested vectors"
-    (transform (with-named-sub-schemas {:a String
-                                        :b [{:c String}]})) => truthy)
-  (fact "nested sets"
-    (transform (with-named-sub-schemas {:a String
-                                        :b #{{:c String}}})) => truthy)
-
-  ;; FIXME: should work
-  (fact "nested value behind a record"
-    (transform
-      (with-named-sub-schemas
-        {:a String
-         :b (s/maybe {:c String})})) => truthy))
 
 ;;
 ;; Web stuff
