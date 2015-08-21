@@ -24,7 +24,7 @@
 
 (defn ->properties [schema]
   (let [properties (jsons/properties schema)]
-    (if-not (empty? properties)
+    (if (seq properties)
       properties)))
 
 (defn ->additional-properties [schema]
