@@ -3,10 +3,7 @@
             [ring.swagger.common :refer [plain-map?]]
             [flatland.ordered.map :refer :all]))
 
-; TODO: clean all 1.2 hacks after Compojure-api goes 2.0
-
 (def ^:dynamic *ignore-missing-mappings* false)
-(def ^:dynamic *swagger-spec-version* "1.2")
 
 (defn json-schema-meta
   "Select interesting keys from meta-data of schema."
@@ -41,15 +38,6 @@
 (defprotocol JsonSchema
   (json-property [this options]))
 
-(defn ensure-swagger12-model-references [schema]
-  (if (or false (= *swagger-spec-version* "1.2"))
-    (if-let [ref (:$ref schema)]
-      (-> schema
-          (dissoc :$ref)
-          (assoc :type ref))
-      schema)
-    schema))
-
 (defn ->json-schema [x options]
   (if (instance? Class x)
     (json-type x)
@@ -78,7 +66,7 @@
    (if-let [json (if operation?
                    (if-let [schema-name (s/schema-name x)]
                      {:type schema-name}
-                     (or (ensure-swagger12-model-references (->json-schema x (dissoc options :operation?)))
+                     (or (->json-schema x (dissoc options :operation?))
                          {:type "void"}))
                    (->json-schema x options))]
      (merge-meta json x options))))
@@ -109,9 +97,7 @@
 
 (defn- named-schema [e]
   (if-let [schema-name (s/schema-name e)]
-    (case *swagger-spec-version*
-      "1.2" {:$ref schema-name}
-      "2.0" {:$ref (str "#/definitions/" schema-name)})
+    {:$ref (str "#/definitions/" schema-name)}
     (and (not *ignore-missing-mappings*)
          (not-supported! e))))
 

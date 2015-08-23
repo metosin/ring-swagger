@@ -84,6 +84,25 @@
 (s/defschema RootModel
   {:sub {:foo Long}})
 
+(fact "collect-models"
+  (fact "Sub-schemas are collected"
+    (rsc/collect-models Pet)
+    => {'Pet #{Pet}
+        'Tag #{Tag}
+        'Category #{Category}})
+
+  (fact "No schemas are collected if all are unnamed"
+    (rsc/collect-models String) => {})
+
+  (fact "Inline-sub-schemas as collected after they are nameed"
+    (rsc/collect-models (rsc/with-named-sub-schemas RootModel))
+    => {'RootModel #{RootModel}
+        'RootModelSub #{(:sub RootModel)}})
+
+  (fact "Described anonymous models are collected"
+    (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
+      (keys (rsc/collect-models (rsc/with-named-sub-schemas schema))) => (two-of symbol?))))
+
 (fact "transform-models"
   (transform-models [Pet] +options+) => {"Pet" Pet'
                                          "Tag" Tag'

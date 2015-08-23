@@ -8,15 +8,6 @@
 
 (def Abba "jabba")
 
-(fact "name-of"
-  (name-of Abba)   => "jabba"
-  (name-of 'Abba)  => "Abba"
-  (name-of #'Abba) => "Abba"
-  (name-of "Abba") => "Abba"
-  (name-of :Abba)  => "Abba"
-  (name-of {})     => nil
-  (name-of nil)    => nil)
-
 (fact "value-of"
   (value-of Abba)   => "jabba"
   (value-of 'Abba)  => "jabba"

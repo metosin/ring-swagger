@@ -1,17 +1,18 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.svg?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Dependencies Status](http://jarkeeper.com/metosin/ring-swagger/status.png)](http://jarkeeper.com/metosin/ring-swagger)
 
-[Swagger](http://swagger.io/) 1.2 & 2.0 implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema). 
+[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema).
 
 - [API Docs](http://metosin.github.io/ring-swagger/doc/)
-- Extendable trasformations from Prismatic Schemas to Swagger JSON Schemas
-- Extended JSON & String Serialization & coercion
+- Transforms deeply nested Schemas into Swagger JSON Schema definitions
+- Extended JSON & String serialization & coercion
 - For web/routing library developers:
-  - A [Schema-based contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj) for collecting route documentation from the web apps
+  - A [Schema-based contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj) for collecting route documentation
   - Middlewares for handling Schemas Validation Errors
-  - Handlers to generate the Swaggers artifacts
+  - Functions to generate the Swaggers artifacts
     - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
-    - [Resource listing](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#51-resource-listing) and [Api declarations](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md#52-api-declaration) for 1.2.
     - [Swagger-UI](https://github.com/swagger-api/swagger-ui) bindings. (get the UI separately as [jar](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
+
+**note** Swagger 1.2 support has been dropped in `0.21.0`.
 
 ## Latest version
 
@@ -24,7 +25,7 @@
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [yada](https://github.com/juxt/yada)
 
-Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema allows extra keys as ring-swagger tries not to be on your way - one can pass any valid Swagger spec data in.
+Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any valid Swagger spec data in.
 
 ### Simplest possible example
 

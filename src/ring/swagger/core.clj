@@ -1,14 +1,9 @@
 (ns ring.swagger.core
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
-            [ring.util.http-response :as r]
             [schema.core :as s]
             [plumbing.core :refer :all]
-            ;; needed for the json-encoders
-            ring.swagger.json
-            [ring.swagger.schema :as schema]
             [ring.swagger.common :refer :all]
-            [ring.swagger.json-schema :as jsons]
             [schema-tools.walk :as stw]
             [flatland.ordered.set :as os]
             [clojure.string :as string]
@@ -27,14 +22,6 @@
   [schema]
   {:pre [(map? schema)]}
   (dissoc schema s/Keyword))
-
-;;
-;; Models
-;;
-
-(s/defschema ResponseMessage {:code Long
-                              (s/optional-key :message) String
-                              (s/optional-key :responseModel) s/Any})
 
 ;;
 ;; Schema transformations
@@ -59,12 +46,6 @@
              (walk x)))
          identity)) [schema])
     @it))
-
-(defn peek-schema-name
-  "Recurisively seeks the schema-name withing a schema.
-   Walks over sets, vectors and Schema predicates."
-  [schema]
-  (s/schema-name (peek-schema schema)))
 
 (defn name-schemas [names schema]
   (stw/walk
@@ -93,14 +74,6 @@
   ([schema] (with-named-sub-schemas schema "schema"))
   ([schema prefix]
    (name-schemas [(or (s/schema-name schema) (gensym prefix))] schema)))
-
-(defn transform [schema]
-  (let [required (required-keys schema)
-        required (if-not (empty? required) required)]
-    (remove-empty-keys
-      {:id (s/schema-name schema)
-       :properties (jsons/properties schema)
-       :required required})))
 
 ;; NOTE: silently ignores non-map schemas
 (defn collect-models
@@ -148,67 +121,14 @@
       (f k v))))
 
 ;;
-;; transformers
-;;
-
-(defn transform-models [schemas]
-  (->> schemas
-       collect-models
-       (handle-duplicate-schemas ignore-duplicate-schemas)
-       (map (juxt key (comp transform val)))
-       (into {})))
-
-(defn extract-models [details]
-  (let [route-meta (->> details
-                        :routes
-                        (map :metadata))
-        return-models (->> route-meta
-                           (keep :return)
-                           flatten)
-        body-models (->> route-meta
-                         (mapcat :parameters)
-                         (filter (fn-> :type (= :body)))
-                         (keep :model)
-                         flatten)
-        response-models (->> route-meta
-                             (mapcat :responseMessages)
-                             (keep :responseModel)
-                             flatten)
-        all-models (->> (concat body-models return-models response-models)
-                        flatten
-                        (map with-named-sub-schemas))]
-    (->> all-models
-         (map (juxt peek-schema-name identity))
-         (filter (fn-> first))
-         (into {}))))
-
-;;
 ;; Route generation
 ;;
 
 (defn path-params [s]
   (map (comp keyword second) (re-seq #":(.[^:|(/]*)[/]?" s)))
 
-(defn string-path-parameters [uri]
-  (let [params (path-params uri)]
-    (if (seq params)
-      {:type :path
-       :model (zipmap params (repeat String))})))
-
 (defn swagger-path [uri]
   (str/replace uri #":([^/]+)" "{$1}"))
-
-(defn generate-nick [{:keys [method uri]}]
-  (-> (str (name method) " " uri)
-    (str/replace #"/" " ")
-    (str/replace #"-" "_")
-    (str/replace #":" " by ")
-    lc/mixed))
-
-(def swagger-defaults      {:swaggerVersion "1.2" :apiVersion "0.0.1"})
-(def resource-defaults     {:produces ["application/json"]
-                            :consumes ["application/json"]})
-(def api-declaration-keys  [:title :description :termsOfServiceUrl :contact :license :licenseUrl])
 
 (defn join-paths
   "Join several paths together with \"/\". If path ends with a slash,
@@ -233,78 +153,3 @@
         scheme (if (= x-forwarded-proto "https") "https" (name scheme))
         port (if (#{80 443} server-port) "" (str ":" server-port))]
     (str scheme "://" server-name port context)))
-
-;;
-;; Convert parameters
-;;
-
-(defmulti ^:private extract-parameter
-  (fn [{:keys [type]}] type))
-
-(defmethod extract-parameter :body [{:keys [model type]}]
-  (if model
-    (vector
-      (merge {:paramType type
-              :name (some-> model schema/extract-schema-name str/lower-case)
-              :description ""
-              :required true}
-             (jsons/->json model {:operation? true})))))
-
-(defmethod extract-parameter :default [{:keys [model type] :as it}]
-  (if model
-    (for [[k v] (-> model value-of strict-schema)
-          :when (s/specific-key? k)
-          :let [rk (s/explicit-schema-key (eval k))]]
-      (merge {:paramType type
-              :name (name rk)
-              :description ""
-              :required (s/required-key? k)}
-             (jsons/->json v)))))
-
-(defn convert-parameters [parameters]
-  (mapcat extract-parameter parameters))
-
-(s/defn ^:always-validate convert-response-messages [messages :- [ResponseMessage]]
-  (for [{:keys [responseModel] :as message} messages]
-    (if (and responseModel (schema/named-schema? responseModel))
-      (update-in message [:responseModel] (fn [x] (:type (jsons/->json x {:operation? true}))))
-      (dissoc message :responseModel))))
-
-;;
-;; Routing
-;;
-
-(defn api-listing [parameters swagger]
-  (r/ok
-    (merge
-      swagger-defaults
-      (select-keys parameters [:apiVersion])
-      {:info (select-keys parameters api-declaration-keys)
-       :authorizations (:authorizations parameters {})
-       :apis (for [[api details] swagger]
-               {:path (str "/" (name api))
-                :description (or (:description details) "")})})))
-
-(defn api-declaration [parameters swagger api basepath]
-  (if-let [details (and swagger (swagger api))]
-    (r/ok
-      (merge
-        swagger-defaults
-        resource-defaults
-        (select-keys parameters [:apiVersion :produces :consumes])
-        {:basePath basepath
-         :resourcePath (str "/" api)
-         :models (transform-models (extract-models details))
-         :apis (for [{:keys [method uri metadata] :as route} (:routes details)
-                     :let [{:keys [return summary notes nickname parameters
-                                   responseMessages authorizations]} metadata]]
-                 {:path (swagger-path uri)
-                  :operations [(merge
-                                 (jsons/->json return {:operation? true})
-                                 {:method (-> method name .toUpperCase)
-                                  :authorizations (or authorizations {})
-                                  :summary (or summary "")
-                                  :notes (or notes "")
-                                  :nickname (or nickname (generate-nick route))
-                                  :responseMessages (convert-response-messages responseMessages)
-                                  :parameters (convert-parameters parameters)})]})}))))

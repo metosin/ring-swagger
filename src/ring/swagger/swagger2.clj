@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [schema.core :as s]
             [plumbing.core :refer [for-map]]
+            ; the json-encodings, FIXME: global side effects -> separate import
             ring.swagger.json
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
@@ -20,18 +21,15 @@
 ;;
 
 (defn ->json [& args]
-  (binding [jsons/*swagger-spec-version* "2.0"]
-    (apply jsons/->json args)))
+  (apply jsons/->json args))
 
 (defn ->properties [schema]
-  (binding [jsons/*swagger-spec-version* "2.0"]
-    (let [properties (jsons/properties schema)]
-      (if-not (empty? properties)
-        properties))))
+  (let [properties (jsons/properties schema)]
+    (if (seq properties)
+      properties)))
 
 (defn ->additional-properties [schema]
-    (binding [jsons/*swagger-spec-version* "2.0"]
-      (jsons/additional-properties schema)))
+  (jsons/additional-properties schema))
 
 ;;
 ;; Schema transformations
