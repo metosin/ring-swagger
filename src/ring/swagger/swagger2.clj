@@ -20,9 +20,6 @@
 ;; 2.0 Json Schema changes
 ;;
 
-(defn ->json [& args]
-  (apply jsons/->json args))
-
 (defn ->properties [schema]
   (let [properties (jsons/properties schema)]
     (if (seq properties)
@@ -72,23 +69,23 @@
 ;; Paths, parameters, responses
 ;;
 
-(defmulti ^:private extract-parameter (fn [[x] _] x))
+(defmulti ^:private extract-parameter (fn [type _ _] type))
 
-(defmethod extract-parameter :body [[_ model] options]
+(defmethod extract-parameter :body [_ model options]
   (if-let [schema (rsc/peek-schema model)]
-    (let [schema-json (->json model options)]
+    (let [schema-json (jsons/->json model options)]
       (vector {:in :body
                :name (name (s/schema-name schema))
-               :description (or (:description (->json schema options)) "")
+               :description (or (:description (jsons/->json schema options)) "")
                :required true
                :schema (dissoc schema-json :description)}))))
 
-(defmethod extract-parameter :default [[type model] options]
+(defmethod extract-parameter :default [type model options]
   (if model
     (for [[k v] (-> model value-of rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
-                json-schema (->json v (assoc options ::jsons/type type))]
+                json-schema (jsons/->json v options)]
           :when json-schema]
       (merge
         {:in type
@@ -108,13 +105,15 @@
 (defn convert-parameters
   ([parameters] (convert-parameters parameters {}))
   ([parameters options]
-   (into [] (mapcat #(extract-parameter % options) parameters))))
+   (into [] (mapcat (fn [[type model]]
+                      (extract-parameter type model (assoc options ::jsons/type type)))
+                      parameters))))
 
 (defn convert-responses [responses options]
   (let [responses (for-map [[k v] responses
                             :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] ->json options))
+                          (cond-> schema (update-in [:schema] jsons/->json options))
                           (cond-> headers (update-in [:headers] ->properties))
                           (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]
