@@ -173,39 +173,41 @@
        :query Query
        :path Path
        :header {:h String}
-       :formData {:f Integer}}) => [{:name "Pet"
-                                     :in :body
-                                     :description ""
-                                     :required true
-                                     :schema {:$ref "#/definitions/Pet"}}
-                                    {:name "id"
-                                     :in :query
-                                     :description ""
-                                     :required true
-                                     :type "integer"
-                                     :format "int64"}
-                                    {:name "q"
-                                     :in :query
-                                     :description ""
-                                     :required false
-                                     :type "string"}
-                                    {:name "p"
-                                     :in :path
-                                     :description ""
-                                     :required true
-                                     :type "integer"
-                                     :format "int64"}
-                                    {:name "h"
-                                     :in :header
-                                     :description ""
-                                     :required true
-                                     :type "string"}
-                                    {:name "f"
-                                     :in :formData
-                                     :description ""
-                                     :required true
-                                     :type "integer"
-                                     :format "int32"}])
+       :formData {:f Integer}} {})
+
+    => [{:name "Pet"
+         :in :body
+         :description ""
+         :required true
+         :schema {:$ref "#/definitions/Pet"}}
+        {:name "id"
+         :in :query
+         :description ""
+         :required true
+         :type "integer"
+         :format "int64"}
+        {:name "q"
+         :in :query
+         :description ""
+         :required false
+         :type "string"}
+        {:name "p"
+         :in :path
+         :description ""
+         :required true
+         :type "integer"
+         :format "int64"}
+        {:name "h"
+         :in :header
+         :description ""
+         :required true
+         :type "string"}
+        {:name "f"
+         :in :formData
+         :description ""
+         :required true
+         :type "integer"
+         :format "int32"}])
 
   (fact "anonymous schemas can be used with ..."
 
@@ -215,7 +217,7 @@
         (convert-parameters
           {type {s/Keyword s/Any
                  :q String
-                 (s/optional-key :l) Long}})
+                 (s/optional-key :l) Long}} {})
 
         => [{:name "q"
              :description ""
@@ -230,8 +232,7 @@
              :type "integer"}])))
 
   (fact "Array body parameters"
-    (convert-parameters
-      {:body [Body]})
+    (convert-parameters {:body [Body]} {})
 
     => [{:name "Body"
          :description ""
@@ -241,8 +242,7 @@
                   :items {:$ref "#/definitions/Body"}}}])
 
   (fact "Set body parameters"
-    (convert-parameters
-      {:body #{Body}})
+    (convert-parameters {:body #{Body}} {})
 
     => [{:name "Body"
          :description ""
@@ -253,7 +253,8 @@
                   :items {:$ref "#/definitions/Body"}}}])
 
   (fact "Body param with desc"
-    (convert-parameters {:body (describe Body "foo")})
+    (convert-parameters {:body (describe Body "foo")} {})
+
     => [{:description "foo"
          :name "Body"
          :in :body
@@ -261,7 +262,8 @@
          :schema {:$ref "#/definitions/Body"}}])
 
   (fact "Array body param with desc"
-    (convert-parameters {:body [(describe Body "foo")]})
+    (convert-parameters {:body [(describe Body "foo")]} {})
+
     => [{:description "foo"
          :name "Body"
          :in :body

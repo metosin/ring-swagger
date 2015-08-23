@@ -103,11 +103,10 @@
     ""))
 
 (defn convert-parameters
-  ([parameters] (convert-parameters parameters {}))
-  ([parameters options]
-   (into [] (mapcat (fn [[type model]]
-                      (extract-parameter type model (assoc options ::jsons/type type)))
-                      parameters))))
+  [parameters options]
+  (into [] (mapcat (fn [[type model]]
+                     (extract-parameter type model (assoc options ::jsons/type type)))
+                   parameters)))
 
 (defn convert-responses [responses options]
   (let [responses (for-map [[k v] responses
