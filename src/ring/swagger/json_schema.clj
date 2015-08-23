@@ -95,7 +95,7 @@
                          keyword? clojure.lang.Keyword
                          symbol?  clojure.lang.Symbol})
 
-(defn- named-schema [e]
+(defn- reference [e]
   (if-let [schema-name (s/schema-name e)]
     {:$ref (str "#/definitions/" schema-name)}
     (and (not *ignore-missing-mappings*)
@@ -154,10 +154,10 @@
   (json-property [e options] (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (json-property [e _] (named-schema e))
+  (json-property [e _] (reference e))
 
   clojure.lang.Var
-  (json-property [e _] (named-schema e)))
+  (json-property [e _] (reference e)))
 
 ;;
 ;; Schema -> Json Schema
