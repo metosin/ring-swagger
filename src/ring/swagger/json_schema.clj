@@ -96,21 +96,27 @@
       (assoc-collection-format options)))
 
 (extend-protocol JsonSchema
+
   Object
-  (json-property [e _] (not-supported! e))
+  (json-property [e _]
+    (not-supported! e))
 
   Class
   (json-property [e options]
     (to-json-property e options))
 
   nil
-  (json-property [_ _] {:type "void"})
+  (json-property [_ _]
+    ; TODO: should be nil?
+    {:type "void"})
 
   schema.core.Predicate
-  (json-property [e _] (some-> e :p? predicate-to-class ->json))
+  (json-property [e _]
+    (some-> e :p? predicate-to-class ->json))
 
   schema.core.EnumSchema
-  (json-property [e _] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+  (json-property [e _]
+    (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
   (json-property [e {:keys [in]}]
@@ -120,41 +126,53 @@
         schema)))
 
   schema.core.Both
-  (json-property [e _] (->json (first (:schemas e))))
+  (json-property [e _]
+    (->json (first (:schemas e))))
 
   schema.core.Either
-  (json-property [e _] (->json (first (:schemas e))))
+  (json-property [e _]
+    (->json (first (:schemas e))))
 
   schema.core.Recursive
-  (json-property [e _] (->json (:derefable e)))
+  (json-property [e _]
+    (->json (:derefable e)))
 
   schema.core.EqSchema
-  (json-property [e _] (->json (class (:v e))))
+  (json-property [e _]
+    (->json (class (:v e))))
 
   schema.core.NamedSchema
-  (json-property [e _] (->json (:schema e)))
+  (json-property [e _]
+    (->json (:schema e)))
 
   schema.core.One
-  (json-property [e _] (->json (:schema e)))
+  (json-property [e _]
+    (->json (:schema e)))
 
   schema.core.AnythingSchema
   (json-property [_ _] nil)
 
   java.util.regex.Pattern
-  (json-property [e _] {:type "string" :pattern (str e)})
+  (json-property [e _]
+    {:type "string" :pattern (str e)})
 
   ;; Collections
+
   clojure.lang.Sequential
-  (json-property [e options] (coll-schema e options))
+  (json-property [e options]
+    (coll-schema e options))
 
   clojure.lang.IPersistentSet
-  (json-property [e options] (assoc (coll-schema e options) :uniqueItems true))
+  (json-property [e options]
+    (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (json-property [e _] (reference e))
+  (json-property [e _]
+    (reference e))
 
   clojure.lang.Var
-  (json-property [e _] (reference e)))
+  (json-property [e _]
+    (reference e)))
 
 ;;
 ;; Schema -> Json Schema
