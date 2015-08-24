@@ -5,4 +5,5 @@
 
 (extend-protocol JsonSchema
   schema.core.ConditionalSchema
-  (json-property [e _]  {:type "void" :oneOf (mapv (comp ->json second) (:preds-and-schemas e))}))
+  (convert [e _]
+    {:type "void" :oneOf (mapv (comp ->swagger second) (:preds-and-schemas e))}))
