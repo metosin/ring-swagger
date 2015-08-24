@@ -44,19 +44,32 @@
       (binding [*ignore-missing-mappings* true]
         (->json java.util.Vector)) => nil))
 
+  (facts "models"
+    (->json Model) => {:$ref "#/definitions/Model"}
+    (->json [Model]) => {:items {:$ref "#/definitions/Model"}, :type "array"}
+    (->json #{Model}) => {:items {:$ref "#/definitions/Model"}, :type "array" :uniqueItems true})
+
   (fact "schema predicates"
     (fact "s/enum"
       (->json (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
       (->json (s/enum 1 2 3))         => {:type "integer" :format "int64" :enum (seq #{1 2 3})})
 
-    (fact "s/maybe -> type of internal schema"
-      (->json (s/maybe Long))         => (->json Long))
+    (fact "s/maybe"
+      (fact "uses wrapped value by default"
+        (->json (s/maybe Long)) => (->json Long))
+      (fact "adds allowEmptyValue when for query and formData as defined by the spec"
+        (->json (s/maybe Long) {:in :query}) => (assoc (->json Long) :allowEmptyValue true)
+        (->json (s/maybe Long) {:in :formData}) => (assoc (->json Long) :allowEmptyValue true))
+      (fact "uses wrapped value for other parameters"
+        (->json (s/maybe Long) {:in :body}) => (->json Long)
+        (->json (s/maybe Long) {:in :header}) => (->json Long)
+        (->json (s/maybe Long) {:in :path}) => (->json Long)))
 
     (fact "s/both -> type of the first element"
       (->json (s/both Long String))   => (->json Long))
 
     (fact "s/either -> type of the first element"
-      (->json (s/either Long String))   => (->json Long))
+      (->json (s/either Long String)) => (->json Long))
 
     (fact "s/named -> type of schema"
       (->json (s/named Long "long"))  => (->json Long))
@@ -72,16 +85,6 @@
 
     (fact "s/Any -> nil"
       (->json s/Any) => nil)))
-
-(facts "generating return types from models, list & set of models"
-  (fact "non-named schema"
-    (->json s/Any {:operation? true})    => {:type "void"})
-  (fact "returning Model"
-    (->json Model {:operation? true})    => {:type 'Model})
-  (fact "returning [Model]"
-    (->json [Model] {:operation? true})  => {:items {:$ref "#/definitions/Model"}, :type "array"})
-  (fact "returning #{Model}"
-    (->json #{Model} {:operation? true}) => {:items {:$ref "#/definitions/Model"}, :type "array" :uniqueItems true}))
 
 (fact "Describe"
   (tabular

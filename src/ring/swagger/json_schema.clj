@@ -114,7 +114,11 @@
   (json-property [e _] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
-  (json-property [e _] (->json (:schema e)))
+  (json-property [e {:keys [in]}]
+    (let [schema (->json (:schema e))]
+      (if (#{:query :formData} in)
+        (assoc schema :allowEmptyValue true)
+        schema)))
 
   schema.core.Both
   (json-property [e _] (->json (first (:schemas e))))
@@ -177,10 +181,10 @@
   [schema]
   {:pre [(plain-map? schema)]}
   (let [props (into (empty schema)
-        (for [[k v] schema
-              :when (not-predicate? k)
-              :let [k (s/explicit-schema-key k)
-                    v (try->json v k)]]
+                    (for [[k v] schema
+                          :when (not-predicate? k)
+                          :let [k (s/explicit-schema-key k)
+                                v (try->json v k)]]
                       (and v [k v])))]
     (if (seq props)
       props)))

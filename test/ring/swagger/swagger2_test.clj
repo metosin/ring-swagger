@@ -109,13 +109,10 @@
                                              :responses {200 {:schema {:sum Long}}
                                                          :default {:schema {:code Long}
                                                                    :headers {:location String}}}}
-                                      :put {:parameters {:body [Pet]
-                                                         :query (merge Anything {:x Long :y Long})
-                                                         :path Nothing
-                                                         :header Anything
-                                                         :formData Anything}
+                                      :put {:parameters {:body [(s/maybe Pet)]
+                                                         :query {:x (s/maybe String)}}
                                             :responses {200 {:description "ok"
-                                                             :schema {:sum Long}}
+                                                             :schema {:sum (s/maybe Long)}}
                                                         :default {:description "error"}}}}}}]
     (validate swagger) => nil))
 
