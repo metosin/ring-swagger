@@ -1,6 +1,6 @@
 (ns ring.swagger.json-schema
   (:require [schema.core :as s]
-            [ring.swagger.common :as c ]
+            [ring.swagger.common :as c]
             [flatland.ordered.map :refer :all]))
 
 ; TODO: remove this in favor of passing it as options
@@ -90,6 +90,15 @@
   ([x options]
    (merge-meta (convert x options) x options)))
 
+(defn- try->swagger [v k]
+  (try (->swagger v)
+       (catch Exception e
+         (throw
+           (IllegalArgumentException.
+             (str "error converting to swagger schema [" k " "
+                  (try (s/explain v) (catch Exception _ v)) "]") e)))))
+
+
 (defn- coll-schema [e options]
   (-> {:type "array"
        :items (->swagger (first e) (assoc options ::no-meta true))}
@@ -174,16 +183,8 @@
     (reference e)))
 
 ;;
-;; Schema -> Json Schema
+;; Schema to Swagger Schmea definitions
 ;;
-
-(defn try->swagger [v k]
-  (try (->swagger v)
-       (catch Exception e
-         (throw
-           (IllegalArgumentException.
-             (str "error converting to json schema [" k " "
-                  (try (s/explain v) (catch Exception _ v)) "]") e)))))
 
 (defn properties
   "Take a map schema and turn them into json-schema properties.
