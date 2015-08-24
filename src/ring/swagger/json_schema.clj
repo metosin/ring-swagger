@@ -38,11 +38,6 @@
 (defprotocol JsonSchema
   (json-property [this options]))
 
-(defn ->json-schema [x options]
-  (if (instance? Class x)
-    (to-json-property x options)
-    (json-property x options)))
-
 (defn assoc-collection-format
   "Add collectionFormat to the JSON Schema if the parameter type
    is query or formData."
@@ -59,11 +54,6 @@
 
 (defn not-supported! [e]
   (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
-
-(defn ->json
-  ([x] (->json x {}))
-  ([x options]
-   (merge-meta (->json-schema x options) x options)))
 
 ;; Classes
 (defmethod to-json-property java.lang.Integer       [_ _] {:type "integer" :format "int32"})
@@ -95,6 +85,11 @@
     (and (not *ignore-missing-mappings*)
          (not-supported! e))))
 
+(defn ->json
+  ([x] (->json x {}))
+  ([x options]
+   (merge-meta (json-property x options) x options)))
+
 (defn- coll-schema [e options]
   (-> {:type "array"
        :items (->json (first e) (assoc options ::no-meta true))}
@@ -103,6 +98,10 @@
 (extend-protocol JsonSchema
   Object
   (json-property [e _] (not-supported! e))
+
+  Class
+  (json-property [e options]
+    (to-json-property e options))
 
   nil
   (json-property [_ _] {:type "void"})
