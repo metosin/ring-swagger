@@ -3,12 +3,12 @@
             [ring.swagger.common :as c ]
             [flatland.ordered.map :refer :all]))
 
+; TODO: remove this in favor of passing it as options
 (def ^:dynamic *ignore-missing-mappings* false)
 
 (defn json-schema-meta
   "Select interesting keys from meta-data of schema."
-  [schema]
-  (:json-schema (meta schema)))
+  [schema] (:json-schema (meta schema)))
 
 ;;
 ;; Schema implementation which is used wrap stuff which doesn't support meta-data
