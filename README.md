@@ -221,17 +221,21 @@ As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schem
 
 There are two possible methods to do this:
 
-1. class-based dispatch via `ring.swagger.json-schema/json-type`.
-2. protocol-based dispatch via `ring.swagger.json-schema/JsonSchema`.
+1. class-based dispatch via `ring.swagger.json-schema/convert-class`.
+2. protocol-based dispatch via `ring.swagger.json-schema/JsonSchema` - the `convert` fn.
 
-To support truly symmetric web schemas, one needs also to ensure both JSON Serialization and deserialization/coercion from JSON.
+Both take the Schema and swagger options map as arguments. Options contain also `:in` to denote the possible location
+of the schema (`nil`, `:query`, `:header`, `:path`, `:formData` and `:body`).
+
+To support truly symmetric web schemas, one needs also to ensure both JSON Serialization and
+deserialization/coercion from JSON.
 
 #### Class-based dispatch
 
 ```clojure
 (require '[ring.swagger.json-schema :as json-schema])
 
-(defmethod json-schema/json-type java.sql.Date [_] {:type "string" :format "date"})
+(defmethod json-schema/convert-class java.sql.Date [_ _] {:type "string" :format "date"})
 ```
 
 #### Protocol-based dispatch
@@ -241,7 +245,20 @@ To support truly symmetric web schemas, one needs also to ensure both JSON Seria
 
 (extend-type java.util.regex.Pattern
   json-schema/JsonSchema
-  (json-schema/json-property [e _] {:type "string" :pattern (str e)}))
+  (json-schema/convert [e _] 
+    {:type "string" :pattern (str e)}))
+```
+
+One can also use the options to create more accurate specs (via the `:in` option).
+
+```clojure
+(extend-type schema.core.Maybe
+  json-schema/JsonSchema
+  (convert [e {:keys [in]}]
+    (let [schema (->swagger (:schema e))]
+      (if (#{:query :formData} in)
+        (assoc schema :allowEmptyValue true)
+        schema))))
 ```
 
 ### Out-of-the-box supported Schema elements
