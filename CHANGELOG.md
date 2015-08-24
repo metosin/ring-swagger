@@ -9,7 +9,9 @@ multimethod. Check [json-schema.clj](./src/ring/swagger/json_schema.clj) for the
 existing JSON Schema custom implementations you'll need to convert those.
 
 - **BREAKING**: `ring.swagger.json-schema/->json` signature has changed, instead of kwargs it now takes a options map.
-  - `:top` option is renamed to `:operation?` to denote it is rendered under Operations as parameters, not under Definitions as properties.
+  - removed option `:top` (required only for Swagger 1.2)
+  - new option `:in` denote the parameter type (`:query`, `:header`, `:path`, `:formData` or `:body`)
+     - responses don't have `:in`.
   
 ### New features
 

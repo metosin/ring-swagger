@@ -17,18 +17,6 @@
 (def Nothing {})
 
 ;;
-;; 2.0 Json Schema changes
-;;
-
-(defn ->properties [schema]
-  (let [properties (jsons/properties schema)]
-    (if (seq properties)
-      properties)))
-
-(defn ->additional-properties [schema]
-  (jsons/additional-properties schema))
-
-;;
 ;; Schema transformations
 ;;
 
@@ -47,8 +35,8 @@
     (concat body-models response-models)))
 
 (defn transform [schema]
-  (let [properties (->properties schema)
-        additional-properties (->additional-properties schema)
+  (let [properties (jsons/properties schema)
+        additional-properties (jsons/additional-properties schema)
         required (->> (rsc/required-keys schema)
                       (filter (partial contains? properties))
                       seq)]
@@ -69,7 +57,7 @@
 ;; Paths, parameters, responses
 ;;
 
-(defmulti ^:private extract-parameter (fn [type _ _] type))
+(defmulti ^:private extract-parameter (fn [in _ _] in))
 
 (defmethod extract-parameter :body [_ model options]
   (if-let [schema (rsc/peek-schema model)]
@@ -80,7 +68,7 @@
                :required true
                :schema (dissoc schema-json :description)}))))
 
-(defmethod extract-parameter :default [type model options]
+(defmethod extract-parameter :default [in model options]
   (if model
     (for [[k v] (-> model value-of rsc/strict-schema)
           :when (s/specific-key? k)
@@ -88,7 +76,7 @@
                 json-schema (jsons/->json v options)]
           :when json-schema]
       (merge
-        {:in type
+        {:in in
          :name (name rk)
          :description ""
          :required (s/required-key? k)}
@@ -102,10 +90,9 @@
     (generator status)
     ""))
 
-(defn convert-parameters
-  [parameters options]
-  (into [] (mapcat (fn [[type model]]
-                     (extract-parameter type model (assoc options ::jsons/type type)))
+(defn convert-parameters [parameters options]
+  (into [] (mapcat (fn [[in model]]
+                     (extract-parameter in model (assoc options :in in)))
                    parameters)))
 
 (defn convert-responses [responses options]
@@ -113,7 +100,7 @@
                             :let [{:keys [schema headers]} v]]
                     k (-> v
                           (cond-> schema (update-in [:schema] jsons/->json options))
-                          (cond-> headers (update-in [:headers] ->properties))
+                          (cond-> headers (update-in [:headers] jsons/properties))
                           (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]
     (if-not (empty? responses)
@@ -139,7 +126,9 @@
                 (fn [acc k v]
                   (assoc acc
                     (swagger-path k)
-                    (convert-operation v options))) (empty original-paths) original-paths)
+                    (convert-operation v options)))
+                (empty original-paths)
+                original-paths)
         definitions (-> swagger
                         extract-models
                         (transform-models options))]

@@ -47,7 +47,7 @@
   "Add collectionFormat to the JSON Schema if the parameter type
    is query or formData."
   [m options]
-  (if (#{:query :formData} (::type options))
+  (if (#{:query :formData} (:in options))
     (assoc m :collectionFormat (:collection-format options "multi"))
     m))
 
@@ -62,14 +62,8 @@
 
 (defn ->json
   ([x] (->json x {}))
-  ([x {:keys [operation?] :as options}]
-   (if-let [json (if operation?
-                   (if-let [schema-name (s/schema-name x)]
-                     {:type schema-name}
-                     (or (->json-schema x (dissoc options :operation?))
-                         {:type "void"}))
-                   (->json-schema x options))]
-     (merge-meta json x options))))
+  ([x options]
+   (merge-meta (->json-schema x options) x options)))
 
 ;; Classes
 (defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
@@ -178,15 +172,18 @@
 (defn properties
   "Take a map schema and turn them into json-schema properties.
    The result is put into collection of same type as input schema.
-   Thus ordered-map should keep the order of items."
+   Thus ordered-map should keep the order of items. Returnes nil
+   if no properties are found."
   [schema]
   {:pre [(plain-map? schema)]}
-  (into (empty schema)
+  (let [props (into (empty schema)
         (for [[k v] schema
               :when (not-predicate? k)
               :let [k (s/explicit-schema-key k)
                     v (try->json v k)]]
-          (and v [k v]))))
+                      (and v [k v])))]
+    (if (seq props)
+      props)))
 
 (defn additional-properties
   "Generates json-schema additional properties from a plain map

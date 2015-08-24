@@ -105,10 +105,7 @@
                                                         :default {:description "error"
                                                                   :schema {:code Long}}}}
                                       :post {:parameters {:body #{Pet}
-                                                          :query (merge Anything {:x Long :y Long})
-                                                          :path Nothing
-                                                          :header Anything
-                                                          :formData Anything}
+                                                          :query (merge Anything {:x Long :y Long})}
                                              :responses {200 {:schema {:sum Long}}
                                                          :default {:schema {:code Long}
                                                                    :headers {:location String}}}}
