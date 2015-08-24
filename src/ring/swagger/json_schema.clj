@@ -107,8 +107,7 @@
 
   nil
   (convert [_ _]
-    ; TODO: should be nil?
-    {:type "void"})
+    nil)
 
   schema.core.Predicate
   (convert [e _]

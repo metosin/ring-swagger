@@ -35,7 +35,7 @@
     (->swagger #{Long})   => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
 
   (facts "nil"
-    (->swagger nil)       => {:type "void"})
+    (->swagger nil)       => nil)
 
   (facts "unknowns"
     (fact "throw exception by default"
