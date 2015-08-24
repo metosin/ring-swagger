@@ -33,14 +33,14 @@
 ;; Describe Java and Clojure classes and Schemas as Json schema
 ;;
 
-(defmulti json-type identity)
+(defmulti to-json-property (fn [c options] c))
 
 (defprotocol JsonSchema
   (json-property [this options]))
 
 (defn ->json-schema [x options]
   (if (instance? Class x)
-    (json-type x)
+    (to-json-property x options)
     (json-property x options)))
 
 (defn assoc-collection-format
@@ -66,20 +66,20 @@
    (merge-meta (->json-schema x options) x options)))
 
 ;; Classes
-(defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
-(defmethod json-type java.lang.Long          [_] {:type "integer" :format "int64"})
-(defmethod json-type java.lang.Double        [_] {:type "number" :format "double"})
-(defmethod json-type java.lang.Number        [_] {:type "number" :format "double"})
-(defmethod json-type java.lang.String        [_] {:type "string"})
-(defmethod json-type java.lang.Boolean       [_] {:type "boolean"})
-(defmethod json-type clojure.lang.Keyword    [_] {:type "string"})
-(defmethod json-type java.util.UUID          [_] {:type "string" :format "uuid"})
-(defmethod json-type java.util.Date          [_] {:type "string" :format "date-time"})
-(defmethod json-type org.joda.time.DateTime  [_] {:type "string" :format "date-time"})
-(defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
-(defmethod json-type java.util.regex.Pattern [_] {:type "string" :format "regex"})
+(defmethod to-json-property java.lang.Integer       [_ _] {:type "integer" :format "int32"})
+(defmethod to-json-property java.lang.Long          [_ _] {:type "integer" :format "int64"})
+(defmethod to-json-property java.lang.Double        [_ _] {:type "number" :format "double"})
+(defmethod to-json-property java.lang.Number        [_ _] {:type "number" :format "double"})
+(defmethod to-json-property java.lang.String        [_ _] {:type "string"})
+(defmethod to-json-property java.lang.Boolean       [_ _] {:type "boolean"})
+(defmethod to-json-property clojure.lang.Keyword    [_ _] {:type "string"})
+(defmethod to-json-property java.util.UUID          [_ _] {:type "string" :format "uuid"})
+(defmethod to-json-property java.util.Date          [_ _] {:type "string" :format "date-time"})
+(defmethod to-json-property org.joda.time.DateTime  [_ _] {:type "string" :format "date-time"})
+(defmethod to-json-property org.joda.time.LocalDate [_ _] {:type "string" :format "date"})
+(defmethod to-json-property java.util.regex.Pattern [_ _] {:type "string" :format "regex"})
 
-(defmethod json-type :default [e]
+(defmethod to-json-property :default [e _]
   (if-not *ignore-missing-mappings*
     (not-supported! e)))
 
