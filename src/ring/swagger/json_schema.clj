@@ -1,6 +1,6 @@
 (ns ring.swagger.json-schema
   (:require [schema.core :as s]
-            [ring.swagger.common :refer [plain-map?]]
+            [ring.swagger.common :as c ]
             [flatland.ordered.map :refer :all]))
 
 (def ^:dynamic *ignore-missing-mappings* false)
@@ -177,17 +177,13 @@
 ;; Schema -> Json Schema
 ;;
 
-(defn predicate? [x]
-  (= (class x) schema.core.Predicate))
-
-(def not-predicate? (complement predicate?))
-
-(defn try->json [v k]
+(defn try->swagger [v k]
   (try (->swagger v)
        (catch Exception e
          (throw
            (IllegalArgumentException.
-             (str "error converting to json schema [" k " " (s/explain v) "]") e)))))
+             (str "error converting to json schema [" k " "
+                  (try (s/explain v) (catch Exception _ v)) "]") e)))))
 
 (defn properties
   "Take a map schema and turn them into json-schema properties.
@@ -195,12 +191,12 @@
    Thus ordered-map should keep the order of items. Returnes nil
    if no properties are found."
   [schema]
-  {:pre [(plain-map? schema)]}
+  {:pre [(c/plain-map? schema)]}
   (let [props (into (empty schema)
                     (for [[k v] schema
-                          :when (not-predicate? k)
+                          :when (c/not-predicate? k)
                           :let [k (s/explicit-schema-key k)
-                                v (try->json v k)]]
+                                v (try->swagger v k)]]
                       (and v [k v])))]
     (if (seq props)
       props)))
@@ -209,6 +205,6 @@
   "Generates json-schema additional properties from a plain map
   schema from under key s/Keyword."
   [schema]
-  {:pre [(plain-map? schema)]}
+  {:pre [(c/plain-map? schema)]}
   (if-let [v (schema s/Keyword)]
-    (try->json v s/Keyword)))
+    (try->swagger v s/Keyword)))
