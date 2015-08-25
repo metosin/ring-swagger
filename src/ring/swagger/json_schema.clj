@@ -1,14 +1,14 @@
 (ns ring.swagger.json-schema
   (:require [schema.core :as s]
-            [ring.swagger.common :refer [plain-map?]]
+            [ring.swagger.common :as c]
             [flatland.ordered.map :refer :all]))
 
+; TODO: remove this in favor of passing it as options
 (def ^:dynamic *ignore-missing-mappings* false)
 
 (defn json-schema-meta
   "Select interesting keys from meta-data of schema."
-  [schema]
-  (:json-schema (meta schema)))
+  [schema] (:json-schema (meta schema)))
 
 ;;
 ;; Schema implementation which is used wrap stuff which doesn't support meta-data
@@ -33,15 +33,10 @@
 ;; Describe Java and Clojure classes and Schemas as Json schema
 ;;
 
-(defmulti json-type identity)
+(defmulti convert-class (fn [c options] c))
 
 (defprotocol JsonSchema
-  (json-property [this options]))
-
-(defn ->json-schema [x options]
-  (if (instance? Class x)
-    (json-type x)
-    (json-property x options)))
+  (convert [this options]))
 
 (defn assoc-collection-format
   "Add collectionFormat to the JSON Schema if the parameter type
@@ -60,26 +55,21 @@
 (defn not-supported! [e]
   (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
 
-(defn ->json
-  ([x] (->json x {}))
-  ([x options]
-   (merge-meta (->json-schema x options) x options)))
-
 ;; Classes
-(defmethod json-type java.lang.Integer       [_] {:type "integer" :format "int32"})
-(defmethod json-type java.lang.Long          [_] {:type "integer" :format "int64"})
-(defmethod json-type java.lang.Double        [_] {:type "number" :format "double"})
-(defmethod json-type java.lang.Number        [_] {:type "number" :format "double"})
-(defmethod json-type java.lang.String        [_] {:type "string"})
-(defmethod json-type java.lang.Boolean       [_] {:type "boolean"})
-(defmethod json-type clojure.lang.Keyword    [_] {:type "string"})
-(defmethod json-type java.util.UUID          [_] {:type "string" :format "uuid"})
-(defmethod json-type java.util.Date          [_] {:type "string" :format "date-time"})
-(defmethod json-type org.joda.time.DateTime  [_] {:type "string" :format "date-time"})
-(defmethod json-type org.joda.time.LocalDate [_] {:type "string" :format "date"})
-(defmethod json-type java.util.regex.Pattern [_] {:type "string" :format "regex"})
+(defmethod convert-class java.lang.Integer       [_ _] {:type "integer" :format "int32"})
+(defmethod convert-class java.lang.Long          [_ _] {:type "integer" :format "int64"})
+(defmethod convert-class java.lang.Double        [_ _] {:type "number" :format "double"})
+(defmethod convert-class java.lang.Number        [_ _] {:type "number" :format "double"})
+(defmethod convert-class java.lang.String        [_ _] {:type "string"})
+(defmethod convert-class java.lang.Boolean       [_ _] {:type "boolean"})
+(defmethod convert-class clojure.lang.Keyword    [_ _] {:type "string"})
+(defmethod convert-class java.util.UUID          [_ _] {:type "string" :format "uuid"})
+(defmethod convert-class java.util.Date          [_ _] {:type "string" :format "date-time"})
+(defmethod convert-class org.joda.time.DateTime  [_ _] {:type "string" :format "date-time"})
+(defmethod convert-class org.joda.time.LocalDate [_ _] {:type "string" :format "date"})
+(defmethod convert-class java.util.regex.Pattern [_ _] {:type "string" :format "regex"})
 
-(defmethod json-type :default [e]
+(defmethod convert-class :default [e _]
   (if-not *ignore-missing-mappings*
     (not-supported! e)))
 
@@ -95,83 +85,106 @@
     (and (not *ignore-missing-mappings*)
          (not-supported! e))))
 
+(defn ->swagger
+  ([x] (->swagger x {}))
+  ([x options]
+   (merge-meta (convert x options) x options)))
+
+(defn- try->swagger [v k]
+  (try (->swagger v)
+       (catch Exception e
+         (throw
+           (IllegalArgumentException.
+             (str "error converting to swagger schema [" k " "
+                  (try (s/explain v) (catch Exception _ v)) "]") e)))))
+
+
 (defn- coll-schema [e options]
   (-> {:type "array"
-       :items (->json (first e) (assoc options ::no-meta true))}
+       :items (->swagger (first e) (assoc options ::no-meta true))}
       (assoc-collection-format options)))
 
 (extend-protocol JsonSchema
+
   Object
-  (json-property [e _] (not-supported! e))
+  (convert [e _]
+    (not-supported! e))
+
+  Class
+  (convert [e options]
+    (convert-class e options))
 
   nil
-  (json-property [_ _] {:type "void"})
+  (convert [_ _]
+    nil)
 
   schema.core.Predicate
-  (json-property [e _] (some-> e :p? predicate-to-class ->json))
+  (convert [e _]
+    (some-> e :p? predicate-to-class ->swagger))
 
   schema.core.EnumSchema
-  (json-property [e _] (merge (->json (class (first (:vs e)))) {:enum (seq (:vs e))}))
+  (convert [e _]
+    (merge (->swagger (class (first (:vs e)))) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
-  (json-property [e {:keys [in]}]
-    (let [schema (->json (:schema e))]
+  (convert [e {:keys [in]}]
+    (let [schema (->swagger (:schema e))]
       (if (#{:query :formData} in)
         (assoc schema :allowEmptyValue true)
         schema)))
 
   schema.core.Both
-  (json-property [e _] (->json (first (:schemas e))))
+  (convert [e _]
+    (->swagger (first (:schemas e))))
 
   schema.core.Either
-  (json-property [e _] (->json (first (:schemas e))))
+  (convert [e _]
+    (->swagger (first (:schemas e))))
 
   schema.core.Recursive
-  (json-property [e _] (->json (:derefable e)))
+  (convert [e _]
+    (->swagger (:derefable e)))
 
   schema.core.EqSchema
-  (json-property [e _] (->json (class (:v e))))
+  (convert [e _]
+    (->swagger (class (:v e))))
 
   schema.core.NamedSchema
-  (json-property [e _] (->json (:schema e)))
+  (convert [e _]
+    (->swagger (:schema e)))
 
   schema.core.One
-  (json-property [e _] (->json (:schema e)))
+  (convert [e _]
+    (->swagger (:schema e)))
 
   schema.core.AnythingSchema
-  (json-property [_ _] nil)
+  (convert [_ _] nil)
 
   java.util.regex.Pattern
-  (json-property [e _] {:type "string" :pattern (str e)})
+  (convert [e _]
+    {:type "string" :pattern (str e)})
 
   ;; Collections
+
   clojure.lang.Sequential
-  (json-property [e options] (coll-schema e options))
+  (convert [e options]
+    (coll-schema e options))
 
   clojure.lang.IPersistentSet
-  (json-property [e options] (assoc (coll-schema e options) :uniqueItems true))
+  (convert [e options]
+    (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (json-property [e _] (reference e))
+  (convert [e _]
+    (reference e))
 
   clojure.lang.Var
-  (json-property [e _] (reference e)))
+  (convert [e _]
+    (reference e)))
 
 ;;
-;; Schema -> Json Schema
+;; Schema to Swagger Schmea definitions
 ;;
-
-(defn predicate? [x]
-  (= (class x) schema.core.Predicate))
-
-(def not-predicate? (complement predicate?))
-
-(defn try->json [v k]
-  (try (->json v)
-       (catch Exception e
-         (throw
-           (IllegalArgumentException.
-             (str "error converting to json schema [" k " " (s/explain v) "]") e)))))
 
 (defn properties
   "Take a map schema and turn them into json-schema properties.
@@ -179,12 +192,12 @@
    Thus ordered-map should keep the order of items. Returnes nil
    if no properties are found."
   [schema]
-  {:pre [(plain-map? schema)]}
+  {:pre [(c/plain-map? schema)]}
   (let [props (into (empty schema)
                     (for [[k v] schema
-                          :when (not-predicate? k)
+                          :when (c/not-predicate? k)
                           :let [k (s/explicit-schema-key k)
-                                v (try->json v k)]]
+                                v (try->swagger v k)]]
                       (and v [k v])))]
     (if (seq props)
       props)))
@@ -193,6 +206,6 @@
   "Generates json-schema additional properties from a plain map
   schema from under key s/Keyword."
   [schema]
-  {:pre [(plain-map? schema)]}
+  {:pre [(c/plain-map? schema)]}
   (if-let [v (schema s/Keyword)]
-    (try->json v s/Keyword)))
+    (try->swagger v s/Keyword)))

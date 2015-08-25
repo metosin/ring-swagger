@@ -61,10 +61,10 @@
 
 (defmethod extract-parameter :body [_ model options]
   (if-let [schema (rsc/peek-schema model)]
-    (let [schema-json (jsons/->json model options)]
+    (let [schema-json (jsons/->swagger model options)]
       (vector {:in :body
                :name (name (s/schema-name schema))
-               :description (or (:description (jsons/->json schema options)) "")
+               :description (or (:description (jsons/->swagger schema options)) "")
                :required true
                :schema (dissoc schema-json :description)}))))
 
@@ -73,7 +73,7 @@
     (for [[k v] (-> model value-of rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
-                json-schema (jsons/->json v options)]
+                json-schema (jsons/->swagger v options)]
           :when json-schema]
       (merge
         {:in in
@@ -99,7 +99,7 @@
   (let [responses (for-map [[k v] responses
                             :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] jsons/->json options))
+                          (cond-> schema (update-in [:schema] jsons/->swagger options))
                           (cond-> headers (update-in [:headers] jsons/properties))
                           (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]

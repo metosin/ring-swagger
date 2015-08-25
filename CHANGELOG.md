@@ -4,15 +4,18 @@
 
 - **BREAKING**: Swagger 1.2 is no more supported.
 
-- **BREAKING**: Json Schema conversion for objects (e.g. records) is now extendable using a protocol instead of a
-multimethod. Check [json-schema.clj](./src/ring/swagger/json_schema.clj) for the new implementation. If you have
-existing JSON Schema custom implementations you'll need to convert those.
+- **BREAKING**: `ring.swagger.json-schema/json-type` multimethod is removed
+  - will cause compile-time errors for those who have client-side custom extensions
+  - new way of doing the Schema -> Swagger Schema mappings:
+    - Classes via `ring.swagger.json-schema/convert-class` multimethod, taking both the class and swagger options
+    - Objects (e.g. records) via `ring.swagger.json-schema/JsonSchema` protocol.
 
-- **BREAKING**: `ring.swagger.json-schema/->json` signature has changed, instead of kwargs it now takes a options map.
+- lot's of internal cleanup in `ring.swagger.json-schema`:
+  - `->json` is now `->swagger` and takes options map instead of kwargs.
   - removed option `:top` (required only for Swagger 1.2)
   - new option `:in` denote the parameter type (`:query`, `:header`, `:path`, `:formData` or `:body`)
      - responses don't have `:in`.
-  
+
 ### New features
 
 - Support for collections in query and form parameters (even with single parameter):

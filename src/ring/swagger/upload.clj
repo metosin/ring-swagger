@@ -1,7 +1,6 @@
 (ns ring.swagger.upload
   (:require [potemkin :refer [import-vars]]
             [ring.middleware.multipart-params]
-            [ring.swagger.json-schema :as js]
             [schema.core :as s]))
 
 (import-vars
@@ -11,17 +10,18 @@
 
 ; Works exactly like map schema but wrapped in record for json-type dispatch
 (defrecord Upload [m]
+
   schema.core.Schema
-  (walker [this]
+  (walker [_]
     (let [sub-walker (s/subschema-walker m)]
       (clojure.core/fn [x]
        (if (schema.utils/error? x)
          x
          (sub-walker x)))))
-  (explain [this] (cons 'file m))
+  (explain [_] (cons 'file m))
 
   ring.swagger.json_schema.JsonSchema
-  (json-property [this _]
+  (convert [_ _]
     {:type "file"}))
 
 (def TempFileUpload

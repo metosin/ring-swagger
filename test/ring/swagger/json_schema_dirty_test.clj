@@ -6,9 +6,9 @@
 
 (facts "type transformations"
   (fact "schema predicates"
-    (->json (s/conditional (constantly true) Long (constantly false) String))
-    => {:type "void" :oneOf [(->json Long) (->json String)]})
+    (->swagger (s/conditional (constantly true) Long (constantly false) String))
+    => {:type "void" :oneOf [(->swagger Long) (->swagger String)]})
 
   (fact "s/if"
-    (->json (s/if (constantly true) Long String))
-    => {:type "void" :oneOf [(->json Long) (->json String)]}))
+    (->swagger (s/if (constantly true) Long String))
+    => {:type "void" :oneOf [(->swagger Long) (->swagger String)]}))
