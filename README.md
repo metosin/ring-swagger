@@ -34,7 +34,7 @@ valid Swagger spec data in.
 ```clojure
 (require '[ring.swagger.swagger2 :as rs])
 
-(rs/swagger-json nil)
+(rs/swagger-json {})
 
 ; {:swagger "2.0"
 ;  :info {:title "Swagger API"

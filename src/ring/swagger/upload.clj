@@ -1,26 +1,29 @@
 (ns ring.swagger.upload
   (:require [potemkin :refer [import-vars]]
             [ring.middleware.multipart-params]
-            [schema.core :as s]))
+            [ring.swagger.json-schema :as js]
+            [schema.core :as s])
+  (:import [java.io File]))
 
 (import-vars
   [ring.middleware.multipart-params
 
    wrap-multipart-params])
 
-; Works exactly like map schema but wrapped in record for json-type dispatch
+; Works exactly like map schema but wrapped in record for JsonSchema dispatch
 (defrecord Upload [m]
 
-  schema.core.Schema
+  s/Schema
   (walker [_]
     (let [sub-walker (s/subschema-walker m)]
       (clojure.core/fn [x]
        (if (schema.utils/error? x)
          x
          (sub-walker x)))))
-  (explain [_] (cons 'file m))
+  (explain [_]
+    (cons 'file m))
 
-  ring.swagger.json_schema.JsonSchema
+  js/JsonSchema
   (convert [_ _]
     {:type "file"}))
 
@@ -29,7 +32,7 @@
   (->Upload {:filename s/Str
              :content-type s/Str
              :size s/Int
-             (s/optional-key :tempfile) java.io.File}))
+             (s/optional-key :tempfile) File}))
 
 (def ByteArrayUpload
   "Schema for file param created by ring.middleware.multipart-params.byte-array store."

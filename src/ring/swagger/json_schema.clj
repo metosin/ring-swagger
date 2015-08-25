@@ -53,7 +53,9 @@
     m))
 
 (defn not-supported! [e]
-  (throw (IllegalArgumentException. (str "don't know how to create json-type of: " e))))
+  (throw (IllegalArgumentException.
+           (str "don't know how to convert " e " into a Swagger Schema. "
+                "Check out ring-swagger docs for details."))))
 
 ;; Classes
 (defmethod convert-class java.lang.Integer       [_ _] {:type "integer" :format "int32"})

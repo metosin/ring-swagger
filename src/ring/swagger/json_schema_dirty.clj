@@ -1,6 +1,6 @@
 (ns ring.swagger.json-schema-dirty
-  "Json-type multimethod implementations for some Schemas which can't be
-   properly described using Json Schema."
+  "JsonSchema conversions for some Schemas which can't be
+  properly described using the Swagger Schema."
   (:require [ring.swagger.json-schema :refer :all]))
 
 (extend-protocol JsonSchema
