@@ -25,7 +25,9 @@
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [yada](https://github.com/juxt/yada)
 
-Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj). The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any valid Swagger spec data in.
+Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj).
+The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any 
+valid Swagger spec data in.
 
 ### Simplest possible example
 
@@ -146,7 +148,8 @@ One can pass extra options-map as a third parameter to `swagger-json`. The follo
                                     Possible values: multi, ssv, csv, tsv, pipes."
 ```
 
-For example, to get default response descriptions from the [HTTP Spec](http://en.wikipedia.org/wiki/List_of_HTTP_status_codes), you can do the following:
+For example, to get default response descriptions from the [HTTP Spec](http://en.wikipedia.org/wiki/List_of_HTTP_status_codes),
+you can do the following:
 
 ```clojure
 (require '[ring.util.http-status :as status])
@@ -169,7 +172,8 @@ For example, to get default response descriptions from the [HTTP Spec](http://en
 
 ## Validating the Swagger Spec
 
-The generated full spec can be validated against the [Swagger JSON Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json) via tools like [scjsv](https://github.com/metosin/scjsv).
+The generated full spec can be validated against the [Swagger JSON Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json)
+via tools like [scjsv](https://github.com/metosin/scjsv).
 
 ```clojure
 (require '[scjsv.core :as scjsv])
@@ -194,10 +198,8 @@ For more information about creating your own adapter, see [Collecting API Docume
 
 There are the following utility functions for transforming the spec (on the client side):
 
-### `ring.swagger.swagger2/transform-operations`
-
-Transforms the operations under the :paths of a ring-swagger spec by applying `(f operation)` to all operations.
-If the function returns nil, the given operation is removed.
+`ring.swagger.swagger2/transform-operations` - transforms the operations under the :paths of a ring-swagger spec
+by applying `(f operation)` to all operations. If the function returns nil, the given operation is removed.
 
 As an example, one can filter away all operations with `:x-no-doc` set to `true`:
 
@@ -213,11 +215,11 @@ As an example, one can filter away all operations with `:x-no-doc` set to `true`
 
 ## Web Schemas
 
-[Prismatic Schema](https://github.com/Prismatic/schema) is used for describing both the input & output schemas for routes.
+[Prismatic Schema](https://github.com/Prismatic/schema) is used to describe both the input & output schemas for routes.
 
-As Swagger 2.0 Spec Schema is a pragmatic and deterministic subset of JSON Schema, so not all Clojure Schema elements can be used.
+As Swagger 2.0 Spec Schema is a deterministic subset of JSON Schema, so not all Clojure Schema elements can be used.
 
-### Schema to Swagger JSON Schema transformation
+### Schema to Swagger JSON Schema conversion
 
 There are two possible methods to do this:
 
@@ -230,7 +232,7 @@ of the schema (`nil`, `:query`, `:header`, `:path`, `:formData` and `:body`).
 To support truly symmetric web schemas, one needs also to ensure both JSON Serialization and
 deserialization/coercion from JSON.
 
-#### Class-based dispatch
+### Class-based dispatch
 
 ```clojure
 (require '[ring.swagger.json-schema :as json-schema])
@@ -292,39 +294,47 @@ One can also use the options to create more accurate specs (via the `:in` option
 - Vectors, Sets and Maps can be used as containers
 - Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references
-    - Nested maps can be within valid containers (as only element - heterogeneous schema sequences not supported by the spec)
+  - Maps can be within valid containers (as only element - heterogeneous schema sequences not supported by the spec)
 
 ### Missing Schema elements
 
-If Ring-swagger can't transform the Schemas into JSON Schemas, by default a `IllegalArgumentException` will be thrown. Binding `ring.swagger.json-schema/*ignore-missing-mappings*` to true, one can ignore the errors (missing schema elements will be ignored from the generated JSON Schema).
+If Ring-swagger can't transform the Schemas into JSON Schemas, by default a `IllegalArgumentException` will be thrown.
+Setting the `:ignore-missing-mappings?` to `true` causes the errors to be ignored - missing schema elements will be
+ignored from the generated Swagger schema.
 
 ### Body and Response model names
 
-Standard Prismatic Schema names are used. Nested schemas are traversed and all found sub-schemas are named automatically - so that they can be referenced in the generated Swagger spec.
+Standard Prismatic Schema names are used. Nested schemas are traversed and all found sub-schemas are named
+automatically - so that they can be referenced in the generated Swagger spec.
 
-Swagger 2.0 squashes all api models into a single global namespace, so schema name collisions can happen. When this happens, the function defined by `:handle-duplicate-schemas-fn` option is called to resolve the collision. By default, the collisions are ignored.
+Swagger 2.0 squashes all api models into a single global namespace, so schema name collisions can happen.
+When this happens, the function defined by `:handle-duplicate-schemas-fn` option is called to resolve the collision.
+By default, the collisions are ignored.
 
-One accidental reason for schema name collisions is the use of normal `clojure.core` functions to create transformed copies of the schemas. The normal core functions retain the original schema meta-data and by so the schema name.
+One accidental reason for schema name collisions is the use of normal `clojure.core` functions to create transformed
+copies of the schemas. The normal core functions retain the original schema meta-data and by so the schema name.
 
 ```clojure
 (s/defschema User {:id s/Str, :name s/Str})
 (def NewUser (dissoc User :id)) ; dissoc does not remove the schema meta-data
 
 (meta User)
-; {:name Kikka}
+; {:name User :ns user}
+
 
 (meta NewUser)
-; {:name Kikka} <- fail!
+; {:name User :ns user} <--- fail, now there are two User-schemas around.
 ```
 
 There are better schema transformers functions available at [schema-tools](https://github.com/metosin/schema-tools).
+It's an implicit dependency of ring-swagger.
 
 ### Extra Schema elements supported by `ring.swagger.json-schema-dirty`
 
 Some Schema elements are impossible to accurately describe within boundaries of JSON-Schema or Swagger spec.
 You can require `ring.swagger.json-schema-dirty` namespace to get JSON Schema dispatching for the following:
 
-Be warned that Swagger-UI might not display these correctly and the code generated by swagger-codegen will be inaccurate.
+**WARNING** Swagger-UI might not display these correctly and the code generated by swagger-codegen will be inaccurate.
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
@@ -340,13 +350,18 @@ These schemas should work, just need the mappings (feel free to contribute!):
 
 ### Schema coercion
 
-Ring-swagger uses [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion) for transforming the input data into vanilla Clojure and back.
+Ring-swagger uses [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion)
+for transforming the input data into vanilla Clojure and back.
 
-There are two coercers in `ring.swagger.coerce`, the `json-schema-coercion-matcher` and `query-schema-coercion-matcher`. These are enchanced versions of the orginal Schema coercers, adding support for all the supported Schema elements, including Dates & Regexps.
+There are two coercers in `ring.swagger.coerce`, the `json-schema-coercion-matcher` and `query-schema-coercion-matcher`.
+These are enchanced versions of the original Schema coercers, adding support for all the supported Schema elements,
+including Dates & Regexps.
 
 #### Coerce!
 
-Ring-swagger provides a convenience function for coercion, `ring.swagger.schema/coerce!`. It returns either a valid coerced value of slingshots an Map with type `:ring.swagger.schema/validation`. One can catch these exceptions via `ring.swagger.middleware/wrap-validation-errors` and return a JSON-friendly map of the contents.
+Ring-swagger provides a convenience function for coercion, `ring.swagger.schema/coerce!`. It returns either a valid
+coerced value of slingshots an Map with type `:ring.swagger.schema/validation`. One can catch these exceptions via
+`ring.swagger.middleware/wrap-validation-errors` and return a JSON-friendly map of the contents.
 
 ```clojure
 (require '[schema.core :as s])
