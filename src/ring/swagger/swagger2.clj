@@ -2,8 +2,6 @@
   (:require [clojure.string :as str]
             [schema.core :as s]
             [plumbing.core :refer [for-map]]
-            ; the json-encodings, FIXME: global side effects -> separate import
-            ring.swagger.json
             [ring.swagger.common :refer :all]
             [ring.swagger.json-schema :as jsons]
             [ring.swagger.core :as rsc]

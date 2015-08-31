@@ -3,6 +3,13 @@
             [clojure.walk :as walk]
             [schema.core :as s]
             [plumbing.core :refer :all]
+
+            ; the json-encoders are registered in ring.swagger.json
+            ; there are client projects depending on ring.swagger.core ns to get the json encodings
+            ; thre real public api - ring.swagger.swagger2 depends on this ns, so it gets these too.
+            ; FIXME: global side effects -> separate import with 1.0
+            ring.swagger.json
+
             [ring.swagger.common :refer :all]
             [schema-tools.walk :as stw]
             [flatland.ordered.set :as os]
