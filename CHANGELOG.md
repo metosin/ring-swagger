@@ -1,4 +1,4 @@
-## 0.21.0-SNAPSHOT
+## 0.21.0 (1.9.2016)
 
 ### Breaking changes
 
