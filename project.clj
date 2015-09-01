@@ -23,7 +23,7 @@
                                   [midje "1.7.0"]
                                   [ring-mock "0.1.5"]
                                   [metosin/scjsv "0.2.0"]
-                                  [metosin/ring-swagger-ui "2.1.1"]
+                                  [metosin/ring-swagger-ui "2.1.2"]
                                   [javax.servlet/servlet-api "2.5"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}}
   :codeina {:sources ["src"]
