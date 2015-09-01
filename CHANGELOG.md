@@ -45,7 +45,7 @@
 
 ```clojure
 [metosin/schema-tools "0.5.2"] is available but we use "0.4.1"
-[metosin/ring-http-response "0.6.4"] is available but we use "0.6.2"
+[metosin/ring-http-response "0.6.5"] is available but we use "0.6.2"
 [metosin/ring-swagger-ui "2.1.2"] is available but we use "2.0.24"
 [prismatic/schema "0.4.4"] is available but we use "0.4.3"
 [cheshire "5.5.0"] is available but we use "5.4.0"
