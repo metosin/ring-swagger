@@ -1,5 +1,6 @@
 ## 0.22.0 (x.x.2015)
 
+- **BREAKING**: Supports and depends on Schema 1.0.
 - updated dependencies:
 
 ```clojure

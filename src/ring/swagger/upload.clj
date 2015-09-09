@@ -14,12 +14,8 @@
 (defrecord Upload [m]
 
   s/Schema
-  (walker [_]
-    (let [sub-walker (s/subschema-walker m)]
-      (clojure.core/fn [x]
-       (if (schema.utils/error? x)
-         x
-         (sub-walker x)))))
+  (spec [_]
+    (s/spec m))
   (explain [_]
     (cons 'file m))
 
