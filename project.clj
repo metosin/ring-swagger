@@ -8,7 +8,7 @@
   :dependencies [[cheshire "5.5.0"]
                  [slingshot "0.12.2"]
                  [metosin/ring-http-response "0.6.5"]
-                 [metosin/schema-tools "0.6.0"]
+                 [metosin/schema-tools "0.6.1"]
                  [prismatic/schema "1.0.1"]
                  [prismatic/plumbing "0.5.0"]
                  [clj-time "0.11.0"]
