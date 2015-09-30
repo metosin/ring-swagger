@@ -1,5 +1,7 @@
 (ns ring.swagger.json-schema
   (:require [schema.core :as s]
+            [schema.spec.core :as spec]
+            [schema.spec.variant :as variant]
             [ring.swagger.common :as c]
             [flatland.ordered.map :refer :all]))
 
@@ -14,6 +16,14 @@
 ;; Schema implementation which is used wrap stuff which doesn't support meta-data
 ;;
 
+(defrecord FieldSchema [schema]
+  schema.core.Schema
+  (spec [this]
+    (variant/variant-spec
+     spec/+no-precondition+
+     [{:schema schema}]))
+  (explain [this] (s/explain schema)))
+
 (defn field
   "Attaches meta-data to a schema under :json-schema key. If the
    schema is of type which cannot have meta-data (e.g. Java Classes)
@@ -21,7 +31,7 @@
   [schema meta-data]
   (with-meta (if (instance? clojure.lang.IObj schema)
                schema
-               (s/conditional (constantly true) schema))
+               (->FieldSchema schema))
              (merge (meta schema) {:json-schema meta-data})))
 
 (defn describe
@@ -119,6 +129,10 @@
   nil
   (convert [_ _]
     nil)
+
+  FieldSchema
+  (convert [e _]
+    (->swagger (:schema e)))
 
   schema.core.Predicate
   (convert [e _]
