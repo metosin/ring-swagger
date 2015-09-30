@@ -17,11 +17,11 @@
 (defn field
   "Attaches meta-data to a schema under :json-schema key. If the
    schema is of type which cannot have meta-data (e.g. Java Classes)
-   schema is wrapped first into s/both Schema."
+   schema is wrapped first into s/conditional Schema."
   [schema meta-data]
   (with-meta (if (instance? clojure.lang.IObj schema)
                schema
-               (s/both schema))
+               (s/conditional (constantly true) schema))
              (merge (meta schema) {:json-schema meta-data})))
 
 (defn describe
@@ -161,6 +161,14 @@
 
   schema.core.AnythingSchema
   (convert [_ _] nil)
+
+  schema.core.ConditionalSchema
+  (convert [e _]
+    {:type "void" :oneOf (mapv (comp ->swagger second) (:preds-and-schemas e))})
+
+  schema.core.CondPre
+  (convert [e _]
+    {:type "void" :oneOf (mapv ->swagger (:schemas e))})
 
   java.util.regex.Pattern
   (convert [e _]

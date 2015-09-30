@@ -84,7 +84,20 @@
       (->swagger (s/eq "kikka"))         => (->swagger String))
 
     (fact "s/Any -> nil"
-      (->swagger s/Any) => nil)))
+      (->swagger s/Any) => nil)
+
+    (fact "s/conditional"
+      (->swagger (s/conditional (constantly true) Long (constantly false) String))
+      => {:type "void" :oneOf [(->swagger Long) (->swagger String)]})
+
+    (fact "s/if"
+      (->swagger (s/if (constantly true) Long String))
+      => {:type "void" :oneOf [(->swagger Long) (->swagger String)]})
+
+    (fact "s/cond-pre"
+      (->swagger (s/cond-pre Model [s/Str]))
+      => {:type "void" :oneOf [(->swagger Model) (->swagger [s/Str])]})
+    ))
 
 (fact "Describe"
   (tabular
