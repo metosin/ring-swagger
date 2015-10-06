@@ -5,6 +5,8 @@
             [ring.swagger.common :as c]
             [flatland.ordered.map :refer :all]))
 
+(declare properties)
+
 ; TODO: remove this in favor of passing it as options
 (def ^:dynamic *ignore-missing-mappings* false)
 
@@ -91,7 +93,7 @@
                          keyword? clojure.lang.Keyword
                          symbol?  clojure.lang.Symbol})
 
-(defn- reference [e]
+(defn reference [e]
   (if-let [schema-name (s/schema-name e)]
     {:$ref (str "#/definitions/" schema-name)}
     (and (not *ignore-missing-mappings*)
@@ -199,8 +201,10 @@
     (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (convert [e _]
-    (reference e))
+  (convert [e {:keys [properties?]}]
+    (if properties?
+      {:properties (properties e)}
+      (reference e)))
 
   clojure.lang.Var
   (convert [e _]
