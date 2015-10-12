@@ -4,9 +4,9 @@
             [ring.swagger.test-utils :refer :all]
             [ring.swagger.schema :refer :all]
             [ring.swagger.core :refer :all]
-            [flatland.ordered.map :refer :all]))
+            [linked.core :as linked]))
 
-(s/defschema OrderedSchema (ordered-map
+(s/defschema OrderedSchema (linked/map
                              :id Long
                              :hot Boolean
                              :tag (s/enum :kikka :kukka)

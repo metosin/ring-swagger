@@ -1,7 +1,7 @@
 (ns ring.swagger.common-test
   (:require [midje.sweet :refer :all]
             [ring.swagger.common :refer :all]
-            [flatland.ordered.map :as om]))
+            [linked.core :as linked]))
 
 (fact "remove-empty-keys"
   (remove-empty-keys {:a nil :b false :c 0}) => {:b false :c 0})
@@ -37,4 +37,4 @@
 (fact "plain-map?"
   (plain-map? {}) => true
   (plain-map? (->ARecord 1)) => false
-  (plain-map? (om/ordered-map :a 1)) => true)
+  (plain-map? (linked/map :a 1)) => true)

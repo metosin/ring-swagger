@@ -14,7 +14,7 @@
                  [clj-time "0.11.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
                  [potemkin "0.4.1"]
-                 [org.flatland/ordered "1.5.3"]]
+                 [frankiesardo/linked "1.2.6"]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-ring "0.9.7"]
                              [lein-midje "3.1.3"]
