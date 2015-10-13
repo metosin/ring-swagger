@@ -15,7 +15,6 @@
 
   schema.experimental.abstract_map.SchemaExtension
   (convert [e options]
-    (println (class (:base-schema e)))
     {:allOf [(json-schema/->swagger (:base-schema e) {:properties? false})
              ; Find which keys are also in base-schema and don't include them in these properties
              (json-schema/->swagger (let [base-keys (set (keys (:schema (:base-schema e))))
