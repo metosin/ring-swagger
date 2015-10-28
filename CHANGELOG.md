@@ -1,12 +1,12 @@
-## 0.22.0 (x.x.2015)
+## Unreleased
 
 - **BREAKING**: Supports and depends on Schema 1.0.
 - updated dependencies:
 
 ```clojure
-[metosin/schema-tools "0.6.0"] is available but we use "0.5.2"
-[prismatic/schema "1.0.1"] is available but we use "0.4.4"
-[prismatic/plumbing "0.5.0"] is available but we use "0.4.4"
+[metosin/schema-tools "0.6.2"] is available but we use "0.5.2"
+[prismatic/schema "1.0.2"] is available but we use "0.4.4"
+[prismatic/plumbing "0.5.1"] is available but we use "0.4.4"
 ```
 
 ## 0.21.0 (1.9.2015)
