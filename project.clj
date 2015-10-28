@@ -24,7 +24,9 @@
                                   [ring-mock "0.1.5"]
                                   [metosin/scjsv "0.2.0"]
                                   [metosin/ring-swagger-ui "2.1.3"]
-                                  [javax.servlet/servlet-api "2.5"]]}
+                                  [javax.servlet/servlet-api "2.5"]
+                                  ; Required when using with Java 1.6
+                                  [org.codehaus.jsr166-mirror/jsr166y "1.7.0"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}}
   :codeina {:sources ["src"]
             :output-dir "gh-pages/doc"
