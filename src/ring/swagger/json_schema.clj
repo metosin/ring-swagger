@@ -186,6 +186,10 @@
   (convert [e _]
     {:type "void" :oneOf (mapv ->swagger (:schemas e))})
 
+  schema.core.Constrained
+  (convert [e _]
+    (->swagger (:schema e)))
+
   java.util.regex.Pattern
   (convert [e _]
     {:type "string" :pattern (str e)})

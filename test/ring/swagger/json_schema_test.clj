@@ -90,6 +90,10 @@
       (->swagger (s/conditional (constantly true) Long (constantly false) String))
       => {:type "void" :oneOf [(->swagger Long) (->swagger String)]})
 
+    (fact "s/constrained"
+      (->swagger (s/constrained Long even?))
+      => (->swagger Long))
+
     (fact "s/if"
       (->swagger (s/if (constantly true) Long String))
       => {:type "void" :oneOf [(->swagger Long) (->swagger String)]})
