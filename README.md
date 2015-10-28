@@ -281,6 +281,9 @@ One can also use the options to create more accurate specs (via the `:in` option
 | `(s/enum X Y Z)`                            | *type of X*, enum(X,Y,Z)
 | `(s/maybe X)`                               | *type of X*
 | `(s/both X Y Z)`                            | *type of X*
+| `(s/constrained X pred)`                    | *type of X*
+| `(s/conditional p1 X p2 Y p3)`              | *one of type X, Y, Z*
+| `(s/cond-pre X Y Z)`                        | *one of type X, Y, Z*
 | `(s/either X Y Z)`                          | *type of X*
 | `(s/named X name)`                          | *type of X*
 | `(s/one X name)`                            | *type of X*
