@@ -27,10 +27,10 @@
                                   [javax.servlet/servlet-api "2.5"]
                                   ; Required when using with Java 1.6
                                   [org.codehaus.jsr166-mirror/jsr166y "1.7.0"]]}
-             :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}}
+             :1.8 {:dependencies [[org.clojure/clojure "1.8.0-beta2"]]}}
   :codeina {:sources ["src"]
             :output-dir "gh-pages/doc"
             :src-dir-uri "http://github.com/metosin/ring-swagger/blob/master/"
             :src-linenum-anchor-prefix "L" }
-  :aliases {"all" ["with-profile" "dev:dev,1.6"]
+  :aliases {"all" ["with-profile" "dev:dev,1.8"]
             "test-ancient" ["midje"]})

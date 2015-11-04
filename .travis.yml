@@ -8,7 +8,7 @@ jdk:
   - oraclejdk8
 env:
   - PROFILE=dev
-  - PROFILE=dev,1.6
+  - PROFILE=dev,1.8
 cache:
   directories:
   - $HOME/.m2
