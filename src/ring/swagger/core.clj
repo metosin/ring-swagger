@@ -37,7 +37,7 @@
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 
 (defn peek-schema
-  "Recurisively seeks the form with schema-name.
+  "Recurisively seeks the first form with schema-name.
    Walks over sets, vectors and Schema predicates."
   [schema]
   (let [it (atom nil)]
@@ -46,7 +46,7 @@
          x
          (fn [x]
            (if (and (plain-map? x) (s/schema-name x))
-             (do (reset! it x) x)
+             (do (if-not @it (reset! it x)) x)
              (walk x)))
          identity)) [schema])
     @it))

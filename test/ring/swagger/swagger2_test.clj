@@ -303,3 +303,16 @@
     (transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
                                                    "/b" {:put {:x-no-doc true}}}})))
 ; {:paths {"/a" {:post {}}}}))
+
+(s/defschema SchemaA {:a s/Str})
+(s/defschema SchemaB {:b s/Str})
+(s/defschema SchemaAB (s/either SchemaA SchemaB))
+
+(fact "s/either stuff is correctly named"
+  (-> (swagger-json {:paths {"/ab" {:get {:parameters {:body SchemaAB}}}}})
+      :paths (get "/ab") :get :parameters first)
+  => {:in :body
+      :name "SchemaA"
+      :description ""
+      :required true
+      :schema {:$ref "#/definitions/SchemaA"}})
