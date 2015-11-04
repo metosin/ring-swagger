@@ -36,9 +36,6 @@
 
 (defn- full-name [path] (->> path (map name) (map lc/capitalized) (apply str) symbol))
 
-(defn map-entry? [x]
-  (instance? IMapEntry x))
-
 (defn peek-schema
   "Recurisively seeks the form with schema-name.
    Walks over sets, vectors and Schema predicates."
@@ -58,7 +55,7 @@
   (stw/walk
     schema
     (fn [x]
-      (if (map-entry? x)
+      (if (instance? IMapEntry x)
         [(key x)
          (name-schemas
            (conj names
