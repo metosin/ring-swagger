@@ -51,7 +51,9 @@
    generating new names for all the requests.
 
 - Fixes [54](https://github.com/metosin/ring-swagger/issues/54): `:paths` order is now preserved
-  - use `flatland.ordered.map/ordered-map` in the client side to keep the order.
+
+- Fixes [55](https://github.com/metosin/ring-swagger/issues/55): arrays of primitives now supported as 
+  top-level items
 
 - updated dependencies:
 
