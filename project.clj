@@ -23,7 +23,7 @@
                                   [midje "1.8.1"]
                                   [ring-mock "0.1.5"]
                                   [metosin/scjsv "0.2.0"]
-                                  [metosin/ring-swagger-ui "2.1.3"]
+                                  [metosin/ring-swagger-ui "2.1.3-4"]
                                   [javax.servlet/servlet-api "2.5"]
                                   ; Required when using with Java 1.6
                                   [org.codehaus.jsr166-mirror/jsr166y "1.7.0"]]}
