@@ -3,7 +3,7 @@
             [schema.core :as s]
             [ring.swagger.json-schema :refer :all]
             [ring.swagger.core :refer [with-named-sub-schemas]]
-            [flatland.ordered.map :refer :all])
+            [linked.core :as linked])
   (:import [java.util Date UUID]
            [org.joda.time DateTime LocalDate]
            [java.util.regex Pattern]))
@@ -148,7 +148,7 @@
                            :b java.util.Vector})) => [:a])))
 
   (fact "Keeps the order of properties intact"
-    (keys (properties (ordered-map :a String
+    (keys (properties (linked/map :a String
                                    :b String
                                    :c String
                                    :d String
@@ -159,7 +159,7 @@
     => [:a :b :c :d :e :f :g :h])
 
   (fact "Ordered-map works with sub-schemas"
-    (properties (with-named-sub-schemas (ordered-map :a String
+    (properties (with-named-sub-schemas (linked/map :a String
                                                      :b {:foo String}
                                                      :c [{:bar String}])))
     => anything)
