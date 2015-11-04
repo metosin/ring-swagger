@@ -32,6 +32,8 @@
    - **:oauth2** map with oauth2 params, namely `:client-id`, `:realm` and `:app-name`
    - Other options are passed as is to SwaggerUi constructor. Map keys are
    renamed to camelCase."
+  {:arglists '([context & {:as opts}]
+               [& {:as opts}])}
   [& params]
   (let [[path kvs] (if (string? (first params))
                      [(first params) (rest params)]
