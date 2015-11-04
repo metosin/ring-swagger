@@ -4,20 +4,21 @@
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.not-modified :refer [wrap-not-modified]]
             [ring.middleware.head :refer [wrap-head]]
-            [ring.swagger.core :as swagger]))
+            [ring.swagger.core :as swagger]
+            [org.tobereplaced.lettercase :as lc]))
 
 (defn get-path [root uri]
   (second (re-find (re-pattern (str "^" root "[/]?(.*)")) uri)))
 
-(defn conf-js [req {:keys [swagger-docs oauth2]
-                    :or {swagger-docs "/swagger.json"
-                         oauth2 nil}}]
-  (let [swagger-docs (swagger/join-paths (swagger/context req) swagger-docs)
-        conf (cond-> {:url swagger-docs}
-                     oauth2 (assoc :oauth2 {"clientId" (:client-id oauth2)
-                                            "appName" (:app-name oauth2)
-                                            "realm" (:realm oauth2)}))]
-    (str "window.API_CONF = " (json/encode conf) ";")))
+(defn- json-key [k]
+  (lc/mixed (name k)))
+
+(defn conf-js [req opts]
+  (let [swagger-docs (swagger/join-paths (swagger/context req) (:swagger-docs opts "/swagger.json"))
+        conf (-> opts
+                 (dissoc :swagger-docs)
+                 (assoc :url swagger-docs))]
+    (str "window.API_CONF = " (json/generate-string conf {:key-fn json-key}) ";")))
 
 (defn swagger-ui
   "This function creates a ring handler which can be used to serve swagger-ui.
@@ -28,7 +29,9 @@
 
    - **:root** the root prefix to get resources from. Default 'swagger-ui'
    - **:swagger-docs** the endpoint to get swagger data from. Default '/swagger.json'
-   - **:oauth2** map with oauth2 params, namely `:client-id`, `:realm` and `:app-name`"
+   - **:oauth2** map with oauth2 params, namely `:client-id`, `:realm` and `:app-name`
+   - Other options are passed as is to SwaggerUi constructor. Map keys are
+   renamed to camelCase."
   [& params]
   (let [[path kvs] (if (string? (first params))
                      [(first params) (rest params)]
