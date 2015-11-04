@@ -3,7 +3,7 @@
             [schema.spec.core :as spec]
             [schema.spec.variant :as variant]
             [ring.swagger.common :as c]
-            [flatland.ordered.map :refer :all]))
+            [linked.core :as linked]))
 
 (declare properties)
 
@@ -221,7 +221,7 @@
 (defn properties
   "Take a map schema and turn them into json-schema properties.
    The result is put into collection of same type as input schema.
-   Thus ordered-map should keep the order of items. Returnes nil
+   Thus linked/map should keep the order of items. Returnes nil
    if no properties are found."
   [schema]
   {:pre [(c/plain-map? schema)]}

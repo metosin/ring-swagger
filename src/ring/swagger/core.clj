@@ -12,7 +12,7 @@
 
             [ring.swagger.common :refer :all]
             [schema-tools.walk :as stw]
-            [flatland.ordered.set :as os]
+            [linked.core :as linked]
             [clojure.string :as string]
             [org.tobereplaced.lettercase :as lc])
   (:import (clojure.lang IMapEntry)))
@@ -92,7 +92,7 @@
           (let [schema (if (var? x) @x x)]
             (swap!
               schemas update-in [schema-name]
-              (fn [x] (conj (or x (os/ordered-set)) schema)))))
+              (fn [x] (conj (or x (linked/set)) schema)))))
         x)
       x)
     @schemas))

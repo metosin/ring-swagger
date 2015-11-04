@@ -2,7 +2,7 @@
   (:require [schema.core :as s]
             [ring.swagger.swagger2 :refer :all]
             [ring.swagger.validator :as v]
-            [flatland.ordered.map :as om]
+            [linked.core :as linked]
             [ring.util.http-status :as status]
             [midje.sweet :refer :all])
   (:import [java.util Date UUID]
@@ -289,7 +289,7 @@
 
 (fact "retain :paths order, #54"
   (let [->path (fn [x] (str "/" x))
-        paths (reduce (fn [acc x] (assoc acc (->path x) {:get {}})) (om/ordered-map) (range 100))
+        paths (reduce (fn [acc x] (assoc acc (->path x) {:get {}})) (linked/map) (range 100))
         swagger {:paths paths}
         spec (swagger-json swagger)]
     (-> spec :paths keys) => (map ->path (range 100))))
