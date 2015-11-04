@@ -5,7 +5,7 @@
 
 ```clojure
 [metosin/schema-tools "0.6.2"] is available but we use "0.5.2"
-[prismatic/schema "1.0.2"] is available but we use "0.4.4"
+[prismatic/schema "1.0.3"] is available but we use "0.4.4"
 [prismatic/plumbing "0.5.1"] is available but we use "0.4.4"
 ```
 
