@@ -1,5 +1,6 @@
 ## Unreleased
 
+- **BREAKING**: Dropped support for Clojure 1.6
 - **BREAKING**: Supports and depends on Schema 1.0.
 - updated dependencies:
 
@@ -48,7 +49,7 @@
    - `transform-operations` for generic operation transformations on the client side
    - `ensure-body-and-response-schema-names` to fix the generated schema names on the client side (vs. the `swagger-json`
    generating new names for all the requests.
-   
+
 - Fixes [54](https://github.com/metosin/ring-swagger/issues/54): `:paths` order is now preserved
   - use `flatland.ordered.map/ordered-map` in the client side to keep the order.
 
@@ -94,7 +95,7 @@
 ## 0.20.3 (17.5.2015)
 
 - new option `:handle-duplicate-schemas-fn` to handle duplicates schemas.
-  - **breaking**: default behaviour is "take the first definition" instead of `IllegalArgumentException` 
+  - **breaking**: default behaviour is "take the first definition" instead of `IllegalArgumentException`
   (the code was broken, did not work with anonymous predicate schemas & regexps.
 - updated deps:
 
