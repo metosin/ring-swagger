@@ -1,4 +1,5 @@
 (ns ring.swagger.core
+  (:refer-clojure :exclude [map-entry?])
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
             [schema.core :as s]
@@ -14,8 +15,7 @@
             [schema-tools.walk :as stw]
             [linked.core :as linked]
             [clojure.string :as string]
-            [org.tobereplaced.lettercase :as lc])
-  (:import (clojure.lang IMapEntry)))
+            [org.tobereplaced.lettercase :as lc]))
 
 ;;
 ;; Helpers
@@ -51,11 +51,20 @@
          identity)) [schema])
     @it))
 
+; From Clojure 1.8
+(defn map-entry?
+  "Return true if x is a map entry"
+  [x]
+  (and (instance? java.util.Map$Entry x)
+       (if (instance? clojure.lang.IPersistentVector x)
+         (= 2 (count x))
+         true)))
+
 (defn name-schemas [names schema]
   (stw/walk
     schema
     (fn [x]
-      (if (instance? IMapEntry x)
+      (if (map-entry? x)
         [(key x)
          (name-schemas
            (conj names

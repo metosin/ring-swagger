@@ -42,7 +42,11 @@
     => {:name 'RootSub})
   (fact "generated names for non-spesific keys"
     (str (:name (meta (get (name-schemas ["Root"] {s/Keyword {:a s/Str}}) s/Keyword))))
-    => #"^RootKeyword\d+"))
+    => #"^RootKeyword\d+")
+
+  (fact "empty vector is not map-entry"
+    (name-schemas ["Root"] [[]])
+    => [[]]))
 
 (fact "with-named-sub-schemas"
   (fact "add :name meta-data to sub-schemas"
