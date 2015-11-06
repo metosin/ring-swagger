@@ -2,7 +2,8 @@
   (:require [midje.sweet :refer :all]
             [ring.mock.request :as mock]
             [ring.swagger.test-utils :refer :all]
-            [ring.swagger.ui :refer :all]))
+            [ring.swagger.ui :refer :all]
+            [cheshire.core :as json]))
 
 (tabular
   (fact get-path
@@ -84,26 +85,41 @@
     (fact "forwards non-swagger-ui resources"
       (GET "/NON-SWAGGER-FILE") => ..response..)))
 
+(defn- strip-js [s]
+  (second (re-find #"window\.API_CONF = (.*);" s)))
+
+(defn- read-js [s]
+  (-> s strip-js (json/parse-string)))
+
 (facts "conf.js"
 
   (fact "with default parameters"
     (conf-js nil {})
     => "window.API_CONF = {\"url\":\"/swagger.json\"};")
 
+  (fact "with default parameters"
+    (read-js (conf-js nil {}))
+    => {"url" "/swagger.json"})
+
   (fact "with swagger-docs & oauth2 set"
-    (conf-js nil {:swagger-docs "/lost"
-                  :oauth2 {:client-id "1"
-                           :app-name "2"
-                           :realm "3"}})
-    => "window.API_CONF = {\"url\":\"/lost\",\"oauth2\":{\"clientId\":\"1\",\"appName\":\"2\",\"realm\":\"3\"}};")
+    (read-js (conf-js nil {:swagger-docs "/lost"
+                           :oauth2 {:client-id "1"
+                                    :app-name "2"
+                                    :realm "3"}}))
+    => {"url" "/lost"
+        "oauth2" {"clientId" "1"
+                  "appName" "2"
+                  "realm" "3"}})
 
   (fact "with parameter passthrough"
-    (conf-js nil {:validatorUrl "foo"})
-    => "window.API_CONF = {\"validatorUrl\":\"foo\",\"url\":\"/swagger.json\"};")
+    (read-js (conf-js nil {:validatorUrl "foo"}))
+    => {"url" "/swagger.json"
+        "validatorUrl" "foo"})
 
   (fact "with parameter passthrough and key renaming"
-    (conf-js nil {:validator-url "foo"})
-    => "window.API_CONF = {\"validatorUrl\":\"foo\",\"url\":\"/swagger.json\"};")
+    (read-js (conf-js nil {:validator-url "foo"}))
+    => {"url" "/swagger.json"
+        "validatorUrl" "foo"})
 
   (fact "does not fail with crappy input"
     (conf-js nil {:kikka "kukka"
