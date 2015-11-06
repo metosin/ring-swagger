@@ -52,7 +52,9 @@
     @it))
 
 ; From Clojure 1.8
-(defn map-entry?
+; Private so that this doesn't cause warnings in namespaces where this ns is
+; requires with :refer :all
+(defn- map-entry?
   "Return true if x is a map entry"
   [x]
   (and (instance? java.util.Map$Entry x)
