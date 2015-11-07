@@ -1,6 +1,7 @@
 (ns ring.swagger.swagger2-test
   (:require [schema.core :as s]
             [ring.swagger.swagger2 :refer :all]
+            [ring.swagger.json-schema :as rsjs]
             [ring.swagger.validator :as v]
             [linked.core :as linked]
             [ring.util.http-status :as status]
@@ -275,6 +276,24 @@
                 'Kakka
                 {:type "object"
                  :additionalProperties {:$ref "#/definitions/Kukka"}}))))
+
+(fact "extra meta-data to properties"
+  (let [Kikka (s/schema-with-name {:a (rsjs/field s/Str {:description "A"})
+                                   :b (rsjs/field [s/Str] {:description "B"})} 'Kikka)
+        swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}}}
+        spec (swagger-json swagger)]
+
+    (validate swagger) => nil
+
+    spec => (has-definition
+              'Kikka
+              {:type "object"
+               :properties {:a {:type "string"
+                                :description "A"}
+                            :b {:type "array"
+                                :items {:type "string"}
+                                :description "B"}}
+               :required [:a :b]})))
 
 (fact "tags"
   (let [swagger {:tags [{:name "pet"
