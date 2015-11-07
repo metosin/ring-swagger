@@ -245,9 +245,9 @@
     (= (get-in actual [:definitions (name schema-name)]) value)))
 
 (fact "additionalProperties"
-  (let [Kikka  (s/schema-with-name {:a s/Str s/Keyword s/Str} 'Kikka)
-        Kukka  (s/schema-with-name {:a s/Str s/Keyword Kikka} 'Kukka)
-        Kakka  (s/schema-with-name {s/Keyword Kukka} 'Kakka)
+  (let [Kikka (s/schema-with-name {:a s/Str s/Keyword s/Str} 'Kikka)
+        Kukka (s/schema-with-name {:a s/Str s/Keyword Kikka} 'Kukka)
+        Kakka (s/schema-with-name {s/Keyword Kukka} 'Kakka)
         swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}
                          "/kukka" {:post {:parameters {:body Kukka}}}
                          "/kakka" {:post {:parameters {:body Kakka}}}}}
@@ -283,7 +283,7 @@
                                         :url "http://swagger.io"}}
                         {:name "store"
                          :description "Operations about user"}]
-                 :paths {"/pet"   {:post {:tags ["pet"]}}
+                 :paths {"/pet" {:post {:tags ["pet"]}}
                          "/store" {:post {:tags ["store"]}}}}]
     (validate swagger) => nil))
 

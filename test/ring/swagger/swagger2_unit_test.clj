@@ -303,9 +303,9 @@
                              :format "int64"}}
           :required [:bar]})))
 
-;; ;;
-;; ;; Helpers
-;; ;;
+;;
+;; Helpers
+;;
 
 (fact "swagger-path"
   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
