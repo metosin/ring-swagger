@@ -20,7 +20,7 @@
                              [lein-midje "3.2"]
                              [funcool/codeina "0.3.0"]]
                    :dependencies [[org.clojure/clojure "1.7.0"]
-                                  [midje "1.8.1"]
+                                  [midje "1.8.2"]
                                   [ring-mock "0.1.5"]
                                   [metosin/scjsv "0.2.0"]
                                   [metosin/ring-swagger-ui "2.1.3-2"]
