@@ -1,5 +1,7 @@
 ## 0.22.0 (8.11.2015)
 
+**[compare](https://github.com/metosin/ring-swagger/compare/0.21.0...0.22.0)**
+
 - **BREAKING**: Dropped support for Clojure 1.6
 - **BREAKING**: Supports and depends on Schema 1.0.
 - Uses now [linked](https://github.com/frankiesardo/linked) instead of
@@ -17,6 +19,8 @@ now supports passing arbitrary options to `SwaggerUI`
 ```
 
 ## 0.21.0 (1.9.2015)
+
+**[compare](https://github.com/metosin/ring-swagger/compare/0.20.4...0.21.0)**
 
 ### Breaking changes
 
