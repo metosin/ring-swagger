@@ -1,4 +1,4 @@
-## Unreleased
+## 0.22.0 (8.11.2015)
 
 - **BREAKING**: Dropped support for Clojure 1.6
 - **BREAKING**: Supports and depends on Schema 1.0.
@@ -11,7 +11,7 @@ now supports passing arbitrary options to `SwaggerUI`
 - updated dependencies:
 
 ```clojure
-[metosin/schema-tools "0.6.2"] is available but we use "0.5.2"
+[metosin/schema-tools "0.7.0"] is available but we use "0.5.2"
 [prismatic/schema "1.0.3"] is available but we use "0.4.4"
 [prismatic/plumbing "0.5.1"] is available but we use "0.4.4"
 ```
