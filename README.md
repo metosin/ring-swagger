@@ -24,6 +24,7 @@
 - [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
 - [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
 - [yada](https://github.com/juxt/yada)
+- [kekkonen](https://github.com/metosin/kekkonen)
 
 Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj).
 The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any 
