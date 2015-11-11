@@ -10,7 +10,7 @@
                  [metosin/ring-http-response "0.6.5"]
                  [metosin/schema-tools "0.7.0"]
                  [prismatic/schema "1.0.3"]
-                 [prismatic/plumbing "0.5.1"]
+                 [prismatic/plumbing "0.5.2"]
                  [clj-time "0.11.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
                  [potemkin "0.4.1"]
