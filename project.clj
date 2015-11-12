@@ -27,7 +27,7 @@
                                   [javax.servlet/servlet-api "2.5"]
                                   ; Required when using with Java 1.6
                                   [org.codehaus.jsr166-mirror/jsr166y "1.7.0"]]}
-             :1.8 {:dependencies [[org.clojure/clojure "1.8.0-beta2"]]}}
+             :1.8 {:dependencies [[org.clojure/clojure "1.8.0-RC1"]]}}
   :codeina {:sources ["src"]
             :target "gh-pages/doc"
             :src-dir-uri "http://github.com/metosin/ring-swagger/blob/master/"
