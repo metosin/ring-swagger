@@ -59,9 +59,11 @@
     m))
 
 (defn merge-meta
-  [m x {no-meta ::no-meta}]
+  [m x {no-meta ::no-meta key-meta :key-meta}]
   (if-not no-meta
-    (merge (json-schema-meta x) m)
+    (merge (json-schema-meta x)
+           (select-keys key-meta [:default])
+           m)
     m))
 
 (defn not-supported! [e]
@@ -102,10 +104,12 @@
 (defn ->swagger
   ([x] (->swagger x {}))
   ([x options]
-   (merge-meta (convert x options) x options)))
+   (-> x
+       (convert options)
+       (merge-meta x options))))
 
-(defn- try->swagger [v k]
-  (try (->swagger v)
+(defn- try->swagger [v k key-meta]
+  (try (->swagger v {:key-meta key-meta})
        (catch Exception e
          (throw
            (IllegalArgumentException.
@@ -228,8 +232,9 @@
   (let [props (into (empty schema)
                     (for [[k v] schema
                           :when (c/not-predicate? k)
-                          :let [k (s/explicit-schema-key k)
-                                v (try->swagger v k)]]
+                          :let [key-meta (meta k)
+                                k (s/explicit-schema-key k)
+                                v (try->swagger v k key-meta)]]
                       (and v [k v])))]
     (if (seq props)
       props)))

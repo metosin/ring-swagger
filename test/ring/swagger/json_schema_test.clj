@@ -103,6 +103,10 @@
       => {:type "void" :oneOf [(->swagger Model) (->swagger [s/Str])]})
     ))
 
+(fact "Optional-key default metadata"
+  (properties {(with-meta (s/optional-key :foo) {:default "bar"}) s/Str})
+  => {:foo {:type "string" :default "bar"}})
+
 (fact "Describe"
   (tabular
     (fact "Basic classes"

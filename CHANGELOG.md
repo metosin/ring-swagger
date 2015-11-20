@@ -1,5 +1,7 @@
 ## ???
 
+- Use `:default` metadata of `optional-key`s set by Plumbing for Swagger
+property `default` field.
 ```clojure
 [prismatic/plumbing "0.5.2] is available but we use "0.5.1"
 ```
