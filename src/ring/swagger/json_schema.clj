@@ -62,7 +62,7 @@
   [m x {no-meta ::no-meta key-meta :key-meta}]
   (if-not no-meta
     (merge (json-schema-meta x)
-           (select-keys key-meta [:default])
+           (if key-meta (select-keys key-meta [:default]))
            m)
     m))
 
@@ -245,4 +245,4 @@
   [schema]
   {:pre [(c/plain-map? schema)]}
   (if-let [v (schema s/Keyword)]
-    (try->swagger v s/Keyword)))
+    (try->swagger v s/Keyword nil)))
