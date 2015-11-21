@@ -1,5 +1,6 @@
 ## ???
 
+- mappings for `s/Symbol` & `s/Inst`
 - Use `:default` metadata of `optional-key`s set by Plumbing for Swagger
 property `default` field.
 ```clojure
