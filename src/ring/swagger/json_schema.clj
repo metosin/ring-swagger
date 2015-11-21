@@ -92,9 +92,10 @@
 
 ;; Schemas
 ;; Convert the most common predicates by mapping fn to Class
-(def predicate-to-class {integer? java.lang.Long
-                         keyword? clojure.lang.Keyword
-                         symbol?  clojure.lang.Symbol})
+;;
+(def predicate-name-to-class {'integer? java.lang.Long
+                              'keyword? clojure.lang.Keyword
+                              'symbol?  clojure.lang.Symbol})
 
 (defn reference [e]
   (if-let [schema-name (s/schema-name e)]
@@ -143,7 +144,7 @@
 
   schema.core.Predicate
   (convert [e _]
-    (some-> e :p? predicate-to-class ->swagger))
+    (some-> e :pred-name predicate-name-to-class ->swagger))
 
   schema.core.EnumSchema
   (convert [e _]

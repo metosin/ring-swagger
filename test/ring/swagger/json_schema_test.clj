@@ -132,8 +132,22 @@
   (fact "Describe Model"
     (let [schema (describe Model ..desc..)]
       (json-schema-meta schema) => {:description ..desc..}
-      (->swagger schema) => (contains {:description ..desc..})
-      )))
+      (->swagger schema) => (contains {:description ..desc..}))))
+
+(fact "leiPredicate evaluation"
+  (tabular
+    (fact "Schema core predicates"
+      (->swagger ?pred) => (->swagger (eval ?pred)))
+    ?pred
+    s/Str
+    s/Bool
+    s/Num
+    s/Int
+    s/Keyword
+    s/Symbol
+    s/Regex
+    s/Inst
+    s/Uuid))
 
 (facts "properties"
   (fact "s/Any -values are ignored"
