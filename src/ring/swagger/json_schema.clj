@@ -79,6 +79,7 @@
 (defmethod convert-class java.lang.String        [_ _] {:type "string"})
 (defmethod convert-class java.lang.Boolean       [_ _] {:type "boolean"})
 (defmethod convert-class clojure.lang.Keyword    [_ _] {:type "string"})
+(defmethod convert-class clojure.lang.Symbol     [_ _] {:type "string"})
 (defmethod convert-class java.util.UUID          [_ _] {:type "string" :format "uuid"})
 (defmethod convert-class java.util.Date          [_ _] {:type "string" :format "date-time"})
 (defmethod convert-class org.joda.time.DateTime  [_ _] {:type "string" :format "date-time"})

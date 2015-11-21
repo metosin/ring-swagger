@@ -6,7 +6,8 @@
             [linked.core :as linked])
   (:import [java.util Date UUID]
            [org.joda.time DateTime LocalDate]
-           [java.util.regex Pattern]))
+           [java.util.regex Pattern]
+           [clojure.lang Symbol]))
 
 (s/defschema Model {:value String})
 
@@ -16,6 +17,7 @@
     (->swagger Long)      => {:type "integer" :format "int64"}
     (->swagger Double)    => {:type "number" :format "double"}
     (->swagger Number)    => {:type "number" :format "double"}
+    (->swagger Symbol)    => {:type "string"}
     (->swagger String)    => {:type "string"}
     (->swagger Boolean)   => {:type "boolean"}
     (->swagger Date)      => {:type "string" :format "date-time"}
@@ -28,6 +30,8 @@
   (fact "schema types"
     (->swagger s/Int)     => {:type "integer" :format "int64"}
     (->swagger s/Str)     => {:type "string"}
+    (->swagger s/Symbol)  => {:type "string"}
+    (->swagger s/Inst)    => {:type "string" :format "date-time"}
     (->swagger s/Num)     => {:type "number" :format "double"})
 
   (fact "containers"

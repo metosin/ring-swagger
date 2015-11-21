@@ -271,10 +271,10 @@ One can also use the options to create more accurate specs (via the `:in` option
 | `Integer`                                   | integer, int32           | `1` 
 | `Long`, `s/Int`                             | integer, int64           | `1` 
 | `Double`, `Number`, `s/Num`                 | number, double           | `1.2`
-| `String`, `s/Str`, `Keyword`, `s/Keyword`   | string                   | `"kikka"`
+| `String`, `s/Str`, `Keyword`, `s/Keyword`, `Symbol`, `s/Symbol` | string                   | `"kikka"`
 | `Boolean`                                   | boolean                  | `true`
 | `nil`, `s/Any`                              | void                     |
-| `java.util.Date`, `org.joda.time.DateTime`  | string, date-time        | `"2014-02-18T18:25:37.456Z"`, also without millis: `"2014-02-18T18:25:37Z"`
+| `java.util.Date`, `org.joda.time.DateTime`, `s/Inst`  | string, date-time        | `"2014-02-18T18:25:37.456Z"`, also without millis: `"2014-02-18T18:25:37Z"`
 | `java.util.regex.Pattern`,                  | string, regex            | `[a-z0-9]`
 | `#"[a-z0-9]+"`                              | string, pattern          | `"a6"`
 | `s/Uuid`, `java.util.UUID`                  | string, uuid             | `"77e70512-1337-dead-beef-0123456789ab"`
@@ -344,13 +344,6 @@ You can require `ring.swagger.json-schema-dirty` namespace to get JSON Schema di
 | --------|-------|:------------:|
 | `(s/conditional pred X pred Y pred Z)` | oneOf: *type of X*, *type of X*, *type of Z*
 | `(s/if pred X Y)` | oneOf: *type of X*, *type of Y*
-
-### Currently Non-supported Schema elements
-
-These schemas should work, just need the mappings (feel free to contribute!):
-
-- `s/Symbol`
-- `s/Inst`
 
 ### Schema coercion
 
