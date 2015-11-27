@@ -87,8 +87,14 @@
     (fact "s/eq -> type of class of value"
       (->swagger (s/eq "kikka"))         => (->swagger String))
 
-    (fact "s/Any -> nil"
-      (->swagger s/Any) => nil)
+    (fact "s/Any"
+      (fact "defaults to nil"
+        (->swagger s/Any)                 => nil
+        (->swagger s/Any {:in :body})     => nil
+        (->swagger s/Any {:in :header})   => {:type "string"}
+        (->swagger s/Any {:in :path})     => {:type "string"}
+        (->swagger s/Any {:in :query})    => {:type "string", :allowEmptyValue true}
+        (->swagger s/Any {:in :formData}) => {:type "string", :allowEmptyValue true}))
 
     (fact "s/conditional"
       (->swagger (s/conditional (constantly true) Long (constantly false) String))
