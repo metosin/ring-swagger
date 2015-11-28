@@ -182,7 +182,9 @@
     (->swagger (:schema e)))
 
   schema.core.AnythingSchema
-  (convert [_ _] nil)
+  (convert [_ {:keys [in] :as opts}]
+    (if (and in (not= :body in))
+      (->swagger (s/maybe s/Str) opts)))
 
   schema.core.ConditionalSchema
   (convert [e _]

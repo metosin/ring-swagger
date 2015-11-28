@@ -271,9 +271,9 @@ One can also use the options to create more accurate specs (via the `:in` option
 | `Integer`                                   | integer, int32           | `1` 
 | `Long`, `s/Int`                             | integer, int64           | `1` 
 | `Double`, `Number`, `s/Num`                 | number, double           | `1.2`
-| `String`, `s/Str`, `Keyword`, `s/Keyword`, `Symbol`, `s/Symbol` | string                   | `"kikka"`
+| `String`, `s/Str`, `Keyword`, `s/Keyword`, `Symbol`, `s/Symbol`, `s/Any` non-body-parameter | string                   | `"kikka"`
 | `Boolean`                                   | boolean                  | `true`
-| `nil`, `s/Any`                              | void                     |
+| `nil`, `s/Any` body-parameter            | void                     |
 | `java.util.Date`, `org.joda.time.DateTime`, `s/Inst`  | string, date-time        | `"2014-02-18T18:25:37.456Z"`, also without millis: `"2014-02-18T18:25:37Z"`
 | `java.util.regex.Pattern`,                  | string, regex            | `[a-z0-9]`
 | `#"[a-z0-9]+"`                              | string, pattern          | `"a6"`
