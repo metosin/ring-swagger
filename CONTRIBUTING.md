@@ -13,7 +13,7 @@ Please file bug reports and feature requests to https://github.com/metosin/ring-
 * Verify that all tests pass using ```lein midje```
 * Push your code to your fork of the repository
 * Make a Pull Request
-* 
+
 ## Commit messages
 
 1. Separate subject from body with a blank line
