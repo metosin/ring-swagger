@@ -1,9 +1,10 @@
-## ???
+## 0.22.1 (29.11.2015)
 
 - Generate `(s/maybe s/Str)`-parameters of `s/Any` for non-body-parameters. Fixes [#74](https://github.com/metosin/ring-swagger/issues/74).
 - Mappings for `s/Symbol` & `s/Inst`
 - Use `:default` metadata of `optional-key`s set by Plumbing for Swagger
 property `default` field.
+
 ```clojure
 [prismatic/plumbing "0.5.2] is available but we use "0.5.1"
 ```
