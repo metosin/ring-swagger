@@ -1,4 +1,15 @@
+## NEXT
+
+* Updated dependencies:
+
+```clj
+[prismatic/schema "1.0.4"] is available but we use "1.0.3"
+[potemkin "0.4.2"] is available but we use "0.4.1"
+```
+
 ## 0.22.1 (29.11.2015)
+
+**[compare](https://github.com/metosin/ring-swagger/compare/0.22.0...0.22.1)**
 
 - Generate `(s/maybe s/Str)`-parameters of `s/Any` for non-body-parameters. Fixes [#74](https://github.com/metosin/ring-swagger/issues/74).
 - Mappings for `s/Symbol` & `s/Inst`
