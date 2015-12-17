@@ -235,7 +235,11 @@
   {:pre [(c/plain-map? schema)]}
   (let [props (into (empty schema)
                     (for [[k v] schema
-                          :when (c/not-predicate? k)
+                          :when (and (c/not-predicate? k)
+                                     ; Ignore s/Str and such
+                                     (not (class? k))
+                                     ; Special case to ignore s/Any
+                                     (not= s/Any k))
                           :let [key-meta (meta k)
                                 k (s/explicit-schema-key k)
                                 v (try->swagger v k key-meta)]]
