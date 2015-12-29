@@ -163,22 +163,27 @@
 
   (fact "s/Keyword -keys are ignored"
     (keys (properties {:a String
-                       s/Keyword s/Any}))
+                       s/Keyword String}))
     => [:a])
 
   (fact "Class -keys are ignored"
     (keys (properties {:a String
-                       s/Str s/Any}))
+                       s/Str String}))
     => [:a])
 
-  (fact "Class -keys are ignored"
+  (fact "Required keyword-keys are used"
+    (keys (properties {:a String
+                       (s/required-key :b) String}))
+    => [:a :b])
+
+  (fact "Required non-keyword-keys are ignored"
     (keys (properties {:a String
                        (s/required-key "b") s/Any}))
     => [:a])
 
   (fact "s/Any -keys are ignored"
     (keys (properties {:a String
-                       s/Any s/Any}))
+                       s/Any String}))
     => [:a])
 
   (fact "with unknown mappings"
