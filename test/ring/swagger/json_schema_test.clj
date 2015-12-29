@@ -171,6 +171,11 @@
                        s/Str s/Any}))
     => [:a])
 
+  (fact "Class -keys are ignored"
+    (keys (properties {:a String
+                       (s/required-key "b") s/Any}))
+    => [:a])
+
   (fact "s/Any -keys are ignored"
     (keys (properties {:a String
                        s/Any s/Any}))
