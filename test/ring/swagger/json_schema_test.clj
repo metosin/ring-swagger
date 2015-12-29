@@ -98,7 +98,11 @@
 
     (fact "s/conditional"
       (->swagger (s/conditional (constantly true) Long (constantly false) String))
-      => {:type "void" :oneOf [(->swagger Long) (->swagger String)]})
+      => {:type "void" :oneOf [(->swagger Long) (->swagger String)]}
+
+      (fact "invalid values are removed"
+        (->swagger (s/conditional (constantly true) Long (constantly false) s/Any))
+        => {:type "void" :oneOf [(->swagger Long)]}))
 
     (fact "s/constrained"
       (->swagger (s/constrained Long even?))
@@ -157,33 +161,39 @@
 
 (facts "properties"
   (fact "s/Any -values are ignored"
-    (keys (properties {:a String
+    (keys (properties {:a s/Str
                        :b s/Any}))
     => [:a])
 
   (fact "s/Keyword -keys are ignored"
-    (keys (properties {:a String
-                       s/Keyword String}))
+    (keys (properties {:a s/Str
+                       s/Keyword s/Str}))
     => [:a])
 
   (fact "Class -keys are ignored"
-    (keys (properties {:a String
-                       s/Str String}))
+    (keys (properties {:a s/Str
+                       s/Str s/Str}))
     => [:a])
 
   (fact "Required keyword-keys are used"
-    (keys (properties {:a String
-                       (s/required-key :b) String}))
+    (keys (properties {:a s/Str
+                       (s/required-key :b) s/Str}))
     => [:a :b])
 
   (fact "Required non-keyword-keys are ignored"
-    (keys (properties {:a String
+    (keys (properties {:a s/Str
                        (s/required-key "b") s/Any}))
     => [:a])
 
+  (fact "s/Uuid as keys"
+    (keys (properties {:a s/Str
+                       (s/required-key "b") s/Any}))
+    => [:a])
+
+
   (fact "s/Any -keys are ignored"
-    (keys (properties {:a String
-                       s/Any String}))
+    (keys (properties {:a s/Str
+                       s/Any s/Str}))
     => [:a])
 
   (fact "with unknown mappings"

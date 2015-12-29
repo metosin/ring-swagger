@@ -188,7 +188,7 @@
 
   schema.core.ConditionalSchema
   (convert [e _]
-    {:type "void" :oneOf (mapv (comp ->swagger second) (:preds-and-schemas e))})
+    {:type "void" :oneOf (vec (keep (comp ->swagger second) (:preds-and-schemas e)))})
 
   schema.core.CondPre
   (convert [e _]
