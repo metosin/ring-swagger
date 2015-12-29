@@ -1,4 +1,6 @@
-## NEXT
+## 0.22.2
+
+* Fixes [#77](https://github.com/metosin/ring-swagger/issues/77): discards all extra Map keys from properties
 
 * Updated dependencies:
 
