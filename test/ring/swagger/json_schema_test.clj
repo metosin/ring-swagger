@@ -166,6 +166,16 @@
                        s/Keyword s/Any}))
     => [:a])
 
+  (fact "Class -keys are ignored"
+    (keys (properties {:a String
+                       s/Str s/Any}))
+    => [:a])
+
+  (fact "s/Any -keys are ignored"
+    (keys (properties {:a String
+                       s/Any s/Any}))
+    => [:a])
+
   (fact "with unknown mappings"
     (fact "by default, exception is thrown"
       (properties {:a String
