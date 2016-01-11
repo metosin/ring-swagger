@@ -1,4 +1,4 @@
-## 0.22.2
+## Unreleased
 
 * Fixes [#77](https://github.com/metosin/ring-swagger/issues/77): discards all extra Map keys from properties
 
@@ -6,7 +6,7 @@
 
 ```clj
 [prismatic/schema "1.0.4"] is available but we use "1.0.3"
-[potemkin "0.4.2"] is available but we use "0.4.1"
+[potemkin "0.4.3"] is available but we use "0.4.1"
 ```
 
 ## 0.22.1 (29.11.2015)
