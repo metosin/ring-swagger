@@ -185,12 +185,6 @@
                        (s/required-key "b") s/Any}))
     => [:a])
 
-  (fact "s/Uuid as keys"
-    (keys (properties {:a s/Str
-                       (s/required-key "b") s/Any}))
-    => [:a])
-
-
   (fact "s/Any -keys are ignored"
     (keys (properties {:a s/Str
                        s/Any s/Str}))
