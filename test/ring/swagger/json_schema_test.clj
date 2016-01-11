@@ -225,3 +225,24 @@
 
     (fact "nested properties work ok"
       (keys (properties Bar)) => [:key])))
+
+(facts "additional-properties"
+  (fact "No additional properties"
+    (additional-properties {:a s/Str})
+    => nil)
+
+  (fact "s/Keyword"
+    (additional-properties {s/Keyword s/Bool})
+    => {:type "boolean"})
+
+  (fact "s/Any"
+    (additional-properties {s/Any s/Str})
+    => {:type "string"})
+
+  (fact "s/Str"
+    (additional-properties {s/Str s/Bool})
+    => {:type "boolean"})
+
+  (fact "s/Int"
+    (additional-properties {s/Int s/Str})
+    => {:type "string"}))
