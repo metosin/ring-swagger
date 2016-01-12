@@ -68,9 +68,3 @@
 
       :else
       (last values))))
-
-(defn predicate?
-  "Tests whether the input is an instance of a predicate"
-  [x] (= (class x) schema.core.Predicate))
-
-(def not-predicate? (complement predicate?))
