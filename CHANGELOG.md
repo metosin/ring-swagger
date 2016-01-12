@@ -1,8 +1,11 @@
 ## Unreleased
 
-* Fixes [#77](https://github.com/metosin/ring-swagger/issues/77): discards all extra Map keys from properties
+- Fixes [#77](https://github.com/metosin/ring-swagger/issues/77): discards all extra Map keys from properties
+- All Schema [extra keys](https://github.com/Prismatic/schema/blob/master/src/cljx/schema/core.cljx#L765)
+are now exposed as Swagger additional properties.
+    - Previously only `s/Keyword` were supported.
 
-* Updated dependencies:
+- Updated dependencies:
 
 ```clj
 [prismatic/schema "1.0.4"] is available but we use "1.0.3"
