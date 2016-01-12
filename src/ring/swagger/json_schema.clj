@@ -248,5 +248,6 @@
   schema from under key s/Keyword."
   [schema]
   {:pre [(c/plain-map? schema)]}
-  (if-let [v (schema s/Keyword)]
-    (try->swagger v s/Keyword nil)))
+  (if-let [extra-key (s/find-extra-keys-schema schema)]
+    (let [v (get schema extra-key)]
+      (try->swagger v s/Keyword nil))))
