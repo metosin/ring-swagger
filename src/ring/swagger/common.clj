@@ -1,9 +1,10 @@
 (ns ring.swagger.common
-  (:require [plumbing.core :refer [fn-> dissoc-in]]))
+  (:require [plumbing.core :refer [dissoc-in]]))
 
 (defn remove-empty-keys
-  "removes empty keys from a map"
-  [m] (into (empty m) (filter (fn-> second nil? not) m)))
+  "Removes empty properties with nil value from a map"
+  [m]
+  (into (empty m) (filter (comp not nil? key) m)))
 
 (defn value-of
   "Extracts value of for var, symbol or returns itself"
