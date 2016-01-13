@@ -4,7 +4,7 @@
 (defn remove-empty-keys
   "Removes empty properties with nil value from a map"
   [m]
-  (into (empty m) (filter (comp not nil? key) m)))
+  (into (empty m) (filter (comp not nil? val) m)))
 
 (defn value-of
   "Extracts value of for var, symbol or returns itself"
