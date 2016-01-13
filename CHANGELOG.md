@@ -1,6 +1,6 @@
-## Unreleased
+## 0.22.2 (13.1.2016)
 
-**[compare](https://github.com/metosin/ring-swagger/compare/0.22.1...master)**
+**[compare](https://github.com/metosin/ring-swagger/compare/0.22.1...0.22.2)**
 
 - Discard all extra map keys from properties ([#77](https://github.com/metosin/ring-swagger/issues/77))
 - All Schema [extra keys](https://github.com/Prismatic/schema/blob/master/src/cljx/schema/core.cljx#L765)
