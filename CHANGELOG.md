@@ -2,10 +2,11 @@
 
 **[compare](https://github.com/metosin/ring-swagger/compare/0.22.1...master)**
 
-- Fixes [#77](https://github.com/metosin/ring-swagger/issues/77): discards all extra Map keys from properties
+- Discard all extra map keys from properties ([#77](https://github.com/metosin/ring-swagger/issues/77))
 - All Schema [extra keys](https://github.com/Prismatic/schema/blob/master/src/cljx/schema/core.cljx#L765)
 are now exposed as Swagger additional properties.
     - Previously only `s/Keyword` were supported.
+- Fix JSON Schema `nil` default value ([#79](https://github.com/metosin/ring-swagger/issues/79))
 - Updated dependencies:
 
 ```clj
