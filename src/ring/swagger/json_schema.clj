@@ -62,7 +62,7 @@
   [m x {no-meta ::no-meta key-meta :key-meta}]
   (if-not no-meta
     (merge (json-schema-meta x)
-           (if key-meta (select-keys key-meta [:default]))
+           (c/remove-empty-keys (if key-meta (select-keys key-meta [:default])))
            m)
     m))
 

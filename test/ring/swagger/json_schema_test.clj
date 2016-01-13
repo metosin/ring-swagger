@@ -1,6 +1,8 @@
 (ns ring.swagger.json-schema-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
+            [plumbing.core :as p]
+            [plumbing.fnk.pfnk :as pfnk]
             [ring.swagger.json-schema :refer :all]
             [ring.swagger.core :refer [with-named-sub-schemas]]
             [linked.core :as linked])
@@ -119,7 +121,19 @@
 
 (fact "Optional-key default metadata"
   (properties {(with-meta (s/optional-key :foo) {:default "bar"}) s/Str})
-  => {:foo {:type "string" :default "bar"}})
+  => {:foo {:type "string" :default "bar"}}
+
+  (fact "nil default is ignored"
+    (properties {(with-meta (s/optional-key :foo) {:default nil}) s/Str})
+    => {:foo {:type "string"}})
+
+  (fact "pfnk schema"
+    (properties (pfnk/input-schema (p/fnk [{x :- s/Str "foo"}])))
+    => {:x {:type "string" :default "foo"}})
+
+  (fact "pfnk schema - nil default is ignored"
+    (properties (pfnk/input-schema (p/fnk [{x :- s/Str nil}])))
+    => {:x {:type "string"}}))
 
 (fact "Describe"
   (tabular
