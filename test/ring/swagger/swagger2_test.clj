@@ -27,10 +27,11 @@
     (v/validate (swagger-json swagger options))))
 
 (defn validate [swagger & [options]]
-  (if-let [input-errors (s/check Swagger swagger)]
-    {:input-errors input-errors}
-    (if-let [output-errors (validate-swagger-json swagger options)]
-      {:output-errors output-errors})))
+  (s/with-fn-validation
+    (if-let [input-errors (s/check Swagger swagger)]
+      {:input-errors input-errors}
+      (if-let [output-errors (validate-swagger-json swagger options)]
+        {:output-errors output-errors}))))
 
 ;;
 ;; facts
@@ -214,19 +215,19 @@
 
       ;; body models
       "/body1" [:parameters 0] identity #"Body.*" valid-reference
-      "/body2" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array"})
-      "/body3" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/body2" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
+      "/body3" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
       "/body4" [:parameters 0] identity #"Body.*" valid-reference
-      "/body5" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array"})
-      "/body6" [:parameters 0] :items   #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/body5" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
+      "/body6" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
 
       ;; response models
-      "/resp" [:responses 200] identity "Response"    valid-reference
-      "/resp" [:responses 201] :items   #"Response.*" (just {:items valid-reference, :type "array"})
-      "/resp" [:responses 202] :items   #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/resp" [:responses 200] identity "Response" valid-reference
+      "/resp" [:responses 201] :items #"Response.*" (just {:items valid-reference, :type "array"})
+      "/resp" [:responses 202] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true})
       "/resp" [:responses 203] identity #"Response.*" valid-reference
-      "/resp" [:responses 204] :items   #"Response.*" (just {:items valid-reference, :type "array"})
-      "/resp" [:responses 205] :items   #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true}))))
+      "/resp" [:responses 204] :items #"Response.*" (just {:items valid-reference, :type "array"})
+      "/resp" [:responses 205] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true}))))
 
 (fact "multiple different schemas with same name"
   (let [model1 (s/schema-with-name {:id s/Str} 'Kikka)
@@ -243,7 +244,7 @@
 
 (defn has-definition [schema-name value]
   (chatty-checker [actual]
-    (= (get-in actual [:definitions (name schema-name)]) value)))
+                  (= (get-in actual [:definitions (name schema-name)]) value)))
 
 (fact "additionalProperties"
   (let [Kikka (s/schema-with-name {:a s/Str s/Keyword s/Str} 'Kikka)
