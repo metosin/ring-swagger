@@ -11,6 +11,7 @@
                  [metosin/schema-tools "0.7.0"]
                  [prismatic/schema "1.0.4"]
                  [prismatic/plumbing "0.5.2"]
+                 [metosin/scjsv "0.2.0"]
                  [clj-time "0.11.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
                  [potemkin "0.4.3"]
@@ -22,7 +23,6 @@
                    :dependencies [[org.clojure/clojure "1.7.0"]
                                   [midje "1.8.3"]
                                   [ring-mock "0.1.5"]
-                                  [metosin/scjsv "0.2.0"]
                                   [metosin/ring-swagger-ui "2.1.4-0"]
                                   [javax.servlet/servlet-api "2.5"]
                                   ; Required when using with Java 1.6

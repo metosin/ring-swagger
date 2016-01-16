@@ -5,6 +5,23 @@
 - Fixed generating Swagger path templates in cases where path parameter is followed
 by an extension ([#82](https://github.com/metosin/ring-swagger/issues/82))
 
+- Make the JSON Schema validator public: `ring.swagger.validator/validate`.
+
+```clojure
+(require '[ring.swagger.validator :as v])
+
+(v/validate (rs/swagger-json {:paths {"/api/ping" {:get nil}}}))
+; nil
+
+(v/validate (rs/swagger-json {:pathz {"/api/ping" {:get nil}}}))
+; ({:level "error"
+;   :schema {:loadingURI "#", :pointer ""}
+;   :instance {:pointer ""}
+;   :domain "validation"
+;   :keyword "additionalProperties"
+;   :message "object instance has properties which are not allowed by the schema: [\"pathz\"]", :unwanted ["pathz"]})
+```
+
 ## 0.22.2 (13.1.2016)
 
 **[compare](https://github.com/metosin/ring-swagger/compare/0.22.1...0.22.2)**
