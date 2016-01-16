@@ -116,7 +116,7 @@
           (update-in [:responses] convert-responses options))))
 
 (defn swagger-path [uri]
-  (str/replace uri #":([^/]+)" "{$1}"))
+  (str/replace uri #":([^/.]+)" "{$1}"))
 
 (defn extract-paths-and-definitions [swagger options]
   (let [original-paths (or (:paths swagger) {})

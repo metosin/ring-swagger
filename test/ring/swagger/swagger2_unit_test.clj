@@ -308,7 +308,8 @@
 ;;
 
 (fact "swagger-path"
-  (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}")
+  (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}"
+  (swagger-path "/api/:id.json") => "/api/{id}.json")
 
 
 (fact "extract-models"

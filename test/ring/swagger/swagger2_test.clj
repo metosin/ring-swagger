@@ -335,3 +335,10 @@
       :description ""
       :required true
       :schema {:$ref "#/definitions/SchemaA"}})
+
+(fact "path-parameters with .dot extension, #82"
+  (swagger-json
+    {:paths {"/api/:id.json" {:get {:parameters {:path {:id String}}}}}})
+  => (contains
+       {:paths (just
+                 {"/api/{id}.json" (contains {:get (contains {:parameters (just [(contains {:name "id"})])})})})}))
