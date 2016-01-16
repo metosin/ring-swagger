@@ -115,8 +115,18 @@
           (update-in-or-remove-key [:parameters] #(convert-parameters % options) empty?)
           (update-in [:responses] convert-responses options))))
 
-(defn swagger-path [uri]
-  (str/replace uri #":([^/.]+)" "{$1}"))
+(defn swagger-path
+  "Replaces Compojure/Clout style path params in uri with Swagger style
+  path params.
+
+  Does not support wildcard-paths or inline-regexes.
+
+  The regex is copied from Clout."
+  [uri]
+  ;; TODO: In 1.0, leave it to client libs to build swagger style path template
+  ;; Currently everyone needs to build Clout path is just extra step for all but
+  ;; compojure-api.
+  (str/replace uri #":([\p{L}_][\p{L}_0-9-]*)" "{$1}"))
 
 (defn extract-paths-and-definitions [swagger options]
   (let [original-paths (or (:paths swagger) {})

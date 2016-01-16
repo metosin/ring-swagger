@@ -309,8 +309,29 @@
 
 (fact "swagger-path"
   (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}"
-  (swagger-path "/api/:id.json") => "/api/{id}.json")
+  (swagger-path "/api/:id.json") => "/api/{id}.json"
 
+  ;; From Clout tests
+
+  (fact "keywords-match-extensions"
+    (swagger-path "/foo.:ext") => "/foo.{ext}"
+    (swagger-path "/:x.:y") => "/{x}.{y}")
+
+  (fact "hyphen-keywords"
+    (swagger-path "/:foo-bar") => "/{foo-bar}"
+    (swagger-path "/:foo-") => "/{foo-}")
+
+  (fact "underscore-keywords"
+    (swagger-path "/:foo_bar") => "/{foo_bar}"
+    (swagger-path "/:_foo") => "/{_foo}")
+
+  (fact "non-ascii-keywords"
+    (swagger-path "/:äñßOÔ") => "/{äñßOÔ}"
+    (swagger-path "/:ÁäñßOÔ") => "/{ÁäñßOÔ}"
+    (swagger-path "/:ä/:ش") => "/{ä}/{ش}"
+    (swagger-path "/:ä/:ä") => "/{ä}/{ä}"
+    (swagger-path "/:Ä-ü") => "/{Ä-ü}"
+    (swagger-path "/:Ä_ü") => "/{Ä_ü}"))
 
 (fact "extract-models"
   (fact "returns both return and body-parameters but not query or path parameter types"
