@@ -1,3 +1,10 @@
+## Unreleased
+
+**[compare](https://github.com/metosin/ring-swagger/compare/0.22.2...master)**
+
+- Fixed generating Swagger path templates in cases where path parameter is followed
+by an extension ([#82](https://github.com/metosin/ring-swagger/issues/82))
+
 ## 0.22.2 (13.1.2016)
 
 **[compare](https://github.com/metosin/ring-swagger/compare/0.22.1...0.22.2)**
