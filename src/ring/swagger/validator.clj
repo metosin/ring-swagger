@@ -6,4 +6,4 @@
 ; http://json-schema.org/draft-04/schema
 
 (def validate
-  (v/validator (slurp (io/resource "ring/swagger/standalone-swagger-schema.json"))))
+  (v/validator (slurp (io/resource "ring/swagger/swagger-schema.json"))))
