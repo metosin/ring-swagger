@@ -294,6 +294,7 @@
                             :b {:type "array"
                                 :items {:type "string"}
                                 :description "B"}}
+               :additionalProperties false
                :required [:a :b]})))
 
 (fact "tags"

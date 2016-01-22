@@ -38,7 +38,8 @@
                      :format "int64"
                      :description "Unique identifier for the tag"}
                 :name {:type "string"
-                       :description "Friendly name for the tag"}}})
+                       :description "Friendly name for the tag"}}
+   :additionalProperties false})
 
 (def Category'
   {:type "object"
@@ -48,7 +49,8 @@
                      :minimum "0.0"
                      :maximum "100.0"}
                 :name {:type "string"
-                       :description "Name of the category"}}})
+                       :description "Name of the category"}}
+   :additionalProperties false})
 
 (def Pet'
   {:type "object"
@@ -70,7 +72,8 @@
                        :items {:$ref "#/definitions/Tag"}}
                 :status {:type "string"
                          :description "pet status in the store"
-                         :enum [:pending :sold :available]}}})
+                         :enum [:pending :sold :available]}}
+   :additionalProperties false})
 
 ;;
 ;; Facts
@@ -122,6 +125,7 @@
     (transform-models [Bar] +options+) => {"Bar" {:type "object"
                                                   :properties {:key {:enum [:b :a]
                                                                      :type "string"}}
+                                                  :additionalProperties false
                                                   :required [:key]}})
 
   (fact "nested schemas"
@@ -137,14 +141,17 @@
       {"Nested" {:type "object"
                  :properties {:address {:$ref "#/definitions/NestedAddress"}
                               :id {:type "string"}}
+                 :additionalProperties false
                  :required [:id :address]}
        "NestedAddress" {:type "object"
                         :properties {:country {:enum [:fi :pl]
                                                :type "string"}
                                      :street {:$ref "#/definitions/NestedAddressStreet"}}
+                        :additionalProperties false
                         :required [:country :street]}
        "NestedAddressStreet" {:type "object"
                               :properties {:name {:type "string"}}
+                              :additionalProperties false
                               :required [:name]}})
 
     (fact "nested named sub-schemas"
@@ -290,6 +297,7 @@
 
       => {:type "object"
           :properties {:foo {:type "string"}}
+          :additionalProperties false
           :required [:foo]})
 
     (fact "array of anonymous map as response model is named and refers to correct definition"
@@ -301,6 +309,7 @@
       => {:type "object"
           :properties {:bar {:type "integer"
                              :format "int64"}}
+          :additionalProperties false
           :required [:bar]})))
 
 ;;
@@ -352,9 +361,11 @@
   (transform-models [Foo Bar] +options+)
   => {"Bar" {:type "object"
              :properties {:foo {:$ref "#/definitions/Foo"}}
+             :additionalProperties false
              :required [:foo]}
       "Foo" {:type "object"
              :properties {:bar {:$ref "#/definitions/Bar"}}
+             :additionalProperties false
              :required [:bar]}})
 
 ;;
@@ -451,7 +462,8 @@
                                                  :description "Tags assigned to this pet"}
                                           :status {:enum [:pending :sold :available]
                                                    :type "string"
-                                                   :description "pet status in the store"}}}
+                                                   :description "pet status in the store"}}
+                             :additionalProperties false}
                       "Category" {:type "object"
                                   :properties {:id {:type "integer"
                                                     :format "int64"
@@ -459,13 +471,15 @@
                                                     :minimum "0.0"
                                                     :maximum "100.0"}
                                                :name {:type "string"
-                                                      :description "Name of the category"}}}
+                                                      :description "Name of the category"}}
+                                  :additionalProperties false}
                       "Tag" {:type "object"
                              :properties {:id {:type "integer"
                                                :format "int64"
                                                :description "Unique identifier for the tag"}
                                           :name {:type "string"
-                                                 :description "Friendly name for the tag"}}}
+                                                 :description "Friendly name for the tag"}}
+                             :additionalProperties false}
                       "PetError" {:type "object"
                                   :properties {:message {:type "string"}}
                                   :required [:message]}}}))
@@ -486,6 +500,7 @@
 
         => {:type "object"
             :properties {:a {:type "string"}}
+            :additionalProperties false
             :required [:a]}))))
 
 (fact "collectionFormat"
