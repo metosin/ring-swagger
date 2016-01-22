@@ -2,8 +2,7 @@
   (:require [schema.core :as s]
             [schema.spec.core :as spec]
             [schema.spec.variant :as variant]
-            [ring.swagger.common :as c]
-            [linked.core :as linked]))
+            [ring.swagger.common :as c]))
 
 (declare properties)
 
@@ -22,8 +21,8 @@
   schema.core.Schema
   (spec [this]
     (variant/variant-spec
-     spec/+no-precondition+
-     [{:schema schema}]))
+      spec/+no-precondition+
+      [{:schema schema}]))
   (explain [this] (s/explain schema)))
 
 (defn field
@@ -95,7 +94,7 @@
 ;;
 (def predicate-name-to-class {'integer? java.lang.Long
                               'keyword? clojure.lang.Keyword
-                              'symbol?  clojure.lang.Symbol})
+                              'symbol? clojure.lang.Symbol})
 
 (defn reference [e]
   (if-let [schema-name (s/schema-name e)]
@@ -228,9 +227,9 @@
 
 (defn properties
   "Take a map schema and turn them into json-schema properties.
-   The result is put into collection of same type as input schema.
-   Thus linked/map should keep the order of items. Returnes nil
-   if no properties are found."
+  The result is put into collection of same type as input schema.
+  Thus linked/map should keep the order of items. Returnes nil
+  if no properties are found."
   [schema]
   {:pre [(c/plain-map? schema)]}
   (let [props (into (empty schema)
