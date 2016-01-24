@@ -326,7 +326,6 @@
 
     (transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
                                                    "/b" {:put {:x-no-doc true}}}})))
-; {:paths {"/a" {:post {}}}}))
 
 (s/defschema SchemaA {:a s/Str})
 (s/defschema SchemaB {:b s/Str})
@@ -346,4 +345,8 @@
     {:paths {"/api/:id.json" {:get {:parameters {:path {:id String}}}}}})
   => (contains
        {:paths (just
-                 {"/api/{id}.json" (contains {:get (contains {:parameters (just [(contains {:name "id"})])})})})}))
+                 {"/api/{id}.json" (contains
+                                     {:get (contains
+                                             {:parameters (just
+                                                            [(contains
+                                                               {:name "id"})])})})})}))
