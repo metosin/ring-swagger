@@ -115,61 +115,61 @@
                                          "Tag" Tag'
                                          "Category" Category'}
 
-  (s/defschema Foo (s/enum :a :b))
-  (s/defschema Bar {:key Foo})
-  (s/defschema Baz s/Keyword)
+(s/defschema Foo (s/enum :a :b))
+(s/defschema Bar {:key Foo})
+(s/defschema Baz s/Keyword)
 
-  (fact "record-schemas are not transformed"
-    (transform-models [Foo] +options+) => {})
+(fact "record-schemas are not transformed"
+  (transform-models [Foo] +options+) => {})
 
-  (fact "non-map schemas are not transformed"
-    (transform-models [Baz] +options+) => {})
+(fact "non-map schemas are not transformed"
+  (transform-models [Baz] +options+) => {})
 
-  (fact "nested record-schemas are inlined"
-    (transform-models [Bar] +options+) => {"Bar" {:type "object"
-                                                  :properties {:key {:enum [:b :a]
-                                                                     :type "string"}}
-                                                  :additionalProperties false
-                                                  :required [:key]}})
+(fact "nested record-schemas are inlined"
+  (transform-models [Bar] +options+) => {"Bar" {:type "object"
+                                                :properties {:key {:enum [:b :a]
+                                                                   :type "string"}}
+                                                :additionalProperties false
+                                                :required [:key]}})
 
-  (fact "nested schemas"
+(fact "nested schemas"
 
-    (fact "with anonymous sub-schemas"
-      (s/defschema Nested {:id s/Str
-                           :address {:country (s/enum :fi :pl)
-                                     :street {:name s/Str}}})
-      (transform-models [(rsc/with-named-sub-schemas Nested)] +options+)
+  (fact "with anonymous sub-schemas"
+    (s/defschema Nested {:id s/Str
+                         :address {:country (s/enum :fi :pl)
+                                   :street {:name s/Str}}})
+    (transform-models [(rsc/with-named-sub-schemas Nested)] +options+)
 
-      =>
+    =>
 
-      {"Nested" {:type "object"
-                 :properties {:address {:$ref "#/definitions/NestedAddress"}
-                              :id {:type "string"}}
-                 :additionalProperties false
-                 :required [:id :address]}
-       "NestedAddress" {:type "object"
-                        :properties {:country {:enum [:fi :pl]
-                                               :type "string"}
-                                     :street {:$ref "#/definitions/NestedAddressStreet"}}
-                        :additionalProperties false
-                        :required [:country :street]}
-       "NestedAddressStreet" {:type "object"
-                              :properties {:name {:type "string"}}
-                              :additionalProperties false
-                              :required [:name]}})
+    {"Nested" {:type "object"
+               :properties {:address {:$ref "#/definitions/NestedAddress"}
+                            :id {:type "string"}}
+               :additionalProperties false
+               :required [:id :address]}
+     "NestedAddress" {:type "object"
+                      :properties {:country {:enum [:fi :pl]
+                                             :type "string"}
+                                   :street {:$ref "#/definitions/NestedAddressStreet"}}
+                      :additionalProperties false
+                      :required [:country :street]}
+     "NestedAddressStreet" {:type "object"
+                            :properties {:name {:type "string"}}
+                            :additionalProperties false
+                            :required [:name]}})
 
-    (fact "nested named sub-schemas"
+  (fact "nested named sub-schemas"
 
-      (s/defschema Boundary
-        {:type (s/enum "MultiPolygon" "Polygon" "MultiPoint" "Point")
-         :coordinates [s/Any]})
+    (s/defschema Boundary
+      {:type (s/enum "MultiPolygon" "Polygon" "MultiPoint" "Point")
+       :coordinates [s/Any]})
 
-      (s/defschema ReturnValue
-        {:boundary (s/maybe Boundary)})
+    (s/defschema ReturnValue
+      {:boundary (s/maybe Boundary)})
 
-      (keys
-        (transform-models
-          [(rsc/with-named-sub-schemas ReturnValue)]
+    (keys
+      (transform-models
+        [(rsc/with-named-sub-schemas ReturnValue)]
         +options+)) => ["Boundary" "ReturnValue"]))
 
 (s/defschema Query {:id Long (s/optional-key :q) String})
@@ -222,25 +222,41 @@
 
   (fact "anonymous schemas can be used with ..."
 
-    (doseq [type [:query :path]]
-      (fact {:midje/description (str "... " type "-parameters")}
-
-        (convert-parameters
-          {type {s/Keyword s/Any
+    (fact ":query-parameters"
+      (convert-parameters
+        {:query {s/Keyword s/Any
                  :q String
                  (s/optional-key :l) Long}} {})
 
-        => [{:name "q"
-             :description ""
-             :in type
-             :required true
-             :type "string"}
-            {:name "l"
-             :description ""
-             :format "int64"
-             :in type
-             :required false
-             :type "integer"}])))
+      => [{:name "q"
+           :description ""
+           :in :query
+           :required true
+           :type "string"}
+          {:name "l"
+           :description ""
+           :format "int64"
+           :in :query
+           :required false
+           :type "integer"}])
+
+    (fact ":path-parameters (are always required)"
+      (convert-parameters
+        {:path {s/Keyword s/Any
+                :q String
+                (s/optional-key :l) Long}} {})
+
+      => [{:name "q"
+           :description ""
+           :in :path
+           :required true
+           :type "string"}
+          {:name "l"
+           :description ""
+           :format "int64"
+           :in :path
+           :required true
+           :type "integer"}]))
 
   (fact "Array body parameters"
     (convert-parameters {:body [Body]} {})

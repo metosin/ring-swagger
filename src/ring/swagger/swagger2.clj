@@ -58,7 +58,7 @@
         {:in in
          :name (name rk)
          :description ""
-         :required (s/required-key? k)}
+         :required (or (= in :path) (s/required-key? k))}
         json-schema))))
 
 (defn- default-response-description
