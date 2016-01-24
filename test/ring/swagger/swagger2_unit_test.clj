@@ -113,7 +113,7 @@
 (fact "transform-models"
   (transform-models [Pet] +options+) => {"Pet" Pet'
                                          "Tag" Tag'
-                                         "Category" Category'}
+                                         "Category" Category'})
 
 (s/defschema Foo (s/enum :a :b))
 (s/defschema Bar {:key Foo})
