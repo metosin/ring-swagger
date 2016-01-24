@@ -2,7 +2,8 @@
   (:require [schema.core :as s]
             [schema.spec.core :as spec]
             [schema.spec.variant :as variant]
-            [ring.swagger.common :as c]))
+            [ring.swagger.common :as c]
+            [ring.swagger.core :as rsc]))
 
 (declare properties)
 
@@ -222,7 +223,7 @@
     (reference e)))
 
 ;;
-;; Schema to Swagger Schmea definitions
+;; Schema to Swagger Schema definitions
 ;;
 
 (defn properties
@@ -251,3 +252,18 @@
     (let [v (get schema extra-key)]
       (try->swagger v s/Keyword nil))
     false))
+
+(defn schema-object
+  "Returns a JSON Schema object of a plain map schema."
+  [schema]
+  {:pre [(c/plain-map? schema)]}
+  (let [properties (properties schema)
+        additional-properties (additional-properties schema)
+        required (->> (rsc/required-keys schema)
+                      (filter (partial contains? properties))
+                      seq)]
+    (c/remove-empty-keys
+      {:type "object"
+       :properties properties
+       :additionalProperties additional-properties
+       :required required})))

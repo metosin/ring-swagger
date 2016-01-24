@@ -10,6 +10,9 @@
            [java.util.regex Pattern]
            [org.joda.time DateTime LocalDate]))
 
+(s/defschema Anything {s/Keyword s/Any})
+(s/defschema Nothing {})
+
 (s/defschema LegOfPet {:length Long})
 
 (s/defschema Pet {:id Long

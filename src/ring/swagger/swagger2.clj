@@ -8,13 +8,6 @@
             [ring.swagger.swagger2-schema :as schema]))
 
 ;;
-;; Support Schemas
-;;
-
-(def Anything {s/Keyword s/Any})
-(def Nothing {})
-
-;;
 ;; Schema transformations
 ;;
 
@@ -32,23 +25,11 @@
                              (keep :schema))]
     (concat body-models response-models)))
 
-(defn transform [schema]
-  (let [properties (jsons/properties schema)
-        additional-properties (jsons/additional-properties schema)
-        required (->> (rsc/required-keys schema)
-                      (filter (partial contains? properties))
-                      seq)]
-    (remove-empty-keys
-      {:type "object"
-       :properties properties
-       :additionalProperties additional-properties
-       :required required})))
-
 (defn transform-models [schemas options]
   (->> schemas
        rsc/collect-models
        (rsc/handle-duplicate-schemas (:handle-duplicate-schemas-fn options))
-       (map (juxt (comp str key) (comp transform val)))
+       (map (juxt (comp str key) (comp jsons/schema-object val)))
        (into (sorted-map))))
 
 ;;

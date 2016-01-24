@@ -14,10 +14,14 @@
 (s/defschema Tag {(s/optional-key :id) (field s/Int {:description "Unique identifier for the tag"})
                   (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
 
-(s/defschema Category {(s/optional-key :id) (field s/Int {:description "Category unique identifier" :minimum "0.0" :maximum "100.0"})
+(s/defschema Category {(s/optional-key :id) (field s/Int {:description "Category unique identifier"
+                                                          :minimum "0.0"
+                                                          :maximum "100.0"})
                        (s/optional-key :name) (field s/Str {:description "Name of the category"})})
 
-(s/defschema Pet {:id (field s/Int {:description "Unique identifier for the Pet" :minimum "0.0" :maximum "100.0"})
+(s/defschema Pet {:id (field s/Int {:description "Unique identifier for the Pet"
+                                    :minimum "0.0"
+                                    :maximum "100.0"})
                   :name (field s/Str {:description "Friendly name of the pet"})
                   (s/optional-key :category) (field Category {:description "Category the pet is in"})
                   (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
@@ -80,9 +84,9 @@
 ;;
 
 (fact "transform simple schemas"
-  (transform Tag) => Tag'
-  (transform Category) => Category'
-  (transform Pet) => Pet')
+  (jsons/schema-object Tag) => Tag'
+  (jsons/schema-object Category) => Category'
+  (jsons/schema-object Pet) => Pet')
 
 (s/defschema RootModel
   {:sub {:foo Long}})
@@ -166,7 +170,7 @@
       (keys
         (transform-models
           [(rsc/with-named-sub-schemas ReturnValue)]
-          +options+)) => ["Boundary" "ReturnValue"])))
+        +options+)) => ["Boundary" "ReturnValue"]))
 
 (s/defschema Query {:id Long (s/optional-key :q) String})
 (s/defschema Path {:p Long})
@@ -492,11 +496,11 @@
                 :b (->InvalidElement)}]
 
     (fact "fail by default"
-      (transform schema) => (throws IllegalArgumentException))
+      (jsons/schema-object schema) => (throws IllegalArgumentException))
 
     (fact "drops bad fields from both properties & required"
       (binding [jsons/*ignore-missing-mappings* true]
-        (transform schema)
+        (jsons/schema-object schema)
 
         => {:type "object"
             :properties {:a {:type "string"}}
