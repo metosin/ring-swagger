@@ -5,6 +5,9 @@
             [ring.swagger.common :as c]
             [ring.swagger.core :as rsc]))
 
+(defn maybe? [schema]
+  (instance? schema.core.Maybe schema))
+
 (declare properties)
 
 ; TODO: remove this in favor of passing it as options
