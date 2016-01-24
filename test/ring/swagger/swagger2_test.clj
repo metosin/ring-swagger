@@ -333,12 +333,17 @@
 
 (fact "s/either stuff is correctly named"
   (-> (swagger-json {:paths {"/ab" {:get {:parameters {:body SchemaAB}}}}})
-      :paths (get "/ab") :get :parameters first)
+      (get-in [:paths "/ab" :get :parameters 0]))
   => {:in :body
       :name "SchemaA"
       :description ""
       :required true
       :schema {:$ref "#/definitions/SchemaA"}})
+
+(fact "body wrapped in Maybe make's it optional"
+  (-> (swagger-json {:paths {"/maybe" {:post {:parameters {:body (s/maybe {:kikka s/Str})}}}}})
+      (get-in [:paths "/maybe" :post :parameters 0]))
+  => (contains {:in :body, :required false}))
 
 (fact "path-parameters with .dot extension, #82"
   (swagger-json
