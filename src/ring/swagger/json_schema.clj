@@ -3,7 +3,10 @@
             [schema.spec.core :as spec]
             [schema.spec.variant :as variant]
             [ring.swagger.common :as c]
-            [linked.core :as linked]))
+            [ring.swagger.core :as rsc]))
+
+(defn maybe? [schema]
+  (instance? schema.core.Maybe schema))
 
 (declare properties)
 
@@ -22,8 +25,8 @@
   schema.core.Schema
   (spec [this]
     (variant/variant-spec
-     spec/+no-precondition+
-     [{:schema schema}]))
+      spec/+no-precondition+
+      [{:schema schema}]))
   (explain [this] (s/explain schema)))
 
 (defn field
@@ -95,7 +98,7 @@
 ;;
 (def predicate-name-to-class {'integer? java.lang.Long
                               'keyword? clojure.lang.Keyword
-                              'symbol?  clojure.lang.Symbol})
+                              'symbol? clojure.lang.Symbol})
 
 (defn reference [e]
   (if-let [schema-name (s/schema-name e)]
@@ -223,14 +226,14 @@
     (reference e)))
 
 ;;
-;; Schema to Swagger Schmea definitions
+;; Schema to Swagger Schema definitions
 ;;
 
 (defn properties
   "Take a map schema and turn them into json-schema properties.
-   The result is put into collection of same type as input schema.
-   Thus linked/map should keep the order of items. Returnes nil
-   if no properties are found."
+  The result is put into collection of same type as input schema.
+  Thus linked/map should keep the order of items. Returnes nil
+  if no properties are found."
   [schema]
   {:pre [(c/plain-map? schema)]}
   (let [props (into (empty schema)
@@ -250,4 +253,20 @@
   {:pre [(c/plain-map? schema)]}
   (if-let [extra-key (s/find-extra-keys-schema schema)]
     (let [v (get schema extra-key)]
-      (try->swagger v s/Keyword nil))))
+      (try->swagger v s/Keyword nil))
+    false))
+
+(defn schema-object
+  "Returns a JSON Schema object of a plain map schema."
+  [schema]
+  {:pre [(c/plain-map? schema)]}
+  (let [properties (properties schema)
+        additional-properties (additional-properties schema)
+        required (->> (rsc/required-keys schema)
+                      (filter (partial contains? properties))
+                      seq)]
+    (c/remove-empty-keys
+      {:type "object"
+       :properties properties
+       :additionalProperties additional-properties
+       :required required})))

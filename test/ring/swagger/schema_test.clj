@@ -16,7 +16,7 @@
    :b Double
    :c Long
    :d String
-   :e {:f [Keyword]
+   :e {:f [s/Keyword]
        :g #{String}
        :h #{(s/enum :kikka :kakka :kukka)}
        :i Date
@@ -109,7 +109,7 @@
         (coerce OddModel 2) => error?))))
 
 (facts "schema coercion"
-  (let [Schema {:a Long :b Double :c Boolean :d Keyword :u UUID}
+  (let [Schema {:a Long :b Double :c Boolean :d s/Keyword :u UUID}
         value  {:a "1"  :b "2.2"  :c "true"  :d "kikka" :u "77e70512-1337-dead-beef-0123456789ab"}
         target {:a 1    :b 2.2    :c true    :d :kikka  :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}]
 

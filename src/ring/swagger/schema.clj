@@ -8,16 +8,6 @@
             [ring.swagger.coerce :as coerce]
             ring.swagger.json-schema))
 
-(def Keyword  s/Keyword)
-
-(defn extract-schema-name
-  "Returns model name or nil"
-  [x] (some-> (if (or (set? x) (sequential? x)) (first x) x) s/schema-name))
-
-;;
-;; Public Api
-;;
-
 (import-vars [ring.swagger.json-schema
               field
               describe])

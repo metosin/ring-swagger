@@ -10,6 +10,9 @@
            [java.util.regex Pattern]
            [org.joda.time DateTime LocalDate]))
 
+(s/defschema Anything {s/Keyword s/Any})
+(s/defschema Nothing {})
+
 (s/defschema LegOfPet {:length Long})
 
 (s/defschema Pet {:id Long
@@ -294,6 +297,7 @@
                             :b {:type "array"
                                 :items {:type "string"}
                                 :description "B"}}
+               :additionalProperties false
                :required [:a :b]})))
 
 (fact "tags"
@@ -322,7 +326,6 @@
 
     (transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
                                                    "/b" {:put {:x-no-doc true}}}})))
-; {:paths {"/a" {:post {}}}}))
 
 (s/defschema SchemaA {:a s/Str})
 (s/defschema SchemaB {:b s/Str})
@@ -330,16 +333,25 @@
 
 (fact "s/either stuff is correctly named"
   (-> (swagger-json {:paths {"/ab" {:get {:parameters {:body SchemaAB}}}}})
-      :paths (get "/ab") :get :parameters first)
+      (get-in [:paths "/ab" :get :parameters 0]))
   => {:in :body
       :name "SchemaA"
       :description ""
       :required true
       :schema {:$ref "#/definitions/SchemaA"}})
 
+(fact "body wrapped in Maybe make's it optional"
+  (-> (swagger-json {:paths {"/maybe" {:post {:parameters {:body (s/maybe {:kikka s/Str})}}}}})
+      (get-in [:paths "/maybe" :post :parameters 0]))
+  => (contains {:in :body, :required false}))
+
 (fact "path-parameters with .dot extension, #82"
   (swagger-json
     {:paths {"/api/:id.json" {:get {:parameters {:path {:id String}}}}}})
   => (contains
        {:paths (just
-                 {"/api/{id}.json" (contains {:get (contains {:parameters (just [(contains {:name "id"})])})})})}))
+                 {"/api/{id}.json" (contains
+                                     {:get (contains
+                                             {:parameters (just
+                                                            [(contains
+                                                               {:name "id"})])})})})}))

@@ -243,7 +243,7 @@
 (facts "additional-properties"
   (fact "No additional properties"
     (additional-properties {:a s/Str})
-    => nil)
+    => false)
 
   (fact "s/Keyword"
     (additional-properties {s/Keyword s/Bool})

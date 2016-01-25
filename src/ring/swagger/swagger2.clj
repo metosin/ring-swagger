@@ -8,13 +8,6 @@
             [ring.swagger.swagger2-schema :as schema]))
 
 ;;
-;; Support Schemas
-;;
-
-(def Anything {s/Keyword s/Any})
-(def Nothing {})
-
-;;
 ;; Schema transformations
 ;;
 
@@ -32,23 +25,11 @@
                              (keep :schema))]
     (concat body-models response-models)))
 
-(defn transform [schema]
-  (let [properties (jsons/properties schema)
-        additional-properties (jsons/additional-properties schema)
-        required (->> (rsc/required-keys schema)
-                      (filter (partial contains? properties))
-                      seq)]
-    (remove-empty-keys
-      {:type "object"
-       :properties properties
-       :additionalProperties additional-properties
-       :required required})))
-
 (defn transform-models [schemas options]
   (->> schemas
        rsc/collect-models
        (rsc/handle-duplicate-schemas (:handle-duplicate-schemas-fn options))
-       (map (juxt (comp str key) (comp transform val)))
+       (map (juxt (comp str key) (comp jsons/schema-object val)))
        (into (sorted-map))))
 
 ;;
@@ -63,7 +44,7 @@
       (vector {:in :body
                :name (name (s/schema-name schema))
                :description (or (:description (jsons/->swagger schema options)) "")
-               :required true
+               :required (not (jsons/maybe? model))
                :schema (dissoc schema-json :description)}))))
 
 (defmethod extract-parameter :default [in model options]
@@ -77,7 +58,7 @@
         {:in in
          :name (name rk)
          :description ""
-         :required (s/required-key? k)}
+         :required (or (= in :path) (s/required-key? k))}
         json-schema))))
 
 (defn- default-response-description
