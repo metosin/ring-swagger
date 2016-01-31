@@ -31,8 +31,8 @@
 
 (defn field
   "Attaches meta-data to a schema under :json-schema key. If the
-   schema is of type which cannot have meta-data (e.g. Java Classes)
-   schema is wrapped first into s/conditional Schema."
+  schema is of type which cannot have meta-data (e.g. Java Classes)
+  schema is wrapped first into wrapper Schema."
   [schema meta-data]
   (with-meta (if (instance? clojure.lang.IObj schema)
                schema
