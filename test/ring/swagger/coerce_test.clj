@@ -1,47 +1,54 @@
 (ns ring.swagger.coerce-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
-            [ring.swagger.coerce :refer :all])
+            [ring.swagger.coerce :as rsc]
+            [schema.coerce :as sc])
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date UUID]))
 
 (fact "json coercions"
-  (let [c (coercer :json)]
+  (let [cooerce (rsc/coercer :json)]
 
     (fact "Date with and without millis"
-      ((c Date) "2014-02-18T18:25:37.456Z") => (partial instance? Date)
-      ((c Date) "2014-02-18T18:25:37Z") => (partial instance? Date))
+      ((cooerce Date) "2014-02-18T18:25:37.456Z") => (partial instance? Date)
+      ((cooerce Date) "2014-02-18T18:25:37Z") => (partial instance? Date))
 
     (fact "DateTime with and without millis"
-      ((c DateTime) "2014-02-18T18:25:37.456Z") => (partial instance? DateTime)
-      ((c DateTime) "2014-02-18T18:25:37Z") => (partial instance? DateTime))
+      ((cooerce DateTime) "2014-02-18T18:25:37.456Z") => (partial instance? DateTime)
+      ((cooerce DateTime) "2014-02-18T18:25:37Z") => (partial instance? DateTime))
 
     (fact "LocalDate"
-      ((c LocalDate) "2014-02-19") => (partial instance? LocalDate))
+      ((cooerce LocalDate) "2014-02-19") => (partial instance? LocalDate))
 
     (fact "UUID"
-      ((c UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))))
+      ((cooerce UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))))
 
 (fact "query coercions"
-  (let [c (coercer :query)]
+  (let [coerce (rsc/coercer :query)]
 
     (fact "s/Int"
-      ((c s/Int) "1") => 1
-      ((c s/Int) "1.2") => "1.2")
+      ((coerce s/Int) 1) => (partial instance? Long)
+      ((coerce s/Int) "1") => 1
+      ((coerce s/Int) "1.2") => "1.2")
 
     (fact "Long"
-      ((c Long) "1") => 1
-      ((c Long) "1.2") => "1.2")
+      ((coerce Long) (int 1)) => (partial instance? Long)
+      ((coerce Long) 1) => 1
+      ((coerce Long) "1") => 1
+      ((coerce Long) "1.2") => "1.2")
 
     (fact "Double"
-      ((c Double) "1") => 1.0
-      ((c Double) "invalid") => "invalid")
+      ((coerce Double) 1) => 1.0
+      ((coerce Double) "1") => 1.0
+      ((coerce Double) "invalid") => "invalid")
 
     (fact "Boolean"
-      ((c Boolean) "true") => true
-      ((c Boolean) "false") => false
-      ((c Boolean) "invalid") => "invalid")
+      ((coerce Boolean) true) => true
+      ((coerce Boolean) "true") => true
+      ((coerce Boolean) "false") => false
+      ((coerce Boolean) "invalid") => "invalid")
 
     (fact "UUID"
-      ((c UUID) "77e70512-1337-dead-beef-0123456789ab") => (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")
-      ((c UUID) "invalid") => "invalid")))
+      ((coerce UUID) #uuid "77e70512-1337-dead-beef-0123456789ab") => #uuid "77e70512-1337-dead-beef-0123456789ab"
+      ((coerce UUID) "77e70512-1337-dead-beef-0123456789ab") => #uuid "77e70512-1337-dead-beef-0123456789ab"
+      ((coerce UUID) "invalid") => "invalid")))

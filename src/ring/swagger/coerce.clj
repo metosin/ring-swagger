@@ -67,6 +67,15 @@
 (defn string->uuid [^String x]
   (try (UUID/fromString x) (catch Exception e x)))
 
+(defn one-of [& fns]
+  (fn [x]
+    (reduce
+      (fn [value f]
+        (let [coerced (try (f value) (catch Exception _ value))]
+          (if-not (= value coerced)
+            (reduced coerced)
+            coerced))) x fns)))
+
 (def json-coersions {s/Keyword sc/string->keyword
                      Keyword sc/string->keyword
                      s/Int sc/safe-long-cast
@@ -74,9 +83,9 @@
                      Double double
                      s/Uuid string->uuid})
 
-(def query-coercions {s/Int string->long
-                      Long string->long
-                      Double string->double
+(def query-coercions {s/Int (one-of string->long sc/safe-long-cast)
+                      Long (one-of string->long sc/safe-long-cast)
+                      Double (one-of string->double double)
                       Boolean string->boolean
                       s/Uuid string->uuid})
 
@@ -121,7 +130,6 @@
 
 (defmulti coercer identity)
 
-(defmethod coercer :json    [_] json-schema-coercion-matcher)
-(defmethod coercer :query   [_] query-schema-coercion-matcher)
+(defmethod coercer :json [_] json-schema-coercion-matcher)
+(defmethod coercer :query [_] query-schema-coercion-matcher)
 (defmethod coercer :default [c] c)
-

@@ -3,6 +3,7 @@
 * Closed Map Schemas (e.g. `s/find-extra-keys-schema` returning nil) will have `:additionalProperties` set to `false`.
 * Path-parameters are always required (in align to the spec)
 * Body-parameters are not required if wrapped in `schema.core.Maybe`
+* `ring.swagger.coerce/query-coercions` now apply both `:json` and `:query` coercions for `s/Int`, `Long` and `Double`
 * Cleaned up internals 
   * `ring.swagger.swagger2/transform` -> `ring.swagger.json-schema/schema-object`
 
