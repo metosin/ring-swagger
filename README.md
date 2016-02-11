@@ -389,6 +389,6 @@ One can add extra meta-data, including descriptions to schema elements using `ri
 
 ## License
 
-Copyright © 2014-2015 [Metosin Oy](http://www.metosin.fi)
+Copyright © 2014-2016 [Metosin Oy](http://www.metosin.fi)
 
 Distributed under the Eclipse Public License, the same as Clojure.
