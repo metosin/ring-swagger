@@ -90,14 +90,12 @@
       (catch Exception _ x))
     x))
 
-(defn one-of [& fns]
-  (fn [x]
-    (reduce
-      (fn [value f]
-        (let [coerced (f value)]
-          (if-not (= value coerced)
-            (reduced coerced)
-            coerced))) x fns)))
+(defmacro cond-matcher [& conds]
+  (let [x (gensym "x")]
+    `(fn [~x]
+       (cond
+         ~@(for [c conds] `(~c ~x))
+         :else ~x))))
 
 (def json-coersions {s/Keyword sc/string->keyword
                      Keyword sc/string->keyword
@@ -109,9 +107,15 @@
 (def query-coercions {s/Keyword sc/string->keyword
                       Keyword sc/string->keyword
                       s/Uuid string->uuid
-                      s/Int (one-of string->long sc/safe-long-cast)
-                      Long (one-of string->long sc/safe-long-cast)
-                      Double (one-of string->double number->double)
+                      s/Int (cond-matcher
+                              string? string->long
+                              number? sc/safe-long-cast)
+                      Long (cond-matcher
+                             string? string->long
+                             number? sc/safe-long-cast)
+                      Double (cond-matcher
+                               string? string->double
+                               number? number->double)
                       Boolean string->boolean})
 
 (defn json-schema-coercion-matcher
