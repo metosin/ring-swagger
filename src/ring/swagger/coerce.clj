@@ -22,8 +22,7 @@
 (defn parse-pattern ^Pattern [pattern] (re-pattern pattern))
 (defn unparse-pattern ^String [pattern] (str pattern))
 
-(defn date-time-matcher
-  [schema]
+(defn date-time-matcher [schema]
   (if (date-time? schema)
     (fn [x]
       (if (string? x)
@@ -31,63 +30,89 @@
           (if (= schema Date) (.toDate parsed) parsed))
         x))))
 
-(defn date-matcher
-  [schema]
+(defn date-matcher [schema]
   (if (= LocalDate schema)
     (fn [x]
       (if (string? x)
         (parse-date x)
         x))))
 
-(defn pattern-matcher
-  [schema]
+(defn pattern-matcher [schema]
   (if (= Pattern schema)
     (fn [x]
       (if (string? x)
         (parse-pattern x)
         x))))
 
-(defn set-matcher
-  [schema]
+(defn set-matcher [schema]
   (if (instance? APersistentSet schema)
-    (fn [x] (if (sequential? x) (set x) x))))
+    (fn [x]
+      (if (sequential? x)
+        (set x)
+        x))))
 
 (defn string->boolean [x]
-  (condp = x
-    "true" true
-    "false" false
+  (if (string? x)
+    (condp = x
+      "true" true
+      "false" false
+      x)
     x))
 
+(string->boolean true)
+
 (defn string->long [^String x]
-  (try (Long/valueOf x) (catch Exception e x)))
+  (if (string? x)
+    (try
+      (Long/valueOf x)
+      (catch Exception e
+        x))
+    x))
 
 (defn string->double [^String x]
-  (try (Double/valueOf x) (catch Exception e x)))
+  (if (string? x)
+    (try
+      (Double/valueOf x)
+      (catch Exception _ x))
+    x))
 
 (defn string->uuid [^String x]
-  (try (UUID/fromString x) (catch Exception e x)))
+  (if (string? x)
+    (try
+      (UUID/fromString x)
+      (catch Exception _ x))
+    x))
+
+(defn number->double [^Number x]
+  (if (number? x)
+    (try
+      (double x)
+      (catch Exception _ x))
+    x))
 
 (defn one-of [& fns]
   (fn [x]
     (reduce
       (fn [value f]
-        (let [coerced (try (f value) (catch Exception _ value))]
+        (let [coerced (f value)]
           (if-not (= value coerced)
             (reduced coerced)
             coerced))) x fns)))
 
 (def json-coersions {s/Keyword sc/string->keyword
                      Keyword sc/string->keyword
+                     s/Uuid string->uuid
                      s/Int sc/safe-long-cast
                      Long sc/safe-long-cast
-                     Double double
-                     s/Uuid string->uuid})
+                     Double double})
 
-(def query-coercions {s/Int (one-of string->long sc/safe-long-cast)
+(def query-coercions {s/Keyword sc/string->keyword
+                      Keyword sc/string->keyword
+                      s/Uuid string->uuid
+                      s/Int (one-of string->long sc/safe-long-cast)
                       Long (one-of string->long sc/safe-long-cast)
-                      Double (one-of string->double double)
-                      Boolean string->boolean
-                      s/Uuid string->uuid})
+                      Double (one-of string->double number->double)
+                      Boolean string->boolean})
 
 (defn json-schema-coercion-matcher
   [schema]
@@ -116,7 +141,6 @@
         [x]
         x))))
 
-;; TODO: string-schema-coercion-matcher
 (defn query-schema-coercion-matcher
   [schema]
   (or (query-coercions schema)
