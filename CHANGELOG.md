@@ -1,5 +1,7 @@
 ## 0.22.4 (11.2.2016)
 
+**[compare](https://github.com/metosin/ring-swagger/compare/0.22.3...0.22.4)**
+
 * Closed Map Schemas (e.g. `s/find-extra-keys-schema` returning nil) will have `:additionalProperties` set to `false`.
 * Path-parameters are always required (in align to the spec)
 * Body-parameters are not required if wrapped in `schema.core.Maybe`
