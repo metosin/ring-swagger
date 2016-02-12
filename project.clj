@@ -9,7 +9,7 @@
                  [slingshot "0.12.2"]
                  [metosin/ring-http-response "0.6.5"]
                  [metosin/schema-tools "0.7.0"]
-                 [prismatic/schema "1.0.4"]
+                 [prismatic/schema "1.0.5"]
                  [prismatic/plumbing "0.5.2"]
                  [metosin/scjsv "0.2.0"]
                  [clj-time "0.11.0"]

@@ -1,3 +1,11 @@
+## unreleased
+
+* updated dependencies:
+
+```clj
+[prismatic/schema "1.0.5"] is available but we use "1.0.4"
+```
+
 ## 0.22.4 (11.2.2016)
 
 **[compare](https://github.com/metosin/ring-swagger/compare/0.22.3...0.22.4)**
