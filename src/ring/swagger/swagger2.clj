@@ -55,7 +55,7 @@
                 json-schema (jsons/->swagger v options)]
           :when json-schema]
       (merge
-        {:in in
+        {:in (name in)
          :name (name rk)
          :description ""
          :required (or (= in :path) (s/required-key? k))}
