@@ -1,5 +1,7 @@
 ## unreleased
 
+* Use strings instead of keywords in `:in`, fixes [#88](https://github.com/metosin/ring-swagger/issues/88), thanks to https://github.com/preoctopus for the fix.
+
 * updated dependencies:
 
 ```clj
