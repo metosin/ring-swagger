@@ -41,7 +41,7 @@
 (defmethod extract-parameter :body [_ model options]
   (if-let [schema (rsc/peek-schema model)]
     (let [schema-json (jsons/->swagger model options)]
-      (vector {:in :body
+      (vector {:in "body"
                :name (name (s/schema-name schema))
                :description (or (:description (jsons/->swagger schema options)) "")
                :required (not (jsons/maybe? model))

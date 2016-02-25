@@ -187,34 +187,34 @@
        :formData {:f Integer}} {})
 
     => [{:name "Pet"
-         :in :body
+         :in "body"
          :description ""
          :required true
          :schema {:$ref "#/definitions/Pet"}}
         {:name "id"
-         :in :query
+         :in "query"
          :description ""
          :required true
          :type "integer"
          :format "int64"}
         {:name "q"
-         :in :query
+         :in "query"
          :description ""
          :required false
          :type "string"}
         {:name "p"
-         :in :path
+         :in "path"
          :description ""
          :required true
          :type "integer"
          :format "int64"}
         {:name "h"
-         :in :header
+         :in "header"
          :description ""
          :required true
          :type "string"}
         {:name "f"
-         :in :formData
+         :in "formData"
          :description ""
          :required true
          :type "integer"
@@ -230,13 +230,13 @@
 
       => [{:name "q"
            :description ""
-           :in :query
+           :in "query"
            :required true
            :type "string"}
           {:name "l"
            :description ""
            :format "int64"
-           :in :query
+           :in "query"
            :required false
            :type "integer"}])
 
@@ -248,13 +248,13 @@
 
       => [{:name "q"
            :description ""
-           :in :path
+           :in "path"
            :required true
            :type "string"}
           {:name "l"
            :description ""
            :format "int64"
-           :in :path
+           :in "path"
            :required true
            :type "integer"}]))
 
@@ -263,7 +263,7 @@
 
     => [{:name "Body"
          :description ""
-         :in :body
+         :in "body"
          :required true
          :schema {:type "array"
                   :items {:$ref "#/definitions/Body"}}}])
@@ -273,7 +273,7 @@
 
     => [{:name "Body"
          :description ""
-         :in :body
+         :in "body"
          :required true
          :schema {:type "array"
                   :uniqueItems true
@@ -284,7 +284,7 @@
 
     => [{:description "foo"
          :name "Body"
-         :in :body
+         :in "body"
          :required true
          :schema {:$ref "#/definitions/Body"}}])
 
@@ -293,7 +293,7 @@
 
     => [{:description "foo"
          :name "Body"
-         :in :body
+         :in "body"
          :required true
          :schema {:type "array"
                   :items {:$ref "#/definitions/Body"}}}]))
@@ -453,7 +453,7 @@
                                         :operationId ..operationid..
                                         :consumes ["application/xyz"]
                                         :produces ["application/xyz"]
-                                        :parameters [{:in :path
+                                        :parameters [{:in "path"
                                                       :name "id"
                                                       :description ""
                                                       :required true
