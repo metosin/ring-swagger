@@ -341,12 +341,12 @@ You can require `ring.swagger.json-schema-dirty` namespace to get JSON Schema di
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
-| `(s/conditional pred X pred Y pred Z)` | oneOf: *type of X*, *type of X*, *type of Z*
+| `(s/conditional pred X pred Y pred Z)` | oneOf: *type of X*, *type of Y*, *type of Z*
 | `(s/if pred X Y)` | oneOf: *type of X*, *type of Y*
 
 ### Schema coercion
 
-Ring-swagger uses [Schema coercions](http://blog.getprismatic.com/blog/2014/1/4/schema-020-back-with-clojurescript-data-coercion)
+Ring-swagger uses [Schema coercions](https://thingr.com/hn/items/4277/schema-0-2-0-back-with-clojurescript-data-coercion)
 for transforming the input data into vanilla Clojure and back.
 
 There are two coercers in `ring.swagger.coerce`, the `json-schema-coercion-matcher` and `query-schema-coercion-matcher`.
