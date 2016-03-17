@@ -1,5 +1,7 @@
 ## 0.22.5 (17.3.2016)
 
+**[compare](https://github.com/metosin/ring-swagger/compare/0.22.4...0.22.5)**
+
 * Use strings instead of keywords in `:in`, fixes [#88](https://github.com/metosin/ring-swagger/issues/88), thanks to https://github.com/preoctopus for the fix.
 * experimental `ring.swagger.swagger2-full-schema/Swagger` for validating the ring-swagger spec in Clojure
 
