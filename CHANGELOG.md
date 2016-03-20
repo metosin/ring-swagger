@@ -1,5 +1,7 @@
 ## 0.22.6 (20.3.2016)
 
+**[compare](https://github.com/metosin/ring-swagger/compare/0.22.5...0.22.6)**
+
 * updated dependencies:
 
 ```clj
