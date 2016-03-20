@@ -43,12 +43,12 @@
   (let [it (atom nil)]
     ((fn walk [x]
        (stw/walk
-         x
          (fn [x]
            (if (and (plain-map? x) (s/schema-name x))
              (do (if-not @it (reset! it x)) x)
              (walk x)))
-         identity)) [schema])
+         identity
+         x)) [schema])
     @it))
 
 ; From Clojure 1.8
@@ -64,7 +64,6 @@
 
 (defn name-schemas [names schema]
   (stw/walk
-    schema
     (fn [x]
       (if (map-entry? x)
         [(key x)
@@ -79,7 +78,8 @@
         (if-not (s/schema-name x)
           (with-meta x {:name (full-name names)})
           x)
-        x))))
+        x))
+    schema))
 
 (defn with-named-sub-schemas
   "Traverses a schema tree of Maps, Sets and Sequences and add Schema-name to all

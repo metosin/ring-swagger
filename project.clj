@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.22.5"
+(defproject metosin/ring-swagger "0.22.6"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -8,7 +8,7 @@
   :dependencies [[cheshire "5.5.0"]
                  [slingshot "0.12.2"]
                  [metosin/ring-http-response "0.6.5"]
-                 [metosin/schema-tools "0.8.0"]
+                 [metosin/schema-tools "0.9.0"]
                  [prismatic/schema "1.0.5"]
                  [prismatic/plumbing "0.5.2"]
                  [metosin/scjsv "0.2.0"]

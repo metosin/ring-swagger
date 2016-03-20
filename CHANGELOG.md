@@ -1,3 +1,11 @@
+## 0.22.6 (20.3.2016)
+
+* updated dependencies:
+
+```clj
+[metosin/schema-tools "0.9.0"] is available but we use "0.8.0"
+```
+
 ## 0.22.5 (17.3.2016)
 
 **[compare](https://github.com/metosin/ring-swagger/compare/0.22.4...0.22.5)**
