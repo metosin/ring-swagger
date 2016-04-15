@@ -121,7 +121,9 @@ Info, tags, routes and anonymous nested schemas.
 ;                               :required (:street :city)}}}
 ```
 
- ![ring-swagger](https://raw.githubusercontent.com/wiki/metosin/ring-swagger/ring-swagger.png)
+producing the following ui:
+
+![ring-swagger](https://raw.githubusercontent.com/wiki/metosin/ring-swagger/ring-swagger.png)
 
 ## Customizing Swagger Spec output
 
