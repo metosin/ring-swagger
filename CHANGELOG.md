@@ -4,6 +4,8 @@
 
 ```clj
 [prismatic/schema "1.1.0"] is available but we use "1.0.5"
+[cheshire "5.6.1"] is available but we use "5.5.0"
+[prismatic/plumbing "0.5.3"] is available but we use "0.5.2"
 ```
 
 ## 0.22.6 (20.3.2016)

@@ -4,13 +4,12 @@
 
 - [API Docs](http://metosin.github.io/ring-swagger/doc/)
 - Transforms deeply nested Schemas into Swagger JSON Schema definitions
-- Extended JSON & String serialization & coercion
-- For web/routing library developers:
-  - A [Schema-based contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj) for collecting route documentation
-  - Middlewares for handling Schemas Validation Errors
-  - Functions to generate the Swaggers artifacts
-    - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
-    - [Swagger-UI](https://github.com/swagger-api/swagger-ui) bindings. (get the UI separately as [jar](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
+- Extended & symmetric JSON & String serialization & coercion
+- Middleware for handling Schemas Validation Errors & Publishing swagger-data
+- Local api validator
+- Swagger artifact generation
+  - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
+  - [Swagger-UI](https://github.com/swagger-api/swagger-ui) bindings. (get the UI separately as [jar](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
 
 **note** Swagger 1.2 support has been dropped in `0.21.0`.
 
@@ -22,13 +21,12 @@
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 - [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
-- [pedastal-swagger](https://github.com/frankiesardo/pedestal-swagger) for Pedastal
+- [route-swagger](https://github.com/frankiesardo/route-swagger) for Pedastal
 - [yada](https://github.com/juxt/yada)
 - [kekkonen](https://github.com/metosin/kekkonen)
 
 Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj).
-The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any 
-valid Swagger spec data in.
+The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any  valid Swagger spec data in.
 
 ### Simplest possible example
 
@@ -37,13 +35,12 @@ valid Swagger spec data in.
 
 (rs/swagger-json {})
 
-; {:swagger "2.0"
-;  :info {:title "Swagger API"
-;          :version "0.0.1"}
-;  :produces ["application/json"]
-;  :consumes ["application/json"]
-;  :definitions {}
-;  :paths {}}
+; {:swagger "2.0",
+;  :info {:title "Swagger API", :version "0.0.1"},
+;  :produces ["application/json"],
+;  :consumes ["application/json"],
+;  :paths {},
+;  :definitions {}}
 ```
 
 ### More complete example
@@ -81,47 +78,50 @@ Info, tags, routes and anonymous nested schemas.
                                                    :description "Found it!"}
                                               404 {:description "Ohnoes."}}}}}}))
 
-; {:swagger "2.0"
-;  :info {:version "1.0.0"
-;         :title "Sausages"
-;         :description "Sausage description"
-;         :termsOfService "http://helloreverb.com/terms/"
-;         :contact {:email "foo@example.com"
-;                   :name "My API Team"
-;                   :url "http://www.metosin.fi"}
-;         :license {:name "Eclipse Public License"
-;                   :url "http://www.eclipse.org/legal/epl-v10.html"}}
-;  :tags [{:description "User stuff" :name "user"}]
-;  :consumes ["application/json"]
-;  :produces ["application/json"]
-;  :definitions {"User" {:type "object"
-;                        :properties {:address {:$ref "#/definitions/UserAddress"}
-;                                     :id {:type "string"}
-;                                     :name {:type "string"}}
-;                        :required (:id :name :address)}
-;                "UserAddress" {:type "object"
-;                               :properties {:city {:enum (:tre :hki)
-;                                                   :type "string"}
-;                                            :street {:type "string"}}
-;                               :required (:street :city)}}
-;   :paths {"/api/ping" {:get {:responses {:default {:description ""}}}}
-;          "/user/{id}" {:post {:description "User Api description"
-;                               :summary "User Api"
-;                               :tags ["user"]
-;                               :parameters [{:description ""
-;                                             :in :path
-;                                             :name "id"
-;                                             :required true
+; {:swagger "2.0",
+;  :info {:title "Sausages",
+;         :version "1.0.0",
+;         :description "Sausage description",
+;         :termsOfService "http://helloreverb.com/terms/",
+;         :contact {:name "My API Team",
+;                   :email "foo@example.com",
+;                   :url "http://www.metosin.fi"},
+;         :license {:name "Eclipse Public License",
+;                   :url "http://www.eclipse.org/legal/epl-v10.html"}},
+;  :produces ["application/json"],
+;  :consumes ["application/json"],
+;  :tags [{:name "user", :description "User stuff"}],
+;  :paths {"/user/{id}" {:post {:summary "User Api",
+;                               :description "User Api description",
+;                               :tags ["user"],
+;                               :parameters [{:in "path",
+;                                             :name "id",
+;                                             :description "",
+;                                             :required true,
 ;                                             :type "string"}
-;                                            {:description ""
-;                                             :in :body
-;                                             :name "User"
-;                                             :required true
-;                                             :schema {:$ref "#/definitions/User"}}]
-;                               :responses {200 {:description "Found it!"
-;                                                :schema {:$ref "#/definitions/User"}}
-;                                           404 {:description "Ohnoes."}}}}}}
- ```
+;                                            {:in "body",
+;                                             :name "User",
+;                                             :description "",
+;                                             :required true,
+;                                             :schema {:$ref "#/definitions/User"}}],
+;                               :responses {200 {:schema {:$ref "#/definitions/User"},
+;                                                         :description "Found it!"},
+;                                           404 {:description "Ohnoes."}}}}},
+;  :definitions {"User" {:type "object",
+;                        :properties {:id {:type "string"},
+;                                     :name {:type "string"},
+;                                     :address {:$ref "#/definitions/UserAddress"}},
+;                        :additionalProperties false,
+;                        :required (:id :name :address)},
+;                "UserAddress" {:type "object",
+;                               :properties {:street {:type "string"},
+;                                                     :city {:type "string",
+;                                                            :enum (:tre :hki)}},
+;                               :additionalProperties false,
+;                               :required (:street :city)}}}
+```
+
+ ![ring-swagger](https://raw.githubusercontent.com/wiki/metosin/ring-swagger/ring-swagger.png)
 
 ## Customizing Swagger Spec output
 

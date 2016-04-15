@@ -5,12 +5,12 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo
             :comments "same as Clojure"}
-  :dependencies [[cheshire "5.5.0"]
+  :dependencies [[cheshire "5.6.1"]
                  [slingshot "0.12.2"]
                  [metosin/ring-http-response "0.6.5"]
                  [metosin/schema-tools "0.9.0"]
                  [prismatic/schema "1.1.0"]
-                 [prismatic/plumbing "0.5.2"]
+                 [prismatic/plumbing "0.5.3"]
                  [metosin/scjsv "0.2.0"]
                  [clj-time "0.11.0"]
                  [org.tobereplaced/lettercase "1.0.0"]
@@ -19,7 +19,7 @@
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-ring "0.9.7"]
                              [lein-midje "3.2"]
-                             [funcool/codeina "0.3.0"]]
+                             [funcool/codeina "0.4.0"]]
                    :dependencies [[org.clojure/clojure "1.8.0"]
                                   [midje "1.8.3"]
                                   [ring-mock "0.1.5"]
