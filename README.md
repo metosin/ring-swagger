@@ -1,15 +1,14 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.svg?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Downloads](https://jarkeeper.com/metosin/ring-swagger/downloads.svg)](https://jarkeeper.com/metosin/ring-swagger) [![Dependencies Status](https://jarkeeper.com/metosin/ring-swagger/status.svg)](https://jarkeeper.com/metosin/ring-swagger)
 
-[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Prismatic Schema](https://github.com/Prismatic/schema).
+[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema).
 
-- [API Docs](http://metosin.github.io/ring-swagger/doc/)
 - Transforms deeply nested Schemas into Swagger JSON Schema definitions
 - Extended & symmetric JSON & String serialization & coercion
 - Middleware for handling Schemas Validation Errors & Publishing swagger-data
 - Local api validator
 - Swagger artifact generation
-  - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) for 2.0.
-  - [Swagger-UI](https://github.com/swagger-api/swagger-ui) bindings. (get the UI separately as [jar](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
+  - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) via `ring.swagger.swagger2/swagger-json`
+  - [Swagger UI](https://github.com/swagger-api/swagger-ui) bindings. (get the UI separately as [jar](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
 
 **note** Swagger 1.2 support has been dropped in `0.21.0`.
 
@@ -27,6 +26,8 @@
 
 Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj).
 The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any  valid Swagger spec data in.
+
+[API Docs](http://metosin.github.io/ring-swagger/doc/).
 
 ### Simplest possible example
 
@@ -68,7 +69,7 @@ Info, tags, routes and anonymous nested schemas.
                       :url "http://www.eclipse.org/legal/epl-v10.html"}}
      :tags [{:name "user"
              :description "User stuff"}]
-     :paths {"/api/ping" {:get nil}
+     :paths {"/api/ping" {:get {}}
              "/user/:id" {:post {:summary "User Api"
                                   :description "User Api description"
                                   :tags ["user"]
@@ -91,7 +92,8 @@ Info, tags, routes and anonymous nested schemas.
 ;  :produces ["application/json"],
 ;  :consumes ["application/json"],
 ;  :tags [{:name "user", :description "User stuff"}],
-;  :paths {"/user/{id}" {:post {:summary "User Api",
+;  :paths {"/api/ping" {:get {:responses {:default {:description ""}}}},
+;          "/user/{id}" {:post {:summary "User Api",
 ;                               :description "User Api description",
 ;                               :tags ["user"],
 ;                               :parameters [{:in "path",
