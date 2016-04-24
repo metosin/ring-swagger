@@ -76,7 +76,7 @@
     (fn [x]
       (if (plain-map? x)
         (if-not (s/schema-name x)
-          (with-meta x {:name (full-name names)})
+          (vary-meta x assoc :name (full-name names))
           x)
         x))
     schema))

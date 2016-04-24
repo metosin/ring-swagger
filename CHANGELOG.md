@@ -1,5 +1,7 @@
 ## Unreleased
 
+* `ring.swagger.core/with-named-subschemas` retains metadata, fixes https://github.com/metosin/compojure-api/issues/168
+
 - update dependencies:
 
 ```clj

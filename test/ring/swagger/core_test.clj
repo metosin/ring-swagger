@@ -59,7 +59,15 @@
     (meta (:sub (with-named-sub-schemas AnonymousRootModel "Body"))) => (contains {:name #(.startsWith (str %) "Body")}))
 
   (fact "Keeps the order"
-    (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order))
+    (keys (with-named-sub-schemas OrderedSchema)) => ordered-schema-order)
+
+  (fact "Retains metadata, fixes #https://github.com/metosin/compojure-api/issues/168"
+    (meta
+      (with-named-sub-schemas
+        (with-meta
+          {:a Long}
+          {:kikka :kukka})
+        "Body")) => (contains {:kikka :kukka})))
 
 ;;
 ;; Route generation
