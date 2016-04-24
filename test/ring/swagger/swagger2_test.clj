@@ -38,107 +38,107 @@
         {:output-errors output-errors}))))
 
 (def a-complete-swagger
-  {:swagger             "2.0"
-   :info                {:version        "version"
-                         :title          "title"
-                         :description    "description"
-                         :termsOfService "jeah"
-                         :contact        {:name  "name"
-                                          :url   "http://someurl.com"
-                                          :email "tommi@example.com"}
-                         :license        {:name "name"
-                                          :url  "http://someurl.com"}
-                         :x-kikka        "jeah"}
-   :host                "somehost:8080"
-   :externalDocs        {:url         "http://someurl.com"
-                         :description "more info"}
-   :basePath            "/"
-   :schemes             []
-   :parameters          {}
-   :responses           {}
+  {:swagger "2.0"
+   :info {:version "version"
+          :title "title"
+          :description "description"
+          :termsOfService "jeah"
+          :contact {:name "name"
+                    :url "http://someurl.com"
+                    :email "tommi@example.com"}
+          :license {:name "name"
+                    :url "http://someurl.com"}
+          :x-kikka "jeah"}
+   :host "somehost:8080"
+   :externalDocs {:url "http://someurl.com"
+                  :description "more info"}
+   :basePath "/"
+   :schemes []
+   :parameters {}
+   :responses {}
    :securityDefinitions {}
-   :security            []
-   :tags                [{:name         "pet",
-                          :description  "Everything about your Pets",
-                          :externalDocs {:description "Find out more", :url "http://swagger.io"}}
-                         {:name        "store",
-                          :description "Access to Petstore orders"}
-                         {:name         "user",
-                          :description  "Operations about user",
-                          :externalDocs {:description "Find out more about our store", :url "http://swagger.io"}}]
-   :consumes            ["application/json" "application/edn"]
-   :produces            ["application/json" "application/edn"]
-   :paths               {"/api/:id"       {:get {:tags         ["pet"]
-                                                 :summary      "summary"
-                                                 :description  "description"
-                                                 :externalDocs {:url         "http://someurl.com"
-                                                                :description "more info"}
-                                                 :operationId  "operationId"
-                                                 :consumes     ["application/xyz"]
-                                                 :produces     ["application/xyz"]
-                                                 :parameters   {:body     nil
-                                                                :query    (merge Anything {:x Long :y Long})
-                                                                :path     {:id String}
-                                                                :header   Anything
-                                                                :formData Anything}
-                                                 :responses    {200      {:description "ok"
-                                                                          :schema      nil}
-                                                                400      {:description "not found"
-                                                                          :schema      NotFound}
-                                                                :default {:description "error"
-                                                                          :schema      {:code Long}}}}}
-                         "/api/parrots"   {:get {:responses {200 {:schema      Parrot
-                                                                  :description ""}}}}
-                         "/api/all-types" {:get {:parameters {:body {:a Boolean
-                                                                     :b Double
-                                                                     :c Long
-                                                                     :d String
-                                                                     :e {:f [s/Keyword]
-                                                                         :g #{String}
-                                                                         :h #{(s/enum :kikka :kakka :kukka)}
-                                                                         :i Date
-                                                                         :j DateTime
-                                                                         :k LocalDate
-                                                                         :l (s/maybe String)
-                                                                         :m (s/both Long (s/pred odd? 'odd?))
-                                                                         :o [{:p #{{:q String}}}]
-                                                                         :u UUID
-                                                                         :v Pattern
-                                                                         :w #"a[6-9]"}}}}}
-                         "/api/pets"      {:get  {:parameters {:body     Pet
-                                                               :query    (merge Anything {:x Long :y Long})
-                                                               :path     Nothing
-                                                               :header   Anything
-                                                               :formData Anything}
-                                                  :responses  {200      {:description "ok"
-                                                                         :schema      {:sum Long}}
-                                                               :default {:description "error"
-                                                                         :schema      {:code Long}}}}
-                                           :post {:parameters {:body  #{Pet}
-                                                               :query (merge Anything {:x Long :y Long})}
-                                                  :responses  {200      {:schema {:sum Long}}
-                                                               :default {:schema  {:code Long}
-                                                                         :headers {:location String}}}}
-                                           :put  {:parameters {:body  [(s/maybe Pet)]
-                                                               :query {:x (s/maybe String)}}
-                                                  :responses  {200      {:description "ok"
-                                                                         :schema      {:sum (s/maybe Long)}}
-                                                               :default {:description "error"}}}}}})
+   :security []
+   :tags [{:name "pet",
+           :description "Everything about your Pets",
+           :externalDocs {:description "Find out more", :url "http://swagger.io"}}
+          {:name "store",
+           :description "Access to Petstore orders"}
+          {:name "user",
+           :description "Operations about user",
+           :externalDocs {:description "Find out more about our store", :url "http://swagger.io"}}]
+   :consumes ["application/json" "application/edn"]
+   :produces ["application/json" "application/edn"]
+   :paths {"/api/:id" {:get {:tags ["pet"]
+                             :summary "summary"
+                             :description "description"
+                             :externalDocs {:url "http://someurl.com"
+                                            :description "more info"}
+                             :operationId "operationId"
+                             :consumes ["application/xyz"]
+                             :produces ["application/xyz"]
+                             :parameters {:body nil
+                                          :query (merge Anything {:x Long :y Long})
+                                          :path {:id String}
+                                          :header Anything
+                                          :formData Anything}
+                             :responses {200 {:description "ok"
+                                              :schema nil}
+                                         400 {:description "not found"
+                                              :schema NotFound}
+                                         :default {:description "error"
+                                                   :schema {:code Long}}}}}
+           "/api/parrots" {:get {:responses {200 {:schema Parrot
+                                                  :description ""}}}}
+           "/api/all-types" {:get {:parameters {:body {:a Boolean
+                                                       :b Double
+                                                       :c Long
+                                                       :d String
+                                                       :e {:f [s/Keyword]
+                                                           :g #{String}
+                                                           :h #{(s/enum :kikka :kakka :kukka)}
+                                                           :i Date
+                                                           :j DateTime
+                                                           :k LocalDate
+                                                           :l (s/maybe String)
+                                                           :m (s/both Long (s/pred odd? 'odd?))
+                                                           :o [{:p #{{:q String}}}]
+                                                           :u UUID
+                                                           :v Pattern
+                                                           :w #"a[6-9]"}}}}}
+           "/api/pets" {:get {:parameters {:body Pet
+                                           :query (merge Anything {:x Long :y Long})
+                                           :path Nothing
+                                           :header Anything
+                                           :formData Anything}
+                              :responses {200 {:description "ok"
+                                               :schema {:sum Long}}
+                                          :default {:description "error"
+                                                    :schema {:code Long}}}}
+                        :post {:parameters {:body #{Pet}
+                                            :query (merge Anything {:x Long :y Long})}
+                               :responses {200 {:schema {:sum Long}}
+                                           :default {:schema {:code Long}
+                                                     :headers {:location String}}}}
+                        :put {:parameters {:body [(s/maybe Pet)]
+                                           :query {:x (s/maybe String)}}
+                              :responses {200 {:description "ok"
+                                               :schema {:sum (s/maybe Long)}}
+                                          :default {:description "error"}}}}}})
 
 ;;
 ;; facts
 ;;
 
 (fact "empty spec"
-      (let [swagger {}]
-        (validate swagger) => nil))
+  (let [swagger {}]
+    (validate swagger) => nil))
 
 (fact "minimalistic spec"
   (let [swagger {:paths {"/ping" {:get nil}}}]
     (validate swagger) => nil))
 
 (fact "more complete spec"
-      (validate a-complete-swagger) => nil)
+  (validate a-complete-swagger) => nil)
 
 (defrecord InvalidElement [])
 
@@ -376,4 +376,4 @@
                                                                {:name "id"})])})})})}))
 
 (fact "should validate full swagger 2 schema"
-      (s/validate fs/Swagger a-complete-swagger) => a-complete-swagger)
+  (s/validate fs/Swagger a-complete-swagger) => a-complete-swagger)
