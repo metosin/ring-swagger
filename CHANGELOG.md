@@ -1,3 +1,11 @@
+## Unreleased
+
+* updated dependencies:
+
+```clj
+[prismatic/schema "1.1.1"] is available but we use "1.1.0"
+```
+
 ## 0.22.7 (24.4.2016)
 
 * `ring.swagger.core/with-named-subschemas` retains metadata, fixes https://github.com/metosin/compojure-api/issues/168
