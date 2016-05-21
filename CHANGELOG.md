@@ -1,5 +1,7 @@
 ## Unreleased
 
+* Response headers are mapped correctly, Fixes https://github.com/metosin/compojure-api/issues/232.
+
 * updated dependencies:
 
 ```clj

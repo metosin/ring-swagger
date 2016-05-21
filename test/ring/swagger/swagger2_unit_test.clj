@@ -428,7 +428,8 @@
                                       :produces ["application/xyz"]
                                       :parameters {:path {:id Integer}}
                                       :responses {200 {:description "ok"
-                                                       :schema Pet}
+                                                       :schema Pet
+                                                       :headers {"X-men" (describe s/Str "mutant header")}}
                                                   404 {:description "fail"
                                                        :schema PetError}}}}}})
     => {:swagger "2.0"
@@ -460,7 +461,9 @@
                                                       :type "integer"
                                                       :format "int32"}]
                                         :responses {200 {:description "ok"
-                                                         :schema {:$ref "#/definitions/Pet"}}
+                                                         :schema {:$ref "#/definitions/Pet"}
+                                                         :headers {"X-men" {:type "string"
+                                                                            :description "mutant header"}}}
                                                     404 {:description "fail"
                                                          :schema {:$ref "#/definitions/PetError"}}}}}}
         :definitions {"Pet" {:type "object"

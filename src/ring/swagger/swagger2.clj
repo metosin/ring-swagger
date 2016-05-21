@@ -79,7 +79,11 @@
                             :let [{:keys [schema headers]} v]]
                     k (-> v
                           (cond-> schema (update-in [:schema] jsons/->swagger options))
-                          (cond-> headers (update-in [:headers] jsons/properties))
+                          (cond-> headers (update-in [:headers] (fn [headers]
+                                                                  (if headers
+                                                                    (->> (for [[k v] headers]
+                                                                           [k (jsons/->swagger v options)])
+                                                                         (into {}))))))
                           (update-in [:description] #(or % (default-response-description k options)))
                           remove-empty-keys))]
     (if-not (empty? responses)
