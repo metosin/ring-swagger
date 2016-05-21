@@ -1,4 +1,4 @@
-## Unreleased
+## 0.22.8 (21.5.2016)
 
 * Response headers are mapped correctly, Fixes https://github.com/metosin/compojure-api/issues/232.
 
