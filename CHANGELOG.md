@@ -1,3 +1,13 @@
+## UNRELEASED
+
+* updated dependencies:
+
+```clj
+[metosin/ring-http-response "0.7.0"] is available but we use "0.6.5"
+[prismatic/schema "1.1.2"] is available but we use "1.1.1"
+[clj-time "0.12.0"] is available but we use "0.11.0"
+```
+
 ## 0.22.8 (21.5.2016)
 
 * Response headers are mapped correctly, Fixes https://github.com/metosin/compojure-api/issues/232.
