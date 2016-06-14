@@ -18,6 +18,8 @@
                :title "Ankka"}}))
 ```
 
+* Better support for nillable fields via `x-nullable` [standard hack](https://github.com/OAI/OpenAPI-Specification/issues/229), fixes fixes [#97](https://github.com/metosin/ring-swagger/issues/97)
+
 * updated dependencies:
 
 ```clj
