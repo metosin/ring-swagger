@@ -23,7 +23,7 @@
                                     :minimum "0.0"
                                     :maximum "100.0"})
                   :name (field s/Str {:description "Friendly name of the pet"})
-                  (s/optional-key :category) (field Category {:description "Category the pet is in"})
+                  (s/optional-key :category) Category
                   (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
                   (s/optional-key :tags) (field [Tag] {:description "Tags assigned to this pet"})
                   (s/optional-key :status) (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
@@ -64,8 +64,7 @@
                      :description "Unique identifier for the Pet"
                      :minimum "0.0"
                      :maximum "100.0"}
-                :category {:$ref "#/definitions/Category"
-                           :description "Category the pet is in"}
+                :category {:$ref "#/definitions/Category"}
                 :name {:type "string"
                        :description "Friendly name of the pet"}
                 :photoUrls {:type "array"
@@ -380,7 +379,8 @@
 (fact "recursive"
   (transform-models [Foo Bar] +options+)
   => {"Bar" {:type "object"
-             :properties {:foo {:$ref "#/definitions/Foo"}}
+             :properties {:foo {:$ref "#/definitions/Foo"
+                                :x-nullable true}}
              :additionalProperties false
              :required [:foo]}
       "Foo" {:type "object"
@@ -475,8 +475,7 @@
                                                :maximum "100.0"}
                                           :name {:type "string"
                                                  :description "Friendly name of the pet"}
-                                          :category {:$ref "#/definitions/Category"
-                                                     :description "Category the pet is in"}
+                                          :category {:$ref "#/definitions/Category"}
                                           :photoUrls {:type "array"
                                                       :items {:type "string"}
                                                       :description "Image URLs"}

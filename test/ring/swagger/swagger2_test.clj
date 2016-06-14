@@ -198,6 +198,7 @@
   (-> m first val (subs (.length "#/definitions/"))))
 
 (def valid-reference (just {:$ref anything}))
+(def valid-optional-reference (just {:$ref anything :x-nullable true}))
 
 (defn extract-schema [swagger-spec uri path f]
   (let [operation (get-in swagger-spec [:paths uri :post])
@@ -239,17 +240,17 @@
       "/body1" [:parameters 0] identity #"Body.*" valid-reference
       "/body2" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
       "/body3" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
-      "/body4" [:parameters 0] identity #"Body.*" valid-reference
-      "/body5" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array"})
-      "/body6" [:parameters 0] :items #"Body.*" (just {:items valid-reference, :type "array", :uniqueItems true})
+      "/body4" [:parameters 0] identity #"Body.*" valid-optional-reference
+      "/body5" [:parameters 0] :items #"Body.*" (just {:items valid-optional-reference, :type "array"})
+      "/body6" [:parameters 0] :items #"Body.*" (just {:items valid-optional-reference, :type "array", :uniqueItems true})
 
       ;; response models
       "/resp" [:responses 200] identity "Response" valid-reference
       "/resp" [:responses 201] :items #"Response.*" (just {:items valid-reference, :type "array"})
       "/resp" [:responses 202] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true})
-      "/resp" [:responses 203] identity #"Response.*" valid-reference
-      "/resp" [:responses 204] :items #"Response.*" (just {:items valid-reference, :type "array"})
-      "/resp" [:responses 205] :items #"Response.*" (just {:items valid-reference, :type "array", :uniqueItems true}))))
+      "/resp" [:responses 203] identity #"Response.*" valid-optional-reference
+      "/resp" [:responses 204] :items #"Response.*" (just {:items valid-optional-reference, :type "array"})
+      "/resp" [:responses 205] :items #"Response.*" (just {:items valid-optional-reference, :type "array", :uniqueItems true}))))
 
 (fact "multiple different schemas with same name"
   (let [model1 (s/schema-with-name {:id s/Str} 'Kikka)
@@ -377,3 +378,71 @@
 
 (fact "should validate full swagger 2 schema"
   (s/validate fs/Swagger a-complete-swagger) => a-complete-swagger)
+
+(s/defschema Required
+  (rsjs/field
+    {(s/optional-key :name) s/Str
+     (s/optional-key :title) s/Str
+     :address (rsjs/field
+                {:street (rsjs/field s/Str {:description "description here"})}
+                {:description "Streename"
+                 :example "Ankkalinna 1"})}
+    {:minProperties 1
+     :description "I'm required"
+     :example {:name "Iines"
+               :title "Ankka"}}))
+
+(fact "models with extra meta, #96"
+  (let [swagger {:paths {"/api" {:post {:parameters {:body Required}}}}}]
+
+    (swagger-json swagger) => (contains
+                                {:definitions {"Required" {:type "object"
+                                                           :description "I'm required"
+                                                           :example {:name "Iines"
+                                                                     :title "Ankka"}
+                                                           :minProperties 1
+                                                           :required [:address]
+                                                           :properties {:name {:type "string"}
+                                                                        :title {:type "string"}
+                                                                        :address {:$ref "#/definitions/RequiredAddress"}}
+                                                           :additionalProperties false}
+                                               "RequiredAddress" {:type "object"
+                                                                  :description "Streename"
+                                                                  :example "Ankkalinna 1"
+                                                                  :properties {:street {:type "string"
+                                                                                        :description "description here"}}
+                                                                  :required [:street]
+                                                                  :additionalProperties false}}
+                                 :paths {"/api" {:post {:parameters [{:description "I'm required"
+                                                                      :in "body"
+                                                                      :name "Required"
+                                                                      :required true
+                                                                      :schema {:$ref "#/definitions/Required"}}]
+                                                        :responses {:default {:description ""}}}}}})
+
+    (validate swagger) => nil))
+
+(s/defschema OptionalMaybe
+  {(s/optional-key :a) s/Str
+   (s/optional-key :b) (s/maybe s/Str)
+   :c (s/maybe s/Str)})
+
+(fact "nillable fields, #97"
+  (let [swagger {:paths {"/api" {:post {:parameters {:body (s/maybe OptionalMaybe)}}}}}]
+
+    (swagger-json swagger) => (contains
+                                {:definitions {"OptionalMaybe" {:type "object"
+                                                                :properties {:a {:type "string"}
+                                                                             :b {:type "string" :x-nullable true}
+                                                                             :c {:type "string" :x-nullable true}}
+                                                                :required [:c]
+                                                                :additionalProperties false}}
+                                 :paths {"/api" {:post {:parameters [{:in "body"
+                                                                      :name "OptionalMaybe"
+                                                                      :description ""
+                                                                      :required false
+                                                                      :schema {:$ref "#/definitions/OptionalMaybe"
+                                                                               :x-nullable true}}]
+                                                        :responses {:default {:description ""}}}}}})
+
+    (validate swagger) => nil))

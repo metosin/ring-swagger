@@ -43,9 +43,9 @@
     (let [schema-json (jsons/->swagger model options)]
       (vector {:in "body"
                :name (name (s/schema-name schema))
-               :description (or (:description (jsons/->swagger schema options)) "")
+               :description (or (:description (jsons/json-schema-meta schema)) "")
                :required (not (jsons/maybe? model))
-               :schema (dissoc schema-json :description)}))))
+               :schema schema-json}))))
 
 (defmethod extract-parameter :default [in model options]
   (if model

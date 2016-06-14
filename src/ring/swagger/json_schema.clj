@@ -53,6 +53,11 @@
 (defprotocol JsonSchema
   (convert [this options]))
 
+(defn not-supported! [e]
+  (throw (IllegalArgumentException.
+           (str "don't know how to convert " e " into a Swagger Schema. "
+                "Check out ring-swagger docs for details."))))
+
 (defn assoc-collection-format
   "Add collectionFormat to the JSON Schema if the parameter type
    is query or formData."
@@ -61,18 +66,22 @@
     (assoc m :collectionFormat (:collection-format options "multi"))
     m))
 
+(defn reference? [m]
+  (contains? m :$ref))
+
+(defn reference [e]
+  (if-let [schema-name (s/schema-name e)]
+    {:$ref (str "#/definitions/" schema-name)}
+    (if (not *ignore-missing-mappings*)
+      (not-supported! e))))
+
 (defn merge-meta
-  [m x {no-meta ::no-meta key-meta :key-meta}]
-  (if-not no-meta
+  [m x {:keys [::no-meta :key-meta]}]
+  (if (and (not no-meta) (not (reference? m)))
     (merge (json-schema-meta x)
            (if key-meta (c/remove-empty-keys (select-keys key-meta [:default])))
            m)
     m))
-
-(defn not-supported! [e]
-  (throw (IllegalArgumentException.
-           (str "don't know how to convert " e " into a Swagger Schema. "
-                "Check out ring-swagger docs for details."))))
 
 ;; Classes
 (defmethod convert-class java.lang.Integer       [_ _] {:type "integer" :format "int32"})
@@ -93,21 +102,17 @@
   (if-not *ignore-missing-mappings*
     (not-supported! e)))
 
-;; Schemas
+;;
 ;; Convert the most common predicates by mapping fn to Class
 ;;
+
 (def predicate-name-to-class {'integer? java.lang.Long
                               'keyword? clojure.lang.Keyword
                               'symbol? clojure.lang.Symbol})
 
-(defn reference [e]
-  (if-let [schema-name (s/schema-name e)]
-    {:$ref (str "#/definitions/" schema-name)}
-    (and (not *ignore-missing-mappings*)
-         (not-supported! e))))
-
 (defn ->swagger
-  ([x] (->swagger x {}))
+  ([x]
+   (->swagger x {}))
   ([x options]
    (-> x
        (convert options)
@@ -156,8 +161,9 @@
   schema.core.Maybe
   (convert [e {:keys [in]}]
     (let [schema (->swagger (:schema e))]
-      (if (#{:query :formData} in)
-        (assoc schema :allowEmptyValue true)
+      (condp contains? in
+        #{:query :formData} (assoc schema :allowEmptyValue true)
+        #{nil :body} (assoc schema :x-nullable true)
         schema)))
 
   schema.core.Both
@@ -262,11 +268,14 @@
   {:pre [(c/plain-map? schema)]}
   (let [properties (properties schema)
         additional-properties (additional-properties schema)
+        meta (json-schema-meta schema)
         required (->> (rsc/required-keys schema)
                       (filter (partial contains? properties))
                       seq)]
     (c/remove-empty-keys
-      {:type "object"
-       :properties properties
-       :additionalProperties additional-properties
-       :required required})))
+      (merge
+        meta
+        {:type "object"
+         :properties properties
+         :additionalProperties additional-properties
+         :required required}))))

@@ -1,5 +1,25 @@
 ## UNRELEASED
 
+* Map-schema swagger-metadata is set to target schema-object, not for the `$ref` of it, fixes [#96](https://github.com/metosin/ring-swagger/issues/96).
+* Better support for additional json-schema meta-data via `ring.swagger.json-schema/field`:
+
+```clj
+(s/defschema Required
+  (rsjs/field
+    {:name s/Str
+     :title s/Str
+     :address (rsjs/field
+                (rsjs/field s/Str {:description "description here"})
+                {:description "Streename"
+                 :example "Ankkalinna 1"})}
+    {:minProperties 1
+     :description "I'm required"
+     :example {:name "Iines"
+               :title "Ankka"}}))
+```
+
+* Better support for nillable fields via `x-nullable` [standard hack](https://github.com/OAI/OpenAPI-Specification/issues/229), fixes fixes [#97](https://github.com/metosin/ring-swagger/issues/97)
+
 * updated dependencies:
 
 ```clj
