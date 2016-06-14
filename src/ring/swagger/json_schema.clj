@@ -66,6 +66,9 @@
     (assoc m :collectionFormat (:collection-format options "multi"))
     m))
 
+(defn reference? [m]
+  (contains? m :$ref))
+
 (defn reference [e]
   (if-let [schema-name (s/schema-name e)]
     {:$ref (str "#/definitions/" schema-name)}
@@ -73,8 +76,8 @@
       (not-supported! e))))
 
 (defn merge-meta
-  [m x {no-meta ::no-meta key-meta :key-meta}]
-  (if-not no-meta
+  [m x {:keys [::no-meta :key-meta]}]
+  (if (and (not no-meta) (not (reference? m)))
     (merge (json-schema-meta x)
            (if key-meta (c/remove-empty-keys (select-keys key-meta [:default])))
            m)
@@ -264,11 +267,14 @@
   {:pre [(c/plain-map? schema)]}
   (let [properties (properties schema)
         additional-properties (additional-properties schema)
+        meta (json-schema-meta schema)
         required (->> (rsc/required-keys schema)
                       (filter (partial contains? properties))
                       seq)]
     (c/remove-empty-keys
-      {:type "object"
-       :properties properties
-       :additionalProperties additional-properties
-       :required required})))
+      (merge
+        meta
+        {:type "object"
+         :properties properties
+         :additionalProperties additional-properties
+         :required required}))))

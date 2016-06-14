@@ -377,3 +377,46 @@
 
 (fact "should validate full swagger 2 schema"
   (s/validate fs/Swagger a-complete-swagger) => a-complete-swagger)
+
+(s/defschema Required
+  (rsjs/field
+    {(s/optional-key :name) s/Str
+     (s/optional-key :title) s/Str
+     :address (rsjs/field
+                {:street (rsjs/field s/Str {:description "description here"})}
+                {:description "Streename"
+                 :example "Ankkalinna 1"})}
+    {:minProperties 1
+     :description "I'm required"
+     :example {:name "Iines"
+               :title "Ankka"}}))
+
+(fact "models with extra meta, #96"
+  (let [swagger {:paths {"/api" {:post {:parameters {:body Required}}}}}]
+
+    (swagger-json swagger) => (contains
+                                {:definitions {"Required" {:type "object"
+                                                           :description "I'm required"
+                                                           :example {:name "Iines"
+                                                                     :title "Ankka"}
+                                                           :minProperties 1
+                                                           :required [:address]
+                                                           :properties {:name {:type "string"}
+                                                                        :title {:type "string"}
+                                                                        :address {:$ref "#/definitions/RequiredAddress"}}
+                                                           :additionalProperties false}
+                                               "RequiredAddress" {:type "object"
+                                                                  :description "Streename"
+                                                                  :example "Ankkalinna 1"
+                                                                  :properties {:street {:type "string"
+                                                                                        :description "description here"}}
+                                                                  :required [:street]
+                                                                  :additionalProperties false}}
+                                 :paths {"/api" {:post {:parameters [{:description "I'm required"
+                                                                      :in "body"
+                                                                      :name "Required"
+                                                                      :required true
+                                                                      :schema {:$ref "#/definitions/Required"}}]
+                                                        :responses {:default {:description ""}}}}}})
+
+    (validate swagger) => nil))

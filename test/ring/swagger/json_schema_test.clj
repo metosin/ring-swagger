@@ -15,33 +15,33 @@
 
 (facts "type transformations"
   (facts "java types"
-    (->swagger Integer)   => {:type "integer" :format "int32"}
-    (->swagger Long)      => {:type "integer" :format "int64"}
-    (->swagger Double)    => {:type "number" :format "double"}
-    (->swagger Number)    => {:type "number" :format "double"}
-    (->swagger Symbol)    => {:type "string"}
-    (->swagger String)    => {:type "string"}
-    (->swagger Boolean)   => {:type "boolean"}
-    (->swagger Date)      => {:type "string" :format "date-time"}
-    (->swagger DateTime)  => {:type "string" :format "date-time"}
+    (->swagger Integer) => {:type "integer" :format "int32"}
+    (->swagger Long) => {:type "integer" :format "int64"}
+    (->swagger Double) => {:type "number" :format "double"}
+    (->swagger Number) => {:type "number" :format "double"}
+    (->swagger Symbol) => {:type "string"}
+    (->swagger String) => {:type "string"}
+    (->swagger Boolean) => {:type "boolean"}
+    (->swagger Date) => {:type "string" :format "date-time"}
+    (->swagger DateTime) => {:type "string" :format "date-time"}
     (->swagger LocalDate) => {:type "string" :format "date"}
-    (->swagger Pattern)   => {:type "string" :format "regex"}
-    (->swagger #"[6-9]")  => {:type "string" :pattern "[6-9]"}
-    (->swagger UUID)      => {:type "string" :format "uuid"})
+    (->swagger Pattern) => {:type "string" :format "regex"}
+    (->swagger #"[6-9]") => {:type "string" :pattern "[6-9]"}
+    (->swagger UUID) => {:type "string" :format "uuid"})
 
   (fact "schema types"
-    (->swagger s/Int)     => {:type "integer" :format "int64"}
-    (->swagger s/Str)     => {:type "string"}
-    (->swagger s/Symbol)  => {:type "string"}
-    (->swagger s/Inst)    => {:type "string" :format "date-time"}
-    (->swagger s/Num)     => {:type "number" :format "double"})
+    (->swagger s/Int) => {:type "integer" :format "int64"}
+    (->swagger s/Str) => {:type "string"}
+    (->swagger s/Symbol) => {:type "string"}
+    (->swagger s/Inst) => {:type "string" :format "date-time"}
+    (->swagger s/Num) => {:type "number" :format "double"})
 
   (fact "containers"
-    (->swagger [Long])    => {:type "array" :items {:format "int64" :type "integer"}}
-    (->swagger #{Long})   => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
+    (->swagger [Long]) => {:type "array" :items {:format "int64" :type "integer"}}
+    (->swagger #{Long}) => {:type "array" :items {:format "int64" :type "integer"} :uniqueItems true})
 
   (facts "nil"
-    (->swagger nil)       => nil)
+    (->swagger nil) => nil)
 
   (facts "unknowns"
     (fact "throw exception by default"
@@ -58,7 +58,7 @@
   (fact "schema predicates"
     (fact "s/enum"
       (->swagger (s/enum :kikka :kakka)) => {:type "string" :enum [:kikka :kakka]}
-      (->swagger (s/enum 1 2 3))         => {:type "integer" :format "int64" :enum (seq #{1 2 3})})
+      (->swagger (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum (seq #{1 2 3})})
 
     (fact "s/maybe"
       (fact "uses wrapped value by default"
@@ -72,30 +72,30 @@
         (->swagger (s/maybe Long) {:in :path}) => (->swagger Long)))
 
     (fact "s/both -> type of the first element"
-      (->swagger (s/both Long String))   => (->swagger Long))
+      (->swagger (s/both Long String)) => (->swagger Long))
 
     (fact "s/either -> type of the first element"
       (->swagger (s/either Long String)) => (->swagger Long))
 
     (fact "s/named -> type of schema"
-      (->swagger (s/named Long "long"))  => (->swagger Long))
+      (->swagger (s/named Long "long")) => (->swagger Long))
 
     (fact "s/one -> type of schema"
-      (->swagger [(s/one Long "s")])  => (->swagger [Long]))
+      (->swagger [(s/one Long "s")]) => (->swagger [Long]))
 
     (fact "s/recursive -> type of internal schema"
-      (->swagger (s/recursive #'Model))  => (->swagger #'Model))
+      (->swagger (s/recursive #'Model)) => (->swagger #'Model))
 
     (fact "s/eq -> type of class of value"
-      (->swagger (s/eq "kikka"))         => (->swagger String))
+      (->swagger (s/eq "kikka")) => (->swagger String))
 
     (fact "s/Any"
       (fact "defaults to nil"
-        (->swagger s/Any)                 => nil
-        (->swagger s/Any {:in :body})     => nil
-        (->swagger s/Any {:in :header})   => {:type "string"}
-        (->swagger s/Any {:in :path})     => {:type "string"}
-        (->swagger s/Any {:in :query})    => {:type "string", :allowEmptyValue true}
+        (->swagger s/Any) => nil
+        (->swagger s/Any {:in :body}) => nil
+        (->swagger s/Any {:in :header}) => {:type "string"}
+        (->swagger s/Any {:in :path}) => {:type "string"}
+        (->swagger s/Any {:in :query}) => {:type "string", :allowEmptyValue true}
         (->swagger s/Any {:in :formData}) => {:type "string", :allowEmptyValue true}))
 
     (fact "s/conditional"
@@ -156,7 +156,25 @@
   (fact "Describe Model"
     (let [schema (describe Model ..desc..)]
       (json-schema-meta schema) => {:description ..desc..}
-      (->swagger schema) => (contains {:description ..desc..}))))
+      (->swagger schema) =not=> (contains {:description ..desc..}))))
+
+(fact "field"
+  (fact "on maps"
+    (let [schema (s/schema-with-name
+                   (field {(s/optional-key :name) s/Str
+                           (s/optional-key :title) s/Str}
+                          {:minProperties 1})
+                   "schema")]
+
+      (fact "$ref's are stripped of extra metadata"
+        (->swagger schema) => {:$ref "#/definitions/schema"})
+
+      (fact "extra metadata is present on schema objects"
+        (schema-object schema) => (contains
+                                    {:properties {:name {:type "string"}
+                                                  :title {:type "string"}}
+                                     :minProperties 1
+                                     :additionalProperties false})))))
 
 (fact "leiPredicate evaluation"
   (tabular
@@ -215,19 +233,19 @@
 
   (fact "Keeps the order of properties intact"
     (keys (properties (linked/map :a String
-                                   :b String
-                                   :c String
-                                   :d String
-                                   :e String
-                                   :f String
-                                   :g String
-                                   :h String)))
+                                  :b String
+                                  :c String
+                                  :d String
+                                  :e String
+                                  :f String
+                                  :g String
+                                  :h String)))
     => [:a :b :c :d :e :f :g :h])
 
   (fact "Ordered-map works with sub-schemas"
     (properties (with-named-sub-schemas (linked/map :a String
-                                                     :b {:foo String}
-                                                     :c [{:bar String}])))
+                                                    :b {:foo String}
+                                                    :c [{:bar String}])))
     => anything)
 
   (fact "referenced record-schemas"
