@@ -53,6 +53,11 @@
 (defprotocol JsonSchema
   (convert [this options]))
 
+(defn not-supported! [e]
+  (throw (IllegalArgumentException.
+           (str "don't know how to convert " e " into a Swagger Schema. "
+                "Check out ring-swagger docs for details."))))
+
 (defn assoc-collection-format
   "Add collectionFormat to the JSON Schema if the parameter type
    is query or formData."
@@ -61,6 +66,12 @@
     (assoc m :collectionFormat (:collection-format options "multi"))
     m))
 
+(defn reference [e]
+  (if-let [schema-name (s/schema-name e)]
+    {:$ref (str "#/definitions/" schema-name)}
+    (if (not *ignore-missing-mappings*)
+      (not-supported! e))))
+
 (defn merge-meta
   [m x {no-meta ::no-meta key-meta :key-meta}]
   (if-not no-meta
@@ -68,11 +79,6 @@
            (if key-meta (c/remove-empty-keys (select-keys key-meta [:default])))
            m)
     m))
-
-(defn not-supported! [e]
-  (throw (IllegalArgumentException.
-           (str "don't know how to convert " e " into a Swagger Schema. "
-                "Check out ring-swagger docs for details."))))
 
 ;; Classes
 (defmethod convert-class java.lang.Integer       [_ _] {:type "integer" :format "int32"})
@@ -93,21 +99,17 @@
   (if-not *ignore-missing-mappings*
     (not-supported! e)))
 
-;; Schemas
+;;
 ;; Convert the most common predicates by mapping fn to Class
 ;;
+
 (def predicate-name-to-class {'integer? java.lang.Long
                               'keyword? clojure.lang.Keyword
                               'symbol? clojure.lang.Symbol})
 
-(defn reference [e]
-  (if-let [schema-name (s/schema-name e)]
-    {:$ref (str "#/definitions/" schema-name)}
-    (and (not *ignore-missing-mappings*)
-         (not-supported! e))))
-
 (defn ->swagger
-  ([x] (->swagger x {}))
+  ([x]
+   (->swagger x {}))
   ([x options]
    (-> x
        (convert options)
