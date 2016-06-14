@@ -61,13 +61,14 @@
       (->swagger (s/enum 1 2 3)) => {:type "integer" :format "int64" :enum (seq #{1 2 3})})
 
     (fact "s/maybe"
-      (fact "uses wrapped value by default"
-        (->swagger (s/maybe Long)) => (->swagger Long))
+      (fact "uses wrapped value by default with x-nullable true"
+        (->swagger (s/maybe Long)) => (assoc (->swagger Long) :x-nullable true))
       (fact "adds allowEmptyValue when for query and formData as defined by the spec"
         (->swagger (s/maybe Long) {:in :query}) => (assoc (->swagger Long) :allowEmptyValue true)
         (->swagger (s/maybe Long) {:in :formData}) => (assoc (->swagger Long) :allowEmptyValue true))
+      (fact "uses wrapped value by default with x-nullable true with body"
+        (->swagger (s/maybe Long) {:in :body}) => (assoc (->swagger Long) :x-nullable true))
       (fact "uses wrapped value for other parameters"
-        (->swagger (s/maybe Long) {:in :body}) => (->swagger Long)
         (->swagger (s/maybe Long) {:in :header}) => (->swagger Long)
         (->swagger (s/maybe Long) {:in :path}) => (->swagger Long)))
 

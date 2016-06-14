@@ -161,8 +161,9 @@
   schema.core.Maybe
   (convert [e {:keys [in]}]
     (let [schema (->swagger (:schema e))]
-      (if (#{:query :formData} in)
-        (assoc schema :allowEmptyValue true)
+      (condp contains? in
+        #{:query :formData} (assoc schema :allowEmptyValue true)
+        #{nil :body} (assoc schema :x-nullable true)
         schema)))
 
   schema.core.Both

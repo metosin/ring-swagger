@@ -379,7 +379,8 @@
 (fact "recursive"
   (transform-models [Foo Bar] +options+)
   => {"Bar" {:type "object"
-             :properties {:foo {:$ref "#/definitions/Foo"}}
+             :properties {:foo {:$ref "#/definitions/Foo"
+                                :x-nullable true}}
              :additionalProperties false
              :required [:foo]}
       "Foo" {:type "object"
