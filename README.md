@@ -378,17 +378,47 @@ coerced value of slingshots an Map with type `:ring.swagger.schema/validation`. 
 
 ## Adding description to Schemas
 
-One can add extra meta-data, including descriptions to schema elements using `ring.swagger.schema/field` and `ring.swagger.schema/describe` functions. These work by adding meta-data to schema under `:json-schema`-key. Objects which don't support meta-data, like Java classes, are wrapped into `s/both`.
+One can add extra meta-data, including descriptions to schema elements using `ring.swagger.json-schema/field` and `ring.swagger.json-schema/describe` functions. These work by adding meta-data to schema under `:json-schema`-key. Objects which don't natively support meta-data, like Java classes, are wrapped automatically into `ring.swagger.json-schema/FieldSchema` to enable the meta-data.
+
+### Example
 
 ```clojure
 (require '[schema.core :as s])
 (require '[ring.swagger.schema :as rs])
 (require '[ring.swagger.json-schema :as rjs])
 
-(s/defschema Customer {:id Long, :name (rs/describe String "the name")})
+(s/defschema Required
+  (rjs/field
+    {(s/optional-key :name) s/Str
+     (s/optional-key :title) s/Str
+     :address (rjs/field
+                {:street (rsjs/field s/Str {:description "description here"})}
+                {:description "Streename"
+                 :example "Ankkalinna 1"})}
+    {:minProperties 1
+     :description "I'm required"
+     :example {:name "Iines"
+               :title "Ankka"}}))
 
-(rjs/json-schema-meta (describe Customer "The Customer"))
-; => {:description "The Customer"})
+; produces the following JSON Schema models =>
+;
+; {"Required" {:type "object"
+;              :description "I'm required"
+;              :example {:name "Iines"
+;                        :title "Ankka"}
+;              :minProperties 1
+;              :required [:address]
+;              :properties {:name {:type "string"}
+;                           :title {:type "string"}
+;                           :address {:$ref "#/definitions/RequiredAddress"}}
+;              :additionalProperties false}
+;  "RequiredAddress" {:type "object"
+;                     :description "Streename"
+;                     :example "Ankkalinna 1"
+;                     :properties {:street {:type "string"
+;                                           :description "description here"}}
+;                     :required [:street]
+;                     :additionalProperties false}}
 ```
 
 ## License

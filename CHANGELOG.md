@@ -1,4 +1,4 @@
-## UNRELEASED
+## 0.22.9 (14.5.2016)
 
 * Map-schema swagger-metadata is set to target schema-object, not for the `$ref` of it, fixes [#96](https://github.com/metosin/ring-swagger/issues/96).
 * Better support for additional json-schema meta-data via `ring.swagger.json-schema/field`:
