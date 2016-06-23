@@ -1,3 +1,9 @@
+## UNRELEASED
+
+```clj
+[cheshire "5.6.2"] is available but we use "5.6.1"
+```
+
 ## 0.22.9 (14.6.2016)
 
 * Map-schema swagger-metadata is set to target schema-object, not for the `$ref` of it, fixes [#96](https://github.com/metosin/ring-swagger/issues/96).
