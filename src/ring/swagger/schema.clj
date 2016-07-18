@@ -44,3 +44,6 @@
       (if (error? result)
         (throw+ (assoc result :type ::validation))
         result))))
+
+(defn class-schema [klass]
+  (s/schema-with-name (:schema (su/class-schema klass)) (.getSimpleName klass)))
