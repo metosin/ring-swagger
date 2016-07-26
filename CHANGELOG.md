@@ -3,6 +3,8 @@
 ```clj
 [cheshire "5.6.3"] is available but we use "5.6.1"
 [metosin/ring-http-response "0.8.0"] is available but we use "0.7.0"
+[prismatic/schema "1.1.3"] is available but we use "1.1.2"
+[frankiesardo/linked "1.2.7"] is available but we use "1.2.6"
 ```
 
 ## 0.22.9 (14.6.2016)
