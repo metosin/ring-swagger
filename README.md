@@ -20,7 +20,7 @@
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
 - [fnhouse-swagger](https://github.com/metosin/fnhouse-swagger) for fnhouse
-- [route-swagger](https://github.com/frankiesardo/route-swagger) for Pedastal
+- [route-swagger](https://github.com/frankiesardo/route-swagger) for Pedestal
 - [yada](https://github.com/juxt/yada)
 - [kekkonen](https://github.com/metosin/kekkonen)
 
