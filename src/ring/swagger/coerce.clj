@@ -127,12 +127,22 @@
       (date-matcher schema)
       (pattern-matcher schema)))
 
+(def collection-format-split-regex
+  {"csv" #","
+   "ssv" #" "
+   "tsv" #"\t"
+   "pipes" #"\|"})
+
 (defn split-params-matcher [schema]
   (if (or (and (coll? schema) (not (record? schema))))
-    (fn [x]
-      (if (string? x)
-        (string/split x #",")
-        x))))
+    ;; FIXME: Can't use json-schema/json-schema-meta because of cyclic dependency
+    (let [collection-format (:collectionFormat (:json-schema (meta schema)) "csv")
+          split-regex (get collection-format-split-regex collection-format)]
+      (if split-regex
+        (fn [x]
+          (if (string? x)
+            (string/split x split-regex)
+            x))))))
 
 (defn multi-params-matcher
   "If only one parameter is provided to multi param, ring
@@ -148,7 +158,7 @@
 (defn query-schema-coercion-matcher
   [schema]
   (or (query-coercions schema)
-      ; (split-params-matcher schema)
+      (split-params-matcher schema)
       (multi-params-matcher schema)
       (json-schema-coercion-matcher schema)))
 

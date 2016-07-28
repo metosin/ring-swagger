@@ -118,7 +118,14 @@
     (fact "s/cond-pre"
       (->swagger (s/cond-pre Model [s/Str]))
       => {:type "void" :oneOf [(->swagger Model) (->swagger [s/Str])]})
-    ))
+    )
+
+  (fact "collection format"
+    (->swagger (field [Long] {:collectionFormat "multi"})) => {:type "array" :items {:format "int64" :type "integer"} :collectionFormat "multi"}
+    (->swagger (field [Long] {:collectionFormat "csv"})) => {:type "array" :items {:format "int64" :type "integer"} :collectionFormat "csv"}
+    (->swagger (field [Long] {:collectionFormat "ssv"})) => {:type "array" :items {:format "int64" :type "integer"} :collectionFormat "ssv"}
+    (->swagger (field [Long] {:collectionFormat "tsv"})) => {:type "array" :items {:format "int64" :type "integer"} :collectionFormat "tsv"}
+    (->swagger (field [Long] {:collectionFormat "pipes"})) => {:type "array" :items {:format "int64" :type "integer"} :collectionFormat "pipes"}))
 
 (fact "Optional-key default metadata"
   (properties {(with-meta (s/optional-key :foo) {:default "bar"}) s/Str})

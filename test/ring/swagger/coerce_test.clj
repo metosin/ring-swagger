@@ -1,7 +1,9 @@
 (ns ring.swagger.coerce-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
+            [schema.coerce :as sc]
             [ring.swagger.coerce :as rsc]
+            [ring.swagger.json-schema :as json-schema]
             [schema.coerce :as sc])
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date UUID]))
@@ -52,3 +54,22 @@
       ((coerce UUID) #uuid "77e70512-1337-dead-beef-0123456789ab") => #uuid "77e70512-1337-dead-beef-0123456789ab"
       ((coerce UUID) "77e70512-1337-dead-beef-0123456789ab") => #uuid "77e70512-1337-dead-beef-0123456789ab"
       ((coerce UUID) "invalid") => "invalid")))
+
+(fact "collection-format coercions"
+  (let [coercer #(sc/coercer % rsc/query-schema-coercion-matcher)]
+
+    (fact "multi"
+      ((coercer (json-schema/field [s/Int] {:collectionFormat "multi"})) ["1" "2"]) => [1 2])
+
+    (fact "csv"
+      ((coercer (json-schema/field [s/Int] {:collectionFormat "csv"})) "1,2") => [1 2])
+
+    (fact "ssv"
+      ((coercer (json-schema/field [s/Int] {:collectionFormat "ssv"})) "1 2") => [1 2])
+
+    (fact "tsv"
+      ((coercer (json-schema/field [s/Int] {:collectionFormat "tsv"})) "1\t2") => [1 2])
+
+    (fact "pipes"
+      ((coercer (json-schema/field [s/Int] {:collectionFormat "pipes"})) "1|2") => [1 2])
+    ))
