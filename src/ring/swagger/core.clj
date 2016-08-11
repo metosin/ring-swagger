@@ -42,8 +42,8 @@
     ((fn walk [x]
        (stw/walk
          (fn [x]
-           (if (and (common/plain-map? x) (s/schema-name x))
-             (do (if-not @it (reset! it x)) x)
+           (if (common/title x)
+             (do (if-not @it (reset! it (common/titled x))) x)
              (walk x)))
          identity
          x)) [schema])

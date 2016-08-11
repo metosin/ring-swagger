@@ -1,6 +1,5 @@
 (ns ring.swagger.json-schema
   (:require [schema.core :as s]
-            [schema.utils :as su]
             [schema.spec.core :as spec]
             [schema.spec.variant :as variant]
             [ring.swagger.common :as common]
@@ -134,9 +133,6 @@
        :items (->swagger (first e) (assoc options ::no-meta true))}
       (assoc-collection-format options)))
 
-(defn- record-schema [x]
-  (some-> x su/class-schema :schema (with-meta {:title (.getSimpleName x)})))
-
 (extend-protocol JsonSchema
 
   Object
@@ -145,7 +141,7 @@
 
   Class
   (convert [e options]
-    (if-let [schema (record-schema e)]
+    (if-let [schema (common/record-schema e)]
       (schema-object schema)
       (convert-class e options)))
 
@@ -272,19 +268,20 @@
 (defn schema-object
   "Returns a JSON Schema object of a plain map schema."
   [schema]
-  {:pre [(common/plain-map? schema)]}
-  (let [properties (properties schema)
-        title (or (s/schema-name schema) (-> schema meta :title))
-        additional-properties (additional-properties schema)
-        meta (json-schema-meta schema)
-        required (->> (rsc/required-keys schema)
-                      (filter (partial contains? properties))
-                      seq)]
-    (common/remove-empty-keys
-      (merge
-        meta
-        {:type "object"
-         :title title
-         :properties properties
-         :additionalProperties additional-properties
-         :required required}))))
+  (if (common/plain-map? schema)
+    (let [properties (properties schema)
+          title (if (not (s/schema-name schema)) (common/title schema))
+          additional-properties (additional-properties schema)
+          meta (json-schema-meta schema)
+          required (some->> (rsc/required-keys schema)
+                            (filter (partial contains? properties))
+                            seq
+                            vec)]
+      (common/remove-empty-keys
+        (merge
+          meta
+          {:type "object"
+           :title title
+           :properties properties
+           :additionalProperties additional-properties
+           :required required})))))
