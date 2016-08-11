@@ -1,10 +1,10 @@
 (ns ring.swagger.middleware
   (:require [slingshot.slingshot :refer [try+ throw+]]
             [schema.utils :as su]
-            [ring.swagger.common :refer [deep-merge]]
-            [plumbing.core :refer [for-map]]
-            [clojure.walk :refer :all]
-            [ring.util.http-response :refer [bad-request]])
+            [plumbing.core :as p]
+            [clojure.walk :as walk]
+            [ring.util.http-response :as http-response]
+            [ring.swagger.common :as common])
   (:import (schema.utils ValidationError)))
 
 ;;
@@ -16,7 +16,7 @@
   By default, deep-merges gives data in. Data
   can be read with get-swagger-data."
   ([request data]
-   (set-swagger-data request deep-merge data))
+   (set-swagger-data request common/deep-merge data))
   ([request f & data]
    (update-in request [::data] (partial apply f) data)))
 
@@ -41,11 +41,11 @@
     (apply mw (concat [handler] base-params params))))
 
 (defn stringify-error [error]
-  (postwalk
+  (walk/postwalk
     (fn [x]
       (if-not (map? x)
         x
-        (for-map [[k v] x]
+        (p/for-map [[k v] x]
           k (cond
               (instance? ValidationError v) (str (su/validation-error-explain v))
               (symbol? v) (str v)
@@ -53,7 +53,7 @@
     error))
 
 (defn default-error-handler [{:keys [error]}]
-  (bad-request {:errors (stringify-error error)}))
+  (http-response/bad-request {:errors (stringify-error error)}))
 
 (defn wrap-validation-errors
   "Middleware that catches thrown ring-swagger validation errors turning them

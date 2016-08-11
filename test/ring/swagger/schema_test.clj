@@ -3,14 +3,13 @@
             [schema.core :as s]
             [cheshire.core :as cheshire]
             [clj-time.core :as t]
-            [ring.swagger.schema :refer :all]
-            [ring.swagger.common :refer :all]
+            [ring.swagger.schema :as schema]
             ring.swagger.json)
-  (:import  [java.util Date UUID]
-            [java.util.regex Pattern]
-            [org.joda.time DateTime LocalDate]))
+  (:import [java.util Date UUID]
+           [java.util.regex Pattern]
+           [org.joda.time DateTime LocalDate]))
 
-(s/defschema SubType  {:alive Boolean})
+(s/defschema SubType {:alive Boolean})
 (s/defschema AllTypes
   {:a Boolean
    :b Double
@@ -54,7 +53,7 @@
   (update-in model [:e :v] str))
 
 (fact "All types can be read from json"
-  (let [json   (cheshire/generate-string model)
+  (let [json (cheshire/generate-string model)
         jmodel (cheshire/parse-string json true)]
 
     (fact "json can be parsed"
@@ -65,62 +64,62 @@
       jmodel =not=> model)
 
     (fact "coerce! makes models match"
-      (pattern-to-str (coerce! AllTypes jmodel)) => model)))
+      (pattern-to-str (schema/coerce! AllTypes jmodel)) => model)))
 
 (fact "date-time coercion"
   (fact "with millis"
-    (coerce! {:d Date} {:d "2014-02-24T21:37:40.477Z"}) =not=> (throws Exception))
+    (schema/coerce! {:d Date} {:d "2014-02-24T21:37:40.477Z"}) =not=> (throws Exception))
   (fact "without millis"
-    (coerce! {:d Date} {:d "2014-02-24T21:37:40Z"}) =not=> (throws Exception)))
+    (schema/coerce! {:d Date} {:d "2014-02-24T21:37:40Z"}) =not=> (throws Exception)))
 
 (fact "named-schema"
 
   (fact "schema is named"
     (s/defschema AbbaSchema {:s String})
-    AbbaSchema => named-schema?)
+    AbbaSchema => schema/named-schema?)
 
   (fact "def is not named"
     (def AbbaDef {:s String})
-    AbbaDef =not=> named-schema?))
+    AbbaDef =not=> schema/named-schema?))
+
+(s/defschema MapModel {:a String})
 
 (fact "coercion"
   (let [valid {:a "kikka"}
         invalid {}]
 
-    (s/defschema MapModel {:a String})
-
     (fact "coerce works for both models and schemas"
-      (coerce MapModel valid) => valid
-      (coerce {:a String} valid) => valid
+      (schema/coerce MapModel valid) => valid
+      (schema/coerce {:a String} valid) => valid
 
-      (coerce MapModel invalid) => error?
-      (coerce {:a String} invalid) => error?)
+      (schema/coerce MapModel invalid) => schema/error?
+      (schema/coerce {:a String} invalid) => schema/error?)
 
     (fact "coerce! works for both models and schemas"
-      (coerce! MapModel valid) => valid
-      (coerce! {:a String} valid) => valid
+      (schema/coerce! MapModel valid) => valid
+      (schema/coerce! {:a String} valid) => valid
 
-      (coerce! MapModel invalid) => (throws clojure.lang.ExceptionInfo)
-      (coerce! {:a String} invalid) => (throws clojure.lang.ExceptionInfo))
+      (schema/coerce! MapModel invalid) => (throws clojure.lang.ExceptionInfo)
+      (schema/coerce! {:a String} invalid) => (throws clojure.lang.ExceptionInfo))
 
     (fact "both runs all predicates"
       (let [OddModel (s/both Long (s/pred odd? 'odd?))]
-        (coerce OddModel 1) => 1
-        (coerce OddModel 2) => error?))))
+        (schema/coerce OddModel 1) => 1
+        (schema/coerce OddModel 2) => schema/error?))))
 
 (facts "schema coercion"
   (let [Schema {:a Long :b Double :c Boolean :d s/Keyword :u UUID}
-        value  {:a "1"  :b "2.2"  :c "true"  :d "kikka" :u "77e70512-1337-dead-beef-0123456789ab"}
-        target {:a 1    :b 2.2    :c true    :d :kikka  :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}]
+        value {:a "1" :b "2.2" :c "true" :d "kikka" :u "77e70512-1337-dead-beef-0123456789ab"}
+        target {:a 1 :b 2.2 :c true :d :kikka :u (UUID/fromString "77e70512-1337-dead-beef-0123456789ab")}]
 
     (fact ":query coercion can convert string to Longs, Doubles, Booleans and UUIDs"
-      (coerce! Schema value :query) => target)
+      (schema/coerce! Schema value :query) => target)
 
     (fact ":json coercion cant convert string to Longs,Doubles, Booleans and UUIDs"
-      (coerce! Schema value :json) => (throws Exception))
+      (schema/coerce! Schema value :json) => (throws Exception))
 
     (fact "custom coersion"
-      (coerce! {:a String :b String}
+      (schema/coerce! {:a String :b String}
                {:a "kikka" :b "kukka"}
                (fn [_]
                  (fn [x]

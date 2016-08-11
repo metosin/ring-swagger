@@ -1,11 +1,11 @@
 (ns ring.swagger.upload
-  (:require [potemkin :refer [import-vars]]
+  (:require [potemkin]
             [ring.middleware.multipart-params]
             [ring.swagger.json-schema :as js]
             [schema.core :as s])
   (:import [java.io File]))
 
-(import-vars
+(potemkin/import-vars
   [ring.middleware.multipart-params
 
    wrap-multipart-params])

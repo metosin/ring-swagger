@@ -1,11 +1,11 @@
 (ns ring.swagger.swagger2
   (:require [clojure.string :as str]
             [schema.core :as s]
-            [plumbing.core :refer [for-map]]
-            [ring.swagger.common :refer :all]
-            [ring.swagger.json-schema :as jsons]
+            [plumbing.core :as p]
+            [ring.swagger.common :as common]
+            [ring.swagger.json-schema :as rsjs]
             [ring.swagger.core :as rsc]
-            [ring.swagger.swagger2-schema :as schema]))
+            [ring.swagger.swagger2-schema :as swagger2-schema]))
 
 ;;
 ;; Schema transformations
@@ -29,7 +29,7 @@
   (->> schemas
        rsc/collect-models
        (rsc/handle-duplicate-schemas (:handle-duplicate-schemas-fn options))
-       (map (juxt (comp str key) (comp jsons/schema-object val)))
+       (map (juxt (comp str key) (comp rsjs/schema-object val)))
        (into (sorted-map))))
 
 ;;
@@ -40,19 +40,19 @@
 
 (defmethod extract-parameter :body [_ model options]
   (if-let [schema (rsc/peek-schema model)]
-    (let [schema-json (jsons/->swagger model options)]
+    (let [schema-json (rsjs/->swagger model options)]
       (vector {:in "body"
                :name (name (s/schema-name schema))
-               :description (or (:description (jsons/json-schema-meta schema)) "")
-               :required (not (jsons/maybe? model))
+               :description (or (:description (rsjs/json-schema-meta schema)) "")
+               :required (not (rsjs/maybe? model))
                :schema schema-json}))))
 
 (defmethod extract-parameter :default [in model options]
   (if model
-    (for [[k v] (-> model value-of rsc/strict-schema)
+    (for [[k v] (-> model common/value-of rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
-                json-schema (jsons/->swagger v options)]
+                json-schema (rsjs/->swagger v options)]
           :when json-schema]
       (merge
         {:in (name in)
@@ -75,17 +75,17 @@
                    parameters)))
 
 (defn convert-responses [responses options]
-  (let [responses (for-map [[k v] responses
-                            :let [{:keys [schema headers]} v]]
+  (let [responses (p/for-map [[k v] responses
+                              :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] jsons/->swagger options))
+                          (cond-> schema (update-in [:schema] rsjs/->swagger options))
                           (cond-> headers (update-in [:headers] (fn [headers]
                                                                   (if headers
                                                                     (->> (for [[k v] headers]
-                                                                           [k (jsons/->swagger v options)])
+                                                                           [k (rsjs/->swagger v options)])
                                                                          (into {}))))))
                           (update-in [:description] #(or % (default-response-description k options)))
-                          remove-empty-keys))]
+                          common/remove-empty-keys))]
     (if-not (empty? responses)
       responses
       {:default {:description ""}})))
@@ -95,9 +95,9 @@
    maps with parameters and responses transformed to comply
    with Swagger spec as values"
   [operation options]
-  (for-map [[k v] operation]
+  (p/for-map [[k v] operation]
     k (-> v
-          (update-in-or-remove-key [:parameters] #(convert-parameters % options) empty?)
+          (common/update-in-or-remove-key [:parameters] #(convert-parameters % options) empty?)
           (update-in [:responses] convert-responses options))))
 
 (defn swagger-path
@@ -189,7 +189,7 @@
 ;; Swagger Spec
 ;;
 
-(def Swagger schema/Swagger)
+(def Swagger swagger2-schema/Swagger)
 
 (def Options {(s/optional-key :ignore-missing-mappings?) s/Bool
               (s/optional-key :default-response-description-fn) (s/=> s/Str s/Int)
@@ -227,11 +227,11 @@
   ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
   ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
     (let [options (merge option-defaults options)]
-      (binding [jsons/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
+      (binding [rsjs/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
         (let [[paths definitions] (-> swagger
                                       ensure-body-and-response-schema-names
                                       (extract-paths-and-definitions options))]
-          (deep-merge
+          (common/deep-merge
             swagger-defaults
             (-> swagger
                 (assoc :paths paths)

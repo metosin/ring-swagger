@@ -2,7 +2,7 @@
   (:require [schema.core :as s]
             [schema.spec.core :as spec]
             [schema.spec.variant :as variant]
-            [ring.swagger.common :as c]
+            [ring.swagger.common :as common]
             [ring.swagger.core :as rsc]))
 
 (defn maybe? [schema]
@@ -79,7 +79,7 @@
   [m x {:keys [::no-meta :key-meta]}]
   (if (and (not no-meta) (not (reference? m)))
     (merge (json-schema-meta x)
-           (if key-meta (c/remove-empty-keys (select-keys key-meta [:default])))
+           (if key-meta (common/remove-empty-keys (select-keys key-meta [:default])))
            m)
     m))
 
@@ -241,7 +241,7 @@
   Thus linked/map should keep the order of items. Returnes nil
   if no properties are found."
   [schema]
-  {:pre [(c/plain-map? schema)]}
+  {:pre [(common/plain-map? schema)]}
   (let [props (into (empty schema)
                     (for [[k v] schema
                           :when (s/specific-key? k)
@@ -256,7 +256,7 @@
   "Generates json-schema additional properties from a plain map
   schema from under key s/Keyword."
   [schema]
-  {:pre [(c/plain-map? schema)]}
+  {:pre [(common/plain-map? schema)]}
   (if-let [extra-key (s/find-extra-keys-schema schema)]
     (let [v (get schema extra-key)]
       (try->swagger v s/Keyword nil))
@@ -265,14 +265,14 @@
 (defn schema-object
   "Returns a JSON Schema object of a plain map schema."
   [schema]
-  {:pre [(c/plain-map? schema)]}
+  {:pre [(common/plain-map? schema)]}
   (let [properties (properties schema)
         additional-properties (additional-properties schema)
         meta (json-schema-meta schema)
         required (->> (rsc/required-keys schema)
                       (filter (partial contains? properties))
                       seq)]
-    (c/remove-empty-keys
+    (common/remove-empty-keys
       (merge
         meta
         {:type "object"

@@ -1,7 +1,7 @@
 (ns ring.swagger.ui-test
   (:require [midje.sweet :refer :all]
             [ring.mock.request :as mock]
-            [ring.swagger.test-utils :refer :all]
+            [ring.swagger.test-utils :as test-utils]
             [ring.swagger.ui :refer :all]
             [cheshire.core :as json]))
 
@@ -64,7 +64,7 @@
     ;; - uri will contain full path
     ;; - servlet context countains ServletContext object
     ;; - context contains context path (under compojure this will also contain compojure context)
-    (let [fake-context  (fake-servlet-context "/servlet")]
+    (let [fake-context  (test-utils/fake-servlet-context "/servlet")]
       (fact "(swagger-ui)"
         (GET (swagger-ui) "/servlet" :context "/servlet" :servlet-context fake-context) => (redirect? "/servlet/index.html"))
       (fact "(swagger-ui \"/docs\")"

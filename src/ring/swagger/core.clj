@@ -3,7 +3,6 @@
   (:require [clojure.string :as str]
             [clojure.walk :as walk]
             [schema.core :as s]
-            [plumbing.core :refer :all]
 
             ; the json-encoders are registered in ring.swagger.json
             ; there are client projects depending on ring.swagger.core ns to get the json encodings
@@ -11,10 +10,9 @@
             ; FIXME: global side effects -> separate import with 1.0
             ring.swagger.json
 
-            [ring.swagger.common :refer :all]
+            [ring.swagger.common :as common]
             [schema-tools.walk :as stw]
             [linked.core :as linked]
-            [clojure.string :as string]
             [org.tobereplaced.lettercase :as lc]))
 
 ;;
@@ -44,7 +42,7 @@
     ((fn walk [x]
        (stw/walk
          (fn [x]
-           (if (and (plain-map? x) (s/schema-name x))
+           (if (and (common/plain-map? x) (s/schema-name x))
              (do (if-not @it (reset! it x)) x)
              (walk x)))
          identity
@@ -74,7 +72,7 @@
                    (gensym (pr-str (key x))))) (val x))]
         (name-schemas names x)))
     (fn [x]
-      (if (plain-map? x)
+      (if (common/plain-map? x)
         (if-not (s/schema-name x)
           (vary-meta x assoc :name (full-name names))
           x)
@@ -99,7 +97,7 @@
   (let [schemas (atom {})]
     (walk/prewalk
       (fn [x]
-        (when-let [schema-name (and (plain-map? x) (s/schema-name x))]
+        (when-let [schema-name (and (common/plain-map? x) (s/schema-name x))]
           (let [schema (if (var? x) @x x)]
             (swap!
               schemas update-in [schema-name]
@@ -123,7 +121,7 @@
       (IllegalArgumentException.
         (str
           "Looks like you're trying to define two models with the same name ("
-          schema-name "), but different values:\n\n" (string/join "\n\n" values) "\n\n"
+          schema-name "), but different values:\n\n" (str/join "\n\n" values) "\n\n"
           "There is no way to create valid api docs with this setup. You may have
           multiple namespaces defining same Schema names or you have created copies"
           "of the scehmas with clojure.core fn's like \"select-keys\". Please check"

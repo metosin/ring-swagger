@@ -1,5 +1,5 @@
 (ns ring.swagger.common
-  (:require [plumbing.core :refer [dissoc-in]]))
+  (:require [plumbing.core :as p]))
 
 (defn remove-empty-keys
   "Removes empty properties with nil value from a map"
@@ -46,7 +46,7 @@
     (let [v (f (get-in m ks))]
       (if-not (iff v)
         (assoc-in m ks v)
-        (dissoc-in m ks)))))
+        (p/dissoc-in m ks)))))
 
 (defn deep-merge
   "Recursively merges maps.

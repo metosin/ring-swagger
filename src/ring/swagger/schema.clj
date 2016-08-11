@@ -2,15 +2,15 @@
   (:require [schema.core :as s]
             [schema.coerce :as sc]
             [schema.utils :as su]
-            [potemkin :refer [import-vars]]
-            [slingshot.slingshot :refer [throw+]]
-            [ring.swagger.common :refer :all]
+            [potemkin]
+            [slingshot.slingshot :as slingshot]
+            [ring.swagger.common :as common]
             [ring.swagger.coerce :as coerce]
             ring.swagger.json-schema))
 
-(import-vars [ring.swagger.json-schema
-              field
-              describe])
+(potemkin/import-vars [ring.swagger.json-schema
+                       field
+                       describe])
 
 (defn error?
   "Checks whether input is an Schema error."
@@ -28,8 +28,8 @@
    defaults to :json"
   ([schema value] (coerce schema value :json))
   ([schema value type]
-    (let [coercer (if (keyword? type) (coerce/coercer type) type)]
-      ((sc/coercer (value-of schema) coercer) value))))
+   (let [coercer (if (keyword? type) (coerce/coercer type) type)]
+     ((sc/coercer (common/value-of schema) coercer) value))))
 
 (defn coerce!
   "Coerces a value against a schema using a given coerser. If no errors,
@@ -40,7 +40,7 @@
    defaults to :json"
   ([schema value] (coerce! schema value :json))
   ([schema value type]
-    (let [result (coerce schema value type)]
-      (if (error? result)
-        (throw+ (assoc result :type ::validation))
-        result))))
+   (let [result (coerce schema value type)]
+     (if (error? result)
+       (slingshot/throw+ (assoc result :type ::validation))
+       result))))

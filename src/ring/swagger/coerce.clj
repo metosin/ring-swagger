@@ -1,10 +1,9 @@
 (ns ring.swagger.coerce
   (:require [schema.core :as s]
             [schema.coerce :as sc]
-            [clojure.string :as string]
+            [clojure.string :as str]
             [clj-time.format :as tf]
-            [clj-time.coerce :as tc]
-            [ring.swagger.common :refer :all])
+            [clj-time.coerce :as tc])
   (:import [org.joda.time LocalDate DateTime]
            [java.util Date UUID]
            [java.util.regex Pattern]
@@ -131,7 +130,7 @@
   (if (or (and (coll? schema) (not (record? schema))))
     (fn [x]
       (if (string? x)
-        (string/split x #",")
+        (str/split x #",")
         x))))
 
 (defn multi-params-matcher

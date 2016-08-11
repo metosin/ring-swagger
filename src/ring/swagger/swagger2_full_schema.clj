@@ -26,34 +26,34 @@
     "valid URL"))
 
 (s/defschema ExternalDocs
-  {:url               URL
+  {:url URL
    (opt :description) s/Str})
 
 (s/defschema Contact
-  {(opt :name)  s/Str
-   (opt :url)   URL
+  {(opt :name) s/Str
+   (opt :url) URL
    (opt :email) (s/both (length-greater 5) (matches #".*@.*"))
-   X-           s/Any})
+   X- s/Any})
 
 (s/defschema License
-  {:name      s/Str
+  {:name s/Str
    (opt :url) URL
-   X-         s/Any})
+   X- s/Any})
 
 (s/defschema Info
-  {:version              s/Str
-   :title                s/Str
-   (opt :description)    s/Str
+  {:version s/Str
+   :title s/Str
+   (opt :description) s/Str
    (opt :termsOfService) s/Str
-   (opt :contact)        Contact
-   (opt :license)        License
-   X-                    s/Any})
+   (opt :contact) Contact
+   (opt :license) License
+   X- s/Any})
 
 (s/defschema Tag
-  {:name               s/Str
-   (opt :description)  s/Str
+  {:name s/Str
+   (opt :description) s/Str
    (opt :externalDocs) ExternalDocs
-   X-                  s/Any})
+   X- s/Any})
 
 (s/defschema Scheme
   (s/enum :http :https :ws :wss
@@ -72,16 +72,16 @@
   {s/Any s/Any})                                            ;;TODO - http://swagger.io/specification/#exampleObject
 
 (s/defschema Response
-  {:description    s/Str
-   (opt :schema)   Schema
-   (opt :headers)  Headers
+  {:description s/Str
+   (opt :schema) Schema
+   (opt :headers) Headers
    (opt :examples) Example
-   X-              s/Any})
+   X- s/Any})
 
 (s/defschema Responses
   s/Any                                                     ;;TODO - http://swagger.io/specification/#responsesObject
   #_{(s/either (s/eq :default) s/Int) (s/maybe {:s s/Str})
-     #"x-"                            {:t s/Str}})
+     #"x-" {:t s/Str}})
 
 (s/defschema ResponsesDefinitions
   {s/Any Response})
@@ -96,27 +96,27 @@
   {s/Keyword [s/Str]})
 
 (s/defschema Operation
-  {(opt :tags)         [(s/either s/Str s/Keyword)]
-   (opt :summary)      s/Str
-   (opt :description)  s/Str
+  {(opt :tags) [(s/either s/Str s/Keyword)]
+   (opt :summary) s/Str
+   (opt :description) s/Str
    (opt :externalDocs) ExternalDocs
-   (opt :operationId)  s/Str
-   (opt :consumes)     [s/Str]
-   (opt :produces)     [s/Str]
-   (opt :parameters)   ParametersDefinitions
-   (opt :responses)    Responses
-   (opt :schemes)      [Scheme]
-   (opt :security)     [SecurityRequirement]
-   X-                  s/Any})
+   (opt :operationId) s/Str
+   (opt :consumes) [s/Str]
+   (opt :produces) [s/Str]
+   (opt :parameters) ParametersDefinitions
+   (opt :responses) Responses
+   (opt :schemes) [Scheme]
+   (opt :security) [SecurityRequirement]
+   X- s/Any})
 
 (s/defschema PathItem
-  {(opt :get)        Operation
-   (opt :put)        Operation
-   (opt :post)       Operation
-   (opt :delete)     Operation
-   (opt :options)    Operation
-   (opt :head)       Operation
-   (opt :patch)      Operation
+  {(opt :get) Operation
+   (opt :put) Operation
+   (opt :post) Operation
+   (opt :delete) Operation
+   (opt :options) Operation
+   (opt :head) Operation
+   (opt :patch) Operation
    (opt :parameters) ParametersDefinitions})
 
 (s/defschema Paths
@@ -126,19 +126,19 @@
   {s/Keyword s/Any})
 
 (s/defschema Swagger
-  {(opt :swagger)             (s/eq "2.0")                  ; has defaults
-   (opt :info)                Info                          ; has defaults
-   (opt :host)                s/Str
-   (opt :externalDocs)        ExternalDocs
-   (opt :basePath)            s/Str
-   (opt :consumes)            [s/Str]
-   (opt :produces)            [s/Str]
-   (opt :paths)               Paths
-   (opt :schemes)             [Scheme]
-   (opt :parameters)          ParametersDefinitions
-   (opt :responses)           ResponsesDefinitions
+  {(opt :swagger) (s/eq "2.0")                              ; has defaults
+   (opt :info) Info                                         ; has defaults
+   (opt :host) s/Str
+   (opt :externalDocs) ExternalDocs
+   (opt :basePath) s/Str
+   (opt :consumes) [s/Str]
+   (opt :produces) [s/Str]
+   (opt :paths) Paths
+   (opt :schemes) [Scheme]
+   (opt :parameters) ParametersDefinitions
+   (opt :responses) ResponsesDefinitions
    (opt :securityDefinitions) SecurityDefinitions
-   (opt :security)            [SecurityRequirement]
-   (opt :tags)                [Tag]
-   X-                         s/Any})
+   (opt :security) [SecurityRequirement]
+   (opt :tags) [Tag]
+   X- s/Any})
 

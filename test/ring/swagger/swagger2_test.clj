@@ -1,9 +1,9 @@
 (ns ring.swagger.swagger2-test
   (:require [schema.core :as s]
-            [ring.swagger.swagger2 :refer :all]
-            [ring.swagger.swagger2-full-schema :as fs]
+            [ring.swagger.swagger2 :as swagger2]
+            [ring.swagger.swagger2-full-schema :as full-schema]
             [ring.swagger.json-schema :as rsjs]
-            [ring.swagger.validator :as v]
+            [ring.swagger.validator :as validator]
             [linked.core :as linked]
             [ring.util.http-status :as status]
             [midje.sweet :refer :all])
@@ -28,11 +28,11 @@
 
 (defn validate-swagger-json [swagger & [options]]
   (s/with-fn-validation
-    (v/validate (swagger-json swagger options))))
+    (validator/validate (swagger2/swagger-json swagger options))))
 
 (defn validate [swagger & [options]]
   (s/with-fn-validation
-    (if-let [input-errors (s/check Swagger swagger)]
+    (if-let [input-errors (s/check swagger2/Swagger swagger)]
       {:input-errors input-errors}
       (if-let [output-errors (validate-swagger-json swagger options)]
         {:output-errors output-errors}))))
@@ -145,7 +145,7 @@
 (facts "with missing schema -> json schema mappings"
 
   (fact "non-body-parameters"
-    (let [swagger {:paths {"/hello" {:get {:parameters {:query {:name (->InvalidElement)}}}}}}]
+    (let [swagger {:paths {"/hello" {:get {:parameters {:query {:name InvalidElement}}}}}}]
 
       (fact "dy default, exception is throws when generating json schema"
         (validate swagger) => (throws IllegalArgumentException))
@@ -154,7 +154,7 @@
         (validate swagger {:ignore-missing-mappings? true}) => nil)))
 
   (fact "body-parameters"
-    (let [swagger {:paths {"/hello" {:post {:parameters {:body {:name (->InvalidElement)
+    (let [swagger {:paths {"/hello" {:post {:parameters {:body {:name InvalidElement
                                                                 :age s/Num}}}}}}]
       (fact "dy default, exception is throws when generating json schema"
         (validate swagger) => (throws IllegalArgumentException))
@@ -170,7 +170,7 @@
     (fact "with defaults"
       (validate swagger) => nil
 
-      (swagger-json swagger)
+      (swagger2/swagger-json swagger)
       => (contains {:paths
                     {"/hello"
                      {:post
@@ -183,7 +183,7 @@
       (let [options {:default-response-description-fn status/get-description}]
         (validate swagger options) => nil
 
-        (swagger-json swagger options)
+        (swagger2/swagger-json swagger options)
         => (contains {:paths
                       {"/hello"
                        {:post
@@ -223,7 +223,7 @@
                          "/body4" {:post {:parameters {:body (s/maybe model)}}}
                          "/body5" {:post {:parameters {:body [(s/maybe model)]}}}
                          "/body6" {:post {:parameters {:body #{(s/maybe model)}}}}}}
-        spec (swagger-json swagger)]
+        spec (swagger2/swagger-json swagger)]
 
     (validate swagger) => nil
 
@@ -276,7 +276,7 @@
         swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}
                          "/kukka" {:post {:parameters {:body Kukka}}}
                          "/kakka" {:post {:parameters {:body Kakka}}}}}
-        spec (swagger-json swagger)]
+        spec (swagger2/swagger-json swagger)]
     (validate swagger) => nil
 
     (fact "keyword to primitive mapping"
@@ -305,7 +305,7 @@
   (let [Kikka (s/schema-with-name {:a (rsjs/field s/Str {:description "A"})
                                    :b (rsjs/field [s/Str] {:description "B"})} 'Kikka)
         swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}}}
-        spec (swagger-json swagger)]
+        spec (swagger2/swagger-json swagger)]
 
     (validate swagger) => nil
 
@@ -335,24 +335,24 @@
   (let [->path (fn [x] (str "/" x))
         paths (reduce (fn [acc x] (assoc acc (->path x) {:get {}})) (linked/map) (range 100))
         swagger {:paths paths}
-        spec (swagger-json swagger)]
+        spec (swagger2/swagger-json swagger)]
     (-> spec :paths keys) => (map ->path (range 100))))
 
 (fact "transform-operations"
   (let [remove-x-no-doc (fn [endpoint] (if-not (some-> endpoint :x-no-doc true?) endpoint))
         swagger {:paths {"/a" {:get {:x-no-doc true}, :post {}}
                          "/b" {:put {:x-no-doc true}}}}]
-    (transform-operations remove-x-no-doc swagger) => {:paths {"/a" {:post {}}}}
+    (swagger2/transform-operations remove-x-no-doc swagger) => {:paths {"/a" {:post {}}}}
 
-    (transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
-                                                   "/b" {:put {:x-no-doc true}}}})))
+    (swagger2/transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
+                                                            "/b" {:put {:x-no-doc true}}}})))
 
 (s/defschema SchemaA {:a s/Str})
 (s/defschema SchemaB {:b s/Str})
 (s/defschema SchemaAB (s/either SchemaA SchemaB))
 
 (fact "s/either stuff is correctly named"
-  (-> (swagger-json {:paths {"/ab" {:get {:parameters {:body SchemaAB}}}}})
+  (-> (swagger2/swagger-json {:paths {"/ab" {:get {:parameters {:body SchemaAB}}}}})
       (get-in [:paths "/ab" :get :parameters 0]))
   => {:in "body"
       :name "SchemaA"
@@ -361,12 +361,12 @@
       :schema {:$ref "#/definitions/SchemaA"}})
 
 (fact "body wrapped in Maybe make's it optional"
-  (-> (swagger-json {:paths {"/maybe" {:post {:parameters {:body (s/maybe {:kikka s/Str})}}}}})
+  (-> (swagger2/swagger-json {:paths {"/maybe" {:post {:parameters {:body (s/maybe {:kikka s/Str})}}}}})
       (get-in [:paths "/maybe" :post :parameters 0]))
   => (contains {:in "body", :required false}))
 
 (fact "path-parameters with .dot extension, #82"
-  (swagger-json
+  (swagger2/swagger-json
     {:paths {"/api/:id.json" {:get {:parameters {:path {:id String}}}}}})
   => (contains
        {:paths (just
@@ -377,7 +377,7 @@
                                                                {:name "id"})])})})})}))
 
 (fact "should validate full swagger 2 schema"
-  (s/validate fs/Swagger a-complete-swagger) => a-complete-swagger)
+  (s/validate full-schema/Swagger a-complete-swagger) => a-complete-swagger)
 
 (s/defschema Required
   (rsjs/field
@@ -395,30 +395,31 @@
 (fact "models with extra meta, #96"
   (let [swagger {:paths {"/api" {:post {:parameters {:body Required}}}}}]
 
-    (swagger-json swagger) => (contains
-                                {:definitions {"Required" {:type "object"
-                                                           :description "I'm required"
-                                                           :example {:name "Iines"
-                                                                     :title "Ankka"}
-                                                           :minProperties 1
-                                                           :required [:address]
-                                                           :properties {:name {:type "string"}
-                                                                        :title {:type "string"}
-                                                                        :address {:$ref "#/definitions/RequiredAddress"}}
-                                                           :additionalProperties false}
-                                               "RequiredAddress" {:type "object"
-                                                                  :description "Streename"
-                                                                  :example "Ankkalinna 1"
-                                                                  :properties {:street {:type "string"
-                                                                                        :description "description here"}}
-                                                                  :required [:street]
-                                                                  :additionalProperties false}}
-                                 :paths {"/api" {:post {:parameters [{:description "I'm required"
-                                                                      :in "body"
-                                                                      :name "Required"
-                                                                      :required true
-                                                                      :schema {:$ref "#/definitions/Required"}}]
-                                                        :responses {:default {:description ""}}}}}})
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {"Required" {:type "object"
+                                    :description "I'm required"
+                                    :example {:name "Iines"
+                                              :title "Ankka"}
+                                    :minProperties 1
+                                    :required [:address]
+                                    :properties {:name {:type "string"}
+                                                 :title {:type "string"}
+                                                 :address {:$ref "#/definitions/RequiredAddress"}}
+                                    :additionalProperties false}
+                        "RequiredAddress" {:type "object"
+                                           :description "Streename"
+                                           :example "Ankkalinna 1"
+                                           :properties {:street {:type "string"
+                                                                 :description "description here"}}
+                                           :required [:street]
+                                           :additionalProperties false}}
+          :paths {"/api" {:post {:parameters [{:description "I'm required"
+                                               :in "body"
+                                               :name "Required"
+                                               :required true
+                                               :schema {:$ref "#/definitions/Required"}}]
+                                 :responses {:default {:description ""}}}}}})
 
     (validate swagger) => nil))
 
@@ -430,19 +431,20 @@
 (fact "nillable fields, #97"
   (let [swagger {:paths {"/api" {:post {:parameters {:body (s/maybe OptionalMaybe)}}}}}]
 
-    (swagger-json swagger) => (contains
-                                {:definitions {"OptionalMaybe" {:type "object"
-                                                                :properties {:a {:type "string"}
-                                                                             :b {:type "string" :x-nullable true}
-                                                                             :c {:type "string" :x-nullable true}}
-                                                                :required [:c]
-                                                                :additionalProperties false}}
-                                 :paths {"/api" {:post {:parameters [{:in "body"
-                                                                      :name "OptionalMaybe"
-                                                                      :description ""
-                                                                      :required false
-                                                                      :schema {:$ref "#/definitions/OptionalMaybe"
-                                                                               :x-nullable true}}]
-                                                        :responses {:default {:description ""}}}}}})
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {"OptionalMaybe" {:type "object"
+                                         :properties {:a {:type "string"}
+                                                      :b {:type "string" :x-nullable true}
+                                                      :c {:type "string" :x-nullable true}}
+                                         :required [:c]
+                                         :additionalProperties false}}
+          :paths {"/api" {:post {:parameters [{:in "body"
+                                               :name "OptionalMaybe"
+                                               :description ""
+                                               :required false
+                                               :schema {:$ref "#/definitions/OptionalMaybe"
+                                                        :x-nullable true}}]
+                                 :responses {:default {:description ""}}}}}})
 
     (validate swagger) => nil))

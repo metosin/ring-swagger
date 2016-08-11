@@ -1,36 +1,37 @@
 (ns ring.swagger.swagger2-unit-test
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
-            [ring.swagger.json-schema :as jsons]
-            [ring.swagger.test-utils :refer :all]
-            [ring.swagger.schema :refer :all]
+            [ring.swagger.json-schema :as rsjs]
             [ring.swagger.core :as rsc]
-            [ring.swagger.swagger2 :refer :all]))
+            [ring.swagger.swagger2 :as swagger2]))
 
 ;;
 ;; Schemas
 ;;
 
-(s/defschema Tag {(s/optional-key :id) (field s/Int {:description "Unique identifier for the tag"})
-                  (s/optional-key :name) (field s/Str {:description "Friendly name for the tag"})})
+(s/defschema Tag
+  {(s/optional-key :id) (rsjs/field s/Int {:description "Unique identifier for the tag"})
+   (s/optional-key :name) (rsjs/field s/Str {:description "Friendly name for the tag"})})
 
-(s/defschema Category {(s/optional-key :id) (field s/Int {:description "Category unique identifier"
-                                                          :minimum "0.0"
-                                                          :maximum "100.0"})
-                       (s/optional-key :name) (field s/Str {:description "Name of the category"})})
+(s/defschema Category
+  {(s/optional-key :id) (rsjs/field s/Int {:description "Category unique identifier"
+                                           :minimum "0.0"
+                                           :maximum "100.0"})
+   (s/optional-key :name) (rsjs/field s/Str {:description "Name of the category"})})
 
-(s/defschema Pet {:id (field s/Int {:description "Unique identifier for the Pet"
-                                    :minimum "0.0"
-                                    :maximum "100.0"})
-                  :name (field s/Str {:description "Friendly name of the pet"})
-                  (s/optional-key :category) Category
-                  (s/optional-key :photoUrls) (field [s/Str] {:description "Image URLs"})
-                  (s/optional-key :tags) (field [Tag] {:description "Tags assigned to this pet"})
-                  (s/optional-key :status) (field (s/enum :available :pending :sold) {:description "pet status in the store"})})
+(s/defschema Pet
+  {:id (rsjs/field s/Int {:description "Unique identifier for the Pet"
+                          :minimum "0.0"
+                          :maximum "100.0"})
+   :name (rsjs/field s/Str {:description "Friendly name of the pet"})
+   (s/optional-key :category) Category
+   (s/optional-key :photoUrls) (rsjs/field [s/Str] {:description "Image URLs"})
+   (s/optional-key :tags) (rsjs/field [Tag] {:description "Tags assigned to this pet"})
+   (s/optional-key :status) (rsjs/field (s/enum :available :pending :sold) {:description "pet status in the store"})})
 
 (s/defschema PetError {:message String s/Keyword s/Any})
 
-(def +options+ option-defaults)
+(def +options+ swagger2/option-defaults)
 
 ;;
 ;; Excepcted JSON Schemas
@@ -83,9 +84,9 @@
 ;;
 
 (fact "transform simple schemas"
-  (jsons/schema-object Tag) => Tag'
-  (jsons/schema-object Category) => Category'
-  (jsons/schema-object Pet) => Pet')
+  (rsjs/schema-object Tag) => Tag'
+  (rsjs/schema-object Category) => Category'
+  (rsjs/schema-object Pet) => Pet')
 
 (s/defschema RootModel
   {:sub {:foo Long}})
@@ -106,30 +107,30 @@
         'RootModelSub #{(:sub RootModel)}})
 
   (fact "Described anonymous models are collected"
-    (let [schema (describe {:sub (describe {:foo Long} "the sub schema")} "the root schema")]
+    (let [schema (rsjs/describe {:sub (rsjs/describe {:foo Long} "the sub schema")} "the root schema")]
       (keys (rsc/collect-models (rsc/with-named-sub-schemas schema))) => (two-of symbol?))))
 
 (fact "transform-models"
-  (transform-models [Pet] +options+) => {"Pet" Pet'
-                                         "Tag" Tag'
-                                         "Category" Category'})
+  (swagger2/transform-models [Pet] +options+) => {"Pet" Pet'
+                                                  "Tag" Tag'
+                                                  "Category" Category'})
 
 (s/defschema Foo (s/enum :a :b))
 (s/defschema Bar {:key Foo})
 (s/defschema Baz s/Keyword)
 
 (fact "record-schemas are not transformed"
-  (transform-models [Foo] +options+) => {})
+  (swagger2/transform-models [Foo] +options+) => {})
 
 (fact "non-map schemas are not transformed"
-  (transform-models [Baz] +options+) => {})
+  (swagger2/transform-models [Baz] +options+) => {})
 
 (fact "nested record-schemas are inlined"
-  (transform-models [Bar] +options+) => {"Bar" {:type "object"
-                                                :properties {:key {:enum [:b :a]
-                                                                   :type "string"}}
-                                                :additionalProperties false
-                                                :required [:key]}})
+  (swagger2/transform-models [Bar] +options+) => {"Bar" {:type "object"
+                                                         :properties {:key {:enum [:b :a]
+                                                                            :type "string"}}
+                                                         :additionalProperties false
+                                                         :required [:key]}})
 
 (fact "nested schemas"
 
@@ -137,25 +138,23 @@
     (s/defschema Nested {:id s/Str
                          :address {:country (s/enum :fi :pl)
                                    :street {:name s/Str}}})
-    (transform-models [(rsc/with-named-sub-schemas Nested)] +options+)
+    (swagger2/transform-models [(rsc/with-named-sub-schemas Nested)] +options+)
 
-    =>
-
-    {"Nested" {:type "object"
-               :properties {:address {:$ref "#/definitions/NestedAddress"}
-                            :id {:type "string"}}
-               :additionalProperties false
-               :required [:id :address]}
-     "NestedAddress" {:type "object"
-                      :properties {:country {:enum [:fi :pl]
-                                             :type "string"}
-                                   :street {:$ref "#/definitions/NestedAddressStreet"}}
-                      :additionalProperties false
-                      :required [:country :street]}
-     "NestedAddressStreet" {:type "object"
-                            :properties {:name {:type "string"}}
-                            :additionalProperties false
-                            :required [:name]}})
+    => {"Nested" {:type "object"
+                  :properties {:address {:$ref "#/definitions/NestedAddress"}
+                               :id {:type "string"}}
+                  :additionalProperties false
+                  :required [:id :address]}
+        "NestedAddress" {:type "object"
+                         :properties {:country {:enum [:fi :pl]
+                                                :type "string"}
+                                      :street {:$ref "#/definitions/NestedAddressStreet"}}
+                         :additionalProperties false
+                         :required [:country :street]}
+        "NestedAddressStreet" {:type "object"
+                               :properties {:name {:type "string"}}
+                               :additionalProperties false
+                               :required [:name]}})
 
   (fact "nested named sub-schemas"
 
@@ -167,7 +166,7 @@
       {:boundary (s/maybe Boundary)})
 
     (keys
-      (transform-models
+      (swagger2/transform-models
         [(rsc/with-named-sub-schemas ReturnValue)]
         +options+)) => ["Boundary" "ReturnValue"]))
 
@@ -178,7 +177,7 @@
 (fact "convert-parameters"
 
   (fact "all parameter types can be converted"
-    (convert-parameters
+    (swagger2/convert-parameters
       {:body Pet
        :query Query
        :path Path
@@ -222,7 +221,7 @@
   (fact "anonymous schemas can be used with ..."
 
     (fact ":query-parameters"
-      (convert-parameters
+      (swagger2/convert-parameters
         {:query {s/Keyword s/Any
                  :q String
                  (s/optional-key :l) Long}} {})
@@ -240,7 +239,7 @@
            :type "integer"}])
 
     (fact ":path-parameters (are always required)"
-      (convert-parameters
+      (swagger2/convert-parameters
         {:path {s/Keyword s/Any
                 :q String
                 (s/optional-key :l) Long}} {})
@@ -258,7 +257,7 @@
            :type "integer"}]))
 
   (fact "Array body parameters"
-    (convert-parameters {:body [Body]} {})
+    (swagger2/convert-parameters {:body [Body]} {})
 
     => [{:name "Body"
          :description ""
@@ -268,7 +267,7 @@
                   :items {:$ref "#/definitions/Body"}}}])
 
   (fact "Set body parameters"
-    (convert-parameters {:body #{Body}} {})
+    (swagger2/convert-parameters {:body #{Body}} {})
 
     => [{:name "Body"
          :description ""
@@ -279,7 +278,7 @@
                   :items {:$ref "#/definitions/Body"}}}])
 
   (fact "Body param with desc"
-    (convert-parameters {:body (describe Body "foo")} {})
+    (swagger2/convert-parameters {:body (rsjs/describe Body "foo")} {})
 
     => [{:description "foo"
          :name "Body"
@@ -288,7 +287,7 @@
          :schema {:$ref "#/definitions/Body"}}])
 
   (fact "Array body param with desc"
-    (convert-parameters {:body [(describe Body "foo")]} {})
+    (swagger2/convert-parameters {:body [(rsjs/describe Body "foo")]} {})
 
     => [{:description "foo"
          :name "Body"
@@ -299,8 +298,8 @@
 
 (fact "ensure-named-top-level-models"
 
-  (let [[paths definitions] (extract-paths-and-definitions
-                              (ensure-body-and-response-schema-names
+  (let [[paths definitions] (swagger2/extract-paths-and-definitions
+                              (swagger2/ensure-body-and-response-schema-names
                                 {:paths {"/api" {:post {:parameters {:body {:foo s/Str}}
                                                         :responses {200 {:description "ok"
                                                                          :schema [{:bar Long}]}}}}}})
@@ -336,37 +335,37 @@
 ;;
 
 (fact "swagger-path"
-  (swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}"
-  (swagger-path "/api/:id.json") => "/api/{id}.json"
+  (swagger2/swagger-path "/api/:kikka/:kakka/:kukka") => "/api/{kikka}/{kakka}/{kukka}"
+  (swagger2/swagger-path "/api/:id.json") => "/api/{id}.json"
 
   ;; From Clout tests
 
   (fact "keywords-match-extensions"
-    (swagger-path "/foo.:ext") => "/foo.{ext}"
-    (swagger-path "/:x.:y") => "/{x}.{y}")
+    (swagger2/swagger-path "/foo.:ext") => "/foo.{ext}"
+    (swagger2/swagger-path "/:x.:y") => "/{x}.{y}")
 
   (fact "hyphen-keywords"
-    (swagger-path "/:foo-bar") => "/{foo-bar}"
-    (swagger-path "/:foo-") => "/{foo-}")
+    (swagger2/swagger-path "/:foo-bar") => "/{foo-bar}"
+    (swagger2/swagger-path "/:foo-") => "/{foo-}")
 
   (fact "underscore-keywords"
-    (swagger-path "/:foo_bar") => "/{foo_bar}"
-    (swagger-path "/:_foo") => "/{_foo}")
+    (swagger2/swagger-path "/:foo_bar") => "/{foo_bar}"
+    (swagger2/swagger-path "/:_foo") => "/{_foo}")
 
   (fact "non-ascii-keywords"
-    (swagger-path "/:äñßOÔ") => "/{äñßOÔ}"
-    (swagger-path "/:ÁäñßOÔ") => "/{ÁäñßOÔ}"
-    (swagger-path "/:ä/:ش") => "/{ä}/{ش}"
-    (swagger-path "/:ä/:ä") => "/{ä}/{ä}"
-    (swagger-path "/:Ä-ü") => "/{Ä-ü}"
-    (swagger-path "/:Ä_ü") => "/{Ä_ü}"))
+    (swagger2/swagger-path "/:äñßOÔ") => "/{äñßOÔ}"
+    (swagger2/swagger-path "/:ÁäñßOÔ") => "/{ÁäñßOÔ}"
+    (swagger2/swagger-path "/:ä/:ش") => "/{ä}/{ش}"
+    (swagger2/swagger-path "/:ä/:ä") => "/{ä}/{ä}"
+    (swagger2/swagger-path "/:Ä-ü") => "/{Ä-ü}"
+    (swagger2/swagger-path "/:Ä_ü") => "/{Ä_ü}"))
 
 (fact "extract-models"
   (fact "returns both return and body-parameters but not query or path parameter types"
-    (extract-models {:paths {"/foo" {:get {:parameters {:body Category
-                                                        :query Pet
-                                                        :path Pet}
-                                           :responses {200 {:schema Tag}}}}}})
+    (swagger2/extract-models {:paths {"/foo" {:get {:parameters {:body Category
+                                                                 :query Pet
+                                                                 :path Pet}
+                                                    :responses {200 {:schema Tag}}}}}})
     => [Category Tag]))
 
 
@@ -377,7 +376,7 @@
 (s/defschema Bar {:foo (s/maybe #'Foo)})
 
 (fact "recursive"
-  (transform-models [Foo Bar] +options+)
+  (swagger2/transform-models [Foo Bar] +options+)
   => {"Bar" {:type "object"
              :properties {:foo {:$ref "#/definitions/Foo"
                                 :x-nullable true}}
@@ -394,16 +393,18 @@
 
 (facts "swagger json"
   (fact "without parameters"
-    (swagger-json {}) => {:swagger "2.0"
-                          :info {:title "Swagger API"
-                                 :version "0.0.1"}
-                          :produces ["application/json"]
-                          :consumes ["application/json"]
-                          :paths {}
-                          :definitions {}})
+
+    (swagger2/swagger-json {})
+    => {:swagger "2.0"
+        :info {:title "Swagger API"
+               :version "0.0.1"}
+        :produces ["application/json"]
+        :consumes ["application/json"]
+        :paths {}
+        :definitions {}})
 
   (fact "full api"
-    (swagger-json
+    (swagger2/swagger-json
       {:swagger "2.0"
        :info {:version ..version..
               :title ..title..
@@ -429,7 +430,7 @@
                                       :parameters {:path {:id Integer}}
                                       :responses {200 {:description "ok"
                                                        :schema Pet
-                                                       :headers {"X-men" (describe s/Str "mutant header")}}
+                                                       :headers {"X-men" (rsjs/describe s/Str "mutant header")}}
                                                   404 {:description "fail"
                                                        :schema PetError}}}}}})
     => {:swagger "2.0"
@@ -514,11 +515,11 @@
                 :b (->InvalidElement)}]
 
     (fact "fail by default"
-      (jsons/schema-object schema) => (throws IllegalArgumentException))
+      (rsjs/schema-object schema) => (throws IllegalArgumentException))
 
     (fact "drops bad fields from both properties & required"
-      (binding [jsons/*ignore-missing-mappings* true]
-        (jsons/schema-object schema)
+      (binding [rsjs/*ignore-missing-mappings* true]
+        (rsjs/schema-object schema)
 
         => {:type "object"
             :properties {:a {:type "string"}}
@@ -526,11 +527,11 @@
             :required [:a]}))))
 
 (fact "collectionFormat"
-  (:collectionFormat (first (convert-parameters {:query {:q [String]}} {})))
+  (:collectionFormat (first (swagger2/convert-parameters {:query {:q [String]}} {})))
   => "multi"
 
-  (:collectionFormat (first (convert-parameters {:formData {:q [String]}} {})))
+  (:collectionFormat (first (swagger2/convert-parameters {:formData {:q [String]}} {})))
   => "multi"
 
-  (:collectionFormat (first (convert-parameters {:query {:q [String]}} {:collection-format "csv"})))
+  (:collectionFormat (first (swagger2/convert-parameters {:query {:q [String]}} {:collection-format "csv"})))
   => "csv")
