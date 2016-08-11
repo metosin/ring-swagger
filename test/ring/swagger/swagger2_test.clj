@@ -453,28 +453,29 @@
 
 (fact "top-level & nested records are embedded"
   (let [swagger {:paths {"/api" {:post {:parameters {:body User}}}}}]
-    (swagger2/swagger-json swagger) => (contains
-                                         {:definitions {}
-                                          :paths
-                                          {"/api"
-                                           {:post
-                                            {:parameters
-                                             [{:in "body"
-                                               :name "User"
-                                               :description ""
-                                               :required true
-                                               :schema {:type "object"
-                                                        :title "User"
-                                                        :properties {:age {:format "int64"
-                                                                           :type "integer"}
-                                                                     :keyboard {:type "object"
-                                                                                :title "Keyboard"
-                                                                                :properties {:type {:type "string"
-                                                                                                    :enum [:right :left]}}
-                                                                                :required [:type]
-                                                                                :additionalProperties false}}
-                                                        :required [:age :keyboard]
-                                                        :additionalProperties false}}]
-                                             :responses {:default {:description ""}}}}}})
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {}
+          :paths
+          {"/api"
+           {:post
+            {:parameters
+             [{:in "body"
+               :name "User"
+               :description ""
+               :required true
+               :schema {:type "object"
+                        :title "User"
+                        :properties {:age {:format "int64"
+                                           :type "integer"}
+                                     :keyboard {:type "object"
+                                                :title "Keyboard"
+                                                :properties {:type {:type "string"
+                                                                    :enum [:right :left]}}
+                                                :required [:type]
+                                                :additionalProperties false}}
+                        :required [:age :keyboard]
+                        :additionalProperties false}}]
+             :responses {:default {:description ""}}}}}})
 
     (validate swagger) => nil))

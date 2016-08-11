@@ -76,16 +76,16 @@
         (rsjs/->swagger (s/maybe Long) {:in :path}) => (rsjs/->swagger Long)))
 
     (fact "s/defrecord"
-      (->swagger User) => {:type "object",
-                           :title "User",
-                           :properties {:age {:type "integer", :format "int64"},
-                                        :keyboard {:type "object",
-                                                   :title "Keyboard",
-                                                   :properties {:type {:type "string", :enum [:right :left]}},
-                                                   :additionalProperties false,
-                                                   :required [:type]}},
-                           :additionalProperties false,
-                           :required [:age :keyboard]})
+      (rsjs/->swagger User) => {:type "object",
+                                :title "User",
+                                :properties {:age {:type "integer", :format "int64"},
+                                             :keyboard {:type "object",
+                                                        :title "Keyboard",
+                                                        :properties {:type {:type "string", :enum [:right :left]}},
+                                                        :additionalProperties false,
+                                                        :required [:type]}},
+                                :additionalProperties false,
+                                :required [:age :keyboard]})
 
     (fact "s/both -> type of the first element"
       (rsjs/->swagger (s/both Long String)) => (rsjs/->swagger Long))
