@@ -23,11 +23,11 @@
 
 (defrecord FieldSchema [schema]
   schema.core.Schema
-  (spec [this]
+  (spec [_]
     (variant/variant-spec
       spec/+no-precondition+
       [{:schema schema}]))
-  (explain [this] (s/explain schema)))
+  (explain [_] (s/explain schema)))
 
 (defn field
   "Attaches meta-data to a schema under :json-schema key. If the
