@@ -512,7 +512,7 @@
 (fact "transform schemas with missing mappings"
 
   (let [schema {:a String
-                :b (->InvalidElement)}]
+                :b InvalidElement}]
 
     (fact "fail by default"
       (rsjs/schema-object schema) => (throws IllegalArgumentException))
