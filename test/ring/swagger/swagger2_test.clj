@@ -479,3 +479,57 @@
              :responses {:default {:description ""}}}}}})
 
     (validate swagger) => nil))
+
+(fact "primitive vector body parameters & responses"
+  (let [swagger {:paths {"/api" {:post {:parameters {:body [s/Str]}
+                                        :responses {200 {:schema [s/Str]}}}}}}]
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {}
+          :paths {"/api" {:post {:parameters [{:in "body"
+                                               :name ""
+                                               :description ""
+                                               :required true
+                                               :schema {:items {:type "string"}
+                                                        :type "array"}}]
+                                 :responses {200 {:description ""
+                                                  :schema {:items {:type "string"}
+                                                           :type "array"}}}}}}})
+
+    (validate swagger) => nil))
+
+(fact "primitive set body parameters & responses"
+  (let [swagger {:paths {"/api" {:post {:parameters {:body #{s/Str}}
+                                        :responses {200 {:schema #{s/Str}}}}}}}]
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {}
+          :paths {"/api" {:post {:parameters [{:in "body"
+                                               :name ""
+                                               :description ""
+                                               :required true
+                                               :schema {:items {:type "string"}
+                                                        :uniqueItems true
+                                                        :type "array"}}]
+                                 :responses {200 {:description ""
+                                                  :schema {:items {:type "string"}
+                                                           :uniqueItems true
+                                                           :type "array"}}}}}}})
+
+    (validate swagger) => nil))
+
+(fact "primitive body parameters & responses"
+  (let [swagger {:paths {"/api" {:post {:parameters {:body s/Str}
+                                        :responses {200 {:schema s/Str}}}}}}]
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {}
+          :paths {"/api" {:post {:parameters [{:in "body"
+                                               :name ""
+                                               :description ""
+                                               :required true
+                                               :schema {:type "string"}}]
+                                 :responses {200 {:description ""
+                                                  :schema {:type "string"}}}}}}})
+
+    (validate swagger) => nil))
