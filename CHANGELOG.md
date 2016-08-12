@@ -1,4 +1,6 @@
-## UNRELEASED
+## 0.23.0-SNAPSHOT
+
+* Support for `schema.core/defrecords`, fixes [#103](https://github.com/metosin/ring-swagger/issues/103)
 
 ```clj
 [cheshire "5.6.3"] is available but we use "5.6.1"
