@@ -349,10 +349,9 @@
 
 (s/defschema SchemaA {:a s/Str})
 (s/defschema SchemaB {:b s/Str})
-(s/defschema SchemaAB (s/either SchemaA SchemaB))
 
 (fact "s/either stuff is correctly named"
-  (-> (swagger2/swagger-json {:paths {"/ab" {:get {:parameters {:body SchemaAB}}}}})
+  (-> (swagger2/swagger-json {:paths {"/ab" {:get {:parameters {:body (s/either SchemaA SchemaB)}}}}})
       (get-in [:paths "/ab" :get :parameters 0]))
   => {:in "body"
       :name "SchemaA"
@@ -446,5 +445,37 @@
                                                :schema {:$ref "#/definitions/OptionalMaybe"
                                                         :x-nullable true}}]
                                  :responses {:default {:description ""}}}}}})
+
+    (validate swagger) => nil))
+
+(s/defrecord Keyboard [type :- (s/enum :left :right)])
+(s/defrecord User [age :- s/Int, keyboard :- Keyboard])
+
+(fact "top-level & nested records are embedded"
+  (let [swagger {:paths {"/api" {:post {:parameters {:body User}}}}}]
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {}
+          :paths
+          {"/api"
+           {:post
+            {:parameters
+             [{:in "body"
+               :name "User"
+               :description ""
+               :required true
+               :schema {:type "object"
+                        :title "User"
+                        :properties {:age {:format "int64"
+                                           :type "integer"}
+                                     :keyboard {:type "object"
+                                                :title "Keyboard"
+                                                :properties {:type {:type "string"
+                                                                    :enum [:right :left]}}
+                                                :required [:type]
+                                                :additionalProperties false}}
+                        :required [:age :keyboard]
+                        :additionalProperties false}}]
+             :responses {:default {:description ""}}}}}})
 
     (validate swagger) => nil))

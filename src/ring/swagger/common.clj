@@ -1,5 +1,7 @@
 (ns ring.swagger.common
-  (:require [plumbing.core :as p]))
+  (:require [plumbing.core :as p]
+            [schema.utils :as su]
+            [schema.core :as s]))
 
 (defn remove-empty-keys
   "Removes empty properties with nil value from a map"
@@ -69,3 +71,16 @@
 
       :else
       (last values))))
+
+(defn record-schema [x]
+  (some-> x su/class-schema :schema (with-meta {::title (.getSimpleName x)})))
+
+(defn titled [x]
+  (or (record-schema x)
+      (if (s/schema-name x) x)))
+
+(defn title [x]
+  (or (some-> x meta ::title)
+      (some-> x record-schema meta ::title)
+      (some-> x s/schema-name name)))
+

@@ -42,7 +42,7 @@
   (if-let [schema (rsc/peek-schema model)]
     (let [schema-json (rsjs/->swagger model options)]
       (vector {:in "body"
-               :name (name (s/schema-name schema))
+               :name (common/title schema)
                :description (or (:description (rsjs/json-schema-meta schema)) "")
                :required (not (rsjs/maybe? model))
                :schema schema-json}))))
