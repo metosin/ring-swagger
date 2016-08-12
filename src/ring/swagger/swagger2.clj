@@ -39,13 +39,15 @@
 (defmulti ^:private extract-parameter (fn [in _ _] in))
 
 (defmethod extract-parameter :body [_ model options]
-  (if-let [schema (rsc/peek-schema model)]
-    (let [schema-json (rsjs/->swagger model options)]
-      (vector {:in "body"
-               :name (common/title schema)
-               :description (or (:description (rsjs/json-schema-meta schema)) "")
-               :required (not (rsjs/maybe? model))
-               :schema schema-json}))))
+  (if model
+    (let [schema (rsc/peek-schema model)
+          schema-json (rsjs/->swagger model options)]
+      (vector
+        {:in "body"
+         :name (or (common/title schema) "")
+         :description (or (:description (rsjs/json-schema-meta schema)) "")
+         :required (not (rsjs/maybe? model))
+         :schema schema-json}))))
 
 (defmethod extract-parameter :default [in model options]
   (if model
