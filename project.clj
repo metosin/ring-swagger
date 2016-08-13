@@ -30,7 +30,7 @@
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}}
   :codeina {:sources ["src"]
             :target "gh-pages/doc"
-            :src-dir-uri "http://github.com/metosin/ring-swagger/blob/master/"
-            :src-linenum-anchor-prefix "L" }
+            :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
+            :src-uri-prefix "#L"}
   :aliases {"all" ["with-profile" "dev:dev,1.7"]
             "test-ancient" ["midje"]})
