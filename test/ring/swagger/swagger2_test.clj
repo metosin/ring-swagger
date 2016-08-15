@@ -533,3 +533,24 @@
                                                   :schema {:type "string"}}}}}}})
 
     (validate swagger) => nil))
+
+(s/defschema Person {:age s/Int})
+
+(def Adult (s/constrained Person #(>= (:age %) 18)))
+
+(fact "query parameters with constrained schema, #104"
+
+  (let [swagger {:paths {"/people" {:get {:parameters {:query Adult}
+                                          :responses {200 {:schema s/Str}}}}}}]
+    (swagger2/swagger-json swagger)
+    => (contains
+         {:definitions {}
+          :paths {"/people" {:get {:parameters [{:in "query"
+                                                 :name "age"
+                                                 :description ""
+                                                 :required true
+                                                 :type "integer"
+                                                 :format "int64"}]
+                                   :responses {200 {:description ""
+                                                    :schema {:type "string"}}}}}}})
+    (validate swagger) => nil))
