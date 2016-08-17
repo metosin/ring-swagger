@@ -218,6 +218,29 @@
          :type "integer"
          :format "int32"}])
 
+  (fact "schemas wtih postconditions are supported in ..."
+    (s/defschema Polygon {:sides s/Int})
+    (s/defschema Triangle (s/constrained Polygon #(= (:sides %) 3)))
+
+    (fact ":query parameters"
+      (swagger2/convert-parameters
+        {:query Triangle} {})
+      => [{:name "sides"
+           :in "query"
+           :description ""
+           :required true
+           :type "integer"
+           :format "int64"}])
+
+    (fact ":body parameters"
+      (swagger2/convert-parameters
+        {:body Triangle} {})
+      => [{:name "Triangle"
+           :in "body"
+           :description ""
+           :required true
+           :schema {:$ref "#/definitions/Polygon"}}]))
+
   (fact "anonymous schemas can be used with ..."
 
     (fact ":query-parameters"

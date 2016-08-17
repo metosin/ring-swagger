@@ -1,6 +1,7 @@
 (ns ring.swagger.swagger2
   (:require [clojure.string :as str]
             [schema.core :as s]
+            [schema-tools.core :as stc]
             [plumbing.core :as p]
             [ring.swagger.common :as common]
             [ring.swagger.json-schema :as rsjs]
@@ -51,7 +52,7 @@
 
 (defmethod extract-parameter :default [in model options]
   (if model
-    (for [[k v] (-> model common/value-of rsc/strict-schema)
+    (for [[k v] (-> model common/value-of stc/schema-value rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
                 json-schema (rsjs/->swagger v options)]
