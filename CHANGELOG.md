@@ -1,11 +1,13 @@
 ## 0.23.0-SNAPSHOT
 
-* Support for `schema.core/defrecords`, fixes [#103](https://github.com/metosin/ring-swagger/issues/103)
+* Support for `schema.core/defrecords`, fixes [#103](https://github.com/metosin/ring-swagger/issues/103).
 * Support for primitives & arrays of primitives both in `:body` & `:response`.
    * Replaces [#56](https://github.com/metosin/ring-swagger/pull/56)
    * Fixes [#55](https://github.com/metosin/ring-swagger/issues/55)
-   * FIxes [compojure-api/#177](https://github.com/metosin/compojure-api/issues/177)
+   * Fixes [compojure-api/#177](https://github.com/metosin/compojure-api/issues/177)
    * Thanks to [Tim Gilberd](https://github.com/timgilbert) for the initial fix!
+* Support for top-level Schema-records for non-body-parameters, fixes [#104](https://github.com/metosin/ring-swagger/issues/104).
+   * Thanks to [quimrstorres](https://github.com/quimrstorres)!
 
 ```clj
 [cheshire "5.6.3"] is available but we use "5.6.1"
