@@ -1,6 +1,6 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.svg?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Downloads](https://jarkeeper.com/metosin/ring-swagger/downloads.svg)](https://jarkeeper.com/metosin/ring-swagger) [![Dependencies Status](https://jarkeeper.com/metosin/ring-swagger/status.svg)](https://jarkeeper.com/metosin/ring-swagger)
 
-[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema).
+[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema) (support for [clojure.spec](http://clojure.org/about/spec) is [coming up](https://github.com/metosin/ring-swagger/issues/95)).
 
 - Transforms deeply nested Schemas into Swagger JSON Schema definitions
 - Extended & symmetric JSON & String serialization & coercion
@@ -9,8 +9,6 @@
 - Swagger artifact generation
   - [swagger.json](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification) via `ring.swagger.swagger2/swagger-json`
   - [Swagger UI](https://github.com/swagger-api/swagger-ui) bindings. (get the UI separately as [jar](https://github.com/metosin/ring-swagger-ui) or from [NPM](https://www.npmjs.com/package/swagger-ui))
-
-**note** Swagger 1.2 support has been dropped in `0.21.0`.
 
 ## Latest version
 
@@ -23,6 +21,12 @@
 - [route-swagger](https://github.com/frankiesardo/route-swagger) for Pedestal
 - [yada](https://github.com/juxt/yada)
 - [kekkonen](https://github.com/metosin/kekkonen)
+
+## Getting help
+
+[Clojurians slack](https://clojurians.slack.com/) ([join](http://clojurians.net/)) has a channel [#ring-swagger](https://clojurians.slack.com/messages/ring-swagger/) for talk about any libraries using Ring-swagger. You can also ask questions about Ring-swagger on other channels at Clojurians Slack or at #clojure on Freenode IRC (mention or `ring-swagger` to highlight us).
+
+## Info
 
 Route definitions are expected as a clojure Map defined by the Schema [Contract](https://github.com/metosin/ring-swagger/blob/master/src/ring/swagger/swagger2_schema.clj).
 The Schema allows mostly any extra keys as ring-swagger tries not to be on your way - one can pass any  valid Swagger spec data in.
