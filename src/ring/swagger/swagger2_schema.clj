@@ -1,6 +1,6 @@
 (ns ring.swagger.swagger2-schema
   "Schemas that Ring-Swagger expects from it's clients"
-  (require [schema.core :as s]))
+  (:require [schema.core :as s]))
 
 (defn opt [x] (s/optional-key x))
 (def X- (s/pred #(re-find #"x-" (name %)) ":x-.*"))
