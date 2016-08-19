@@ -24,7 +24,7 @@
 
 ## Getting help
 
-[Clojurians slack](https://clojurians.slack.com/) ([join](http://clojurians.net/)) has a channel [#ring-swagger](https://clojurians.slack.com/messages/ring-swagger/) for talk about any libraries using Ring-swagger. You can also ask questions about Ring-swagger on other channels at Clojurians Slack or at #clojure on Freenode IRC (mention or `ring-swagger` to highlight us).
+[Clojurians slack](https://clojurians.slack.com/) ([join](http://clojurians.net/)) has a channel [#ring-swagger](https://clojurians.slack.com/messages/ring-swagger/) for Ring-swagger related issues. You can also ask questions about Ring-swagger on other channels at Clojurians Slack or at #clojure on Freenode IRC (mention or `ring-swagger` to highlight us).
 
 ## Info
 
