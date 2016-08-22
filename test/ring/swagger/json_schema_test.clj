@@ -7,7 +7,7 @@
             [ring.swagger.core :as rsc]
             [linked.core :as linked])
   (:import [java.util Date UUID]
-           [org.joda.time DateTime LocalDate]
+           [org.joda.time DateTime LocalDate LocalTime]
            [java.util.regex Pattern]
            [clojure.lang Symbol]))
 
@@ -18,19 +18,20 @@
 
 (facts "type transformations"
   (facts "java types"
-    (rsjs/->swagger Integer) => {:type "integer" :format "int32"}
-    (rsjs/->swagger Long) => {:type "integer" :format "int64"}
-    (rsjs/->swagger Double) => {:type "number" :format "double"}
-    (rsjs/->swagger Number) => {:type "number" :format "double"}
-    (rsjs/->swagger Symbol) => {:type "string"}
-    (rsjs/->swagger String) => {:type "string"}
-    (rsjs/->swagger Boolean) => {:type "boolean"}
-    (rsjs/->swagger Date) => {:type "string" :format "date-time"}
-    (rsjs/->swagger DateTime) => {:type "string" :format "date-time"}
-    (rsjs/->swagger LocalDate) => {:type "string" :format "date"}
-    (rsjs/->swagger Pattern) => {:type "string" :format "regex"}
-    (rsjs/->swagger #"[6-9]") => {:type "string" :pattern "[6-9]"}
-    (rsjs/->swagger UUID) => {:type "string" :format "uuid"})
+         (rsjs/->swagger Integer) => {:type "integer" :format "int32"}
+         (rsjs/->swagger Long) => {:type "integer" :format "int64"}
+         (rsjs/->swagger Double) => {:type "number" :format "double"}
+         (rsjs/->swagger Number) => {:type "number" :format "double"}
+         (rsjs/->swagger Symbol) => {:type "string"}
+         (rsjs/->swagger String) => {:type "string"}
+         (rsjs/->swagger Boolean) => {:type "boolean"}
+         (rsjs/->swagger Date) => {:type "string" :format "date-time"}
+         (rsjs/->swagger DateTime) => {:type "string" :format "date-time"}
+         (rsjs/->swagger LocalDate) => {:type "string" :format "date"}
+         (rsjs/->swagger LocalTime) => {:type "string" :format "time"}
+         (rsjs/->swagger Pattern) => {:type "string" :format "regex"}
+         (rsjs/->swagger #"[6-9]") => {:type "string" :pattern "[6-9]"}
+         (rsjs/->swagger UUID) => {:type "string" :format "uuid"})
 
   (fact "schema types"
     (rsjs/->swagger s/Int) => {:type "integer" :format "int64"}
@@ -165,6 +166,7 @@
     Date
     DateTime
     LocalDate
+    LocalTime
     Pattern
     UUID
     clojure.lang.Keyword)

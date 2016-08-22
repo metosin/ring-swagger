@@ -97,6 +97,7 @@
 (defmethod convert-class java.util.Date          [_ _] {:type "string" :format "date-time"})
 (defmethod convert-class org.joda.time.DateTime  [_ _] {:type "string" :format "date-time"})
 (defmethod convert-class org.joda.time.LocalDate [_ _] {:type "string" :format "date"})
+(defmethod convert-class org.joda.time.LocalTime [_ _] {:type "string" :format "time"})
 (defmethod convert-class java.util.regex.Pattern [_ _] {:type "string" :format "regex"})
 
 (defmethod convert-class :default [e _]

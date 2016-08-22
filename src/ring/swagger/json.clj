@@ -6,7 +6,7 @@
            [schema.utils ValidationError]
            [java.util Date]
            [java.util.regex Pattern]
-           [org.joda.time DateTime LocalDate]))
+           [org.joda.time DateTime LocalDate LocalTime]))
 
 (defn date-time-encoder [x ^JsonGenerator jg]
   (.writeString jg (coerce/unparse-date-time x)))
@@ -26,6 +26,10 @@
 (add-encoder LocalDate
   (fn [x ^JsonGenerator jg]
     (.writeString jg (coerce/unparse-date x))))
+
+(add-encoder LocalTime
+  (fn [x ^JsonGenerator jg]
+    (.writeString jg (coerce/unparse-time x))))
 
 (add-encoder Pattern
   (fn [x ^JsonGenerator jg]
