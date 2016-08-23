@@ -9,6 +9,7 @@
 * Support for top-level Schema-records for non-body-parameters, fixes [#104](https://github.com/metosin/ring-swagger/issues/104).
    * Thanks to [quimrstorres](https://github.com/quimrstorres)!
 * Fixed to work with the latest Clojure 1.9 alpha, thanks to [Brent Hagany](https://github.com/bhagany)
+* Support for `org.joda.time.LocalTime`, thanks to [Francesco Bellomi](https://github.com/fbellomi)!
 
 ```clj
 [cheshire "5.6.3"] is available but we use "5.6.1"

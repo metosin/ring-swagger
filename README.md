@@ -286,6 +286,7 @@ One can also use the options to create more accurate specs (via the `:in` option
 | `#"[a-z0-9]+"`                              | string, pattern          | `"a6"`
 | `s/Uuid`, `java.util.UUID`                  | string, uuid             | `"77e70512-1337-dead-beef-0123456789ab"`
 | `org.joda.time.LocalDate`                   | string, date             | `"2014-02-19"`
+| `org.joda.time.LocalTime`                   | string, time             | `"16:22"`
 | `(s/enum X Y Z)`                            | *type of X*, enum(X,Y,Z)
 | `(s/maybe X)`                               | *type of X*
 | `(s/both X Y Z)`                            | *type of X*
