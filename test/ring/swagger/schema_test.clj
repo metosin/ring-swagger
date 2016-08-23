@@ -7,7 +7,7 @@
             ring.swagger.json)
   (:import [java.util Date UUID]
            [java.util.regex Pattern]
-           [org.joda.time DateTime LocalDate]))
+           [org.joda.time DateTime LocalDate LocalTime]))
 
 (s/defschema SubType {:alive Boolean})
 (s/defschema AllTypes
@@ -21,6 +21,7 @@
        :i Date
        :j DateTime
        :k LocalDate
+       :k2 LocalTime
        :l (s/maybe String)
        :m (s/both Long (s/pred odd? 'odd?))
        :n SubType
@@ -39,6 +40,7 @@
                 :i (Date.)
                 :j (t/now)
                 :k (t/today)
+                :k2 (t/time-now)
                 :l nil
                 :m 1
                 :n {:alive true}

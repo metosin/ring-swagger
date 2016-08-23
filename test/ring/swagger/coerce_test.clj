@@ -3,7 +3,7 @@
             [schema.core :as s]
             [ring.swagger.coerce :as rsc]
             [schema.coerce :as sc])
-  (:import [org.joda.time LocalDate DateTime]
+  (:import [org.joda.time LocalDate DateTime LocalTime]
            [java.util Date UUID]))
 
 (fact "json coercions"
@@ -19,6 +19,11 @@
 
     (fact "LocalDate"
       ((cooerce LocalDate) "2014-02-19") => (partial instance? LocalDate))
+
+    (fact "LocalTime"
+      ((cooerce LocalTime) "10:23") => (partial instance? LocalTime)
+      ((cooerce LocalTime) "10:23:37") => (partial instance? LocalTime)
+      ((cooerce LocalTime) "10:23:37.456") => (partial instance? LocalTime))
 
     (fact "UUID"
       ((cooerce UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))))

@@ -9,7 +9,7 @@
             [midje.sweet :refer :all])
   (:import [java.util Date UUID]
            [java.util.regex Pattern]
-           [org.joda.time DateTime LocalDate]))
+           [org.joda.time DateTime LocalDate LocalTime]))
 
 (s/defschema Anything {s/Keyword s/Any})
 (s/defschema Nothing {})
@@ -99,6 +99,7 @@
                                                            :i Date
                                                            :j DateTime
                                                            :k LocalDate
+                                                           :k2 LocalTime
                                                            :l (s/maybe String)
                                                            :m (s/both Long (s/pred odd? 'odd?))
                                                            :o [{:p #{{:q String}}}]

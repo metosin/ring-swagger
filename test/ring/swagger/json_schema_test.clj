@@ -7,7 +7,7 @@
             [ring.swagger.core :as rsc]
             [linked.core :as linked])
   (:import [java.util Date UUID]
-           [org.joda.time DateTime LocalDate]
+           [org.joda.time DateTime LocalDate LocalTime]
            [java.util.regex Pattern]
            [clojure.lang Symbol]))
 
@@ -28,6 +28,7 @@
     (rsjs/->swagger Date) => {:type "string" :format "date-time"}
     (rsjs/->swagger DateTime) => {:type "string" :format "date-time"}
     (rsjs/->swagger LocalDate) => {:type "string" :format "date"}
+    (rsjs/->swagger LocalTime) => {:type "string" :format "time"}
     (rsjs/->swagger Pattern) => {:type "string" :format "regex"}
     (rsjs/->swagger #"[6-9]") => {:type "string" :pattern "[6-9]"}
     (rsjs/->swagger UUID) => {:type "string" :format "uuid"})
@@ -165,6 +166,7 @@
     Date
     DateTime
     LocalDate
+    LocalTime
     Pattern
     UUID
     clojure.lang.Keyword)

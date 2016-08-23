@@ -4,7 +4,7 @@
             [clojure.string :as str]
             [clj-time.format :as tf]
             [clj-time.coerce :as tc])
-  (:import [org.joda.time LocalDate DateTime]
+  (:import [org.joda.time LocalDate DateTime LocalTime]
            [java.util Date UUID]
            [java.util.regex Pattern]
            (clojure.lang APersistentSet Keyword)))
@@ -14,9 +14,11 @@
 
 (defn parse-date-time ^DateTime [date] (tf/parse (tf/formatters :date-time-parser) (->DateTime date)))
 (defn parse-date ^DateTime [date] (tf/parse-local-date (tf/formatters :date) (->DateTime date)))
+(defn parse-time ^DateTime [date] (tf/parse-local-time (tf/formatters :time-parser) (->DateTime date)))
 
 (defn unparse-date-time ^String [date] (tf/unparse (tf/formatters :date-time) (->DateTime date)))
 (defn unparse-date ^String [date] (tf/unparse-local-date (tf/formatters :date) (->DateTime date)))
+(defn unparse-time ^String [date] (tf/unparse-local-time (tf/formatters :time) (->DateTime date)))
 
 (defn parse-pattern ^Pattern [pattern] (re-pattern pattern))
 (defn unparse-pattern ^String [pattern] (str pattern))
@@ -34,6 +36,13 @@
     (fn [x]
       (if (string? x)
         (parse-date x)
+        x))))
+
+(defn time-matcher [schema]
+  (if (= LocalTime schema)
+    (fn [x]
+      (if (string? x)
+        (parse-time x)
         x))))
 
 (defn pattern-matcher [schema]
@@ -124,6 +133,7 @@
       (set-matcher schema)
       (date-time-matcher schema)
       (date-matcher schema)
+      (time-matcher schema)
       (pattern-matcher schema)))
 
 (defn split-params-matcher [schema]
