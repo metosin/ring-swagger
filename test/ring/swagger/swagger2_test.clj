@@ -271,8 +271,8 @@
                   (= (get-in actual [:definitions (name schema-name)]) value)))
 
 (fact "additionalProperties"
-  (let [Kikka (s/schema-with-name {:a s/Str s/Keyword s/Str} 'Kikka)
-        Kukka (s/schema-with-name {:a s/Str s/Keyword Kikka} 'Kukka)
+  (let [Kikka (s/schema-with-name {:a s/Str s/Str s/Str} 'Kikka)
+        Kukka (s/schema-with-name {:a s/Str s/Int Kikka} 'Kukka)
         Kakka (s/schema-with-name {s/Keyword Kukka} 'Kakka)
         swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}
                          "/kukka" {:post {:parameters {:body Kukka}}}
