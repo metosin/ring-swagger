@@ -528,7 +528,8 @@
                              :additionalProperties false}
                       "PetError" {:type "object"
                                   :properties {:message {:type "string"}}
-                                  :required [:message]}}}))
+                                  :required [:message]
+                                  :additionalProperties {}}}}))
 
 (defrecord InvalidElement [])
 

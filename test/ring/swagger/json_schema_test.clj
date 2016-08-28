@@ -6,7 +6,7 @@
             [ring.swagger.json-schema :as rsjs]
             [ring.swagger.core :as rsc]
             [linked.core :as linked])
-  (:import [java.util Date UUID]
+  (:import [java.util Date UUID Currency]
            [org.joda.time DateTime LocalDate LocalTime]
            [java.util.regex Pattern]
            [clojure.lang Symbol]))
@@ -16,7 +16,13 @@
 (s/defrecord Keyboard [type :- (s/enum :left :right)])
 (s/defrecord User [age :- s/Int, keyboard :- Keyboard])
 
+;; Make currency return nil for testing purporses
+(defmethod rsjs/convert-class java.util.Currency [_ _] nil)
+
 (facts "type transformations"
+  (fact "mapped to nil"
+    (rsjs/->swagger Currency) => nil)
+
   (facts "java types"
     (rsjs/->swagger Integer) => {:type "integer" :format "int32"}
     (rsjs/->swagger Long) => {:type "integer" :format "int64"}
@@ -120,7 +126,7 @@
       => {:type "void" :oneOf [(rsjs/->swagger Long) (rsjs/->swagger String)]}
 
       (fact "invalid values are removed"
-        (rsjs/->swagger (s/conditional (constantly true) Long (constantly false) s/Any))
+        (rsjs/->swagger (s/conditional (constantly true) Long (constantly false) Currency))
         => {:type "void" :oneOf [(rsjs/->swagger Long)]}))
 
     (fact "s/constrained"
@@ -210,9 +216,13 @@
     s/Uuid))
 
 (facts "properties"
-  (fact "s/Any -values are ignored"
+  (fact "s/Any -values are not ignored"
     (keys (rsjs/properties {:a s/Str
                             :b s/Any}))
+    => [:a :b])
+
+  (fact "nil-values are ignored"
+    (keys (rsjs/properties {:a s/Str, :b Currency}))
     => [:a])
 
   (fact "s/Keyword -keys are ignored"

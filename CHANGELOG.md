@@ -11,6 +11,7 @@
 * Fixed to work with the latest Clojure 1.9 alpha, thanks to [Brent Hagany](https://github.com/bhagany)
 * Support for `org.joda.time.LocalTime`, thanks to [Francesco Bellomi](https://github.com/fbellomi)!
 * Fixes all reflection warnings
+* `s/Any` as a value generates empty object `{}` to JSON Schema, Fixes #91, thanks to [Mika Haapakorpi](https://github.com/hkorpi) for the tip.
 
 ```clj
 [cheshire "5.6.3"] is available but we use "5.6.1"
