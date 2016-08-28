@@ -8,7 +8,7 @@
    * Thanks to [Tim Gilberd](https://github.com/timgilbert) for the initial fix!
 * Support for top-level Schema-records for non-body-parameters, fixes [#104](https://github.com/metosin/ring-swagger/issues/104).
    * Thanks to [quimrstorres](https://github.com/quimrstorres)!
-* Fixed to work with the latest Clojure 1.9 alpha, thanks to [Brent Hagany](https://github.com/bhagany)
+* Fixed to work Clojure 1.9 alpha11, thanks to [Brent Hagany](https://github.com/bhagany)
 * Support for `org.joda.time.LocalTime`, thanks to [Francesco Bellomi](https://github.com/fbellomi)!
 * Fixes all reflection warnings
 * `s/Any` as a value generates empty object `{}` to JSON Schema, Fixes #91, thanks to [Mika Haapakorpi](https://github.com/hkorpi) for the tip.
