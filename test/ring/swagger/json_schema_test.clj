@@ -232,7 +232,7 @@
 
   (fact "Required non-keyword-keys are ignored"
     (keys (rsjs/properties {:a s/Str
-                            (s/required-key "b") s/Any}))
+                            (s/required-key "b") s/Str}))
     => [:a])
 
   (fact "s/Any -keys are ignored"
