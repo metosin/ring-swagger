@@ -113,13 +113,12 @@
       (rsjs/->swagger (s/eq "kikka")) => (rsjs/->swagger String))
 
     (fact "s/Any"
-      (fact "defaults to nil"
-        (rsjs/->swagger s/Any) => nil
-        (rsjs/->swagger s/Any {:in :body}) => nil
-        (rsjs/->swagger s/Any {:in :header}) => {:type "string"}
-        (rsjs/->swagger s/Any {:in :path}) => {:type "string"}
-        (rsjs/->swagger s/Any {:in :query}) => {:type "string", :allowEmptyValue true}
-        (rsjs/->swagger s/Any {:in :formData}) => {:type "string", :allowEmptyValue true}))
+      (rsjs/->swagger s/Any) => {}
+      (rsjs/->swagger s/Any {:in :body}) => {}
+      (rsjs/->swagger s/Any {:in :header}) => {:type "string"}
+      (rsjs/->swagger s/Any {:in :path}) => {:type "string"}
+      (rsjs/->swagger s/Any {:in :query}) => {:type "string", :allowEmptyValue true}
+      (rsjs/->swagger s/Any {:in :formData}) => {:type "string", :allowEmptyValue true})
 
     (fact "s/conditional"
       (rsjs/->swagger (s/conditional (constantly true) Long (constantly false) String))
