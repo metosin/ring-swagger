@@ -10,6 +10,7 @@
    * Thanks to [quimrstorres](https://github.com/quimrstorres)!
 * Fixed to work with the latest Clojure 1.9 alpha, thanks to [Brent Hagany](https://github.com/bhagany)
 * Support for `org.joda.time.LocalTime`, thanks to [Francesco Bellomi](https://github.com/fbellomi)!
+* Fixes all reflection warnings
 
 ```clj
 [cheshire "5.6.3"] is available but we use "5.6.1"

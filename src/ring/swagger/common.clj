@@ -84,3 +84,13 @@
       (some-> x record-schema meta ::title)
       (some-> x s/schema-name name)))
 
+(defn java-invoke
+  "Invokes a Java object method via reflection "
+  [class-name method-name object]
+  (.invoke
+    (.getMethod
+      (Class/forName class-name)
+      method-name
+      (into-array Class []))
+    object
+    (object-array 0)))

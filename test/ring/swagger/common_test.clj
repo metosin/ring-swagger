@@ -38,3 +38,6 @@
   (common/plain-map? {}) => true
   (common/plain-map? (->ARecord 1)) => false
   (common/plain-map? (linked/map :a 1)) => true)
+
+(fact "java-invoke"
+  (common/java-invoke "java.lang.String" "length" "kikka") => 5)

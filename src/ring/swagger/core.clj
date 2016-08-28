@@ -153,7 +153,9 @@
   "Context of a request. Defaults to \"\", but has the
    servlet-context in the legacy app-server environments."
   [{:keys [servlet-context]}]
-  (if servlet-context (.getContextPath servlet-context) ""))
+  (if servlet-context
+    (common/java-invoke "javax.servlet.ServletContext" "getContextPath" servlet-context)
+    ""))
 
 (defn basepath
   "extract a base-path from ring request. Doesn't return default ports
