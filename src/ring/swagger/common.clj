@@ -73,7 +73,7 @@
       (last values))))
 
 (defn record-schema [x]
-  (some-> x su/class-schema :schema (with-meta {::title (.getSimpleName x)})))
+  (some-> x su/class-schema :schema (with-meta {::title (.getSimpleName ^Class x)})))
 
 (defn titled [x]
   (or (record-schema x)
