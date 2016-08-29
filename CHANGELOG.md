@@ -1,4 +1,4 @@
-## 0.23.0-SNAPSHOT
+## 0.22.10 (29.8.2016)
 
 * Support for `schema.core/defrecords`, fixes [#103](https://github.com/metosin/ring-swagger/issues/103).
 * Support for primitives & arrays of primitives both in `:body` & `:response`.
