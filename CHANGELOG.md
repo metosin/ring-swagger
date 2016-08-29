@@ -1,3 +1,11 @@
+## Unreleased
+
+* updated dependencies:
+
+```clj
+[frankiesardo/linked "1.2.8"] is available but we use "1.2.7"
+```
+
 ## 0.22.10 (29.8.2016)
 
 * Support for `schema.core/defrecords`, fixes [#103](https://github.com/metosin/ring-swagger/issues/103).
