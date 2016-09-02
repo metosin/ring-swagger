@@ -178,8 +178,7 @@ you can do the following:
 ## Validating the Swagger Spec
 
 The generated full spec can be validated against the [Swagger JSON Schema](https://raw.githubusercontent.com/reverb/swagger-spec/master/schemas/v2.0/schema.json)
-with the help of [scjsv](https://github.com/metosin/scjsv). **NOTE** currently loads the JSON Schema files for the internet, 
-from http://json-schema.org/draft-04/schema.
+with the help of [scjsv](https://github.com/metosin/scjsv).
 
 ```clojure
 (require '[ring.swagger.validator :as v])
