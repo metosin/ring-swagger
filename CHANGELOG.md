@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.22.11 (27.9.2016)
+
+* Validating a schema does not load anything from the Internet anymore, fixes [#113](https://github.com/metosin/ring-swagger/issues/113).
 * updated dependencies:
 
 ```clj
