@@ -1,5 +1,11 @@
 ## Unreleased
 
+* updated dependencies:
+
+```clj
+[metosin/scjsv "0.4.0"] is available but we use "0.3.0"
+```
+
 ## 0.22.11 (27.9.2016)
 
 * Validating a schema does not load anything from the Internet anymore, fixes [#113](https://github.com/metosin/ring-swagger/issues/113).
