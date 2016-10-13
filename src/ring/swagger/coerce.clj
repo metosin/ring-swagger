@@ -3,13 +3,13 @@
             [schema.coerce :as sc]
             [clojure.string :as str]
             [clj-time.format :as tf]
-            [clj-time.coerce :as tc])
+            [clj-time.coerce :as tc]
+            [ring.swagger.extension :as extension])
   (:import [org.joda.time LocalDate DateTime LocalTime]
            [java.util Date UUID]
            [java.util.regex Pattern]
            (clojure.lang APersistentSet Keyword)))
 
-(defn date-time? [x] (#{Date DateTime} x))
 (defn ->DateTime [date] (if (instance? Date date) (tc/from-date date) date))
 
 (defn parse-date-time ^DateTime [date] (tf/parse (tf/formatters :date-time-parser) (->DateTime date)))
@@ -23,27 +23,26 @@
 (defn parse-pattern ^Pattern [pattern] (re-pattern pattern))
 (defn unparse-pattern ^String [pattern] (str pattern))
 
-(defn date-time-matcher [schema]
-  (if (date-time? schema)
-    (fn [x]
-      (if (string? x)
-        (let [parsed (parse-date-time x)]
-          (if (= schema Date) (.toDate parsed) parsed))
-        x))))
+(defmulti time-matcher identity)
 
-(defn date-matcher [schema]
-  (if (= LocalDate schema)
-    (fn [x]
-      (if (string? x)
-        (parse-date x)
-        x))))
+(defn coerce-if-string [f] (fn [x] (if (string? x) (f x) x)))
 
-(defn time-matcher [schema]
-  (if (= LocalTime schema)
-    (fn [x]
-      (if (string? x)
-        (parse-time x)
-        x))))
+(defmethod time-matcher Date      [_] (coerce-if-string (fn [x] (.toDate (parse-date-time x)))))
+(defmethod time-matcher DateTime  [_] (coerce-if-string parse-date-time))
+(defmethod time-matcher LocalDate [_] (coerce-if-string parse-date))
+(defmethod time-matcher LocalTime [_] (coerce-if-string parse-time))
+
+(extension/java-time
+  (defmethod time-matcher java.time.Instant [_]
+    (coerce-if-string (fn [x] (java.time.Instant/parse x))))
+
+  (defmethod time-matcher java.time.LocalDate [_]
+    (coerce-if-string (fn [x] (java.time.LocalDate/parse x))))
+
+  (defmethod time-matcher java.time.LocalTime [_]
+    (coerce-if-string (fn [x] (java.time.LocalTime/parse x)))))
+
+(defmethod time-matcher :default [_] nil)
 
 (defn pattern-matcher [schema]
   (if (= Pattern schema)
@@ -66,8 +65,6 @@
       "false" false
       x)
     x))
-
-(string->boolean true)
 
 (defn string->long [^String x]
   (if (string? x)
@@ -131,8 +128,6 @@
   (or (json-coersions schema)
       (sc/keyword-enum-matcher schema)
       (set-matcher schema)
-      (date-time-matcher schema)
-      (date-matcher schema)
       (time-matcher schema)
       (pattern-matcher schema)))
 

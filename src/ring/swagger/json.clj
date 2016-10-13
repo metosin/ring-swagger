@@ -1,7 +1,8 @@
 (ns ring.swagger.json
   (:require [cheshire.generate :refer [add-encoder]]
             [schema.utils :as su]
-            [ring.swagger.coerce :as coerce])
+            [ring.swagger.coerce :as coerce]
+            [ring.swagger.extension :as extension])
   (:import [com.fasterxml.jackson.core JsonGenerator]
            [schema.utils ValidationError]
            [java.util Date]
@@ -34,3 +35,16 @@
 (add-encoder Pattern
   (fn [x ^JsonGenerator jg]
     (.writeString jg (coerce/unparse-pattern x))))
+
+(extension/java-time
+  (add-encoder java.time.Instant
+    (fn [^java.time.Instant x ^JsonGenerator jg]
+      (.writeString jg (.toString x))))
+
+  (add-encoder java.time.LocalDate
+    (fn [^java.time.LocalDate x ^JsonGenerator jg]
+      (.writeString jg (.toString x))))
+
+  (add-encoder java.time.LocalTime
+    (fn [^java.time.LocalTime x ^JsonGenerator jg]
+      (.writeString jg (.toString x)))))
