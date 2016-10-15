@@ -5,6 +5,7 @@
             [plumbing.fnk.pfnk :as pfnk]
             [ring.swagger.json-schema :as rsjs]
             [ring.swagger.core :as rsc]
+            [ring.swagger.extension :as extension]
             [linked.core :as linked])
   (:import [java.util Date UUID Currency]
            [org.joda.time DateTime LocalDate LocalTime]
@@ -37,7 +38,12 @@
     (rsjs/->swagger LocalTime) => {:type "string" :format "time"}
     (rsjs/->swagger Pattern) => {:type "string" :format "regex"}
     (rsjs/->swagger #"[6-9]") => {:type "string" :pattern "[6-9]"}
-    (rsjs/->swagger UUID) => {:type "string" :format "uuid"})
+    (rsjs/->swagger UUID) => {:type "string" :format "uuid"}
+    (extension/java-time
+      (rsjs/->swagger java.time.Instant) => {:type "string" :format "date-time"}
+      (rsjs/->swagger java.time.LocalDate) => {:type "string" :format "date"}
+      (rsjs/->swagger java.time.LocalTime) => {:type "string" :format "time"}))
+
 
   (fact "schema types"
     (rsjs/->swagger s/Int) => {:type "integer" :format "int64"}
@@ -174,7 +180,10 @@
     LocalTime
     Pattern
     UUID
-    clojure.lang.Keyword)
+    clojure.lang.Keyword
+    (extension/java-time java.time.Instant)
+    (extension/java-time java.time.LocalDate)
+    (extension/java-time java.time.LocalTime))
 
   (fact "Describe Model"
     (let [schema (rsjs/describe Model ..desc..)]

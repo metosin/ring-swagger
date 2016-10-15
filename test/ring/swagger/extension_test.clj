@@ -11,7 +11,7 @@
       (disabled
         (swap! evals conj :a)
         (swap! evals conj :b)
-        :c) => nil?
+        :c) => nil
       @evals => empty?)
     (fact "do evaluate the body if the extension test is truthy"
       (enabled
@@ -20,7 +20,18 @@
         :f) => :f
       @evals => [:d :e]))
   (fact "undefined vars/classes are ignored in disabled extensions"
-    (resolve 'a) => nil?
+    (resolve 'a) => nil
     (disabled (a)) =not=> (throws Exception)
     (resolve 'dummy.Class) => (throws ClassNotFoundException)
     (disabled (dummy.Class)) =not=> (throws Exception)))
+
+(fact "java-time extension"
+  (let [java-time (try
+                    (resolve 'java.time.Instant)
+                    (catch Exception _))]
+    (if java-time
+      (fact "runs the enclosed form"
+        (extension/java-time :a) => :a)
+      (fact "skips the enclosed form"
+        (extension/java-time :a) => nil
+        (resolve 'java.time.Instant) => (throws ClassNotFoundException)))))

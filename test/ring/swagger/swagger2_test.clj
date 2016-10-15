@@ -3,6 +3,7 @@
             [ring.swagger.swagger2 :as swagger2]
             [ring.swagger.swagger2-full-schema :as full-schema]
             [ring.swagger.json-schema :as rsjs]
+            [ring.swagger.extension :as extension]
             [ring.swagger.validator :as validator]
             [linked.core :as linked]
             [ring.util.http-status :as status]
@@ -140,6 +141,14 @@
 
 (fact "more complete spec"
   (validate a-complete-swagger) => nil)
+
+(extension/java-time
+  (fact "spec with java.time"
+    (let [model {:i java.time.Instant
+                 :ld java.time.LocalDate
+                 :lt java.time.LocalTime}
+          swagger {:paths {"/time" {:post {:parameters {:body model}}}}}]
+      (validate swagger) => nil)))
 
 (defrecord InvalidElement [])
 
