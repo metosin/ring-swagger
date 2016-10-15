@@ -23,7 +23,7 @@
                    :dependencies [[org.clojure/clojure "1.8.0"]
                                   [midje "1.8.3"]
                                   [ring-mock "0.1.5"]
-                                  [metosin/ring-swagger-ui "2.2.2-0"]
+                                  [metosin/ring-swagger-ui "2.2.5-0"]
                                   [javax.servlet/servlet-api "2.5"]
                                   ; Required when using with Java 1.6
                                   [org.codehaus.jsr166-mirror/jsr166y "1.7.0"]]}
