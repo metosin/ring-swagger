@@ -3,6 +3,7 @@
             [schema.core :as s]
             [cheshire.core :as cheshire]
             [clj-time.core :as t]
+            [ring.swagger.extension :as extension]
             [ring.swagger.schema :as schema]
             ring.swagger.json)
   (:import [java.util Date UUID]
@@ -66,7 +67,27 @@
       jmodel =not=> model)
 
     (fact "coerce! makes models match"
-      (pattern-to-str (schema/coerce! AllTypes jmodel)) => model)))
+      (pattern-to-str (schema/coerce! AllTypes jmodel)) => model))
+
+  (extension/java-time
+    (let [types {:i java.time.Instant
+                 :ld java.time.LocalDate
+                 :lt java.time.LocalTime}
+          model {:i (java.time.Instant/now)
+                 :ld (java.time.LocalDate/now)
+                 :lt (java.time.LocalTime/now)}
+          json (cheshire/generate-string model)
+          jmodel (cheshire/parse-string json true)]
+
+      (fact "json can be parsed"
+        json => truthy
+        jmodel => truthy)
+
+      (fact "by default, models don't match"
+        jmodel =not=> model)
+
+      (fact "coerce! makes models match"
+        (schema/coerce! types jmodel) => model))))
 
 (fact "date-time coercion"
   (fact "with millis"

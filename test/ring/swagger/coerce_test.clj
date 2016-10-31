@@ -2,6 +2,7 @@
   (:require [midje.sweet :refer :all]
             [schema.core :as s]
             [ring.swagger.coerce :as rsc]
+            [ring.swagger.extension :as extension]
             [schema.coerce :as sc])
   (:import [org.joda.time LocalDate DateTime LocalTime]
            [java.util Date UUID]))
@@ -26,7 +27,21 @@
       ((cooerce LocalTime) "10:23:37.456") => (partial instance? LocalTime))
 
     (fact "UUID"
-      ((cooerce UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))))
+      ((cooerce UUID) "77e70512-1337-dead-beef-0123456789ab") => (partial instance? UUID))
+
+    (extension/java-time
+      (fact "java.time"
+        (fact "Instant with and without millis"
+          ((cooerce java.time.Instant) "2014-02-18T18:25:37.456Z") => (partial instance? java.time.Instant)
+          ((cooerce java.time.Instant) "2014-02-18T18:25:37Z") => (partial instance? java.time.Instant))
+
+        (fact "LocalDate"
+          ((cooerce java.time.LocalDate) "2014-02-19") => (partial instance? java.time.LocalDate))
+
+        (fact "LocalTime"
+          ((cooerce java.time.LocalTime) "10:23") => (partial instance? java.time.LocalTime)
+          ((cooerce java.time.LocalTime) "10:23:37") => (partial instance? java.time.LocalTime)
+          ((cooerce java.time.LocalTime) "10:23:37.456") => (partial instance? java.time.LocalTime))))))
 
 (fact "query coercions"
   (let [coerce (rsc/coercer :query)]

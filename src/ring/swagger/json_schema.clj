@@ -3,7 +3,8 @@
             [schema.spec.core :as spec]
             [schema.spec.variant :as variant]
             [ring.swagger.common :as common]
-            [ring.swagger.core :as rsc]))
+            [ring.swagger.core :as rsc]
+            [ring.swagger.extension :as extension]))
 
 (defn maybe? [schema]
   (instance? schema.core.Maybe schema))
@@ -99,6 +100,11 @@
 (defmethod convert-class org.joda.time.LocalDate [_ _] {:type "string" :format "date"})
 (defmethod convert-class org.joda.time.LocalTime [_ _] {:type "string" :format "time"})
 (defmethod convert-class java.util.regex.Pattern [_ _] {:type "string" :format "regex"})
+
+(extension/java-time
+  (defmethod convert-class java.time.Instant   [_ _] {:type "string" :format "date-time"})
+  (defmethod convert-class java.time.LocalDate [_ _] {:type "string" :format "date"})
+  (defmethod convert-class java.time.LocalTime [_ _] {:type "string" :format "time"}))
 
 (defmethod convert-class :default [e _]
   (if-not *ignore-missing-mappings*
