@@ -4,6 +4,8 @@
 
 ```clj
 [metosin/scjsv "0.4.0"] is available but we use "0.3.0"
+[clj-time "0.12.1"] is available but we use "0.12.0"
+[frankiesardo/linked "1.2.9"] is available but we use "1.2.8"
 ```
 
 ## 0.22.11 (27.9.2016)
