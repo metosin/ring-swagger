@@ -12,7 +12,7 @@
                  [prismatic/schema "1.1.3"]
                  [prismatic/plumbing "0.5.3"]
                  [metosin/scjsv "0.4.0"]
-                 [clj-time "0.12.1"]
+                 [clj-time "0.12.2"]
                  [org.tobereplaced/lettercase "1.0.0"]
                  [potemkin "0.4.3"]
                  [frankiesardo/linked "1.2.9"]]

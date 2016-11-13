@@ -1,3 +1,11 @@
+## UNRELEASED
+
+* updated dependencies:
+
+```clj
+[clj-time "0.12.2"] is available but we use "0.12.1"
+```
+
 ## 0.22.12 (31.10.2016)
 
 * Support for Java 1.8 Dates, fixes [#107](https://github.com/metosin/ring-swagger/issues/107). Thanks to [Matt K](https://github.com/mtkp) for contributing!
