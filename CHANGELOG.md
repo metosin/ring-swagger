@@ -3,7 +3,7 @@
 * updated dependencies:
 
 ```clj
-[clj-time "0.12.2"] is available but we use "0.12.1"
+[clj-time "0.13.0"] is available but we use "0.12.1"
 ```
 
 ## 0.22.12 (31.10.2016)
@@ -133,7 +133,7 @@
 * Path-parameters are always required (in align to the spec)
 * Body-parameters are not required if wrapped in `schema.core.Maybe`
 * `ring.swagger.coerce/query-coercions` now apply both `:json` and `:query` coercions for `s/Int`, `Long` and `Double`
-* Cleaned up internals 
+* Cleaned up internals
   * `ring.swagger.swagger2/transform` -> `ring.swagger.json-schema/schema-object`
 
 ## 0.22.3 (17.1.2016)
