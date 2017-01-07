@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.22.12"
+(defproject metosin/ring-swagger "0.22.13"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -28,7 +28,7 @@
                                   ; Required when using with Java 1.6
                                   [org.codehaus.jsr166-mirror/jsr166y "1.7.0"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
-             :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha11"]]}}
+             :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha14"]]}}
   :codeina {:sources ["src"]
             :target "gh-pages/doc"
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
