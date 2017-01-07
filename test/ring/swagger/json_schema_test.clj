@@ -248,10 +248,10 @@
                             (s/required-key :b) s/Str}))
     => [:a :b])
 
-  (fact "Required non-keyword-keys are ignored"
+  (fact "Required non-keyword-keys are NOT ignored"
     (keys (rsjs/properties {:a s/Str
                             (s/required-key "b") s/Str}))
-    => [:a])
+    => [:a "b"])
 
   (fact "s/Any -keys are ignored"
     (keys (rsjs/properties {:a s/Str

@@ -1,5 +1,6 @@
-## UNRELEASED
+## 0.22.13 (7.1.2017)
 
+* produce json schema properties also from non-keyword keys
 * updated dependencies:
 
 ```clj

@@ -258,7 +258,6 @@
                           :when (s/specific-key? k)
                           :let [key-meta (meta k)
                                 k (s/explicit-schema-key k)]
-                          :when (keyword? k)
                           :let [v (try->swagger v k key-meta)]]
                       (and v [k v])))]
     (if (seq props)
