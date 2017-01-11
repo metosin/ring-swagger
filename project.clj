@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.22.13"
+(defproject metosin/ring-swagger "0.22.14-SNAPSHOT"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -7,7 +7,7 @@
             :comments "same as Clojure"}
   :dependencies [[cheshire "5.6.3"]
                  [slingshot "0.12.2"]
-                 [metosin/ring-http-response "0.8.0"]
+                 [metosin/ring-http-response "0.8.1"]
                  [metosin/schema-tools "0.9.0"]
                  [prismatic/schema "1.1.3"]
                  [prismatic/plumbing "0.5.3"]
@@ -33,5 +33,6 @@
             :target "gh-pages/doc"
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
             :src-uri-prefix "#L"}
+  :deploy-repositories [["releases" :clojars]]
   :aliases {"all" ["with-profile" "dev:dev,1.7"]
             "test-ancient" ["midje"]})

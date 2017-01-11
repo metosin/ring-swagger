@@ -1,3 +1,11 @@
+## 0.22.14 (11.1.2017)
+
+* updated dependencies:
+
+```clj
+[metosin/ring-http-response "0.8.1"] is available but we use "0.8.0"
+```
+
 ## 0.22.13 (7.1.2017)
 
 * produce json schema properties also from non-keyword keys
