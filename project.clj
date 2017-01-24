@@ -5,9 +5,9 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo
             :comments "same as Clojure"}
-  :dependencies [[cheshire "5.6.3"]
+  :dependencies [[cheshire "5.7.0"]
                  [slingshot "0.12.2"]
-                 [metosin/ring-http-response "0.8.0"]
+                 [metosin/ring-http-response "0.8.1"]
                  [metosin/schema-tools "0.9.0"]
                  [prismatic/schema "1.1.3"]
                  [prismatic/plumbing "0.5.3"]
