@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.22.13"
+(defproject metosin/ring-swagger "0.22.15-SNAPSHOT"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -33,5 +33,6 @@
             :target "gh-pages/doc"
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
             :src-uri-prefix "#L"}
+  :deploy-repositories [["releases" :clojars]]
   :aliases {"all" ["with-profile" "dev:dev,1.7"]
             "test-ancient" ["midje"]})
