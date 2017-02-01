@@ -1,5 +1,7 @@
 ## UNRELEASED
 
+* **BREAKING**: Requires Java 1.7
+
 ```clj
 [cheshire "5.7.0"] is available but we use "5.6.3"
 ```
