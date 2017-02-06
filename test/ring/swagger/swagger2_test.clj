@@ -10,7 +10,8 @@
             [midje.sweet :refer :all])
   (:import [java.util Date UUID]
            [java.util.regex Pattern]
-           [org.joda.time DateTime LocalDate LocalTime]))
+           [org.joda.time DateTime LocalDate LocalTime]
+           (java.io File)))
 
 (s/defschema Anything {s/Keyword s/Any})
 (s/defschema Nothing {})
@@ -106,7 +107,9 @@
                                                            :o [{:p #{{:q String}}}]
                                                            :u UUID
                                                            :v Pattern
-                                                           :w #"a[6-9]"}}}}}
+                                                           :w #"a[6-9]"}}}
+                                   :responses {200 {:description "file"
+                                                    :schema File}}}}
            "/api/pets" {:get {:parameters {:body Pet
                                            :query (merge Anything {:x Long :y Long})
                                            :path Nothing

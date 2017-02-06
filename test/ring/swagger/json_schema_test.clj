@@ -10,7 +10,8 @@
   (:import [java.util Date UUID Currency]
            [org.joda.time DateTime LocalDate LocalTime]
            [java.util.regex Pattern]
-           [clojure.lang Symbol]))
+           [clojure.lang Symbol]
+           (java.io File)))
 
 (s/defschema Model {:value String})
 
@@ -40,6 +41,7 @@
     (rsjs/->swagger #"[6-9]") => {:type "string" :pattern "[6-9]"}
     (rsjs/->swagger UUID) => {:type "string" :format "uuid"}
     (extension/java-time
+    (rsjs/->swagger File) => {:type "file"}
       (rsjs/->swagger java.time.Instant) => {:type "string" :format "date-time"}
       (rsjs/->swagger java.time.LocalDate) => {:type "string" :format "date"}
       (rsjs/->swagger java.time.LocalTime) => {:type "string" :format "time"}))

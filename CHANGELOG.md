@@ -1,6 +1,7 @@
 ## UNRELEASED
 
 * **BREAKING**: Requires Java 1.7
+* Support for `java.io.File` return type, mapping to `"file"`.
 
 ```clj
 [cheshire "5.7.0"] is available but we use "5.6.3"
