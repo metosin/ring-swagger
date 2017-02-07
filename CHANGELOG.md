@@ -1,10 +1,19 @@
-## UNRELEASED
+## 0.23.0-SNAPSHOT
 
 * **BREAKING**: Requires Java 1.7
+* Support Async Ring handlers in `ring.swagger.middleware`
 * Support for `java.io.File` return type, mapping to `"file"`.
+
+* updated dependencies:
 
 ```clj
 [cheshire "5.7.0"] is available but we use "5.6.3"
+```
+
+* droped dependencies:
+
+```clj
+[slingshot "0.12.2"]
 ```
 
 ## 0.22.14 (11.1.2017)
