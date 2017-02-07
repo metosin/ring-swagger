@@ -1,6 +1,7 @@
 (ns ring.swagger.middleware
-  (:require [slingshot.slingshot :refer [try+ throw+]]
-            [schema.utils :as su]
+  (:require [schema.utils :as su]
+            [schema.core :as s]
+            [ring.swagger.schema :as rss]
             [plumbing.core :as p]
             [clojure.walk :as walk]
             [ring.util.http-response :as http-response]
@@ -29,8 +30,11 @@
 (defn wrap-swagger-data
   "Middleware that adds top level swagger-data into request."
   [handler data]
-  (fn [request]
-    (handler (set-swagger-data request data))))
+  (fn
+    ([request]
+     (handler (set-swagger-data request data)))
+    ([request respond raise]
+     (handler (set-swagger-data request data) respond raise))))
 
 ;;
 ;; common utilities
@@ -63,12 +67,27 @@
    :catch-core-errors? - consume also :schema.core/errors (defaults to false)"
   [handler & [{:keys [error-handler catch-core-errors?]}]]
   (let [error-handler (or error-handler default-error-handler)]
-    (fn [request]
-      (try+
-        (handler request)
-        (catch [:type :schema.core/error] validation-error
-          (if catch-core-errors?
-            (error-handler validation-error)
-            (throw+ validation-error)))
-        (catch [:type :ring.swagger.schema/validation] error-container
-          (error-handler error-container))))))
+    (fn
+      ([request]
+       (try
+         (handler request)
+         (catch Exception e
+           (let [{:keys [type] :as data} (ex-data e)]
+             (if (or (and catch-core-errors? (= type ::s/error))
+                     (= type ::rss/validation))
+               (error-handler data)
+               (throw e))))))
+      ([request respond raise]
+       (try
+         (handler request respond (fn [e]
+                                    (let [{:keys [type] :as data} (ex-data e)]
+                                      (if (or (and catch-core-errors? (= type ::s/error))
+                                              (= type ::rss/validation))
+                                        (respond (error-handler data))
+                                        (raise e)))))
+         (catch Exception e
+           (let [{:keys [type] :as data} (ex-data e)]
+             (if (or (and catch-core-errors? (= type ::s/error))
+                     (= type ::rss/validation))
+               (respond (error-handler data))
+               (throw e)))))))))
