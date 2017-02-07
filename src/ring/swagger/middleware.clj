@@ -59,6 +59,13 @@
 (defn default-error-handler [{:keys [error]}]
   (http-response/bad-request {:errors (stringify-error error)}))
 
+(defn- handle-exception [catch-core-errors? error-handler e respond raise]
+  (let [{:keys [type] :as data} (ex-data e)]
+    (if (or (and catch-core-errors? (= type ::s/error))
+            (= type ::rss/validation))
+      (respond (error-handler data))
+      (raise e))))
+
 (defn wrap-validation-errors
   "Middleware that catches thrown ring-swagger validation errors turning them
    into valid error respones. Accepts the following options:
@@ -66,28 +73,17 @@
    :error-handler - a function of schema.utils.ErrorContainer -> response
    :catch-core-errors? - consume also :schema.core/errors (defaults to false)"
   [handler & [{:keys [error-handler catch-core-errors?]}]]
-  (let [error-handler (or error-handler default-error-handler)]
+  (let [error-handler (or error-handler default-error-handler)
+        handle-exception (partial handle-exception catch-core-errors? error-handler)
+        throw #(throw %)]
     (fn
       ([request]
        (try
          (handler request)
          (catch Exception e
-           (let [{:keys [type] :as data} (ex-data e)]
-             (if (or (and catch-core-errors? (= type ::s/error))
-                     (= type ::rss/validation))
-               (error-handler data)
-               (throw e))))))
+           (handle-exception e identity throw))))
       ([request respond raise]
        (try
-         (handler request respond (fn [e]
-                                    (let [{:keys [type] :as data} (ex-data e)]
-                                      (if (or (and catch-core-errors? (= type ::s/error))
-                                              (= type ::rss/validation))
-                                        (respond (error-handler data))
-                                        (raise e)))))
+         (handler request respond #(handle-exception % respond raise))
          (catch Exception e
-           (let [{:keys [type] :as data} (ex-data e)]
-             (if (or (and catch-core-errors? (= type ::s/error))
-                     (= type ::rss/validation))
-               (respond (error-handler data))
-               (throw e)))))))))
+           (handle-exception e respond throw)))))))
