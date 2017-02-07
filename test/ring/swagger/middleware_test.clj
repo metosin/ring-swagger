@@ -135,12 +135,3 @@
           (middleware/get-swagger-data enchanced)
           => {:produces [:json :edn]
               :consumes [:json :edn]})))))
-
-(let [failing-handler (fn [_] (s/validate {:a String} {}))]
-  (fact "by default, schema.core validation errors are not caught"
-    ((middleware/wrap-validation-errors failing-handler)) => (throws Exception))
-  (fact "with :catch-core-errors? false, schema.core validation errors are not caught"
-    ((middleware/wrap-validation-errors failing-handler {:catch-core-errors? false})) => (throws Exception))
-  (fact "with :catch-core-errors? true, schema.core validation errors are caught"
-    ((middleware/wrap-validation-errors failing-handler {:catch-core-errors? true}) request) =>
-    (http-response/bad-request {:errors {:a "missing-required-key"}})))
