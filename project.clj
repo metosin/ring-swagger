@@ -7,7 +7,7 @@
             :comments "same as Clojure"}
   :dependencies [[cheshire "5.7.0"]
                  [slingshot "0.12.2"]
-                 [metosin/ring-http-response "0.8.1"]
+                 [metosin/ring-http-response "0.8.2"]
                  [metosin/schema-tools "0.9.0"]
                  [prismatic/schema "1.1.3"]
                  [prismatic/plumbing "0.5.3"]
@@ -17,7 +17,7 @@
                  [potemkin "0.4.3"]
                  [frankiesardo/linked "1.2.9"]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
-                             [lein-ring "0.10.0"]
+                             [lein-ring "0.11.0"]
                              [lein-midje "3.2.1"]
                              [funcool/codeina "0.5.0"]]
                    :dependencies [[org.clojure/clojure "1.8.0"]
