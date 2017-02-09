@@ -22,6 +22,7 @@
                              [funcool/codeina "0.5.0"]]
                    :dependencies [[org.clojure/clojure "1.8.0"]
                                   [midje "1.8.3"]
+                                  [ring/ring-core "1.6.0-beta7"]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "2.2.8"]
                                   [javax.servlet/servlet-api "2.5"]
