@@ -14,6 +14,8 @@
 
 [![Clojars Project](http://clojars.org/metosin/ring-swagger/latest-version.svg)](http://clojars.org/metosin/ring-swagger)
 
+The [CHANGELOG](https://github.com/metosin/ring-swagger/blob/master/CHANGELOG.md).
+
 ## Web libs using Ring-Swagger
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure
