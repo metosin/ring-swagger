@@ -2,17 +2,17 @@
 
 * **BREAKING**: Requires Java 1.7
 * **BREAKING**: `ring.swagger.ui` is now `ring.swagger.swagger-ui` with new map-based options:
-  - `swagger-ui` takes just a single options map instead of varargs with new key `uri` for the uri to be mounted
-  - `wrap-swagger-ui` takes just a single options map (with `uri`) instead of varargs
+  - `swagger-ui` takes just a single options map instead of varargs with new key `path` for the path to be mounted
+  - `wrap-swagger-ui` takes just a single options map (with `path`) instead of varargs
   - both support the new async-ring
   - Fixes [#99](https://github.com/metosin/ring-swagger/issues/99)
 
 ```clj
 (require '[ring.swagger.swagger-ui :as ui])
 
-(ui/swagger-ui {:uri "/api-docs"})
+(ui/swagger-ui {:path "/api-docs"})
 
-(-> app (ui/wrap-swagger-ui {:uri "/api-docs"}))
+(-> app (ui/wrap-swagger-ui {:path "/api-docs"}))
 ```
 
 * Support async-ring in `ring.swagger.middleware`

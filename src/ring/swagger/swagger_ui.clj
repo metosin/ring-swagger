@@ -16,15 +16,15 @@
 (defn conf-js [req opts]
   (let [swagger-docs (swagger/join-paths (swagger/context req) (:swagger-docs opts "/swagger.json"))
         conf (-> opts
-                 (dissoc :swagger-docs :uri)
+                 (dissoc :swagger-docs :path)
                  (assoc :url swagger-docs))]
     (str "window.API_CONF = " (json/generate-string conf {:key-fn json-key}) ";")))
 
 
-(defn- serve [{:keys [uri root] :or {uri "/", root "swagger-ui"} :as options}]
+(defn- serve [{:keys [path root] :or {path "/", root "swagger-ui"} :as options}]
   (let [f (fn [{request-uri :uri :as req}]
             (let [;; Prefix path with servlet-context and compojure context
-                  uri (swagger/join-paths (:context req) uri)]
+                  uri (swagger/join-paths (:context req) path)]
               ;; Check if requested uri is under swagger-ui path and what file is requested
               (when-let [req-path (get-path uri request-uri)]
                 (condp = req-path
@@ -41,7 +41,7 @@
   "Returns a (async-)ring handler which can be used to serve swagger-ui.
    Takes the following options:
 
-   - **:uri**          the root uri for the swagger-ui, Defaults to \"/\"
+   - **:path**         the root path for the swagger-ui, Defaults to \"/\"
    - **:root**         the root prefix to get resources from. Default 'swagger-ui'
    - **:swagger-docs** the endpoint to get swagger data from. Default '/swagger.json'
    - **:oauth2**       map with oauth2 params, namely `:client-id`, `:realm` and `:app-name`

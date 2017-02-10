@@ -58,7 +58,7 @@
           (http-get handler "/index.html") => html?))
 
       (facts "with uri"
-        (let [handler (swagger-ui {:uri "/ui-docs"})]
+        (let [handler (swagger-ui {:path "/ui-docs"})]
 
           (http-get handler "/") => nil
           (http-get handler "/index.html") => nil
@@ -80,7 +80,7 @@
 
         (fact "with context and an uri"
           (http-get
-            (swagger-ui {:uri "/docs"})
+            (swagger-ui {:path "/docs"})
             "/compojure/docs"
             {:context "/compojure"}) => (redirect? "/compojure/docs/index.html")))
 
@@ -96,7 +96,7 @@
                      :servlet-context fake-context}) => (redirect? "/servlet/index.html")
 
           (fact "with uri"
-            (http-get (swagger-ui {:uri "/docs"})
+            (http-get (swagger-ui {:path "/docs"})
                       "/servlet/docs"
                       {:context "/servlet"
                        :servlet-context fake-context}) => (redirect? "/servlet/docs/index.html"))
@@ -108,7 +108,7 @@
                        :servlet-context fake-context}) => (redirect? "/servlet/compojure/index.html")
 
             (fact "and uri"
-              (http-get (swagger-ui {:uri "/docs"})
+              (http-get (swagger-ui {:path "/docs"})
                         "/servlet/compojure/docs"
                         {:context "/servlet/compojure"
                          :servlet-context fake-context}) => (redirect? "/servlet/compojure/docs/index.html"))))))))
