@@ -1,4 +1,4 @@
-## 0.23.0-SNAPSHOT
+## 0.23.0 (10.2.2017)
 
 * **BREAKING**: Requires Java 1.7
 * **BREAKING**: `ring.swagger.ui` is now `ring.swagger.swagger-ui` with new map-based options:

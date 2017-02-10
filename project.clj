@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.23.0-SNAPSHOT"
+(defproject metosin/ring-swagger "0.23.0"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
