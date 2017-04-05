@@ -1,3 +1,12 @@
+## UNRELEASED
+
+* updated dependencies:
+
+```clj
+[prismatic/schema "1.1.5"] is available but we use "1.1.3"
+[metosin/ring-swagger-ui "2.2.10"] is available but we use "2.2.8"
+```
+
 ## 0.23.0 (10.2.2017)
 
 * **BREAKING**: Requires Java 1.7
