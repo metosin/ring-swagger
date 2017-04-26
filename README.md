@@ -282,10 +282,10 @@ One can also use the options to create more accurate specs (via the `:in` option
 | `String`, `s/Str`, `Keyword`, `s/Keyword`, `Symbol`, `s/Symbol`, `s/Any` non-body-parameter | string                   | `"kikka"`
 | `Boolean`                                   | boolean                  | `true`
 | `nil`, `s/Any` body-parameter            | void                     |
-| `java.util.Date`, `org.joda.time.DateTime`, `s/Inst`, `java.time.Instant` | string, date-time        | `"2014-02-18T18:25:37.456Z"`, also without millis: `"2014-02-18T18:25:37Z"`
 | `java.util.regex.Pattern`,                  | string, regex            | `[a-z0-9]`
 | `#"[a-z0-9]+"`                              | string, pattern          | `"a6"`
 | `s/Uuid`, `java.util.UUID`                  | string, uuid             | `"77e70512-1337-dead-beef-0123456789ab"`
+| `java.util.Date`, `org.joda.time.DateTime`, `s/Inst`, `java.time.Instant` | string, date-time        | `"2014-02-18T18:25:37.456Z"`, also without millis: `"2014-02-18T18:25:37Z"`
 | `org.joda.time.LocalDate`, `java.time.LocalDate` | string, date             | `"2014-02-19"`
 | `org.joda.time.LocalTime`, `java.time.LocalTime` | string, time             | `"16:22"`
 | `(s/enum X Y Z)`                            | *type of X*, enum(X,Y,Z)
