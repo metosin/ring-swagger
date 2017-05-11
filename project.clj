@@ -6,7 +6,6 @@
             :distribution :repo
             :comments "same as Clojure"}
   :dependencies [[cheshire "5.7.0"]
-                 [slingshot "0.12.2"]
                  [metosin/ring-http-response "0.9.0"]
                  [ring/ring-core "1.6.0"]
                  [metosin/schema-tools "0.9.0"]
