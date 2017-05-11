@@ -1,6 +1,7 @@
 ## 0.24.0-SNAPSHOT
 
 * Drop `[slingshot "0.12.2"]` dependency, use `ex-info` instead.
+* Support qualified keywords in swagger paramters, fixes [#93](https://github.com/metosin/ring-swagger/issues/93)
 * Depend directly on `[ring/ring-core "1.6.0"]`
 
 * updated dependencies:
