@@ -1,4 +1,5 @@
-## UNRELEASED
+## 0.24.0-SNAPSHOT
+
 * Drop `[slingshot "0.12.2"]` dependency, use `ex-info` instead.
 * Depend directly on `[ring/ring-core "1.6.0"]`
 
