@@ -7,7 +7,8 @@
             :comments "same as Clojure"}
   :dependencies [[cheshire "5.7.0"]
                  [slingshot "0.12.2"]
-                 [metosin/ring-http-response "0.8.2"]
+                 [metosin/ring-http-response "0.9.0"]
+                 [ring/ring-core "1.6.0"]
                  [metosin/schema-tools "0.9.0"]
                  [prismatic/schema "1.1.5"]
                  [prismatic/plumbing "0.5.3"]
@@ -22,7 +23,6 @@
                              [funcool/codeina "0.5.0"]]
                    :dependencies [[org.clojure/clojure "1.8.0"]
                                   [midje "1.8.3"]
-                                  [ring/ring-core "1.6.0-beta7"]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "2.2.10"]
                                   [javax.servlet/servlet-api "2.5"]
