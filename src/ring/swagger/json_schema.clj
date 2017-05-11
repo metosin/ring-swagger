@@ -50,6 +50,12 @@
 ;; Describe Java and Clojure classes and Schemas as Json schema
 ;;
 
+(defn key-name [x]
+  (if (keyword? x)
+    (let [n (namespace x)]
+      (str (if n (str n "/")) (name x)))
+    x))
+
 (defmulti convert-class (fn [c options] c))
 
 (defprotocol JsonSchema

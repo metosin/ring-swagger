@@ -593,3 +593,12 @@
                                              :allowEmptyValue true}]
                                :responses {:default {:description ""}}}}}})
           (validate swagger) => nil)))
+
+(fact "qualified keywords"
+  (let [swagger {:paths {"/any" {:get {:parameters {:query {:kikka/kukka String}}
+                                       :responses {:default {:schema {:olipa/kerran String}}}}}}}
+        endpoint (get-in (swagger2/swagger-json swagger) [:paths "/any" :get])
+        response (-> (swagger2/swagger-json swagger) :definitions first second)]
+
+    (get-in endpoint [:parameters 0]) => (contains {:name "kikka/kukka"})
+    (get-in response [:properties]) => (contains {:olipa/kerran {:type "string"}})))
