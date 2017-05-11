@@ -6,6 +6,8 @@
 
 ```clj
 [ring/ring-core "1.6.0"] is available but we use "1.6.0-beta7"
+[cheshire "5.7.1"] is available but we use "5.7.0"
+[prismatic/plumbing "0.5.4"] is available but we use "0.5.3"
 [prismatic/schema "1.1.5"] is available but we use "1.1.3"
 [metosin/ring-http-response "0.9.0"] is available but we use "0.8.2"
 [metosin/ring-swagger-ui "2.2.10"] is available but we use "2.2.8"
