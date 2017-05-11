@@ -3,7 +3,6 @@
             [schema.coerce :as sc]
             [schema.utils :as su]
             [potemkin]
-            [slingshot.slingshot :as slingshot]
             [ring.swagger.common :as common]
             [ring.swagger.coerce :as coerce]
             ring.swagger.json-schema))
@@ -42,5 +41,5 @@
   ([schema value type]
    (let [result (coerce schema value type)]
      (if (error? result)
-       (slingshot/throw+ (assoc result :type ::validation))
+       (throw (ex-info (str "Validation failed") (assoc result :type ::validation)))
        result))))

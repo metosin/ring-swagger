@@ -1,9 +1,17 @@
-## UNRELEASED
+## 0.24.0-SNAPSHOT
+
+* Drop `[slingshot "0.12.2"]` dependency, use `ex-info` instead.
+* Support qualified keywords in swagger paramters, fixes [#93](https://github.com/metosin/ring-swagger/issues/93)
+* Depend directly on `[ring/ring-core "1.6.0"]`
 
 * updated dependencies:
 
 ```clj
+[ring/ring-core "1.6.0"] is available but we use "1.6.0-beta7"
+[cheshire "5.7.1"] is available but we use "5.7.0"
+[prismatic/plumbing "0.5.4"] is available but we use "0.5.3"
 [prismatic/schema "1.1.5"] is available but we use "1.1.3"
+[metosin/ring-http-response "0.9.0"] is available but we use "0.8.2"
 [metosin/ring-swagger-ui "2.2.10"] is available but we use "2.2.8"
 ```
 
