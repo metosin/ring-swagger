@@ -62,6 +62,13 @@
       ((coerce Double) "1") => 1.0
       ((coerce Double) "invalid") => "invalid")
 
+    (fact "s/Num"
+      ((coerce s/Num) 1) => 1
+      ((coerce s/Num) 1.0) => 1.0
+      ((coerce s/Num) "1") => 1
+      ((coerce s/Num) "1.0") => 1.0
+      ((coerce s/Num) "invalid") => "invalid")
+
     (fact "Boolean"
       ((coerce Boolean) true) => true
       ((coerce Boolean) "true") => true
