@@ -4,6 +4,7 @@
             [clojure.string :as str]
             [clj-time.format :as tf]
             [clj-time.coerce :as tc]
+            [clojure.edn :as edn]
             [ring.swagger.extension :as extension])
   (:import [org.joda.time LocalDate DateTime LocalTime]
            [java.util Date UUID]
@@ -83,9 +84,10 @@
 
 (defn string->number [^String x]
   (if (string? x)
-    (if (re-find #"^-?\d+\.?\d*$" x) ; https://stackoverflow.com/a/12285023
-      (read-string x)
-      x)
+    (try
+      (let [parsed (edn/read-string x)]
+        (if (number? parsed) parsed x))
+      (catch Exception _ x))
     x))
 
 (defn string->uuid [^String x]

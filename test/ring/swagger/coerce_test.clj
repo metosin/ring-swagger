@@ -67,6 +67,9 @@
       ((coerce s/Num) 1.0) => 1.0
       ((coerce s/Num) "1") => 1
       ((coerce s/Num) "1.0") => 1.0
+      ((coerce s/Num) "-1.0") => -1.0
+      ((coerce s/Num) "+1.0") => 1.0
+      ((coerce s/Num) "1.0e10") => 1.0e10
       ((coerce s/Num) "invalid") => "invalid")
 
     (fact "Boolean"
