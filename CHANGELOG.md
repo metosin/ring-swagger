@@ -1,3 +1,15 @@
+## 0.24.1-SNAPSHOT
+
+* Support for `s/Num` coercion, thanks to [Valtteri Harmainen](https://github.com/vharmain).
+
+* updated dependencies:
+
+```clj
+[ring/ring-core "1.6.2"] is available but we use "1.6.0"
+[prismatic/schema "1.1.6"] is available but we use "1.1.5"
+[clj-time "0.14.0"] is available but we use "0.13.0"
+```
+
 ## 0.24.0 (11.5.2017)
 
 * Drop `[slingshot "0.12.2"]` dependency, use `ex-info` instead.
