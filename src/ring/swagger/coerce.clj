@@ -81,6 +81,13 @@
       (catch Exception _ x))
     x))
 
+(defn string->number [^String x]
+  (if (string? x)
+    (if (re-find #"^-?\d+\.?\d*$" x) ; https://stackoverflow.com/a/12285023
+      (read-string x)
+      x)
+    x))
+
 (defn string->uuid [^String x]
   (if (string? x)
     (try
@@ -113,14 +120,17 @@
                       Keyword sc/string->keyword
                       s/Uuid string->uuid
                       s/Int (cond-matcher
-                              string? string->long
-                              number? sc/safe-long-cast)
-                      Long (cond-matcher
                              string? string->long
                              number? sc/safe-long-cast)
+                      Long (cond-matcher
+                            string? string->long
+                            number? sc/safe-long-cast)
                       Double (cond-matcher
-                               string? string->double
-                               number? number->double)
+                              string? string->double
+                              number? number->double)
+                      s/Num (cond-matcher
+                             string? string->number
+                             number? identity)
                       Boolean string->boolean})
 
 (defn json-schema-coercion-matcher
