@@ -1,4 +1,4 @@
-## 0.24.1-SNAPSHOT
+## 0.24.1 (25.7.2017)
 
 * Support for `s/Num` coercion, thanks to [Valtteri Harmainen](https://github.com/vharmain).
 
