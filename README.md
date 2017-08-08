@@ -356,7 +356,7 @@ You can require `ring.swagger.json-schema-dirty` namespace to get JSON Schema di
 
 ### Schema coercion
 
-Ring-swagger uses [Schema coercions](http://plumatic.github.io/schema-0-2-0-back-with-clojurescript-data-coercion/)
+Ring-swagger uses [Schema coercions](http://plumatic.github.io/schema-0-2-0-back-with-clojurescript-data-coercion)
 for transforming the input data into vanilla Clojure and back.
 
 There are two coercers in `ring.swagger.coerce`, the `json-schema-coercion-matcher` and `query-schema-coercion-matcher`.
