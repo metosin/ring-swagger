@@ -57,13 +57,13 @@ Info, tags, routes and anonymous nested schemas.
 ```clojure
 (require '[schema.core :as s])
 
-(s/defschema User {:id s/Str, 
+(s/defschema User {:id s/Str,
                    :name s/Str
                    :address {:street s/Str
                              :city (s/enum :tre :hki)}})
 
-(s/with-fn-validation 
-  (rs/swagger-json 
+(s/with-fn-validation
+  (rs/swagger-json
     {:info {:version "1.0.0"
             :title "Sausages"
             :description "Sausage description"
@@ -216,7 +216,7 @@ As an example, one can filter away all operations with `:x-no-doc` set to `true`
 (defn remove-x-no-doc [endpoint]
   (if-not (some-> endpoint :x-no-doc true?)
     endpoint))
-    
+
 (transform-operations remove-x-no-doc {:paths {"/a" {:get {:x-no-doc true}, :post {}}
                                                "/b" {:put {:x-no-doc true}}}}))
 ; {:paths {"/a" {:post {}}}}
@@ -256,7 +256,7 @@ deserialization/coercion from JSON.
 
 (extend-type java.util.regex.Pattern
   json-schema/JsonSchema
-  (json-schema/convert [e _] 
+  (json-schema/convert [e _]
     {:type "string" :pattern (str e)}))
 ```
 
@@ -276,8 +276,8 @@ One can also use the options to create more accurate specs (via the `:in` option
 
 | Clojure Schema                              | JSON Schema              | Sample JSON |
 | --------------------------------------------|--------------------------|:-----------:|
-| `Integer`                                   | integer, int32           | `1` 
-| `Long`, `s/Int`                             | integer, int64           | `1` 
+| `Integer`                                   | integer, int32           | `1`
+| `Long`, `s/Int`                             | integer, int64           | `1`
 | `Double`, `Number`, `s/Num`                 | number, double           | `1.2`
 | `String`, `s/Str`, `Keyword`, `s/Keyword`, `Symbol`, `s/Symbol`, `s/Any` non-body-parameter | string                   | `"kikka"`
 | `Boolean`                                   | boolean                  | `true`
@@ -362,6 +362,19 @@ for transforming the input data into vanilla Clojure and back.
 There are two coercers in `ring.swagger.coerce`, the `json-schema-coercion-matcher` and `query-schema-coercion-matcher`.
 These are enchanced versions of the original Schema coercers, adding support for all the supported Schema elements,
 including Dates & Regexps.
+
+#### Custom Coercions
+
+In order to allow for custom input coercion, ring-swagger includes a multimethod 'custom-matcher' that can be implemented for custom input types. For example, to coerce currency strings into joda.money.Money objects, you can implement the following:
+
+```clojure
+(require '[ring.swagger.coerce :as coerce])
+(import org.joda.money.Money)
+
+(defmethod coerce/custom-matcher org.joda.money.Money  [_]  #(org.joda.money.Money/parse %))
+```
+
+This will allow org.joda.money.Money objects in your Schema definitions to be coerced correctly.
 
 #### Coerce!
 

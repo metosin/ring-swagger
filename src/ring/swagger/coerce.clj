@@ -24,6 +24,8 @@
 (defn parse-pattern ^Pattern [pattern] (re-pattern pattern))
 (defn unparse-pattern ^String [pattern] (str pattern))
 
+(declare custom-matcher)
+
 (defmulti time-matcher identity)
 
 (defn coerce-if-string [f] (fn [x] (if (string? x) (f x) x)))
@@ -141,7 +143,8 @@
       (sc/keyword-enum-matcher schema)
       (set-matcher schema)
       (time-matcher schema)
-      (pattern-matcher schema)))
+      (pattern-matcher schema)
+      (custom-matcher schema)))
 
 (defn split-params-matcher [schema]
   (if (or (and (coll? schema) (not (record? schema))))
@@ -171,6 +174,9 @@
 ;;
 ;; Public Api
 ;;
+
+(defmulti custom-matcher identity)
+(defmethod custom-matcher :default [_] nil)
 
 (defmulti coercer identity)
 
