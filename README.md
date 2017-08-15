@@ -374,7 +374,7 @@ In order to allow for custom input coercion, ring-swagger includes a multimethod
 (defmethod coerce/custom-matcher org.joda.money.Money  [_]  #(org.joda.money.Money/parse %))
 ```
 
-This will allow org.joda.money.Money objects in your Schema definitions to be coerced correctly.
+This will allow org.joda.money.Money objects in your Schema definitions to be coerced correctly. However, this is only for coercing input, see [Schema to Swagger JSON Schema conversion](#schema-to-swagger-json-schema-conversion) for examples on transforming output.
 
 #### Coerce!
 
