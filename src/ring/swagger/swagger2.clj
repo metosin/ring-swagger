@@ -87,7 +87,9 @@
                                                                     (->> (for [[k v] headers]
                                                                            [k (rsjs/->swagger v options)])
                                                                          (into {}))))))
-                          (update-in [:description] #(or % (default-response-description k options)))
+                          (update-in [:description] #(or %
+                                                         (:description (rsjs/json-schema-meta v))
+                                                         (default-response-description k options)))
                           common/remove-empty-keys))]
     (if-not (empty? responses)
       responses

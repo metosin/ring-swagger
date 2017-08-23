@@ -602,3 +602,14 @@
 
     (get-in endpoint [:parameters 0]) => (contains {:name "kikka/kukka"})
     (get-in response [:properties]) => (contains {:olipa/kerran {:type "string"}})))
+
+
+(fact "Meta-description of body responses are considered"
+  (let [swagger {:paths {"/meta" {:get {:parameters {:query {:kikka/kukka String}}
+                                       :responses {200 (rsjs/describe {:body {:kikka/kukka String}}
+                                                                      "A meta description")}}}
+                         "/direct" {:get {:parameters {:query {:kikka/kukka String}}
+                                          :responses {200 {:body {:kikka/kukka String}
+                                                           :description "A direct description"}}}}}}]
+    (get-in (swagger2/swagger-json swagger) [:paths "/meta" :get :responses 200]) => (contains {:description "A meta description"})
+    (get-in (swagger2/swagger-json swagger) [:paths "/direct" :get :responses 200]) => (contains {:description "A direct description"})))
