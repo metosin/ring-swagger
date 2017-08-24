@@ -1,3 +1,30 @@
+## 0.24.2 (24.8.2017)
+
+* `:description` is read from Schema meta-data into response bodys too. Thanks to [David James Humphreys](https://github.com/davidjameshumphreys)
+
+```clj
+{:get {:parameters {:query {:kikka/kukka String}}
+       :responses {200 (rsjs/describe
+                         {:body {:kikka/kukka String}}
+                         "A meta description")}}}
+```
+
+* Easy to define custom coercions via multimethod, thanks to [Nick Bailey](https://github.com/nickmbailey)
+
+```clojure
+(require '[ring.swagger.coerce :as coerce])
+(import org.joda.money.Money)
+
+(defmethod coerce/custom-matcher org.joda.money.Money  [_]  #(org.joda.money.Money/parse %))
+```
+
+* updated deps:
+
+```clj
+[cheshire "5.8.0"] is available but we use "5.7.1"
+[potemkin "0.4.4"] is available but we use "0.4.3"
+```
+
 ## 0.24.1 (25.7.2017)
 
 * Support for `s/Num` coercion, thanks to [Valtteri Harmainen](https://github.com/vharmain).
