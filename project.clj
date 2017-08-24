@@ -24,7 +24,7 @@
                                   [midje "1.9.0-alpha6"]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "3.0.17"]
-                                  [javax.servlet/javax.servlet-api "4.0.0"]]}
+                                  [javax.servlet/javax.servlet-api "3.1.0"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha16"]]}}
   :codeina {:sources ["src"]
