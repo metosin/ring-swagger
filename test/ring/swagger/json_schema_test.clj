@@ -130,11 +130,11 @@
 
     (fact "s/conditional"
       (rsjs/->swagger (s/conditional (constantly true) Long (constantly false) String))
-      => {:type "void" :oneOf [(rsjs/->swagger Long) (rsjs/->swagger String)]}
+      => {:type "void" :x-oneOf [(rsjs/->swagger Long) (rsjs/->swagger String)]}
 
       (fact "invalid values are removed"
         (rsjs/->swagger (s/conditional (constantly true) Long (constantly false) Currency))
-        => {:type "void" :oneOf [(rsjs/->swagger Long)]}))
+        => {:type "void" :x-oneOf [(rsjs/->swagger Long)]}))
 
     (fact "s/constrained"
       (rsjs/->swagger (s/constrained Long even?))
@@ -142,11 +142,11 @@
 
     (fact "s/if"
       (rsjs/->swagger (s/if (constantly true) Long String))
-      => {:type "void" :oneOf [(rsjs/->swagger Long) (rsjs/->swagger String)]})
+      => {:type "void" :x-oneOf [(rsjs/->swagger Long) (rsjs/->swagger String)]})
 
     (fact "s/cond-pre"
       (rsjs/->swagger (s/cond-pre Model [s/Str]))
-      => {:type "void" :oneOf [(rsjs/->swagger Model) (rsjs/->swagger [s/Str])]})
+      => {:type "void" :x-oneOf [(rsjs/->swagger Model) (rsjs/->swagger [s/Str])]})
     ))
 
 (fact "Optional-key default metadata"
