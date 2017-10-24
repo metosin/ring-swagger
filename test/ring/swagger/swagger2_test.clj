@@ -26,6 +26,9 @@
 (s/defschema Parrot {:name String
                      :type {:name String}})
 
+(s/defschema Turtle {:name String
+                     :tags  (s/if map? {s/Keyword s/Keyword} [String])})
+
 (s/defschema NotFound {:message s/Str})
 
 (defn validate-swagger-json [swagger & [options]]
@@ -128,7 +131,26 @@
                                            :query {:x (s/maybe String)}}
                               :responses {200 {:description "ok"
                                                :schema {:sum (s/maybe Long)}}
-                                          :default {:description "error"}}}}}})
+                                          :default {:description "error"}}}}
+           "/api/turtle" {:get {:parameters {:body Turtle
+                                             :query (merge Anything {:x Long :y Long})
+                                             :path Nothing
+                                             :header Anything
+                                             :formData Anything}
+                                :responses {200 {:description "ok"
+                                                 :schema {:sum Long}}
+                                            :default {:description "error"
+                                                      :schema {:code Long}}}}
+                          :post {:parameters {:body #{Turtle}
+                                              :query (merge Anything {:x Long :y Long})}
+                                 :responses {200 {:schema {:sum Long}}
+                                             :default {:schema {:code Long}
+                                                       :headers {:location String}}}}
+                          :put {:parameters {:body [(s/maybe Turtle)]
+                                             :query {:x (s/maybe String)}}
+                                :responses {200 {:description "ok"
+                                                 :schema {:sum (s/maybe Long)}}
+                                            :default {:description "error"}}}}}})
 
 ;;
 ;; facts

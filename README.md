@@ -351,8 +351,8 @@ You can require `ring.swagger.json-schema-dirty` namespace to get JSON Schema di
 
 | Clojure | JSON Schema | Sample  |
 | --------|-------|:------------:|
-| `(s/conditional pred X pred Y pred Z)` | oneOf: *type of X*, *type of Y*, *type of Z*
-| `(s/if pred X Y)` | oneOf: *type of X*, *type of Y*
+| `(s/conditional pred X pred Y pred Z)` | x-oneOf: *type of X*, *type of Y*, *type of Z*
+| `(s/if pred X Y)` | x-oneOf: *type of X*, *type of Y*
 
 ### Schema coercion
 
