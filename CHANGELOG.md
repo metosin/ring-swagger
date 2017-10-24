@@ -1,3 +1,12 @@
+## 0.24.3 (24.10.2017)
+
+* Emit `:x-oneOf` and `:x-oneOf` instead of `:oneOf` & `:anyOf` for Swagger2, thanks to [Nicolas Ha](https://github.com/nha)
+
+```clj
+[metosin/schema-tools "0.9.1"] is available but we use "0.9.0"
+[prismatic/schema "1.1.7"] is available but we use "1.1.6"
+```
+
 ## 0.24.2 (24.8.2017)
 
 * `:description` is read from Schema meta-data into response bodys too. Thanks to [David James Humphreys](https://github.com/davidjameshumphreys)
