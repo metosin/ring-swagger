@@ -26,7 +26,7 @@
                                   [metosin/ring-swagger-ui "3.0.17"]
                                   [javax.servlet/javax.servlet-api "3.1.0"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
-             :1.9 {:dependencies [[org.clojure/clojure "1.9.0-beta2"]]}}
+             :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}}
   :codeina {:sources ["src"]
             :target "gh-pages/doc"
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
