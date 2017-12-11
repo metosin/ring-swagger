@@ -7,7 +7,7 @@
             :comments "same as Clojure"}
   :dependencies [[cheshire "5.8.0"]
                  [metosin/ring-http-response "0.9.0"]
-                 [ring/ring-core "1.6.2"]
+                 [ring/ring-core "1.6.3"]
                  [metosin/schema-tools "0.9.1"]
                  [prismatic/schema "1.1.7"]
                  [prismatic/plumbing "0.5.4"]
