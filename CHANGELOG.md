@@ -1,3 +1,13 @@
+## 0.24.4 (11.12.2017)
+
+* Updated deps
+
+```clj
+[prismatic/plumbing "0.5.5"] is available but we use "0.5.4"
+[ring/ring-core "1.6.3"] is available but we use "1.6.2"
+[clj-time "0.14.2"] is available but we use "0.14.0"
+```
+
 ## 0.24.3 (24.10.2017)
 
 * Emit `:x-oneOf` and `:x-oneOf` instead of `:oneOf` & `:anyOf` for Swagger2, thanks to [Nicolas Ha](https://github.com/nha)
