@@ -13,13 +13,15 @@
 (defn- json-key [k]
   (lc/mixed (name k)))
 
-(defn conf-js [req opts]
+(defn config-json [req opts]
   (let [swagger-docs (swagger/join-paths (swagger/context req) (:swagger-docs opts "/swagger.json"))
         conf (-> opts
                  (dissoc :swagger-docs :path)
                  (assoc :url swagger-docs))]
-    (str "window.API_CONF = " (json/generate-string conf {:key-fn json-key}) ";")))
+    (json/generate-string conf {:key-fn json-key})))
 
+(defn conf-js [req opts]
+  (str "window.API_CONF = " (config-json req opts) ";"))
 
 (defn- serve [{:keys [path root] :or {path "/", root "swagger-ui"} :as options}]
   (let [f (fn [{request-uri :uri :as req}]
@@ -29,7 +31,10 @@
               (when-let [req-path (get-path uri request-uri)]
                 (condp = req-path
                   "" (http-response/found (swagger/join-paths request-uri "index.html"))
+                  ;; Swagger-UI 2
                   "conf.js" (http-response/content-type (http-response/ok (conf-js req options)) "application/javascript")
+                  ;; Swagger-UI 3
+                  "config.json" (http-response/content-type (http-response/ok (config-json req options)) "application/json")
                   (http-response/resource-response (str root "/" req-path))))))]
     (fn
       ([request]

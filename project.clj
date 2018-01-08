@@ -23,7 +23,7 @@
                    :dependencies [[org.clojure/clojure "1.8.0"]
                                   [midje "1.9.0"]
                                   [ring-mock "0.1.5"]
-                                  [metosin/ring-swagger-ui "3.0.17"]
+                                  [metosin/ring-swagger-ui "3.9.0"]
                                   [javax.servlet/javax.servlet-api "3.1.0"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}}
