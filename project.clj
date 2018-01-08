@@ -17,14 +17,16 @@
                  [potemkin "0.4.4"]
                  [frankiesardo/linked "1.2.9"]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
-                             [lein-ring "0.12.2"]
+                             [lein-ring "0.12.3"]
                              [lein-midje "3.2.1"]
                              [funcool/codeina "0.5.0"]]
                    :dependencies [[org.clojure/clojure "1.8.0"]
-                                  [midje "1.9.0"]
+                                  [midje "1.9.1" :exclusions [org.clojure/tools.namespace
+                                                              org.clojure/clojure
+                                                              commons-codec]]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "3.9.0"]
-                                  [javax.servlet/javax.servlet-api "3.1.0"]]}
+                                  [javax.servlet/javax.servlet-api "4.0.0"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}}
   :codeina {:sources ["src"]

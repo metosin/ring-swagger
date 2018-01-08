@@ -1,3 +1,7 @@
+## UNRELEASED
+
+* Cleanup transitive dependency conflicts
+
 ## 0.24.4 (11.12.2017)
 
 * Updated deps
