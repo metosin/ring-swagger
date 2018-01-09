@@ -16,6 +16,8 @@
 
 The [CHANGELOG](https://github.com/metosin/ring-swagger/blob/master/CHANGELOG.md).
 
+Requires Java 1.8+
+
 ## Web libs using Ring-Swagger
 
 - [Compojure-Api](https://github.com/metosin/compojure-api) for Compojure

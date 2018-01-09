@@ -3,7 +3,6 @@ language: clojure
 lein: 2.7.1
 script: lein do clean, all midje, all check
 jdk:
-  - openjdk7
   - oraclejdk8
 cache:
   directories:

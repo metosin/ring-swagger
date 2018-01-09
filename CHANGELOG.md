@@ -1,5 +1,6 @@
-## 0.24.5 (9.1.2018)
+## 0.25.0 (9.1.2018)
 
+* **BREAKING**: requires Java 1.8+
 * Cleanup transitive dependency conflicts
 * Support both swagger-ui major versions (2.* and 3.*)
 
