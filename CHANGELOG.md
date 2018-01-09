@@ -1,4 +1,4 @@
-## UNRELEASED
+## 0.24.5 (UNRELEASED)
 
 * Cleanup transitive dependency conflicts
 
