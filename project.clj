@@ -21,8 +21,7 @@
                              [lein-midje "3.2.1"]
                              [funcool/codeina "0.5.0"]]
                    :dependencies [[org.clojure/clojure "1.8.0"]
-                                  [midje "1.9.1" :exclusions [org.clojure/tools.namespace
-                                                              org.clojure/clojure
+                                  [midje "1.9.1" :exclusions [org.clojure/clojure
                                                               commons-codec]]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "3.9.0"]
