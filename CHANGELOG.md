@@ -1,6 +1,7 @@
-## 0.24.5 (UNRELEASED)
+## 0.24.5 (9.1.2018)
 
 * Cleanup transitive dependency conflicts
+* Support both swagger-ui major versions (2.* and 3.*)
 
 ## 0.24.4 (11.12.2017)
 
