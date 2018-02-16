@@ -1,14 +1,8 @@
 (ns ring.swagger.upload
   (:require [potemkin]
-            [ring.middleware.multipart-params]
             [ring.swagger.json-schema :as js]
             [schema.core :as s])
   (:import [java.io File]))
-
-(potemkin/import-vars
-  [ring.middleware.multipart-params
-
-   wrap-multipart-params])
 
 ; Works exactly like map schema but wrapped in record for JsonSchema dispatch
 (defrecord Upload [m]
