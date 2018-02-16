@@ -1,3 +1,13 @@
+## 0.26.0 (16.2.2018)
+
+* **BREAKING**: drop automatic (potemkin) imports of `ring.middleware.multipart-params` from `ring.swagger.upload` to support non-servlet servers. You can require those manually.
+
+* Updated deps
+
+```clj
+[metosin/scjsv "0.4.1"] is available but we use "0.4.0"
+```
+
 ## 0.25.0 (9.1.2018)
 
 * **BREAKING**: requires Java 1.8+
