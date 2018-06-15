@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.26.0"
+(defproject metosin/ring-swagger "0.26.1"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -8,14 +8,14 @@
   :dependencies [[cheshire "5.8.0"]
                  [metosin/ring-http-response "0.9.0"]
                  [ring/ring-core "1.6.3"]
-                 [metosin/schema-tools "0.9.1"]
-                 [prismatic/schema "1.1.7"]
+                 [metosin/schema-tools "0.10.3"]
+                 [prismatic/schema "1.1.9"]
                  [prismatic/plumbing "0.5.5"]
                  [metosin/scjsv "0.4.1"]
-                 [clj-time "0.14.2"]
+                 [clj-time "0.14.4"]
                  [org.tobereplaced/lettercase "1.0.0"]
-                 [potemkin "0.4.4"]
-                 [frankiesardo/linked "1.2.9"]]
+                 [potemkin "0.4.5"]
+                 [frankiesardo/linked "1.3.0"]]
   :profiles {:dev {:plugins [[lein-clojars "0.9.1"]
                              [lein-ring "0.12.3"]
                              [lein-midje "3.2.1"]

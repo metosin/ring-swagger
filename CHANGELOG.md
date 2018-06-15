@@ -1,3 +1,15 @@
+## 0.26.1 (15.6.2018)
+
+Updated dependencies:
+
+```clj
+[metosin/schema-tools "0.10.3"] is available but we use "0.9.1"
+[prismatic/schema "1.1.9"] is available but we use "1.1.7"
+[clj-time "0.14.4"] is available but we use "0.14.2"
+[potemkin "0.4.5"] is available but we use "0.4.4"
+[frankiesardo/linked "1.3.0"] is available but we use "1.2.9"
+```
+
 ## 0.26.0 (16.2.2018)
 
 * **BREAKING**: drop automatic (potemkin) imports of `ring.middleware.multipart-params` from `ring.swagger.upload` to support non-servlet servers. You can require those manually.
