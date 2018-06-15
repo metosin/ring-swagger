@@ -1,6 +1,6 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.svg?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Downloads](https://jarkeeper.com/metosin/ring-swagger/downloads.svg)](https://jarkeeper.com/metosin/ring-swagger) [![Dependencies Status](https://jarkeeper.com/metosin/ring-swagger/status.svg)](https://jarkeeper.com/metosin/ring-swagger)
 
-[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema) (support for [clojure.spec](http://clojure.org/about/spec) is [coming up](https://github.com/metosin/ring-swagger/issues/95)).
+[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema) (support for [clojure.spec](http://clojure.org/about/spec) via [spec-tools](https://github.com/metosin/spec-tools).
 
 - Transforms deeply nested Schemas into Swagger JSON Schema definitions
 - Extended & symmetric JSON & String serialization & coercion
@@ -444,6 +444,6 @@ One can add extra meta-data, including descriptions to schema elements using `ri
 
 ## License
 
-Copyright © 2014-2017 [Metosin Oy](http://www.metosin.fi)
+Copyright © 2014-2018 [Metosin Oy](http://www.metosin.fi)
 
 Distributed under the Eclipse Public License, the same as Clojure.
