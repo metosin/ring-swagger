@@ -1,4 +1,4 @@
-# Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.svg?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Downloads](https://jarkeeper.com/metosin/ring-swagger/downloads.svg)](https://jarkeeper.com/metosin/ring-swagger) [![Dependencies Status](https://jarkeeper.com/metosin/ring-swagger/status.svg)](https://jarkeeper.com/metosin/ring-swagger)
+# Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.svg?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Downloads](https://versions.deps.co/metosin/ring-swagger/downloads.svg)](https://jarkeeper.com/metosin/ring-swagger) [![Dependencies Status](https://versions.deps.co/metosin/ring-swagger/status.svg)](https://jarkeeper.com/metosin/ring-swagger)
 
 [Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema) (support for [clojure.spec](http://clojure.org/about/spec) via [spec-tools](https://github.com/metosin/spec-tools).
 
