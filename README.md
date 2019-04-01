@@ -300,7 +300,7 @@ One can also use the options to create more accurate specs (via the `:in` option
 | `(s/named X name)`                          | *type of X*
 | `(s/one X name)`                            | *type of X*
 | `(s/recursive Var)`                         | *Ref to (model) Var*
-| `(s/eq X)`                                  | *type of class of X*
+| `(s/eq X)`                                  | *type of class of X*, enum(X)
 | `(s/optional-key X)`                        | *optional key*
 | `(s/required-key X)`                        | *required key*
 | `s/Keyword` (as a key)                      | *ignored*
