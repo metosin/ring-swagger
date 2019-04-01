@@ -117,8 +117,8 @@
     (fact "s/recursive -> type of internal schema"
       (rsjs/->swagger (s/recursive #'Model)) => (rsjs/->swagger #'Model))
 
-    (fact "s/eq -> type of class of value"
-      (rsjs/->swagger (s/eq "kikka")) => (rsjs/->swagger String))
+    (fact "s/eq -> enum of size one"
+      (rsjs/->swagger (s/eq "kikka")) => (rsjs/->swagger (s/enum "kikka")))
 
     (fact "s/Any"
       (rsjs/->swagger s/Any) => {}

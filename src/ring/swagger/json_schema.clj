@@ -197,7 +197,8 @@
 
   schema.core.EqSchema
   (convert [e _]
-    (->swagger (class (:v e))))
+    (merge (->swagger (class (:v e)))
+           {:enum [(:v e)]}))
 
   schema.core.NamedSchema
   (convert [e _]
