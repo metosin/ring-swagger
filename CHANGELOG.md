@@ -1,3 +1,19 @@
+## 0.26.2 (1.4.2019)
+
+* `s/eq` is mapped into enum by [Joel Kaasinen](https://github.com/opqdonut).
+
+* Updated deps:
+
+```clj
+[cheshire "5.8.1"] is available but we use "5.8.0"
+[metosin/ring-http-response "0.9.1"] is available but we use "0.9.0"
+[ring/ring-core "1.7.1"] is available but we use "1.6.3"
+[metosin/schema-tools "0.11.0"] is available but we use "0.10.3"
+[prismatic/schema "1.1.10"] is available but we use "1.1.9"
+[metosin/scjsv "0.5.0"] is available but we use "0.4.1"
+[clj-time "0.15.1"] is available but we use "0.14.4"
+```
+
 ## 0.26.1 (15.6.2018)
 
 Updated dependencies:
