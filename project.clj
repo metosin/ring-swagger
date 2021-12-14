@@ -9,8 +9,8 @@
                  [metosin/ring-http-response "0.9.3"]
                  [ring/ring-core "1.9.4"]
                  [metosin/schema-tools "0.12.3"]
-                 [prismatic/schema "1.1.10"]
-                 [prismatic/plumbing "0.5.5"]
+                 [prismatic/schema "1.2.0"]
+                 [prismatic/plumbing "0.6.0"]
                  [metosin/scjsv "0.6.2"]
                  [clj-time "0.15.2"]
                  [org.tobereplaced/lettercase "1.0.0"]
@@ -27,12 +27,11 @@
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "4.0.0"]
                                   [javax.servlet/javax.servlet-api "4.0.1"]]}
-             :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}}
   :codeina {:sources ["src"]
             :target "gh-pages/doc"
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
             :src-uri-prefix "#L"}
   :deploy-repositories [["releases" :clojars]]
-  :aliases {"all" ["with-profile" "dev:dev,1.7:dev,1.9"]
+  :aliases {"all" ["with-profile" "dev:dev,1.9"]
             "test-ancient" ["midje"]})
