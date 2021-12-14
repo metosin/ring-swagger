@@ -5,14 +5,14 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :repo
             :comments "same as Clojure"}
-  :dependencies [[cheshire "5.8.1"]
-                 [metosin/ring-http-response "0.9.1"]
-                 [ring/ring-core "1.7.1"]
-                 [metosin/schema-tools "0.11.0"]
+  :dependencies [[cheshire "5.10.1"]
+                 [metosin/ring-http-response "0.9.3"]
+                 [ring/ring-core "1.9.4"]
+                 [metosin/schema-tools "0.12.3"]
                  [prismatic/schema "1.1.10"]
                  [prismatic/plumbing "0.5.5"]
-                 [metosin/scjsv "0.5.0"]
-                 [clj-time "0.15.1"]
+                 [metosin/scjsv "0.6.2"]
+                 [clj-time "0.15.2"]
                  [org.tobereplaced/lettercase "1.0.0"]
                  [potemkin "0.4.5"]
                  [frankiesardo/linked "1.3.0"]]
@@ -21,10 +21,11 @@
                              [lein-midje "3.2.1"]
                              [funcool/codeina "0.5.0"]]
                    :dependencies [[org.clojure/clojure "1.8.0"]
-                                  [midje "1.9.6" :exclusions [org.clojure/clojure
-                                                              commons-codec]]
+                                  [midje "1.10.5"
+                                   :exclusions [org.clojure/clojure
+                                                commons-codec]]
                                   [ring-mock "0.1.5"]
-                                  [metosin/ring-swagger-ui "3.20.1"]
+                                  [metosin/ring-swagger-ui "4.0.0"]
                                   [javax.servlet/javax.servlet-api "4.0.1"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}}
