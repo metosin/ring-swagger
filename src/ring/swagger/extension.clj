@@ -9,8 +9,7 @@
        `(do ~@body#))))
 
 (defextension java-time
-  (every?
-    (fn [c] (try (resolve c) (catch Exception _)))
-    '[java.time.Instant
-      java.time.LocalDate
-      java.time.LocalTime]))
+  (every? resolve
+          '[java.time.Instant
+            java.time.LocalDate
+            java.time.LocalTime]))
