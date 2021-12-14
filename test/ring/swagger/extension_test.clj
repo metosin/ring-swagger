@@ -22,16 +22,17 @@
   (fact "undefined vars/classes are ignored in disabled extensions"
     (resolve 'a) => nil
     (disabled (a)) =not=> (throws Exception)
-    (resolve 'dummy.Class) => (throws ClassNotFoundException)
+    ;; https://clojure.atlassian.net/browse/CLJ-1403 fixes `resolve`
+    ;; to return nil, which was not the behavior in Clojure 1.8.0,
+    ;; when this test was written.
+    (resolve 'dummy.Class) =not=> (throws ClassNotFoundException)
+    (resolve 'dummy.Class) => nil
     (disabled (dummy.Class)) =not=> (throws Exception)))
 
 (fact "java-time extension"
-  (let [java-time (try
-                    (resolve 'java.time.Instant)
-                    (catch Exception _))]
-    (if java-time
-      (fact "runs the enclosed form"
-        (extension/java-time :a) => :a)
-      (fact "skips the enclosed form"
-        (extension/java-time :a) => nil
-        (resolve 'java.time.Instant) => (throws ClassNotFoundException)))))
+  (if-let [java-time (resolve 'java.time.Instant)]
+    (fact "runs the enclosed form"
+          (extension/java-time :a) => :a)
+    (fact "skips the enclosed form"
+          (extension/java-time :a) => nil
+          (resolve 'java.time.Instant) => nil)))

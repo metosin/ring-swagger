@@ -20,13 +20,14 @@
                              [lein-ring "0.12.5"]
                              [lein-midje "3.2.1"]
                              [funcool/codeina "0.5.0"]]
-                   :dependencies [[org.clojure/clojure "1.8.0"]
+                   :dependencies [[org.clojure/clojure "1.10.3"]
                                   [midje "1.10.5"
                                    :exclusions [org.clojure/clojure
                                                 commons-codec]]
                                   [ring-mock "0.1.5"]
                                   [metosin/ring-swagger-ui "4.0.0"]
                                   [javax.servlet/javax.servlet-api "4.0.1"]]}
+             :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}}
   :codeina {:sources ["src"]
             :target "gh-pages/doc"
