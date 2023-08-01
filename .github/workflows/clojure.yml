@@ -1,0 +1,46 @@
+---
+name: Run tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  ACTIONS_CACHE_VERSION: 0
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        jdk: [8, 11, 17, 21]
+
+    name: Java ${{ matrix.jdk }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Java ${{ matrix.jdk }}
+        uses: actions/setup-java@v3.11.0
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.jdk }}
+      - name: Maven Cache
+        id: maven-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-${{ hashFiles('project.clj') }}-${{ matrix.jdk }}
+          restore-keys: |
+            m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-${{ hashFiles('project.clj') }}-
+            m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-
+      - name: Setup Clojure
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          lein: latest
+      - name: Run tests
+        run: lein do clean, all midje, all check

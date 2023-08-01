@@ -26,7 +26,9 @@
 
 (declare custom-matcher)
 
-(defmulti time-matcher identity)
+(defmulti time-matcher (if (= "true" (System/getProperty "ring.swagger.coerce.identity-time-matcher-dispatch"))
+                         identity
+                         #(when (class? %) %)))
 
 (defn coerce-if-string [f] (fn [x] (if (string? x) (f x) x)))
 
@@ -175,10 +177,14 @@
 ;; Public Api
 ;;
 
-(defmulti custom-matcher identity)
+(defmulti custom-matcher (if (= "true" (System/getProperty "ring.swagger.coerce.identity-custom-matcher-dispatch"))
+                           identity
+                           #(when (class? %) %)))
 (defmethod custom-matcher :default [_] nil)
 
-(defmulti coercer identity)
+(defmulti coercer (if (= "true" (System/getProperty "ring.swagger.coerce.identity-coercer-dispatch"))
+                    identity
+                    #(when (keyword? %) %)))
 
 (defmethod coercer :json [_] json-schema-coercion-matcher)
 (defmethod coercer :query [_] query-schema-coercion-matcher)

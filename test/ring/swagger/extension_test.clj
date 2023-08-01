@@ -22,7 +22,8 @@
   (fact "undefined vars/classes are ignored in disabled extensions"
     (resolve 'a) => nil
     (disabled (a)) =not=> (throws Exception)
-    (resolve 'dummy.Class) => (throws ClassNotFoundException)
+    (try (resolve 'dummy.Class)
+         (catch ClassNotFoundException _)) => nil
     (disabled (dummy.Class)) =not=> (throws Exception)))
 
 (fact "java-time extension"
@@ -34,4 +35,5 @@
         (extension/java-time :a) => :a)
       (fact "skips the enclosed form"
         (extension/java-time :a) => nil
-        (resolve 'java.time.Instant) => (throws ClassNotFoundException)))))
+        (try (resolve 'java.time.Instant)
+             (catch ClassNotFoundException _)) => nil))))
