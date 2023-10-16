@@ -38,7 +38,8 @@
 ;;
 
 (def Tag'
-  {:type "object"
+  {:title "Tag"
+   :type "object"
    :properties {:id {:type "integer"
                      :format "int64"
                      :description "Unique identifier for the tag"}
@@ -47,7 +48,8 @@
    :additionalProperties false})
 
 (def Category'
-  {:type "object"
+  {:title "Category"
+   :type "object"
    :properties {:id {:type "integer"
                      :format "int64"
                      :description "Category unique identifier"
@@ -58,7 +60,8 @@
    :additionalProperties false})
 
 (def Pet'
-  {:type "object"
+  {:title "Pet"
+   :type "object"
    :required [:id :name]
    :properties {:id {:type "integer"
                      :format "int64"
@@ -126,7 +129,8 @@
   (swagger2/transform-models [Baz] +options+) => {})
 
 (fact "nested record-schemas are inlined"
-  (swagger2/transform-models [Bar] +options+) => {"Bar" {:type "object"
+  (swagger2/transform-models [Bar] +options+) => {"Bar" {:title "Bar"
+                                                         :type "object"
                                                          :properties {:key {:enum [:b :a]
                                                                             :type "string"}}
                                                          :additionalProperties false
@@ -140,18 +144,21 @@
                                    :street {:name s/Str}}})
     (swagger2/transform-models [(rsc/with-named-sub-schemas Nested)] +options+)
 
-    => {"Nested" {:type "object"
+    => {"Nested" {:title "Nested"
+                  :type "object"
                   :properties {:address {:$ref "#/definitions/NestedAddress"}
                                :id {:type "string"}}
                   :additionalProperties false
                   :required [:id :address]}
-        "NestedAddress" {:type "object"
+        "NestedAddress" {:title "NestedAddress"
+                         :type "object"
                          :properties {:country {:enum [:fi :pl]
                                                 :type "string"}
                                       :street {:$ref "#/definitions/NestedAddressStreet"}}
                          :additionalProperties false
                          :required [:country :street]}
-        "NestedAddressStreet" {:type "object"
+        "NestedAddressStreet" {:title "NestedAddressStreet"
+                               :type "object"
                                :properties {:name {:type "string"}}
                                :additionalProperties false
                                :required [:name]}})
@@ -336,7 +343,8 @@
             body-schema-name (last (re-find #"\#\/definitions\/(.+)$" body-schema-ref))]
         (get definitions body-schema-name))
 
-      => {:type "object"
+      => {:title "Body18115"
+          :type "object"
           :properties {:foo {:type "string"}}
           :additionalProperties false
           :required [:foo]})
@@ -347,7 +355,8 @@
             response-schema-name (last (re-find #"\#\/definitions\/(.+)$" response-schema-ref))]
         (get definitions response-schema-name))
 
-      => {:type "object"
+      => {:title "Response18116"
+          :type "object"
           :properties {:bar {:type "integer"
                              :format "int64"}}
           :additionalProperties false
@@ -400,12 +409,14 @@
 
 (fact "recursive"
   (swagger2/transform-models [Foo Bar] +options+)
-  => {"Bar" {:type "object"
+  => {"Bar" {:title "Bar"
+             :type "object"
              :properties {:foo {:$ref "#/definitions/Foo"
                                 :x-nullable true}}
              :additionalProperties false
              :required [:foo]}
-      "Foo" {:type "object"
+      "Foo" {:title "Foo"
+             :type "object"
              :properties {:bar {:$ref "#/definitions/Bar"}}
              :additionalProperties false
              :required [:bar]}})
@@ -490,7 +501,8 @@
                                                                             :description "mutant header"}}}
                                                     404 {:description "fail"
                                                          :schema {:$ref "#/definitions/PetError"}}}}}}
-        :definitions {"Pet" {:type "object"
+        :definitions {"Pet" {:title "Pet"
+                             :type "object"
                              :required [:id :name]
                              :properties {:id {:type "integer"
                                                :format "int64"
@@ -510,7 +522,8 @@
                                                    :type "string"
                                                    :description "pet status in the store"}}
                              :additionalProperties false}
-                      "Category" {:type "object"
+                      "Category" {:title "Category"
+                                  :type "object"
                                   :properties {:id {:type "integer"
                                                     :format "int64"
                                                     :description "Category unique identifier"
@@ -519,14 +532,16 @@
                                                :name {:type "string"
                                                       :description "Name of the category"}}
                                   :additionalProperties false}
-                      "Tag" {:type "object"
+                      "Tag" {:title "Tag"
+                             :type "object"
                              :properties {:id {:type "integer"
                                                :format "int64"
                                                :description "Unique identifier for the tag"}
                                           :name {:type "string"
                                                  :description "Friendly name for the tag"}}
                              :additionalProperties false}
-                      "PetError" {:type "object"
+                      "PetError" {:title "PetError"
+                                  :type "object"
                                   :properties {:message {:type "string"}}
                                   :required [:message]
                                   :additionalProperties {}}}}))
