@@ -317,7 +317,8 @@
     (fact "keyword to primitive mapping"
       spec => (has-definition
                 'Kikka
-                {:type "object"
+                {:title "Kikka"
+                 :type "object"
                  :properties {:a {:type "string"}}
                  :additionalProperties {:type "string"}
                  :required [:a]}))
@@ -325,7 +326,8 @@
     (fact "keyword to model mapping"
       spec => (has-definition
                 'Kukka
-                {:type "object"
+                {:title "Kukka"
+                 :type "object"
                  :properties {:a {:type "string"}}
                  :additionalProperties {:$ref "#/definitions/Kikka"}
                  :required [:a]}))
@@ -333,7 +335,8 @@
     (fact "just additional properties"
       spec => (has-definition
                 'Kakka
-                {:type "object"
+                {:title "Kakka"
+                 :type "object"
                  :additionalProperties {:$ref "#/definitions/Kukka"}}))))
 
 (fact "extra meta-data to properties"
@@ -346,7 +349,8 @@
 
     spec => (has-definition
               'Kikka
-              {:type "object"
+              {:title "Kikka"
+               :type "object"
                :properties {:a {:type "string"
                                 :description "A"}
                             :b {:type "array"
@@ -431,7 +435,8 @@
 
     (swagger2/swagger-json swagger)
     => (contains
-         {:definitions {"Required" {:type "object"
+         {:definitions {"Required" {:title "Required"
+                                    :type "object"
                                     :description "I'm required"
                                     :example {:name "Iines"
                                               :title "Ankka"}
@@ -441,7 +446,8 @@
                                                  :title {:type "string"}
                                                  :address {:$ref "#/definitions/RequiredAddress"}}
                                     :additionalProperties false}
-                        "RequiredAddress" {:type "object"
+                        "RequiredAddress" {:title "RequiredAddress"
+                                           :type "object"
                                            :description "Streename"
                                            :example "Ankkalinna 1"
                                            :properties {:street {:type "string"
@@ -467,7 +473,8 @@
 
     (swagger2/swagger-json swagger)
     => (contains
-         {:definitions {"OptionalMaybe" {:type "object"
+         {:definitions {"OptionalMaybe" {:title "OptionalMaybe"
+                                         :type "object"
                                          :properties {:a {:type "string"}
                                                       :b {:type "string" :x-nullable true}
                                                       :c {:type "string" :x-nullable true}}
