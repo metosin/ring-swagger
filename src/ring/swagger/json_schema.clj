@@ -286,7 +286,7 @@
   [schema]
   (if (common/plain-map? schema)
     (let [properties (properties schema)
-          title (if (not (s/schema-name schema)) (common/title schema))
+          title (common/title schema)
           additional-properties (additional-properties schema)
           meta (json-schema-meta schema)
           required (some->> (rsc/required-keys schema)
