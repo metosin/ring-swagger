@@ -3,7 +3,7 @@ name: Run tests
 
 on:
   push:
-    branches: [master]
+    branches: [test-threadgrid-ci]
   pull_request:
     branches: [master]
 
