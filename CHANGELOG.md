@@ -1,3 +1,7 @@
+## NEXT
+
+* Fix memory leaks via multimethods caching default dispatch values: https://github.com/metosin/compojure-api/issues/454
+
 ## 0.26.2 (1.4.2019)
 
 * `s/eq` is mapped into enum by [Joel Kaasinen](https://github.com/opqdonut).
