@@ -52,16 +52,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
+      - name: Maven Cache
+        id: maven-cache
+        uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/project.clj') }}
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-${{ hashFiles('project.clj') }}-${{ matrix.jdk }}
           restore-keys: |
-            ${{ runner.os }}-maven-
-      - uses: turtlequeue/setup-babashka@5e0acf2cf146558d93a573e339e1d24f2758adfd
-        with:
-          babashka-version: ${{env.BABASHKA_VERSION}}
+            m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-${{ hashFiles('project.clj') }}-
+            m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-
       - name: Prepare java
         uses: actions/setup-java@v2
         with:
