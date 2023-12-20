@@ -36,12 +36,8 @@
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
             :src-uri-prefix "#L"}
   :deploy-repositories [["snapshot" {:url "https://clojars.org/repo"
-                                     :username :env/clojars_user
-                                     :password  :env/clojars_token
                                      :sign-releases false}]
                         ["release" {:url "https://clojars.org/repo"
-                                    :username :env/clojars_user
-                                    :password  :env/clojars_token
                                     :sign-releases false}]]
   :release-tasks [["clean"]
                   ["vcs" "assert-committed"]
