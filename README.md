@@ -442,6 +442,16 @@ One can add extra meta-data, including descriptions to schema elements using `ri
 ;                     :additionalProperties false}}
 ```
 
+## Release process
+
+To release a version, set the project.clj version to the one you want to release, but with a `-SNAPSHOT` suffix.
+
+Then create a commit reading "Release :{major,minor,patch}" based on whether
+you want the next development version to be a major/minor/patch increment.
+
+Push to master, and the GitHub Actions release will release the jar to clojars, then bump the version
+on the master branch.
+
 ## License
 
 Copyright © 2014-2018 [Metosin Oy](http://www.metosin.fi)
