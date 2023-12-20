@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.26.2"
+(defproject metosin/ring-swagger "0.26.3-SNAPSHOT"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -35,6 +35,19 @@
             :target "gh-pages/doc"
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
             :src-uri-prefix "#L"}
-  :deploy-repositories [["releases" :clojars]]
+  :deploy-repositories [["snapshot" {:url "https://clojars.org/repo"
+                                     :sign-releases false}]
+                        ["release" {:url "https://clojars.org/repo"
+                                    :sign-releases false}]]
+  :release-tasks [["clean"]
+                  ["vcs" "assert-committed"]
+                  ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["deploy" "release"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]]
+
   :aliases {"all" ["with-profile" "dev:dev,1.7:dev,1.9:dev,1.10:dev,1.11:dev,1.12"]
             "test-ancient" ["midje"]})

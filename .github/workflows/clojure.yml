@@ -44,3 +44,46 @@ jobs:
           lein: latest
       - name: Run tests
         run: lein do clean, all midje, all check
+  deploy:
+    concurrency: deploy
+    needs: test
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Maven Cache
+        id: maven-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-${{ hashFiles('project.clj') }}-${{ matrix.jdk }}
+          restore-keys: |
+            m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-${{ hashFiles('project.clj') }}-
+            m2-cache-${{ env.ACTIONS_CACHE_VERSION }}-
+      - name: Prepare java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - name: Configure settings.xml
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings><servers><server></id><username>${{ secrets.CLOJARS_USER }}</username><password>${{ secrets.CLOJARS_TOKEN }}</password></server></servers></settings>" > ~/.m2/settings.xml
+      - name: deploy
+        env: 
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          if [[ "$COMMIT_MSG" == "Release :major" ]]; then
+            lein release :major
+          elif [[ "$COMMIT_MSG" == "Release :minor" ]]; then
+            lein release :minor
+          elif [[ "$COMMIT_MSG" == "Release :patch" ]]; then
+            lein release :patch
+          else
+            lein deploy snapshot
+          fi
+      - run: rm -f ~/.m2/settings.xml
+        if: ${{ always() }}
