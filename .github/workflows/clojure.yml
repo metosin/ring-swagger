@@ -85,4 +85,4 @@ jobs:
             lein deploy snapshot
           fi
       - run: rm -f ~/.m2/settings.xml
-        if: ${{ always }}
+        if: ${{ always() }}
