@@ -68,12 +68,10 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
-      - name: Configure settings.xml
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings><servers><server></id><username>${{ secrets.CLOJARS_USER }}</username><password>${{ secrets.CLOJARS_TOKEN }}</password></server></servers></settings>" > ~/.m2/settings.xml
       - name: deploy
         env: 
+          CLOJARS_USER: ${{ secrets.CLOJARS_USER }}
+          CLOJARS_TOKEN: ${{ secrets.CLOJARS_TOKEN }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           if [[ "$COMMIT_MSG" == "Release :major" ]]; then
@@ -85,5 +83,3 @@ jobs:
           else
             lein deploy snapshot
           fi
-      - run: rm -f ~/.m2/settings.xml
-        if: ${{ always() }}
