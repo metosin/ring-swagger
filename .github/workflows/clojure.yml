@@ -80,6 +80,12 @@ jobs:
             lein release :minor
           elif [[ "$COMMIT_MSG" == "Release :patch" ]]; then
             lein release :patch
+          elif [[ "$COMMIT_MSG" == "Release :alpha" ]]; then
+            lein release :alpha
+          elif [[ "$COMMIT_MSG" == "Release :beta" ]]; then
+            lein release :beta
+          elif [[ "$COMMIT_MSG" == "Release :rc" ]]; then
+            lein release :rc
           else
             lein deploy snapshot
           fi
