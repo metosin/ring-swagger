@@ -19,7 +19,7 @@
 (s/defrecord User [age :- s/Int, keyboard :- Keyboard])
 
 ;; Make currency return nil for testing purporses
-(defmethod rsjs/convert-class java.util.Currency [_ _] nil)
+(defmethod rsjs/convert-class java.util.Currency [_ _ _] nil)
 
 (facts "type transformations"
   (fact "mapped to nil"
@@ -82,13 +82,13 @@
       (fact "uses wrapped value by default with x-nullable true"
         (rsjs/->swagger (s/maybe Long)) => (assoc (rsjs/->swagger Long) :x-nullable true))
       (fact "adds allowEmptyValue when for query and formData as defined by the spec"
-        (rsjs/->swagger (s/maybe Long) {:in :query}) => (assoc (rsjs/->swagger Long) :allowEmptyValue true)
-        (rsjs/->swagger (s/maybe Long) {:in :formData}) => (assoc (rsjs/->swagger Long) :allowEmptyValue true))
+        (rsjs/->swagger (s/maybe Long) {:in :query} :swagger) => (assoc (rsjs/->swagger Long) :allowEmptyValue true)
+        (rsjs/->swagger (s/maybe Long) {:in :formData} :swagger) => (assoc (rsjs/->swagger Long) :allowEmptyValue true))
       (fact "uses wrapped value by default with x-nullable true with body"
-        (rsjs/->swagger (s/maybe Long) {:in :body}) => (assoc (rsjs/->swagger Long) :x-nullable true))
+        (rsjs/->swagger (s/maybe Long) {:in :body} :swagger) => (assoc (rsjs/->swagger Long) :x-nullable true))
       (fact "uses wrapped value for other parameters"
-        (rsjs/->swagger (s/maybe Long) {:in :header}) => (rsjs/->swagger Long)
-        (rsjs/->swagger (s/maybe Long) {:in :path}) => (rsjs/->swagger Long)))
+        (rsjs/->swagger (s/maybe Long) {:in :header} :swagger) => (rsjs/->swagger Long)
+        (rsjs/->swagger (s/maybe Long) {:in :path} :swagger) => (rsjs/->swagger Long)))
 
     (fact "s/defrecord"
       (rsjs/->swagger User) => {:type "object",
@@ -122,11 +122,11 @@
 
     (fact "s/Any"
       (rsjs/->swagger s/Any) => {}
-      (rsjs/->swagger s/Any {:in :body}) => {}
-      (rsjs/->swagger s/Any {:in :header}) => {:type "string"}
-      (rsjs/->swagger s/Any {:in :path}) => {:type "string"}
-      (rsjs/->swagger s/Any {:in :query}) => {:type "string", :allowEmptyValue true}
-      (rsjs/->swagger s/Any {:in :formData}) => {:type "string", :allowEmptyValue true})
+      (rsjs/->swagger s/Any {:in :body} :swagger) => {}
+      (rsjs/->swagger s/Any {:in :header} :swagger) => {:type "string"}
+      (rsjs/->swagger s/Any {:in :path} :swagger) => {:type "string"}
+      (rsjs/->swagger s/Any {:in :query} :swagger) => {:type "string", :allowEmptyValue true}
+      (rsjs/->swagger s/Any {:in :formData} :swagger) => {:type "string", :allowEmptyValue true})
 
     (fact "s/conditional"
       (rsjs/->swagger (s/conditional (constantly true) Long (constantly false) String))
@@ -150,19 +150,19 @@
     ))
 
 (fact "Optional-key default metadata"
-  (rsjs/properties {(with-meta (s/optional-key :foo) {:default "bar"}) s/Str})
+  (rsjs/properties {(with-meta (s/optional-key :foo) {:default "bar"}) s/Str} :swagger)
   => {:foo {:type "string" :default "bar"}}
 
   (fact "nil default is ignored"
-    (rsjs/properties {(with-meta (s/optional-key :foo) {:default nil}) s/Str})
+    (rsjs/properties {(with-meta (s/optional-key :foo) {:default nil}) s/Str} :swagger)
     => {:foo {:type "string"}})
 
   (fact "pfnk schema"
-    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str "foo"}])))
+    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str "foo"}])) :swagger)
     => {:x {:type "string" :default "foo"}})
 
   (fact "pfnk schema - nil default is ignored"
-    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str nil}])))
+    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str nil}])) :swagger)
     => {:x {:type "string"}}))
 
 (fact "Describe"
@@ -204,7 +204,7 @@
         (rsjs/->swagger schema) => {:$ref "#/definitions/schema"})
 
       (fact "extra metadata is present on schema objects"
-        (rsjs/schema-object schema) => (contains
+        (rsjs/schema-object schema :swagger) => (contains
                                          {:properties {:name {:type "string"}
                                                        :title {:type "string"}}
                                           :minProperties 1
@@ -228,46 +228,46 @@
 (facts "properties"
   (fact "s/Any -values are not ignored"
     (keys (rsjs/properties {:a s/Str
-                            :b s/Any}))
+                            :b s/Any} :swagger))
     => [:a :b])
 
   (fact "nil-values are ignored"
-    (keys (rsjs/properties {:a s/Str, :b Currency}))
+    (keys (rsjs/properties {:a s/Str, :b Currency} :swagger))
     => [:a])
 
   (fact "s/Keyword -keys are ignored"
     (keys (rsjs/properties {:a s/Str
-                            s/Keyword s/Str}))
+                            s/Keyword s/Str} :swagger))
     => [:a])
 
   (fact "Class -keys are ignored"
     (keys (rsjs/properties {:a s/Str
-                            s/Str s/Str}))
+                            s/Str s/Str} :swagger))
     => [:a])
 
   (fact "Required keyword-keys are used"
     (keys (rsjs/properties {:a s/Str
-                            (s/required-key :b) s/Str}))
+                            (s/required-key :b) s/Str} :swagger))
     => [:a :b])
 
   (fact "Required non-keyword-keys are NOT ignored"
     (keys (rsjs/properties {:a s/Str
-                            (s/required-key "b") s/Str}))
+                            (s/required-key "b") s/Str} :swagger))
     => [:a "b"])
 
   (fact "s/Any -keys are ignored"
     (keys (rsjs/properties {:a s/Str
-                            s/Any s/Str}))
+                            s/Any s/Str} :swagger))
     => [:a])
 
   (fact "with unknown mappings"
     (fact "by default, exception is thrown"
       (rsjs/properties {:a String
-                        :b java.util.Vector}) => (throws IllegalArgumentException))
+                        :b java.util.Vector} :swagger) => (throws IllegalArgumentException))
     (fact "unknown fields are ignored ig *ignore-missing-mappings* is set"
       (binding [rsjs/*ignore-missing-mappings* true]
         (keys (rsjs/properties {:a String
-                                :b java.util.Vector})) => [:a])))
+                                :b java.util.Vector} :swagger)) => [:a])))
 
   (fact "Keeps the order of properties intact"
     (keys (rsjs/properties (linked/map :a String
@@ -277,13 +277,13 @@
                                        :e String
                                        :f String
                                        :g String
-                                       :h String)))
+                                       :h String) :swagger))
     => [:a :b :c :d :e :f :g :h])
 
   (fact "Ordered-map works with sub-schemas"
     (rsjs/properties (rsc/with-named-sub-schemas (linked/map :a String
                                                              :b {:foo String}
-                                                             :c [{:bar String}])))
+                                                             :c [{:bar String}] )) :swagger)
     => anything)
 
   (fact "referenced record-schemas"
@@ -291,28 +291,28 @@
     (s/defschema Bar {:key Foo})
 
     (fact "can't get properties out of record schemas"
-      (rsjs/properties Foo)) => (throws AssertionError)
+      (rsjs/properties Foo :swagger)) => (throws AssertionError)
 
     (fact "nested properties work ok"
-      (keys (rsjs/properties Bar)) => [:key])))
+      (keys (rsjs/properties Bar :swagger)) => [:key])))
 
 (facts "additional-properties"
   (fact "No additional properties"
-    (rsjs/additional-properties {:a s/Str})
+    (rsjs/additional-properties {:a s/Str} :swagger)
     => false)
 
   (fact "s/Keyword"
-    (rsjs/additional-properties {s/Keyword s/Bool})
+    (rsjs/additional-properties {s/Keyword s/Bool} :swagger)
     => {:type "boolean"})
 
   (fact "s/Any"
-    (rsjs/additional-properties {s/Any s/Str})
+    (rsjs/additional-properties {s/Any s/Str} :swagger)
     => {:type "string"})
 
   (fact "s/Str"
-    (rsjs/additional-properties {s/Str s/Bool})
+    (rsjs/additional-properties {s/Str s/Bool} :swagger)
     => {:type "boolean"})
 
   (fact "s/Int"
-    (rsjs/additional-properties {s/Int s/Str})
+    (rsjs/additional-properties {s/Int s/Str} :swagger)
     => {:type "string"}))

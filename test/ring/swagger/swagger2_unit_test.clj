@@ -84,9 +84,9 @@
 ;;
 
 (fact "transform simple schemas"
-  (rsjs/schema-object Tag) => Tag'
-  (rsjs/schema-object Category) => Category'
-  (rsjs/schema-object Pet) => Pet')
+  (rsjs/schema-object Tag :swagger) => Tag'
+  (rsjs/schema-object Category :swagger) => Category'
+  (rsjs/schema-object Pet :swagger) => Pet')
 
 (s/defschema RootModel
   {:sub {:foo Long}})
@@ -539,11 +539,11 @@
                 :b InvalidElement}]
 
     (fact "fail by default"
-      (rsjs/schema-object schema) => (throws IllegalArgumentException))
+      (rsjs/schema-object schema :swagger) => (throws IllegalArgumentException))
 
     (fact "drops bad fields from both properties & required"
       (binding [rsjs/*ignore-missing-mappings* true]
-        (rsjs/schema-object schema)
+        (rsjs/schema-object schema :swagger)
 
         => {:type "object"
             :properties {:a {:type "string"}}
