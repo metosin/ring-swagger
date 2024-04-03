@@ -19,7 +19,7 @@
 (s/defrecord User [age :- s/Int, keyboard :- Keyboard])
 
 ;; Make currency return nil for testing purporses
-(defmethod rsjs/convert-class java.util.Currency [_ _ _] nil)
+(defmethod rsjs/convert-class java.util.Currency [_ _] nil)
 
 (facts "type transformations"
   (fact "mapped to nil"
@@ -82,13 +82,13 @@
       (fact "uses wrapped value by default with x-nullable true"
         (rsjs/->swagger (s/maybe Long)) => (assoc (rsjs/->swagger Long) :x-nullable true))
       (fact "adds allowEmptyValue when for query and formData as defined by the spec"
-        (rsjs/->swagger (s/maybe Long) {:in :query} :swagger) => (assoc (rsjs/->swagger Long) :allowEmptyValue true)
-        (rsjs/->swagger (s/maybe Long) {:in :formData} :swagger) => (assoc (rsjs/->swagger Long) :allowEmptyValue true))
+        (rsjs/->swagger (s/maybe Long) {:in :query}) => (assoc (rsjs/->swagger Long) :allowEmptyValue true)
+        (rsjs/->swagger (s/maybe Long) {:in :formData}) => (assoc (rsjs/->swagger Long) :allowEmptyValue true))
       (fact "uses wrapped value by default with x-nullable true with body"
-        (rsjs/->swagger (s/maybe Long) {:in :body} :swagger) => (assoc (rsjs/->swagger Long) :x-nullable true))
+        (rsjs/->swagger (s/maybe Long) {:in :body}) => (assoc (rsjs/->swagger Long) :x-nullable true))
       (fact "uses wrapped value for other parameters"
-        (rsjs/->swagger (s/maybe Long) {:in :header} :swagger) => (rsjs/->swagger Long)
-        (rsjs/->swagger (s/maybe Long) {:in :path} :swagger) => (rsjs/->swagger Long)))
+        (rsjs/->swagger (s/maybe Long) {:in :header}) => (rsjs/->swagger Long)
+        (rsjs/->swagger (s/maybe Long) {:in :path}) => (rsjs/->swagger Long)))
 
     (fact "s/defrecord"
       (rsjs/->swagger User) => {:type "object",
@@ -122,11 +122,11 @@
 
     (fact "s/Any"
       (rsjs/->swagger s/Any) => {}
-      (rsjs/->swagger s/Any {:in :body} :swagger) => {}
-      (rsjs/->swagger s/Any {:in :header} :swagger) => {:type "string"}
-      (rsjs/->swagger s/Any {:in :path} :swagger) => {:type "string"}
-      (rsjs/->swagger s/Any {:in :query} :swagger) => {:type "string", :allowEmptyValue true}
-      (rsjs/->swagger s/Any {:in :formData} :swagger) => {:type "string", :allowEmptyValue true})
+      (rsjs/->swagger s/Any {:in :body}) => {}
+      (rsjs/->swagger s/Any {:in :header}) => {:type "string"}
+      (rsjs/->swagger s/Any {:in :path}) => {:type "string"}
+      (rsjs/->swagger s/Any {:in :query}) => {:type "string", :allowEmptyValue true}
+      (rsjs/->swagger s/Any {:in :formData}) => {:type "string", :allowEmptyValue true})
 
     (fact "s/conditional"
       (rsjs/->swagger (s/conditional (constantly true) Long (constantly false) String))

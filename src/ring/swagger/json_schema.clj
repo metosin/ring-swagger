@@ -56,10 +56,10 @@
       (str (if n (str n "/")) (name x)))
     x))
 
-(defmulti convert-class (fn [c _ _] c))
+(defmulti convert-class (fn [c _] c))
 
 (defprotocol JsonSchema
-  (convert [this options schema-type]))
+  (convert [this options]))
 
 (defn not-supported! [e]
   (throw (IllegalArgumentException.
@@ -92,28 +92,28 @@
     m))
 
 ;; Classes
-(defmethod convert-class java.lang.Integer       [_ _ _] {:type "integer" :format "int32"})
-(defmethod convert-class java.lang.Long          [_ _ _] {:type "integer" :format "int64"})
-(defmethod convert-class java.lang.Double        [_ _ _] {:type "number" :format "double"})
-(defmethod convert-class java.lang.Number        [_ _ _] {:type "number" :format "double"})
-(defmethod convert-class java.lang.String        [_ _ _] {:type "string"})
-(defmethod convert-class java.lang.Boolean       [_ _ _] {:type "boolean"})
-(defmethod convert-class clojure.lang.Keyword    [_ _ _] {:type "string"})
-(defmethod convert-class clojure.lang.Symbol     [_ _ _] {:type "string"})
-(defmethod convert-class java.util.UUID          [_ _ _] {:type "string" :format "uuid"})
-(defmethod convert-class java.util.Date          [_ _ _] {:type "string" :format "date-time"})
-(defmethod convert-class org.joda.time.DateTime  [_ _ _] {:type "string" :format "date-time"})
-(defmethod convert-class org.joda.time.LocalDate [_ _ _] {:type "string" :format "date"})
-(defmethod convert-class org.joda.time.LocalTime [_ _ _] {:type "string" :format "time"})
-(defmethod convert-class java.util.regex.Pattern [_ _ _] {:type "string" :format "regex"})
-(defmethod convert-class java.io.File            [_ _ _] {:type "file"})
+(defmethod convert-class java.lang.Integer       [_ _] {:type "integer" :format "int32"})
+(defmethod convert-class java.lang.Long          [_ _] {:type "integer" :format "int64"})
+(defmethod convert-class java.lang.Double        [_ _] {:type "number" :format "double"})
+(defmethod convert-class java.lang.Number        [_ _] {:type "number" :format "double"})
+(defmethod convert-class java.lang.String        [_ _] {:type "string"})
+(defmethod convert-class java.lang.Boolean       [_ _] {:type "boolean"})
+(defmethod convert-class clojure.lang.Keyword    [_ _] {:type "string"})
+(defmethod convert-class clojure.lang.Symbol     [_ _] {:type "string"})
+(defmethod convert-class java.util.UUID          [_ _] {:type "string" :format "uuid"})
+(defmethod convert-class java.util.Date          [_ _] {:type "string" :format "date-time"})
+(defmethod convert-class org.joda.time.DateTime  [_ _] {:type "string" :format "date-time"})
+(defmethod convert-class org.joda.time.LocalDate [_ _] {:type "string" :format "date"})
+(defmethod convert-class org.joda.time.LocalTime [_ _] {:type "string" :format "time"})
+(defmethod convert-class java.util.regex.Pattern [_ _] {:type "string" :format "regex"})
+(defmethod convert-class java.io.File            [_ _] {:type "file"})
 
 (extension/java-time
- (defmethod convert-class java.time.Instant   [_ _ _] {:type "string" :format "date-time"})
- (defmethod convert-class java.time.LocalDate [_ _ _] {:type "string" :format "date"})
- (defmethod convert-class java.time.LocalTime [_ _ _] {:type "string" :format "time"}))
+ (defmethod convert-class java.time.Instant   [_ _] {:type "string" :format "date-time"})
+ (defmethod convert-class java.time.LocalDate [_ _] {:type "string" :format "date"})
+ (defmethod convert-class java.time.LocalTime [_ _] {:type "string" :format "time"}))
 
-(defmethod convert-class :default [e _ _]
+(defmethod convert-class :default [e _]
   (if-not *ignore-missing-mappings*
     (not-supported! e)))
 
@@ -127,56 +127,55 @@
 
 (defn ->swagger
   ([x]
-   (->swagger x {} :swagger))
-  ([x options schema-type]
+   (->swagger x {}))
+  ([x options]
    (-> x
-       (convert options schema-type)
+       (convert options)
        (merge-meta x options))))
 
 (defn try->swagger [v k key-meta schema-type]
-  (try (->swagger v {:key-meta key-meta} schema-type)
+  (try (->swagger v {:key-meta key-meta :schema-type schema-type})
        (catch Exception e
          (throw
           (IllegalArgumentException.
            (str "error converting to swagger schema [" k " "
                 (try (s/explain v) (catch Exception _ v)) "]") e)))))
 
-
-(defn- coll-schema [e options schema-type]
+(defn- coll-schema [e options]
   (-> {:type "array"
-       :items (->swagger (first e) (assoc options ::no-meta true) schema-type)}
+       :items (->swagger (first e) (assoc options ::no-meta true))}
       (assoc-collection-format options)))
 
 (extend-protocol JsonSchema
 
   Object
-  (convert [e _ _]
+  (convert [e _]
     (not-supported! e))
 
   Class
-  (convert [e options schema-type]
+  (convert [e options]
     (if-let [schema (common/record-schema e)]
-      (schema-object schema schema-type)
-      (convert-class e options schema-type)))
+      (schema-object schema (:schema-type options))
+      (convert-class e options)))
 
   nil
-  (convert [_ _ _]
+  (convert [_ _]
     nil)
 
   FieldSchema
-  (convert [e _ schema-type]
-    (->swagger (:schema e) {} schema-type))
+  (convert [e _]
+    (->swagger (:schema e) {}))
 
   schema.core.Predicate
-  (convert [e _ schema-type]
-    (some-> e :pred-name predicate-name-to-class (->swagger {} schema-type)))
+  (convert [e _]
+    (some-> e :pred-name predicate-name-to-class (->swagger {})))
 
   schema.core.EnumSchema
-  (convert [e options schema-type]
-    (merge (->swagger (class (first (:vs e))) options schema-type) {:enum (seq (:vs e))}))
+  (convert [e options]
+    (merge (->swagger (class (first (:vs e))) options) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
-  (convert [e {:keys [in]} _]
+  (convert [e {:keys [in]}]
     (let [schema (->swagger (:schema e))]
       (condp contains? in
         #{:query :formData} (assoc schema :allowEmptyValue true)
@@ -184,70 +183,70 @@
         schema)))
 
   schema.core.Both
-  (convert [e _ _]
+  (convert [e _]
     (->swagger (first (:schemas e))))
 
   schema.core.Either
-  (convert [e _ _]
+  (convert [e _]
     (->swagger (first (:schemas e))))
 
   schema.core.Recursive
-  (convert [e _ _]
+  (convert [e _]
     (->swagger (:derefable e)))
 
   schema.core.EqSchema
-  (convert [e _ _]
+  (convert [e _]
     (merge (->swagger (class (:v e)))
            {:enum [(:v e)]}))
 
   schema.core.NamedSchema
-  (convert [e _ schema-type]
-    (->swagger (:schema e) {} schema-type))
+  (convert [e _]
+    (->swagger (:schema e) {}))
 
   schema.core.One
-  (convert [e _ _]
+  (convert [e _]
     (->swagger (:schema e)))
 
   schema.core.AnythingSchema
-  (convert [_ {:keys [in] :as opts} schema-type]
+  (convert [_ {:keys [in] :as opts}]
     (if (and in (not= :body in))
-      (->swagger (s/maybe s/Str) opts schema-type)
+      (->swagger (s/maybe s/Str) opts)
       {}))
 
   schema.core.ConditionalSchema
-  (convert [e _ _]
+  (convert [e _]
     {:x-oneOf (vec (keep (comp ->swagger second) (:preds-and-schemas e)))})
 
   schema.core.CondPre
-  (convert [e _ _]
+  (convert [e _]
     {:x-oneOf (mapv ->swagger (:schemas e))})
 
   schema.core.Constrained
-  (convert [e _ _]
+  (convert [e _]
     (->swagger (:schema e)))
 
   java.util.regex.Pattern
-  (convert [e _ _]
+  (convert [e _]
     {:type "string" :pattern (str e)})
 
   ;; Collections
 
   clojure.lang.Sequential
-  (convert [e options schema-type]
-    (coll-schema e options schema-type))
+  (convert [e options]
+    (coll-schema e options))
 
   clojure.lang.IPersistentSet
-  (convert [e options schema-type]
-    (assoc (coll-schema e options schema-type) :uniqueItems true))
+  (convert [e options]
+    (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (convert [e {:keys [properties?]} schema-type]
+  (convert [e {:keys [properties? schema-type]}]
     (if properties?
       {:properties (properties e schema-type)}
       (reference e schema-type)))
 
   clojure.lang.Var
-  (convert [e _ schema-type]
+  (convert [e {:keys [schema-type]}]
     (reference e schema-type)))
 
 ;;

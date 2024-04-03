@@ -39,7 +39,7 @@
     (for [[k v] (-> model common/value-of stc/schema-value rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
-                json-schema (rsjs/->swagger v options :openapi)]
+                json-schema (rsjs/->swagger v (assoc options :schema-type :openapi))]
           :when json-schema]
       {:in          (name in)
        :name        (rsjs/key-name rk)
@@ -60,7 +60,7 @@
     (into {} (for [[content-type schema-input] contents]
                [content-type
                 (let [schema      (rsc/peek-schema schema-input)
-                      schema-json (rsjs/->swagger schema-input options :openapi)]
+                      schema-json (rsjs/->swagger schema-input (assoc options :schema-type :openapi))]
                   {:name   (or (common/title schema) "")
                    :schema schema-json})]))))
 
@@ -78,7 +78,7 @@
                           (cond-> headers (update-in [:headers] (fn [headers]
                                                                   (if headers
                                                                     (->> (for [[k v] headers]
-                                                                           [k (rsjs/->swagger v options :openapi)])
+                                                                           [k (rsjs/->swagger v (assoc options :schema-type :openapi))])
                                                                          (into {}))))))
                           (update-in [:description] #(or %
                                                          (:description (rsjs/json-schema-meta v))

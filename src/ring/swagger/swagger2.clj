@@ -37,12 +37,12 @@
 ;; Paths, parameters, responses
 ;;
 
-(defmulti extract-parameter (fn [in _ _] in))
+(defmulti ^:private extract-parameter (fn [in _ _] in))
 
 (defmethod extract-parameter :body [_ model options]
   (if model
     (let [schema (rsc/peek-schema model)
-          schema-json (rsjs/->swagger model options :swagger)]
+          schema-json (rsjs/->swagger model options)]
       (vector
        {:in "body"
         :name (or (common/title schema) "")
@@ -55,7 +55,7 @@
     (for [[k v] (-> model common/value-of stc/schema-value rsc/strict-schema)
           :when (s/specific-key? k)
           :let [rk (s/explicit-schema-key k)
-                json-schema (rsjs/->swagger v options :swagger)]
+                json-schema (rsjs/->swagger v options)]
           :when json-schema]
       (merge
        {:in (name in)
@@ -81,11 +81,11 @@
   (let [responses (p/for-map [[k v] responses
                               :let [{:keys [schema headers]} v]]
                     k (-> v
-                          (cond-> schema (update-in [:schema] rsjs/->swagger options :swagger))
+                          (cond-> schema (update-in [:schema] rsjs/->swagger options))
                           (cond-> headers (update-in [:headers] (fn [headers]
                                                                   (if headers
                                                                     (->> (for [[k v] headers]
-                                                                           [k (rsjs/->swagger v options :swagger)])
+                                                                           [k (rsjs/->swagger v options)])
                                                                          (into {}))))))
                           (update-in [:description] #(or %
                                                          (:description (rsjs/json-schema-meta v))
