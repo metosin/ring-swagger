@@ -44,11 +44,11 @@
     (let [schema (rsc/peek-schema model)
           schema-json (rsjs/->swagger model options)]
       (vector
-       {:in "body"
-        :name (or (common/title schema) "")
-        :description (or (:description (rsjs/json-schema-meta schema)) "")
-        :required (not (rsjs/maybe? model))
-        :schema schema-json}))))
+        {:in "body"
+         :name (or (common/title schema) "")
+         :description (or (:description (rsjs/json-schema-meta schema)) "")
+         :required (not (rsjs/maybe? model))
+         :schema schema-json}))))
 
 (defmethod extract-parameter :default [in model options]
   (if model
@@ -58,11 +58,11 @@
                 json-schema (rsjs/->swagger v options)]
           :when json-schema]
       (merge
-       {:in (name in)
-        :name (rsjs/key-name rk)
-        :description ""
-        :required (or (= in :path) (s/required-key? k))}
-       json-schema))))
+        {:in (name in)
+         :name (rsjs/key-name rk)
+         :description ""
+         :required (or (= in :path) (s/required-key? k))}
+        json-schema))))
 
 (defn- default-response-description
   "uses option :default-response-description-fn to generate
@@ -121,12 +121,12 @@
 (defn extract-paths-and-definitions [swagger options]
   (let [original-paths (or (:paths swagger) {})
         paths (reduce-kv
-               (fn [acc k v]
-                 (assoc acc
-                   (swagger-path k)
-                   (convert-operation v options)))
-               (empty original-paths)
-               original-paths)
+                (fn [acc k v]
+                  (assoc acc
+                    (swagger-path k)
+                    (convert-operation v options)))
+                (empty original-paths)
+                original-paths)
         definitions (-> swagger
                         extract-models
                         (transform-models options))]
@@ -231,13 +231,13 @@
                                       Possible values: multi, ssv, csv, tsv, pipes."
   ([swagger :- (s/maybe Swagger)] (swagger-json swagger nil))
   ([swagger :- (s/maybe Swagger), options :- (s/maybe Options)]
-   (let [options (merge option-defaults options)]
-     (binding [rsjs/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
-       (let [[paths definitions] (-> swagger
-                                     ensure-body-and-response-schema-names
-                                     (extract-paths-and-definitions options))]
-         (common/deep-merge
-          swagger-defaults
-          (-> swagger
-              (assoc :paths paths)
-              (assoc :definitions definitions))))))))
+    (let [options (merge option-defaults options)]
+      (binding [rsjs/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
+        (let [[paths definitions] (-> swagger
+                                      ensure-body-and-response-schema-names
+                                      (extract-paths-and-definitions options))]
+          (common/deep-merge
+            swagger-defaults
+            (-> swagger
+                (assoc :paths paths)
+                (assoc :definitions definitions))))))))
