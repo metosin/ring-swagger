@@ -12,6 +12,10 @@
 (declare properties)
 (declare schema-object)
 
+(defn- opts->schema-type [opts]
+  {:post [(keyword? %)]}
+  (get opts ::schema-type :swagger))
+
 ; TODO: remove this in favor of passing it as options
 (def ^:dynamic *ignore-missing-mappings* false)
 
@@ -77,11 +81,16 @@
 (defn reference? [m]
   (contains? m :$ref))
 
-(defn reference [e schema-type]
-  (if-let [schema-name (s/schema-name e)]
-    {:$ref (str (if (= schema-type :openapi) "#/components/schemas/" "#/definitions/") schema-name)}
-    (if (not *ignore-missing-mappings*)
-      (not-supported! e))))
+(defn reference
+  ([e] (reference e nil))
+  ([e opts]
+   (if-let [schema-name (s/schema-name e)]
+     {:$ref (str (case (opts->schema-type (opts->schema-type opts))
+                   :swagger "#/definitions/"
+                   :openapi "#/components/schemas/")
+                 schema-name)}
+     (if (not *ignore-missing-mappings*)
+       (not-supported! e)))))
 
 (defn merge-meta
   [m x {:keys [::no-meta :key-meta]}]
@@ -109,9 +118,9 @@
 (defmethod convert-class java.io.File            [_ _] {:type "file"})
 
 (extension/java-time
- (defmethod convert-class java.time.Instant   [_ _] {:type "string" :format "date-time"})
- (defmethod convert-class java.time.LocalDate [_ _] {:type "string" :format "date"})
- (defmethod convert-class java.time.LocalTime [_ _] {:type "string" :format "time"}))
+  (defmethod convert-class java.time.Instant   [_ _] {:type "string" :format "date-time"})
+  (defmethod convert-class java.time.LocalDate [_ _] {:type "string" :format "date"})
+  (defmethod convert-class java.time.LocalTime [_ _] {:type "string" :format "time"}))
 
 (defmethod convert-class :default [e _]
   (if-not *ignore-missing-mappings*
@@ -133,8 +142,8 @@
        (convert options)
        (merge-meta x options))))
 
-(defn try->swagger [v k key-meta schema-type]
-  (try (->swagger v {:key-meta key-meta :schema-type schema-type})
+(defn try->swagger [v k key-meta opts]
+  (try (->swagger v {:key-meta key-meta ::schema-type (opts->schema-type opts)})
        (catch Exception e
          (throw
           (IllegalArgumentException.
@@ -155,7 +164,7 @@
   Class
   (convert [e options]
     (if-let [schema (common/record-schema e)]
-      (schema-object schema (:schema-type options))
+      (schema-object schema options)
       (convert-class e options)))
 
   nil
@@ -240,14 +249,14 @@
     (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (convert [e {:keys [properties? schema-type]}]
+  (convert [e {:keys [properties?] :as opts}]
     (if properties?
-      {:properties (properties e schema-type)}
-      (reference e schema-type)))
+      {:properties (properties e opts)}
+      (reference e opts)))
 
   clojure.lang.Var
-  (convert [e {:keys [schema-type]}]
-    (reference e schema-type)))
+  (convert [e opts]
+    (reference e opts)))
 
 ;;
 ;; Schema to Swagger Schema definitions
@@ -258,45 +267,48 @@
   The result is put into collection of same type as input schema.
   Thus linked/map should keep the order of items. Returnes nil
   if no properties are found."
-  [schema schema-type]
-  {:pre [(common/plain-map? schema)]}
-  (let [props (into (empty schema)
-                    (for [[k v] schema
-                          :when (s/specific-key? k)
-                          :let [key-meta (meta k)
-                                k (s/explicit-schema-key k)]
-                          :let [v (try->swagger v k key-meta schema-type)]]
-                      (and v [k v])))]
-    (if (seq props)
-      props)))
+  ([schema] (properties schema nil))
+  ([schema opts]
+   {:pre [(common/plain-map? schema)]}
+   (let [props (into (empty schema)
+                     (for [[k v] schema
+                           :when (s/specific-key? k)
+                           :let [key-meta (meta k)
+                                 k (s/explicit-schema-key k)]
+                           :let [v (try->swagger v k key-meta opts)]]
+                       (and v [k v])))]
+     (if (seq props)
+       props))))
 
 (defn additional-properties
   "Generates json-schema additional properties from a plain map
   schema from under key s/Keyword."
-  [schema schema-type]
-  {:pre [(common/plain-map? schema)]}
-  (if-let [extra-key (s/find-extra-keys-schema schema)]
-    (let [v (get schema extra-key)]
-      (try->swagger v s/Keyword nil schema-type ))
-    false))
+  ([schema] (additional-properties schema nil))
+  ([schema opts]
+   {:pre [(common/plain-map? schema)]}
+   (if-let [extra-key (s/find-extra-keys-schema schema)]
+     (let [v (get schema extra-key)]
+       (try->swagger v s/Keyword nil (opts->schema-type opts)))
+     false)))
 
 (defn schema-object
   "Returns a JSON Schema object of a plain map schema."
-  [schema schema-type]
-  (if (common/plain-map? schema)
-    (let [properties (properties schema schema-type)
-          title (if (not (s/schema-name schema)) (common/title schema))
-          additional-properties (additional-properties schema schema-type)
-          meta (json-schema-meta schema)
-          required (some->> (rsc/required-keys schema)
-                            (filter (partial contains? properties))
-                            seq
-                            vec)]
-      (common/remove-empty-keys
-        (merge
-          meta
-          {:type "object"
-           :title title
-           :properties properties
-           :additionalProperties additional-properties
-           :required required})))))
+  ([schema] (schema-object schema nil))
+  ([schema opts]
+   (if (common/plain-map? schema)
+     (let [properties (properties schema opts)
+           title (if (not (s/schema-name schema)) (common/title schema))
+           additional-properties (additional-properties schema opts)
+           meta (json-schema-meta schema)
+           required (some->> (rsc/required-keys schema)
+                             (filter (partial contains? properties))
+                             seq
+                             vec)]
+       (common/remove-empty-keys
+         (merge
+           meta
+           {:type "object"
+            :title title
+            :properties properties
+            :additionalProperties additional-properties
+            :required required}))))))

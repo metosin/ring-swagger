@@ -539,11 +539,11 @@
                 :b InvalidElement}]
 
     (fact "fail by default"
-      (rsjs/schema-object schema :swagger) => (throws IllegalArgumentException))
+      (rsjs/schema-object schema) => (throws IllegalArgumentException))
 
     (fact "drops bad fields from both properties & required"
       (binding [rsjs/*ignore-missing-mappings* true]
-        (rsjs/schema-object schema :swagger)
+        (rsjs/schema-object schema)
 
         => {:type "object"
             :properties {:a {:type "string"}}
