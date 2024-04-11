@@ -84,9 +84,9 @@
 ;;
 
 (fact "transform simple schemas"
-  (rsjs/schema-object Tag :swagger) => Tag'
-  (rsjs/schema-object Category :swagger) => Category'
-  (rsjs/schema-object Pet :swagger) => Pet')
+  (rsjs/schema-object Tag) => Tag'
+  (rsjs/schema-object Category) => Category'
+  (rsjs/schema-object Pet) => Pet')
 
 (s/defschema RootModel
   {:sub {:foo Long}})
