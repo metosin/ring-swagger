@@ -143,7 +143,7 @@
        (merge-meta x options))))
 
 (defn- try->swagger [v k key-meta opts]
-  (try (->swagger v {:key-meta key-meta ::schema-type (opts->schema-type opts)})
+  (try (->swagger v (assoc opts :key-meta key-meta))
        (catch Exception e
          (throw
            (IllegalArgumentException.
@@ -288,7 +288,7 @@
    {:pre [(common/plain-map? schema)]}
    (if-let [extra-key (s/find-extra-keys-schema schema)]
      (let [v (get schema extra-key)]
-       (try->swagger v s/Keyword nil (opts->schema-type opts)))
+       (try->swagger v s/Keyword nil opts))
      false)))
 
 (defn schema-object
