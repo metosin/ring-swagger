@@ -150,19 +150,19 @@
     ))
 
 (fact "Optional-key default metadata"
-  (rsjs/properties {(with-meta (s/optional-key :foo) {:default "bar"}) s/Str} :swagger)
+  (rsjs/properties {(with-meta (s/optional-key :foo) {:default "bar"}) s/Str})
   => {:foo {:type "string" :default "bar"}}
 
   (fact "nil default is ignored"
-    (rsjs/properties {(with-meta (s/optional-key :foo) {:default nil}) s/Str} :swagger)
+    (rsjs/properties {(with-meta (s/optional-key :foo) {:default nil}) s/Str})
     => {:foo {:type "string"}})
 
   (fact "pfnk schema"
-    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str "foo"}])) :swagger)
+    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str "foo"}])))
     => {:x {:type "string" :default "foo"}})
 
   (fact "pfnk schema - nil default is ignored"
-    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str nil}])) :swagger)
+    (rsjs/properties (pfnk/input-schema (p/fnk [{x :- s/Str nil}])))
     => {:x {:type "string"}}))
 
 (fact "Describe"
@@ -204,7 +204,7 @@
         (rsjs/->swagger schema) => {:$ref "#/definitions/schema"})
 
       (fact "extra metadata is present on schema objects"
-        (rsjs/schema-object schema :swagger) => (contains
+        (rsjs/schema-object schema) => (contains
                                          {:properties {:name {:type "string"}
                                                        :title {:type "string"}}
                                           :minProperties 1
@@ -228,46 +228,46 @@
 (facts "properties"
   (fact "s/Any -values are not ignored"
     (keys (rsjs/properties {:a s/Str
-                            :b s/Any} :swagger))
+                            :b s/Any}))
     => [:a :b])
 
   (fact "nil-values are ignored"
-    (keys (rsjs/properties {:a s/Str, :b Currency} :swagger))
+    (keys (rsjs/properties {:a s/Str, :b Currency}))
     => [:a])
 
   (fact "s/Keyword -keys are ignored"
     (keys (rsjs/properties {:a s/Str
-                            s/Keyword s/Str} :swagger))
+                            s/Keyword s/Str}))
     => [:a])
 
   (fact "Class -keys are ignored"
     (keys (rsjs/properties {:a s/Str
-                            s/Str s/Str} :swagger))
+                            s/Str s/Str}))
     => [:a])
 
   (fact "Required keyword-keys are used"
     (keys (rsjs/properties {:a s/Str
-                            (s/required-key :b) s/Str} :swagger))
+                            (s/required-key :b) s/Str}))
     => [:a :b])
 
   (fact "Required non-keyword-keys are NOT ignored"
     (keys (rsjs/properties {:a s/Str
-                            (s/required-key "b") s/Str} :swagger))
+                            (s/required-key "b") s/Str}))
     => [:a "b"])
 
   (fact "s/Any -keys are ignored"
     (keys (rsjs/properties {:a s/Str
-                            s/Any s/Str} :swagger))
+                            s/Any s/Str}))
     => [:a])
 
   (fact "with unknown mappings"
     (fact "by default, exception is thrown"
       (rsjs/properties {:a String
-                        :b java.util.Vector} :swagger) => (throws IllegalArgumentException))
+                        :b java.util.Vector}) => (throws IllegalArgumentException))
     (fact "unknown fields are ignored ig *ignore-missing-mappings* is set"
       (binding [rsjs/*ignore-missing-mappings* true]
         (keys (rsjs/properties {:a String
-                                :b java.util.Vector} :swagger)) => [:a])))
+                                :b java.util.Vector})) => [:a])))
 
   (fact "Keeps the order of properties intact"
     (keys (rsjs/properties (linked/map :a String
@@ -277,13 +277,13 @@
                                        :e String
                                        :f String
                                        :g String
-                                       :h String) :swagger))
+                                       :h String)))
     => [:a :b :c :d :e :f :g :h])
 
   (fact "Ordered-map works with sub-schemas"
     (rsjs/properties (rsc/with-named-sub-schemas (linked/map :a String
                                                              :b {:foo String}
-                                                             :c [{:bar String}] )) :swagger)
+                                                             :c [{:bar String}])))
     => anything)
 
   (fact "referenced record-schemas"
@@ -291,28 +291,28 @@
     (s/defschema Bar {:key Foo})
 
     (fact "can't get properties out of record schemas"
-      (rsjs/properties Foo :swagger)) => (throws AssertionError)
+      (rsjs/properties Foo)) => (throws AssertionError)
 
     (fact "nested properties work ok"
-      (keys (rsjs/properties Bar :swagger)) => [:key])))
+      (keys (rsjs/properties Bar)) => [:key])))
 
 (facts "additional-properties"
   (fact "No additional properties"
-    (rsjs/additional-properties {:a s/Str} :swagger)
+    (rsjs/additional-properties {:a s/Str})
     => false)
 
   (fact "s/Keyword"
-    (rsjs/additional-properties {s/Keyword s/Bool} :swagger)
+    (rsjs/additional-properties {s/Keyword s/Bool})
     => {:type "boolean"})
 
   (fact "s/Any"
-    (rsjs/additional-properties {s/Any s/Str} :swagger)
+    (rsjs/additional-properties {s/Any s/Str})
     => {:type "string"})
 
   (fact "s/Str"
-    (rsjs/additional-properties {s/Str s/Bool} :swagger)
+    (rsjs/additional-properties {s/Str s/Bool})
     => {:type "boolean"})
 
   (fact "s/Int"
-    (rsjs/additional-properties {s/Int s/Str} :swagger)
+    (rsjs/additional-properties {s/Int s/Str})
     => {:type "string"}))
