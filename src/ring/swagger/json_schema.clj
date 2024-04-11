@@ -146,9 +146,9 @@
   (try (->swagger v {:key-meta key-meta ::schema-type (opts->schema-type opts)})
        (catch Exception e
          (throw
-          (IllegalArgumentException.
-           (str "error converting to swagger schema [" k " "
-                (try (s/explain v) (catch Exception _ v)) "]") e)))))
+           (IllegalArgumentException.
+             (str "error converting to swagger schema [" k " "
+                  (try (s/explain v) (catch Exception _ v)) "]") e)))))
 
 (defn- coll-schema [e options]
   (-> {:type "array"
@@ -172,49 +172,49 @@
     nil)
 
   FieldSchema
-  (convert [e _]
-    (->swagger (:schema e) {}))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   schema.core.Predicate
-  (convert [e _]
-    (some-> e :pred-name predicate-name-to-class (->swagger {})))
+  (convert [e options]
+    (some-> e :pred-name predicate-name-to-class (->swagger options)))
 
   schema.core.EnumSchema
   (convert [e options]
     (merge (->swagger (class (first (:vs e))) options) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
-  (convert [e {:keys [in]}]
-    (let [schema (->swagger (:schema e))]
+  (convert [e {:keys [in] :as options}]
+    (let [schema (->swagger (:schema e) options)]
       (condp contains? in
         #{:query :formData} (assoc schema :allowEmptyValue true)
         #{nil :body} (assoc schema :x-nullable true)
         schema)))
 
   schema.core.Both
-  (convert [e _]
-    (->swagger (first (:schemas e))))
+  (convert [e options]
+    (->swagger (first (:schemas e)) options))
 
   schema.core.Either
-  (convert [e _]
-    (->swagger (first (:schemas e))))
+  (convert [e options]
+    (->swagger (first (:schemas e)) options))
 
   schema.core.Recursive
-  (convert [e _]
-    (->swagger (:derefable e)))
+  (convert [e options]
+    (->swagger (:derefable e) options))
 
   schema.core.EqSchema
-  (convert [e _]
-    (merge (->swagger (class (:v e)))
+  (convert [e options]
+    (merge (->swagger (class (:v e)) options)
            {:enum [(:v e)]}))
 
   schema.core.NamedSchema
-  (convert [e _]
-    (->swagger (:schema e) {}))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   schema.core.One
-  (convert [e _]
-    (->swagger (:schema e)))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   schema.core.AnythingSchema
   (convert [_ {:keys [in] :as opts}]
@@ -223,16 +223,16 @@
       {}))
 
   schema.core.ConditionalSchema
-  (convert [e _]
-    {:x-oneOf (vec (keep (comp ->swagger second) (:preds-and-schemas e)))})
+  (convert [e options]
+    {:x-oneOf (vec (keep #(->swagger (second %) options) (:preds-and-schemas e)))})
 
   schema.core.CondPre
-  (convert [e _]
-    {:x-oneOf (mapv ->swagger (:schemas e))})
+  (convert [e options]
+    {:x-oneOf (mapv #(->swagger % options) (:schemas e))})
 
   schema.core.Constrained
-  (convert [e _]
-    (->swagger (:schema e)))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   java.util.regex.Pattern
   (convert [e _]
