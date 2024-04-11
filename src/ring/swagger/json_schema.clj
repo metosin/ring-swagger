@@ -142,7 +142,7 @@
        (convert options)
        (merge-meta x options))))
 
-(defn try->swagger [v k key-meta opts]
+(defn- try->swagger [v k key-meta opts]
   (try (->swagger v {:key-meta key-meta ::schema-type (opts->schema-type opts)})
        (catch Exception e
          (throw
