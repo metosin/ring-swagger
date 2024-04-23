@@ -70,8 +70,8 @@ jobs:
           java-version: '11'
       - name: deploy
         env: 
-          CLOJARS_USER: ${{ secrets.CLOJARS_USER }}
-          CLOJARS_TOKEN: ${{ secrets.CLOJARS_TOKEN }}
+          CLOJARS_USER: metosinci
+          CLOJARS_TOKEN: "${{ secrets.CLOJARS_DEPLOY_TOKEN }}"
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           if [[ "$COMMIT_MSG" == "Release :major" ]]; then
