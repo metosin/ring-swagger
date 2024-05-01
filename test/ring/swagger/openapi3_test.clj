@@ -1,4 +1,4 @@
-(ns ring.openapi.openapi3-test
+(ns ring.swagger.openapi3-test
   (:require [clojure.test :refer :all]
             [ring.swagger.openapi3 :refer :all]
             [schema.core :as s]
