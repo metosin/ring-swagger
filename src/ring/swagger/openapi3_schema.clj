@@ -1,4 +1,4 @@
-(ns ring.openapi.openapi3-schema
+(ns ring.swagger.openapi3-schema
   (:require [schema.core :as s]
             [ring.swagger.swagger2-full-schema :refer [opt Info]]))
 

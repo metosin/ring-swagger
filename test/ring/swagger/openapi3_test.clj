@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [ring.swagger.openapi3 :refer :all]
             [schema.core :as s]
-            [ring.openapi.openapi3-schema :as full-schema]
+            [ring.swagger.openapi3-schema :as full-schema]
             [ring.swagger.json-schema :as rsjs]
             [ring.swagger.extension :as extension]
             [ring.swagger.openapi3-validator :as validator]

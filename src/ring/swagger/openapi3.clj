@@ -6,7 +6,7 @@
             [ring.swagger.common :as common]
             [ring.swagger.json-schema :as rsjs]
             [ring.swagger.core :as rsc]
-            [ring.openapi.openapi3-schema :as openapi3-schema]))
+            [ring.swagger.openapi3-schema :as openapi3-schema]))
 
 ;;
 ;; Schema transformations
