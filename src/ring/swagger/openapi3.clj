@@ -1,4 +1,4 @@
-(ns ring.openapi.openapi3
+(ns ring.swagger.openapi3
   (:require [clojure.string :as str]
             [schema.core :as s]
             [schema-tools.core :as stc]

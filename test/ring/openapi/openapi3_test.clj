@@ -1,6 +1,6 @@
 (ns ring.openapi.openapi3-test
   (:require [clojure.test :refer :all]
-            [ring.openapi.openapi3 :refer :all]
+            [ring.swagger.openapi3 :refer :all]
             [schema.core :as s]
             [ring.openapi.openapi3-schema :as full-schema]
             [ring.swagger.json-schema :as rsjs]
