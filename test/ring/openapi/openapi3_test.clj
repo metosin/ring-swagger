@@ -5,7 +5,7 @@
             [ring.openapi.openapi3-schema :as full-schema]
             [ring.swagger.json-schema :as rsjs]
             [ring.swagger.extension :as extension]
-            [ring.openapi.validator :as validator]
+            [ring.swagger.openapi3-validator :as validator]
             [linked.core :as linked]
             [ring.util.http-status :as status]
             [midje.sweet :refer :all])

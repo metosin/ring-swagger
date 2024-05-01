@@ -1,4 +1,4 @@
-(ns ring.openapi.validator
+(ns ring.swagger.openapi3-validator
   (:require [clojure.java.io :as io]
             [scjsv.core :as v]))
 
