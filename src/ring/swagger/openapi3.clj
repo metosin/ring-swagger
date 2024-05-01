@@ -283,7 +283,7 @@
                        :handle-duplicate-schemas-fn rsc/ignore-duplicate-schemas}))
 
 (s/defn openapi-json
-  "Produces openapi-json output from ring-openapi spec.
+  "Produces openapi-json output from ring-swagger openapi3 spec.
    Optional second argument is a options map, supporting
    the following options with defaults:
 
@@ -297,7 +297,7 @@
                                       response descriptions from http status code.
                                       Takes a status code (Int) and returns a String.
 
-   :handle-duplicate-schemas-fn     - (ring.openapi.core/ignore-duplicate-schemas),
+   :handle-duplicate-schemas-fn     - (ring.swagger.core/ignore-duplicate-schemas),
                                       a function to handle possible duplicate schema
                                       definitions. Takes schema-name and set of found
                                       attached schema values as parameters. Returns
