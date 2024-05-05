@@ -50,19 +50,9 @@
    (opt :encoding) {s/Str Encoding}})
 
 (s/defschema Parameter
-  {:name s/Str
-   (opt :in) s/Any
-   (opt :description) s/Str
-   :required s/Bool
-   (opt :deprecated) s/Bool
-   (opt :allowEmptyValue) s/Bool
-   (opt :style) s/Any
-   (opt :explode) s/Bool
-   (opt :allowReserved) s/Bool
-   (opt :schema) OpenApiSchemaPart
-   (opt :example) Example
-   (opt :examples) {s/Str Example}
-   (opt :content) {s/Str MediaObject}})
+  {(opt :query) s/Any
+   (opt :path) s/Any
+   (opt :header) s/Any})
 
 (s/defschema RequestBody
   {(opt :description) s/Str
@@ -101,7 +91,7 @@
    (opt :description) s/Str
    (opt :externalDocs) ExternalDocumentation
    (opt :operationId) s/Str
-   (opt :parameters) s/Any  #_[Parameter]
+   (opt :parameters) [Parameter]
    (opt :requestBody) RequestBody
    (opt :responses) {ResponseCode Response}
    (opt :deprecated) s/Bool
