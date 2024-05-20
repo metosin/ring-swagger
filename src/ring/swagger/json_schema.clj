@@ -14,7 +14,7 @@
 
 (defn- opts->schema-type [opts]
   {:post [(keyword? %)]}
-  (get opts ::schema-type :swagger))
+  (get opts :schema-type :swagger))
 
 ; TODO: remove this in favor of passing it as options
 (def ^:dynamic *ignore-missing-mappings* false)
@@ -28,7 +28,7 @@
 ;;
 
 (defrecord FieldSchema [schema]
-  schema.core.Schema
+  s/Schema
   (spec [_]
     (variant/variant-spec
       spec/+no-precondition+
@@ -85,7 +85,7 @@
   ([e] (reference e nil))
   ([e opts]
    (if-let [schema-name (s/schema-name e)]
-     {:$ref (str (case (opts->schema-type (opts->schema-type opts))
+     {:$ref (str (case (opts->schema-type opts)
                    :swagger "#/definitions/"
                    :openapi "#/components/schemas/")
                  schema-name)}
@@ -143,7 +143,9 @@
        (merge-meta x options))))
 
 (defn- try->swagger [v k key-meta opts]
-  (try (->swagger v (assoc opts :key-meta key-meta))
+  (try (->swagger v (-> opts
+                        (assoc :key-meta key-meta)
+                        (assoc :schema-type (opts->schema-type opts))))
        (catch Exception e
          (throw
            (IllegalArgumentException.
