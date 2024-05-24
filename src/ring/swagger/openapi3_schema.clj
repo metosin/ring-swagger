@@ -50,13 +50,13 @@
    (opt :encoding) {s/Str Encoding}})
 
 (s/defschema Parameter
-  {(opt :query) s/Any
-   (opt :path) s/Any
-   (opt :header) s/Any})
+  {(opt :query)  {s/Any s/Any}
+   (opt :path)   {s/Any s/Any}
+   (opt :header) {s/Any s/Any}})
 
 (s/defschema RequestBody
   {(opt :description) s/Str
-   :content {s/Str MediaObject}
+   :content           {s/Str MediaObject}
    (opt :required) s/Bool})
 
 (s/defschema Link
@@ -91,7 +91,7 @@
    (opt :description) s/Str
    (opt :externalDocs) ExternalDocumentation
    (opt :operationId) s/Str
-   (opt :parameters) [Parameter]
+   (opt :parameters) Parameter
    (opt :requestBody) RequestBody
    (opt :responses) {ResponseCode Response}
    (opt :deprecated) s/Bool

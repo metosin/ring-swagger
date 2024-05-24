@@ -187,10 +187,12 @@
 
   schema.core.Maybe
   (convert [e {:keys [in] :as options}]
-    (let [schema (->swagger (:schema e) options)]
+    (let [schema       (->swagger (:schema e) options)
+          schema-type  (opts->schema-type options)
+          nullable-key (if (= schema-type :openapi) :nullable :x-nullable)]
       (condp contains? in
         #{:query :formData} (assoc schema :allowEmptyValue true)
-        #{nil :body} (assoc schema :x-nullable true)
+        #{nil :body} (assoc schema nullable-key true)
         schema)))
 
   schema.core.Both
@@ -226,11 +228,17 @@
 
   schema.core.ConditionalSchema
   (convert [e options]
-    {:x-oneOf (vec (keep #(->swagger (second %) options) (:preds-and-schemas e)))})
+    (let [schema-type (opts->schema-type options)
+          schema      (vec (keep #(->swagger (second %) options) (:preds-and-schemas e)))
+          schema-key  (if (= schema-type :openapi) :oneOf :x-oneOf)]
+      {schema-key schema}))
 
   schema.core.CondPre
   (convert [e options]
-    {:x-oneOf (mapv #(->swagger % options) (:schemas e))})
+    (let [schema-type (opts->schema-type options)
+          schema      (mapv #(->swagger % options) (:schemas e))
+          schema-key  (if (= schema-type :openapi) :oneOf :x-oneOf)]
+      {schema-key schema}))
 
   schema.core.Constrained
   (convert [e options]
