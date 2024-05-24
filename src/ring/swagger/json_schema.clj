@@ -12,6 +12,10 @@
 (declare properties)
 (declare schema-object)
 
+(defn- opts->schema-type [opts]
+  {:post [(keyword? %)]}
+  (get opts :schema-type :swagger))
+
 ; TODO: remove this in favor of passing it as options
 (def ^:dynamic *ignore-missing-mappings* false)
 
@@ -24,7 +28,7 @@
 ;;
 
 (defrecord FieldSchema [schema]
-  schema.core.Schema
+  s/Schema
   (spec [_]
     (variant/variant-spec
       spec/+no-precondition+
@@ -56,7 +60,7 @@
       (str (if n (str n "/")) (name x)))
     x))
 
-(defmulti convert-class (fn [c options] c))
+(defmulti convert-class (fn [c _] c))
 
 (defprotocol JsonSchema
   (convert [this options]))
@@ -77,11 +81,16 @@
 (defn reference? [m]
   (contains? m :$ref))
 
-(defn reference [e]
-  (if-let [schema-name (s/schema-name e)]
-    {:$ref (str "#/definitions/" schema-name)}
-    (if (not *ignore-missing-mappings*)
-      (not-supported! e))))
+(defn reference
+  ([e] (reference e nil))
+  ([e opts]
+   (if-let [schema-name (s/schema-name e)]
+     {:$ref (str (case (opts->schema-type opts)
+                   :swagger "#/definitions/"
+                   :openapi "#/components/schemas/")
+                 schema-name)}
+     (if (not *ignore-missing-mappings*)
+       (not-supported! e)))))
 
 (defn merge-meta
   [m x {:keys [::no-meta :key-meta]}]
@@ -133,14 +142,15 @@
        (convert options)
        (merge-meta x options))))
 
-(defn- try->swagger [v k key-meta]
-  (try (->swagger v {:key-meta key-meta})
+(defn- try->swagger [v k key-meta opts]
+  (try (->swagger v (-> opts
+                        (assoc :key-meta key-meta)
+                        (assoc :schema-type (opts->schema-type opts))))
        (catch Exception e
          (throw
            (IllegalArgumentException.
              (str "error converting to swagger schema [" k " "
                   (try (s/explain v) (catch Exception _ v)) "]") e)))))
-
 
 (defn- coll-schema [e options]
   (-> {:type "array"
@@ -156,7 +166,7 @@
   Class
   (convert [e options]
     (if-let [schema (common/record-schema e)]
-      (schema-object schema)
+      (schema-object schema options)
       (convert-class e options)))
 
   nil
@@ -164,49 +174,51 @@
     nil)
 
   FieldSchema
-  (convert [e _]
-    (->swagger (:schema e)))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   schema.core.Predicate
-  (convert [e _]
-    (some-> e :pred-name predicate-name-to-class ->swagger))
+  (convert [e options]
+    (some-> e :pred-name predicate-name-to-class (->swagger options)))
 
   schema.core.EnumSchema
-  (convert [e _]
-    (merge (->swagger (class (first (:vs e)))) {:enum (seq (:vs e))}))
+  (convert [e options]
+    (merge (->swagger (class (first (:vs e))) options) {:enum (seq (:vs e))}))
 
   schema.core.Maybe
-  (convert [e {:keys [in]}]
-    (let [schema (->swagger (:schema e))]
+  (convert [e {:keys [in] :as options}]
+    (let [schema       (->swagger (:schema e) options)
+          schema-type  (opts->schema-type options)
+          nullable-key (if (= schema-type :openapi) :nullable :x-nullable)]
       (condp contains? in
         #{:query :formData} (assoc schema :allowEmptyValue true)
-        #{nil :body} (assoc schema :x-nullable true)
+        #{nil :body} (assoc schema nullable-key true)
         schema)))
 
   schema.core.Both
-  (convert [e _]
-    (->swagger (first (:schemas e))))
+  (convert [e options]
+    (->swagger (first (:schemas e)) options))
 
   schema.core.Either
-  (convert [e _]
-    (->swagger (first (:schemas e))))
+  (convert [e options]
+    (->swagger (first (:schemas e)) options))
 
   schema.core.Recursive
-  (convert [e _]
-    (->swagger (:derefable e)))
+  (convert [e options]
+    (->swagger (:derefable e) options))
 
   schema.core.EqSchema
-  (convert [e _]
-    (merge (->swagger (class (:v e)))
+  (convert [e options]
+    (merge (->swagger (class (:v e)) options)
            {:enum [(:v e)]}))
 
   schema.core.NamedSchema
-  (convert [e _]
-    (->swagger (:schema e)))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   schema.core.One
-  (convert [e _]
-    (->swagger (:schema e)))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   schema.core.AnythingSchema
   (convert [_ {:keys [in] :as opts}]
@@ -215,16 +227,22 @@
       {}))
 
   schema.core.ConditionalSchema
-  (convert [e _]
-    {:x-oneOf (vec (keep (comp ->swagger second) (:preds-and-schemas e)))})
+  (convert [e options]
+    (let [schema-type (opts->schema-type options)
+          schema      (vec (keep #(->swagger (second %) options) (:preds-and-schemas e)))
+          schema-key  (if (= schema-type :openapi) :oneOf :x-oneOf)]
+      {schema-key schema}))
 
   schema.core.CondPre
-  (convert [e _]
-    {:x-oneOf (mapv ->swagger (:schemas e))})
+  (convert [e options]
+    (let [schema-type (opts->schema-type options)
+          schema      (mapv #(->swagger % options) (:schemas e))
+          schema-key  (if (= schema-type :openapi) :oneOf :x-oneOf)]
+      {schema-key schema}))
 
   schema.core.Constrained
-  (convert [e _]
-    (->swagger (:schema e)))
+  (convert [e options]
+    (->swagger (:schema e) options))
 
   java.util.regex.Pattern
   (convert [e _]
@@ -241,14 +259,14 @@
     (assoc (coll-schema e options) :uniqueItems true))
 
   clojure.lang.IPersistentMap
-  (convert [e {:keys [properties?]}]
+  (convert [e {:keys [properties?] :as opts}]
     (if properties?
-      {:properties (properties e)}
-      (reference e)))
+      {:properties (properties e opts)}
+      (reference e opts)))
 
   clojure.lang.Var
-  (convert [e _]
-    (reference e)))
+  (convert [e opts]
+    (reference e opts)))
 
 ;;
 ;; Schema to Swagger Schema definitions
@@ -259,45 +277,48 @@
   The result is put into collection of same type as input schema.
   Thus linked/map should keep the order of items. Returnes nil
   if no properties are found."
-  [schema]
-  {:pre [(common/plain-map? schema)]}
-  (let [props (into (empty schema)
-                    (for [[k v] schema
-                          :when (s/specific-key? k)
-                          :let [key-meta (meta k)
-                                k (s/explicit-schema-key k)]
-                          :let [v (try->swagger v k key-meta)]]
-                      (and v [k v])))]
-    (if (seq props)
-      props)))
+  ([schema] (properties schema nil))
+  ([schema opts]
+   {:pre [(common/plain-map? schema)]}
+   (let [props (into (empty schema)
+                     (for [[k v] schema
+                           :when (s/specific-key? k)
+                           :let [key-meta (meta k)
+                                 k (s/explicit-schema-key k)]
+                           :let [v (try->swagger v k key-meta opts)]]
+                       (and v [k v])))]
+     (if (seq props)
+       props))))
 
 (defn additional-properties
   "Generates json-schema additional properties from a plain map
   schema from under key s/Keyword."
-  [schema]
-  {:pre [(common/plain-map? schema)]}
-  (if-let [extra-key (s/find-extra-keys-schema schema)]
-    (let [v (get schema extra-key)]
-      (try->swagger v s/Keyword nil))
-    false))
+  ([schema] (additional-properties schema nil))
+  ([schema opts]
+   {:pre [(common/plain-map? schema)]}
+   (if-let [extra-key (s/find-extra-keys-schema schema)]
+     (let [v (get schema extra-key)]
+       (try->swagger v s/Keyword nil opts))
+     false)))
 
 (defn schema-object
   "Returns a JSON Schema object of a plain map schema."
-  [schema]
-  (if (common/plain-map? schema)
-    (let [properties (properties schema)
-          title (if (not (s/schema-name schema)) (common/title schema))
-          additional-properties (additional-properties schema)
-          meta (json-schema-meta schema)
-          required (some->> (rsc/required-keys schema)
-                            (filter (partial contains? properties))
-                            seq
-                            vec)]
-      (common/remove-empty-keys
-        (merge
-          meta
-          {:type "object"
-           :title title
-           :properties properties
-           :additionalProperties additional-properties
-           :required required})))))
+  ([schema] (schema-object schema nil))
+  ([schema opts]
+   (if (common/plain-map? schema)
+     (let [properties (properties schema opts)
+           title (if (not (s/schema-name schema)) (common/title schema))
+           additional-properties (additional-properties schema opts)
+           meta (json-schema-meta schema)
+           required (some->> (rsc/required-keys schema)
+                             (filter (partial contains? properties))
+                             seq
+                             vec)]
+       (common/remove-empty-keys
+         (merge
+           meta
+           {:type "object"
+            :title title
+            :properties properties
+            :additionalProperties additional-properties
+            :required required}))))))
