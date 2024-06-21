@@ -308,9 +308,11 @@
   (let [Kikka (s/schema-with-name {:a s/Str s/Str s/Str} 'Kikka)
         Kukka (s/schema-with-name {:a s/Str s/Int Kikka} 'Kukka)
         Kakka (s/schema-with-name {s/Keyword Kukka} 'Kakka)
+        Wakka (s/schema-with-name {:message s/Str s/Keyword s/Any} 'Wakka)
         swagger {:paths {"/kikka" {:post {:parameters {:body Kikka}}}
                          "/kukka" {:post {:parameters {:body Kukka}}}
-                         "/kakka" {:post {:parameters {:body Kakka}}}}}
+                         "/kakka" {:post {:parameters {:body Kakka}
+                                          :responses {100 {:schema Wakka}}}}}}
         spec (swagger2/swagger-json swagger)]
     (validate swagger) => nil
 
@@ -334,7 +336,15 @@
       spec => (has-definition
                 'Kakka
                 {:type "object"
-                 :additionalProperties {:$ref "#/definitions/Kukka"}}))))
+                 :additionalProperties {:$ref "#/definitions/Kukka"}}))
+
+    (fact "open Free-Form object"
+          spec => (has-definition
+                    'Wakka
+                    {:type "object"
+                     :properties {:message {:type "string"}}
+                     :required [:message]
+                     :additionalProperties {}}))))
 
 (fact "extra meta-data to properties"
   (let [Kikka (s/schema-with-name {:a (rsjs/field s/Str {:description "A"})

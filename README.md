@@ -243,7 +243,7 @@ of the schema (`nil`, `:query`, `:header`, `:path`, `:formData` and `:body`).
 To support truly symmetric web schemas, one needs also to ensure both JSON Serialization and
 deserialization/coercion from JSON.
 
-### Class-based dispatch
+#### Class-based dispatch
 
 ```clojure
 (require '[ring.swagger.json-schema :as json-schema])
@@ -310,6 +310,29 @@ One can also use the options to create more accurate specs (via the `:in` option
 - Maps are presented as Complex Types and References. Model references are resolved automatically.
   - Nested maps are transformed automatically into flat maps with generated child references
   - Maps can be within valid containers (as only element - heterogeneous schema sequences not supported by the spec)
+
+### Additional Properties, Free-Form Objects
+
+The JSON schema generated for a map is closed (`additionalProperties` is false) unless there are non-keyword map keys, i.e. `s/Keyword` or `s/Str`.
+For example, to create a map of unknown keywords to ints:
+
+```clojure
+(rsjs/schema-object (rsjs/describe {s/Keyword s/Int} "maps keywords to ints"))
+
+; {:type "object"
+;  :description "maps keywords to ints",
+;  :additionalProperties {:format "int64", :type "integer"}}
+```
+
+To create a completely open, [Free-Form](https://swagger.io/docs/specification/data-models/data-types/#free-form) object:
+
+```clojure
+(rsjs/schema-object (rsjs/describe {s/Keyword s/Any} "open map"))
+
+; {:type "object"
+;  :description "open map",
+;  :additionalProperties {}}
+```
 
 ### Missing Schema elements
 
