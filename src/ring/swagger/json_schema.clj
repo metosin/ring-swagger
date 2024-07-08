@@ -257,7 +257,7 @@
 (defn properties
   "Take a map schema and turn them into json-schema properties.
   The result is put into collection of same type as input schema.
-  Thus linked/map should keep the order of items. Returnes nil
+  Thus linked/map should keep the order of items. Returns nil
   if no properties are found."
   [schema]
   {:pre [(common/plain-map? schema)]}
@@ -265,11 +265,10 @@
                     (for [[k v] schema
                           :when (s/specific-key? k)
                           :let [key-meta (meta k)
-                                k (s/explicit-schema-key k)]
-                          :let [v (try->swagger v k key-meta)]]
+                                k (s/explicit-schema-key k)
+                                v (try->swagger v k key-meta)]]
                       (and v [k v])))]
-    (if (seq props)
-      props)))
+    (not-empty props)))
 
 (defn additional-properties
   "Generates json-schema additional properties from a plain map
