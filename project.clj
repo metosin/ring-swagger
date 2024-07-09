@@ -1,4 +1,4 @@
-(defproject metosin/ring-swagger "0.26.3-SNAPSHOT"
+(defproject metosin/ring-swagger "1.0.1-SNAPSHOT"
   :description "Swagger Spec for Ring Apps"
   :url "https://github.com/metosin/ring-swagger"
   :license {:name "Eclipse Public License"
@@ -39,10 +39,10 @@
                                      :username [:gpg :env/clojars_user]
                                      :password [:gpg :env/clojars_token]
                                      :sign-releases false}]
-                        ["releases" {:url "https://clojars.org/repo"
-                                     :username [:gpg :env/clojars_user]
-                                     :password [:gpg :env/clojars_token]
-                                     :sign-releases false}]]
+                        ["release" {:url "https://clojars.org/repo"
+                                    :username [:gpg :env/clojars_user]
+                                    :password [:gpg :env/clojars_token]
+                                    :sign-releases false}]]
   :release-tasks [["clean"]
                   ["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]

@@ -1,5 +1,7 @@
 ## NEXT
 
+## 1.0.0 (30.4.2024)
+
 * Fix memory leaks via multimethods caching default dispatch values: https://github.com/metosin/compojure-api/issues/454
 
 ## 0.26.2 (1.4.2019)
