@@ -160,7 +160,7 @@
 (defn to-responses-defn [responses]
   (into {} (for [[method status-ref-map] responses] [method  (into {} (for [[status [references]] status-ref-map] [status {:$ref references}]))])))
 
-(defn endpoint-processor2 [endpoint]
+(defn endpoint-processor [endpoint]
   (let [backup          (reduce-kv (fn [acc method definition]
                             (let [body-acc      (if (:requestBody definition)
                                                   (let [body-name (-> (get-in definition [:requestBody :content])
@@ -189,19 +189,25 @@
 (defn remove-body-name [{:keys [content]}]
   {:content (into {} (for [[k v] content] [k (dissoc v :name)]))})
 
+(defn remove-response-content-name [content]
+  (for [[k v] content] [k (dissoc v :name)]))
+
+(defn remove-response-name [schemas]
+  (let [responses-schema (flatten (map :responses-schema schemas))]
+    (for [[k v] responses-schema] [k (merge v (remove-response-name v))])))
+
 (defn move-schemas [swagger]
   (let [paths (or (:paths swagger) {})
-        map-req-resp-schemas (for [[k v] paths] [k (endpoint-processor2 v)])
+        map-req-resp-schemas (for [[k v] paths] [k (endpoint-processor v)])
         updated-paths (into {} (for [[k v] map-req-resp-schemas] [k (:endpoint v)]))
         all-schemas (for [[_ v] map-req-resp-schemas] [(dissoc v :endpoint)])
         request-bodies  (into {} (flatten (mapv (fn [x] (map :requestBodySchemas x)) (vec all-schemas))))
         request-bodies  (into {} (for [[body-name schema] request-bodies] [body-name (remove-body-name schema)]))
-        responses-schema (into {} (flatten (map (fn [x] (map :responses-schema x)) (vec all-schemas))))
+        responses-schema (into {} (flatten (map remove-response-name (vec all-schemas))))
         swagger-new       (-> swagger
                               (assoc :paths updated-paths)
                               (assoc-in [:components :responses] responses-schema)
                               (assoc-in [:components :requestBodies] request-bodies))]
-    (clojure.pprint/pprint request-bodies)
     swagger-new))
 
 ;;
