@@ -30,7 +30,7 @@
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}
              :1.10 {:dependencies [[org.clojure/clojure "1.10.1"]]}
              :1.11 {:dependencies [[org.clojure/clojure "1.11.1"]]}
-             :1.12 {:dependencies [[org.clojure/clojure "1.12.0-alpha5"]]}}
+             :1.12 {:dependencies [[org.clojure/clojure "1.12.0"]]}}
   :codeina {:sources ["src"]
             :target "gh-pages/doc"
             :src-uri "http://github.com/metosin/ring-swagger/blob/master/"
