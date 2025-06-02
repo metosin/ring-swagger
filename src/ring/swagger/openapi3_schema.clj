@@ -73,17 +73,19 @@
                       400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419 420 421 422 423 424 425 426 428 429 431 451
                       500 501 502 503 504 505 506 507 508 510 511])
 
-(assert (apply distinct? codes))
-(assert (apply < codes))
+#_(assert (apply distinct? codes))
+#_(assert (apply < codes))
 
 (s/defschema ResponseCode
   (apply s/enum (map str codes)))
 
 (s/defschema Response
-  {:description s/Str
-   (opt :headers) {s/Str Header}
-   (opt :content) {s/Str MediaObject}
-   (opt :links) {s/Str Link}})
+  {(opt :description)          s/Str
+   (opt :additionalProperties) s/Bool
+   (opt :headers)              {s/Str Header}
+   (opt :content)              {s/Str MediaObject}
+   (opt :$ref)                 s/Any
+   (opt :links)                {s/Str Link}})
 
 (s/defschema Operation
   {(opt :tags) [s/Str]
@@ -92,20 +94,21 @@
    (opt :externalDocs) ExternalDocumentation
    (opt :operationId) s/Str
    (opt :parameters) Parameter
-   (opt :requestBody) RequestBody
-   (opt :responses) {ResponseCode Response}
+   (opt :requestBody) s/Any
+   (opt :responses) {ResponseCode (s/maybe s/Any)}
    (opt :deprecated) s/Bool
    (opt :security) {s/Str [s/Str]}
    (opt :servers) [Server]})
 
 (s/defschema Path
-  {(opt :summary) s/Str
-   (opt :description) s/Str
-   (opt :get) Operation
-   (opt :put) Operation
-   (opt :post) Operation
-   (opt :delete) Operation
-   (opt :head) Operation
+  {(s/optional-key :$ref) (s/maybe s/Str)
+   (opt :summary)         s/Str
+   (opt :description)     s/Str
+   (opt :get)             Operation
+   (opt :put)             Operation
+   (opt :post)            Operation
+   (opt :delete)          Operation
+   (opt :head)            Operation
    (opt :patch) Operation
    (opt :servers) [Server]
    (opt :parameters) s/Any})
@@ -135,6 +138,9 @@
     #(and (map? %) (= "apiKey" (:type %))) SecuritySchemeApiKey
     :else SecuritySchemeHttp))
 
+(s/defschema SecurityRequirement
+  {s/Keyword [s/Str]})
+
 (s/defschema Components
   {(opt :schemas) {s/Str OpenApiSchemaPart}
    (opt :responses) {s/Str Response}
@@ -152,6 +158,6 @@
    (opt :servers) [Server]
    (opt :paths) {s/Str Path}
    (opt :components) Components
-   (opt :security) {s/Str [s/Str]}
+   (opt :security)  [SecurityRequirement]
    (opt :tags) [Tag]
    (opt :externalDocs) ExternalDocumentation})

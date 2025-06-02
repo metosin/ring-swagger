@@ -172,7 +172,7 @@
                                                         (update-in [:requestBodyDefinitions method] conj (str "#/components/requestBodies/" body-name)))) acc)
                                   responses-acc (reduce-kv (fn [acc-res k v]
                                                              (let [response-path (get-response-ref v)
-                                                                   response-name (last (.split response-path "/"))
+                                                                   response-name (if response-path (last (.split response-path "/")) (gensym))
                                                                    response-path-val (keyword response-name)]
                                                                (-> acc-res
                                                                    (update-in [:responses method k] conj response-path)
@@ -186,28 +186,28 @@
                                           (assoc-in acc [http-method :requestBody] {:$ref schema-reference})) response-refs-updated (:requestBodyDefinitions backup))]
     {:requestBodySchemas (:requestBodySchemas backup) :responses-schema (:responses-schema backup) :endpoint req-body-refs-updated}))
 
-(defn remove-body-name [{:keys [content]}]
+(defn remove-req-body-name [{:keys [content]}]
   {:content (into {} (for [[k v] content] [k (dissoc v :name)]))})
 
-(defn remove-response-content-name [content]
-  (for [[k v] content] [k (dissoc v :name)]))
+(defn remove-response-content-name [{:keys [content] :as schema}]
+  (merge schema {:content (into {} (for [[k v] content] [k (dissoc v :name)]))}))
 
 (defn remove-response-name [schemas]
   (let [responses-schema (flatten (map :responses-schema schemas))]
-    (for [[k v] responses-schema] [k (merge v (remove-response-name v))])))
+    (for [[k v] (into {} responses-schema)] {k (remove-response-content-name v)})))
 
 (defn move-schemas [swagger]
   (let [paths (or (:paths swagger) {})
         map-req-resp-schemas (for [[k v] paths] [k (endpoint-processor v)])
         updated-paths (into {} (for [[k v] map-req-resp-schemas] [k (:endpoint v)]))
-        all-schemas (for [[_ v] map-req-resp-schemas] [(dissoc v :endpoint)])
-        request-bodies  (into {} (flatten (mapv (fn [x] (map :requestBodySchemas x)) (vec all-schemas))))
-        request-bodies  (into {} (for [[body-name schema] request-bodies] [body-name (remove-body-name schema)]))
-        responses-schema (into {} (flatten (map remove-response-name (vec all-schemas))))
-        swagger-new       (-> swagger
-                              (assoc :paths updated-paths)
-                              (assoc-in [:components :responses] responses-schema)
-                              (assoc-in [:components :requestBodies] request-bodies))]
+        all-schemas (vec (for [[_ v] map-req-resp-schemas] [(dissoc v :endpoint)]))
+        request-bodies (into {} (flatten (mapv (fn [x] (map :requestBodySchemas x)) all-schemas)))
+        request-bodies (into {} (for [[body-name schema] request-bodies] [body-name (remove-req-body-name schema)]))
+        responses-schema (into {} (flatten (mapv remove-response-name all-schemas)))
+        swagger-new (-> swagger
+                        (assoc :paths updated-paths)
+                        (assoc-in [:components :responses] responses-schema)
+                        (assoc-in [:components :requestBodies] request-bodies))]
     swagger-new))
 
 ;;
@@ -314,14 +314,15 @@
                                       Possible values: multi, ssv, csv, tsv, pipes."
   ([openapi :- (s/maybe OpenApi)] (openapi-json openapi nil))
   ([openapi :- (s/maybe OpenApi), options :- (s/maybe Options)]
-   (let [options (merge option-defaults options)]
-     (binding [rsjs/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
-       (let [[paths definitions] (-> openapi
-                                     ensure-body-and-response-schema-names
-                                     (extract-paths-and-definitions options))]
-         (common/deep-merge
-          openapi-defaults
-          (-> openapi
-              (assoc :paths paths)
-              (assoc-in [:components :schemas] definitions)
-              (security-operations))))))))
+   (move-schemas
+     (let [options (merge option-defaults options)]
+       (binding [rsjs/*ignore-missing-mappings* (true? (:ignore-missing-mappings? options))]
+         (let [[paths definitions] (-> openapi
+                                       ensure-body-and-response-schema-names
+                                       (extract-paths-and-definitions options))]
+           (common/deep-merge
+             openapi-defaults
+             (-> openapi
+                 (assoc :paths paths)
+                 (assoc-in [:components :schemas] definitions)
+                 (security-operations)))))))))

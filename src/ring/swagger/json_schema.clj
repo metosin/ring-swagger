@@ -189,9 +189,10 @@
   (convert [e {:keys [in] :as options}]
     (let [schema       (->swagger (:schema e) options)
           schema-type  (opts->schema-type options)
-          nullable-key (if (= schema-type :openapi) :nullable :x-nullable)]
+          is-openapi?  (= schema-type :openapi)
+          nullable-key (if is-openapi? :nullable :x-nullable)]
       (condp contains? in
-        #{:query :formData} (assoc schema :allowEmptyValue true)
+        #{:query :formData} (if is-openapi? schema (assoc schema :allowEmptyValue true))
         #{nil :body} (assoc schema nullable-key true)
         schema)))
 
