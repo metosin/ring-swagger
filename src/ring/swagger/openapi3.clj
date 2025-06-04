@@ -80,7 +80,7 @@
                           (cond-> headers (update-in [:headers] (fn [headers]
                                                                   (if headers
                                                                     (->> (for [[k v] headers]
-                                                                           [k (rsjs/->swagger v (into options openapi-opts))])
+                                                                           [k {:schema (rsjs/->swagger v (into options openapi-opts))}])
                                                                          (into {}))))))
                           (update-in [:description] #(or %
                                                          (:description (rsjs/json-schema-meta v))
