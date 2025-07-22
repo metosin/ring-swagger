@@ -1,6 +1,6 @@
 # Ring-Swagger [![Build Status](https://travis-ci.org/metosin/ring-swagger.svg?branch=master)](https://travis-ci.org/metosin/ring-swagger) [![Downloads](https://versions.deps.co/metosin/ring-swagger/downloads.svg)](https://versions.deps.co/metosin/ring-swagger)
 
-[Swagger](http://swagger.io/) 2.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema) (support for [clojure.spec](http://clojure.org/about/spec) via [spec-tools](https://github.com/metosin/spec-tools)).
+[Swagger](http://swagger.io/) 2.0/[OpenApi](https://spec.openapis.org/oas/v3.0.3.html) 3.0 implementation for Clojure/Ring using [Plumatic Schema](https://github.com/Plumatic/schema) (support for [clojure.spec](http://clojure.org/about/spec) via [spec-tools](https://github.com/metosin/spec-tools)).
 
 - Transforms deeply nested Schemas into Swagger JSON Schema definitions
 - Extended & symmetric JSON & String serialization & coercion
@@ -37,7 +37,7 @@ The Schema allows mostly any extra keys as ring-swagger tries not to be on your 
 
 [API Docs](http://metosin.github.io/ring-swagger/doc/).
 
-### Simplest possible example
+### Simplest possible example for swagger 2.0
 
 ```clojure
 (require '[ring.swagger.swagger2 :as rs])
@@ -51,8 +51,34 @@ The Schema allows mostly any extra keys as ring-swagger tries not to be on your 
 ;  :paths {},
 ;  :definitions {}}
 ```
+### Simplest possible example for openapi 3.0
 
-### More complete example
+```clojure
+(require '[ring.swagger.openapi3 :as rs])
+(rs/openapi-json {:info         {:version        "version"
+                                 :title          "title"
+                                 :description    "description"
+                                 :termsOfService "jeah"
+                                 :contact        {:name  "name"
+                                                  :url   "http://someurl.com"
+                                                  :email "tommi@example.com"}
+                                 :license        {:name "name"
+                                                  :url  "http://someurl.com"}}
+                  :paths {}})
+;{:openapi "3.0.3"
+; :info {:title "title"
+;        :version "version"
+;        :description "description"
+;        :termsOfService "jeah"
+;        :contact {:name "name" :url "http://someurl.com" :email "tommi@example.com"}
+;        :license {:name "name" :url "http://someurl.com"}}
+; :paths {}
+; :components {:schemas {}
+;              :securitySchemes {} 
+;              :responses {} 
+;              :requestBodies {}}}
+```
+### More complete example for swagger 2.0
 
 Info, tags, routes and anonymous nested schemas.
 
@@ -129,6 +155,64 @@ Info, tags, routes and anonymous nested schemas.
 ;                                                            :enum (:tre :hki)}},
 ;                               :additionalProperties false,
 ;                               :required (:street :city)}}}
+```
+### More complete example for openapi 3.x
+```clojure
+(require '[schema.core :as s])
+(require '[ring.swagger.openapi3 :as rs])
+
+(s/defschema User {:id s/Str,
+                   :name s/Str
+                   :address {:street s/Str
+                             :city (s/enum :tre :hki)}})
+
+
+(rs/openapi-json {:info         {:version        "version"
+                                 :title          "title"
+                                 :description    "description"
+                                 :termsOfService "jeah"
+                                 :contact        {:name  "name"
+                                                  :url   "http://someurl.com"
+                                                  :email "tommi@example.com"}
+                                 :license        {:name "name"
+                                                  :url  "http://someurl.com"}}
+                  :paths {"/api"
+                          {:post
+                           {:requestBody {:content {"application/json" User}}
+                            :responses   {200 {:description "ok"
+                                               :content {"application/json" {:schema User}}}}}}}})
+;{:openapi "3.0.3",
+; :info {:title "title",
+;        :version "version",
+;        :description "description",
+;        :termsOfService "jeah",
+;        :contact {:name "name", :url "http://someurl.com", :email "tommi@example.com"},
+;        :license {:name "name", :url "http://someurl.com"}},
+; :paths {"/api" {:post {:requestBody {:$ref "#/components/requestBodies/User"},
+;                        :responses {200 {:$ref "#/components/responses/Response7944"}}}}},
+; :components {:schemas {"Response7944" {:type "object",
+;                                        :properties {:schema {:$ref "#/components/schemas/User"}},
+;                                        :additionalProperties false,
+;                                        :required [:schema]},
+;                        "Response7944SchemaAddress" {:type "object",
+;                                                     :properties {:street {:type "string"},
+;                                                                  :city {:type "string", :enum (:tre :hki)}},
+;                                                     :additionalProperties false,
+;                                                     :required [:street :city]},
+;                        "User" {:type "object",
+;                                :properties {:id {:type "string"},
+;                                             :name {:type "string"},
+;                                             :address {:$ref "#/components/schemas/UserAddress"}},
+;                                :additionalProperties false,
+;                                :required [:id :name :address]},
+;                        "UserAddress" {:type "object",
+;                                       :properties {:street {:type "string"}, :city {:type "string", :enum (:tre :hki)}},
+;                                       :additionalProperties false,
+;                                       :required [:street :city]}},
+;              :securitySchemes {},
+;              :responses {:Response7944 {:description "ok",
+;                                         :content {"application/json" {:schema {:$ref "#/components/schemas/Response7944"}}}}},
+;              :requestBodies {:User {:content {"application/json" {:schema {:$ref "#/components/schemas/User"}}}}}}}
 ```
 
 producing the following ui:

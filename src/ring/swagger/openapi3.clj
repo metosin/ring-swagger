@@ -171,8 +171,8 @@
                                                         (update-in [:requestBodySchemas] conj {(keyword body-name) (:requestBody definition)})
                                                         (update-in [:requestBodyDefinitions method] conj (str "#/components/requestBodies/" body-name)))) acc)
                                   responses-acc (reduce-kv (fn [acc-res k v]
-                                                             (let [response-path (get-response-ref v)
-                                                                   response-name (if response-path (last (.split response-path "/")) (gensym))
+                                                             (let [response-path ^String (get-response-ref v)
+                                                                   response-name ^String (if response-path (last (.split response-path "/")) (gensym))
                                                                    response-path-val (keyword response-name)]
                                                                (-> acc-res
                                                                    (update-in [:responses method k] conj response-path)
