@@ -148,7 +148,7 @@
       transformed)
     route))
 
-(defn get-response-ref [v]
+(defn get-response-ref ^String [v]
   (some-> (-> v
               :content
               vals
