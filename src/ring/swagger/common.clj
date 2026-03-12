@@ -1,5 +1,6 @@
 (ns ring.swagger.common
-  (:require [plumbing.core :as p]
+  (:require [clojure.string :as str]
+            [plumbing.core :as p]
             [schema.utils :as su]
             [schema.core :as s]))
 
@@ -94,3 +95,25 @@
       (into-array Class []))
     object
     (object-array 0)))
+
+(defn java-invoke-first
+  "Tries to invoke a method on the object using the first class name that
+   can be resolved and is compatible with the given object. Useful when the
+   same interface exists under multiple package names (e.g. javax.servlet
+   vs jakarta.servlet)."
+  [class-names method-name object]
+  (loop [[class-name & more] class-names
+         last-error nil]
+    (if class-name
+      (let [result (try
+                     (java-invoke class-name method-name object)
+                     (catch ClassNotFoundException e
+                       (if (seq more) ::not-found (throw e)))
+                     (catch IllegalArgumentException e
+                       (if (seq more) ::not-found (throw e))))]
+        (if (= result ::not-found)
+          (recur more nil)
+          result))
+      (throw (IllegalArgumentException.
+               (str "None of the classes [" (str/join ", " class-names)
+                    "] matched the object of type " (.getName (class object))))))))
