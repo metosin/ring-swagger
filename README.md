@@ -16,7 +16,7 @@
 
 The [CHANGELOG](https://github.com/metosin/ring-swagger/blob/master/CHANGELOG.md).
 
-Requires Java 1.8+
+Requires Java 11+
 
 ## Web libs using Ring-Swagger
 
@@ -74,8 +74,8 @@ The Schema allows mostly any extra keys as ring-swagger tries not to be on your 
 ;        :license {:name "name" :url "http://someurl.com"}}
 ; :paths {}
 ; :components {:schemas {}
-;              :securitySchemes {} 
-;              :responses {} 
+;              :securitySchemes {}
+;              :responses {}
 ;              :requestBodies {}}}
 ```
 ### More complete example for swagger 2.0
