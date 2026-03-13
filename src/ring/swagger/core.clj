@@ -154,7 +154,10 @@
    servlet-context in the legacy app-server environments."
   [{:keys [servlet-context]}]
   (if servlet-context
-    (common/java-invoke "javax.servlet.ServletContext" "getContextPath" servlet-context)
+    (common/java-invoke-first ["javax.servlet.ServletContext"
+                               "jakarta.servlet.ServletContext"]
+                               "getContextPath"
+                               servlet-context)
     ""))
 
 (defn basepath
