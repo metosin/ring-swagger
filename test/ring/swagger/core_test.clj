@@ -99,7 +99,8 @@
 
 (fact "(servlet-)context"
   (rsc/context {}) => ""
-  (rsc/context {:servlet-context (test-utils/fake-servlet-context "/kikka")}) => "/kikka")
+  (rsc/context {:servlet-context (test-utils/fake-servlet-context "/kikka")}) => "/kikka"
+  (rsc/context {:servlet-context (test-utils/fake-jakarta-servlet-context "/jakarta")}) => "/jakarta")
 
 (fact "basepath"
   (fact "http"

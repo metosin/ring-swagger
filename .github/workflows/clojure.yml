@@ -14,7 +14,7 @@ jobs:
   test:
     strategy:
       matrix:
-        jdk: [8, 11, 17, 21]
+        jdk: [11, 17, 21]
 
     name: Java ${{ matrix.jdk }}
 
@@ -68,14 +68,18 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@3fe9b3ae632c6758d0b7757b0838606ef4287b08 #13.4
+        with:
+          lein: 2.11.2
       - name: deploy
-        env: 
+        env:
           CLOJARS_USER: metosinci
           CLOJARS_TOKEN: "${{ secrets.CLOJARS_DEPLOY_TOKEN }}"
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          git config --global user.email "abonnairesergeant@gmail.com"
-          git config --global user.name "Ambrose Bonnaire-Sergeant"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
 
           if [[ "$COMMIT_MSG" == "Release :major" ]]; then
             lein release :major
