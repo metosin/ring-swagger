@@ -2,6 +2,19 @@
 
 * Support Jakarta Servlet API for servlet context resolution (eg. for Jetty 12) [#154](https://github.com/metosin/ring-swagger/pull/154)
 * Drop support for Java 8
+* Updated deps:
+```
+[cheshire "6.2.0"] is available but we use "5.8.1"
+[metosin/ring-http-response "0.9.5"] is available but we use "0.9.1"
+[ring/ring-core "1.15.3"] is available but we use "1.7.1"
+[metosin/schema-tools "0.13.1"] is available but we use "0.11.0"
+[prismatic/schema "1.4.1"] is available but we use "1.1.10"
+[prismatic/plumbing "0.6.0"] is available but we use "0.5.5"
+[metosin/scjsv "0.6.2"] is available but we use "0.5.0"
+[clj-time "0.15.2"] is available but we use "0.15.1"
+[potemkin "0.4.9"] is available but we use "0.4.5"
+[org.clojure/clojure "1.12.4"] is available but we use "1.12.0"
+```
 
 ## 1.0.0 (30.4.2024)
 
