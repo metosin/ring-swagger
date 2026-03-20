@@ -1,6 +1,6 @@
 ## NEXT
 
-## 1.1.0 (30.4.2026)
+## 1.1.0 (20.3.2026)
 
 * **BREAKING** Drop support for Java 8
 * Support Jakarta Servlet API for servlet context resolution (eg. for Jetty 12) [#154](https://github.com/metosin/ring-swagger/pull/154)
