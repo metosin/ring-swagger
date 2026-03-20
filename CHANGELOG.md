@@ -1,5 +1,8 @@
 ## NEXT
 
+* Support Jakarta Servlet API for servlet context resolution (eg. for Jetty 12) [#154](https://github.com/metosin/ring-swagger/pull/154)
+* Drop support for Java 8
+
 ## 1.0.0 (30.4.2024)
 
 * Fix memory leaks via multimethods caching default dispatch values: https://github.com/metosin/compojure-api/issues/454
